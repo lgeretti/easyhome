@@ -23,9 +23,9 @@ public class ClientAccess {
         PushRenderer.addCurrentSession(PUSH_GROUP);
     }
     
-    public void doIncreaseCounter() {
-        PushRenderer.render(PUSH_GROUP);
+    public void doIncreaseCounter() {        
         counter.doIncrease();
+        PushRenderer.render(PUSH_GROUP);
     }
     
     public int getCount() {
