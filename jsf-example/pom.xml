@@ -2,10 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>it.uniud.easyhome</groupId>
     <artifactId>jsf-example</artifactId>
     <packaging>war</packaging>
-    <version>1.0</version>
     <name>JSF Example</name>
 
     <parent>
@@ -13,8 +11,40 @@
         <artifactId>common</artifactId>
         <version>1.0</version>
     </parent>
+    
+    <properties>
+        <ice.version>3.0.1</ice.version>
+    </properties>
+    
+    <repositories>
+        <repository>
+            <id>ICEsoft Release Repository</id>
+            <url>http://anonsvn.icefaces.org/repo/maven2/releases</url>
+        </repository>
+    </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>org.icefaces</groupId>
+            <artifactId>icefaces</artifactId>
+            <version>${ice.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.icefaces</groupId>
+            <artifactId>icefaces-ace</artifactId>
+            <version>${ice.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.icepush</groupId>
+            <artifactId>icepush</artifactId>
+            <version>${ice.version}</version>
+        </dependency>    
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+            <scope>provided</scope>
+        </dependency>        
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>javax.persistence</artifactId>
