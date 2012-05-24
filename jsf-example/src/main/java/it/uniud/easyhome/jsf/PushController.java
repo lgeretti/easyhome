@@ -8,7 +8,7 @@ import org.icefaces.application.PushRenderer;
 
 @ManagedBean
 @ViewScoped
-public class ClientAccess {
+public class PushController {
     
     private static final String PUSH_GROUP = "everyone";
 
@@ -19,8 +19,8 @@ public class ClientAccess {
     // =           Public Methods           =
     // ======================================
 
-    public ClientAccess() {
-        PushRenderer.addCurrentSession(PUSH_GROUP);
+    public PushController() {
+        PushRenderer.addCurrentView(PUSH_GROUP);
     }
     
     public void doIncreaseCounter() {        
@@ -35,8 +35,5 @@ public class ClientAccess {
     public void setCounter(Counter counter) {
         this.counter = counter;
     }
-    
-    public Counter getCounter() {
-        return this.counter;
-    }
+
 }

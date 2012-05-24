@@ -8,9 +8,9 @@
 </h:head>
 <h:body>
     <h:form>
-        <i>Count: </i><h:outputText value="#{clientAccess.counter.count}"/>
+        <i>Count: </i><h:outputText value="#{pushController.count}"/>
         <br/>
-        <h:commandButton value="Increase" action="#{clientAccess.doIncreaseCounter}"/>
+        <h:commandButton value="Increase" action="#{pushController.doIncreaseCounter}"/>
     </h:form>
     <hr/>
 </h:body>
