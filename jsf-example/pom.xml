@@ -29,32 +29,17 @@
             <artifactId>icefaces</artifactId>
             <version>${ice.version}</version>
         </dependency>
+        <!--
         <dependency>
             <groupId>org.icefaces</groupId>
             <artifactId>icefaces-ace</artifactId>
             <version>${ice.version}</version>
-        </dependency>
+        </dependency> -->
         <dependency>
             <groupId>org.icepush</groupId>
             <artifactId>icepush</artifactId>
             <version>${ice.version}</version>
-        </dependency>    
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
-            <scope>provided</scope>
-        </dependency>        
-        <dependency>
-            <groupId>org.eclipse.persistence</groupId>
-            <artifactId>javax.persistence</artifactId>
-            <version>${javax.persistence-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.persistence</groupId>
-            <artifactId>eclipselink</artifactId>
-            <version>${eclipselink-version}</version>
-        </dependency>
+        </dependency>  
         <dependency>
             <groupId>javax.faces</groupId>
             <artifactId>jsf-api</artifactId>
