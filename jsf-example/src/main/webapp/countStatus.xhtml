@@ -2,7 +2,8 @@
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:f="http://java.sun.com/jsf/core">
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
 <h:head>
     <title>Count status</title>
 </h:head>
@@ -10,7 +11,8 @@
     <h:form>
         <i>Count: </i><h:outputText value="#{pushController.count}"/>
         <br/>
-        <h:commandButton value="Increase" action="#{pushController.doIncreaseCounter}"/>
+        <!-- <h:commandButton value="Increase" action="#{pushController.doIncreaseCounter}"/> -->
+        <p:commandButton action="#{pushController.doIncreaseCounter}" value="Increase" />
     </h:form>
     <hr/>
 </h:body>

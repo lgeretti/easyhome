@@ -1,12 +1,13 @@
 package it.uniud.easyhome.jsf;
 
+import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 
 import org.icefaces.application.PushRenderer;
 
-@ManagedBean
+@ManagedBean(eager = true)
 @ViewScoped
 public class PushController {
     
@@ -14,12 +15,9 @@ public class PushController {
 
     @ManagedProperty(value="#{counter}")
     private Counter counter;
-    
-    // ======================================
-    // =           Public Methods           =
-    // ======================================
 
-    public PushController() {
+    @PostConstruct
+    public void init() {
         PushRenderer.addCurrentView(PUSH_GROUP);
     }
     
@@ -36,4 +34,4 @@ public class PushController {
         this.counter = counter;
     }
 
-}
+}   
