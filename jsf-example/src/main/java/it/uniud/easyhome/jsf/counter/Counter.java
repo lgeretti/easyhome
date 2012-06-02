@@ -1,4 +1,4 @@
-package it.uniud.easyhome.jsf;
+package it.uniud.easyhome.jsf.counter;
 
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;

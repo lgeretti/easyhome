@@ -1,4 +1,4 @@
-package it.uniud.easyhome.jsf;
+package it.uniud.easyhome.jsf.counter;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;

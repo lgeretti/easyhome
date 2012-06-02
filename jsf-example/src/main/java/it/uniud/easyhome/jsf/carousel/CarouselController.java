@@ -1,4 +1,5 @@
-package it.uniud.easyhome.jsf;
+package it.uniud.easyhome.jsf.carousel;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,9 +7,10 @@ import java.util.UUID;
 
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
 
 @ManagedBean
-@ApplicationScoped
+@ViewScoped
 public class CarouselController {
     
     private static String[] colors, manufacturers;
@@ -49,6 +51,15 @@ public class CarouselController {
     private void populateRandomCars(List<Car> list, int size) {
         for(int i = 0 ; i < size ; i++)
             list.add(new Car(getRandomModel(), getRandomYear(), getRandomManufacturer(), getRandomColor()));
+    }
+    
+    public void doIncreaseCars() {
+        carsSmall.add(new Car(getRandomModel(), getRandomYear(), getRandomManufacturer(), getRandomColor()));
+    }
+
+    public void doDecreaseCars() {
+        if (!carsSmall.isEmpty())
+            carsSmall.remove(carsSmall.size()-1);
     }
     
     public List<Car> getCarsSmall() {

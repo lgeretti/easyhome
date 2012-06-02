@@ -1,4 +1,4 @@
-package it.uniud.easyhome.jsf;
+package it.uniud.easyhome.jsf.carousel;
 
 public class Car {
 
