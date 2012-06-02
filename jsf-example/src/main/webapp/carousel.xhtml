@@ -9,7 +9,7 @@
     <title>Carousel</title>
 </h:head>
 <h:body>
-<p:carousel id="basicCarousel" value="#{carouselController.carsSmall}" var="car" itemStyleClass="carItem">
+<p:carousel id="basicCarousel" value="#{carouselController.cars.content}" var="car" itemStyleClass="carItem">
     <f:facet name="header">
             Cars
     </f:facet>
@@ -21,7 +21,7 @@
         <h:outputText value="Color: #{car.color}" />
     </h:panelGrid>
     <f:facet name="footer">
-            In total there are #{fn:length(carouselController.carsSmall)} cars.
+            In total there are #{fn:length(carouselController.cars.content)} cars.
     </f:facet>
 </p:carousel>
 </h:body>

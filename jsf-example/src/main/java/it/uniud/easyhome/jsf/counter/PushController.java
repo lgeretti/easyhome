@@ -7,11 +7,11 @@ import javax.faces.bean.ViewScoped;
 
 import org.icefaces.application.PushRenderer;
 
-@ManagedBean(eager = true)
-@ViewScoped
+@ManagedBean
+@ViewScoped 
 public class PushController {
     
-    private static final String PUSH_GROUP = "everyone";
+    private static final String PUSH_GROUP = "counter";
 
     @ManagedProperty(value="#{counter}")
     private Counter counter;
