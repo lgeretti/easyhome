@@ -1,5 +1,7 @@
 package it.uniud.easyhome.jsf.carousel;
 
+import it.uniud.easyhome.jsf.common.CarList;
+
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;

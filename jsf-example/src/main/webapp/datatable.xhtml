@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+      xmlns:ace="http://www.icefaces.org/icefaces/components">
+<h:head>
+    <title>Carousel</title>
+</h:head>
+<h:body>
+ <h:form id="form">
+  <ace:dataTable id="carTable"
+              value="#{carouselController.cars.content}"
+              var="car"
+              paginator="true"
+              paginatorPosition="bottom"
+              rows="10">
+    <ace:column id="model" headerText="Model" sortBy="#{car.model}"
+                filterBy="#{car.model}" filterMatchMode="contains">
+        <h:outputText id="modelCell" value="#{car.model}"/>
+    </ace:column>
+    <ace:column id="year" headerText="Year" sortBy="#{car.year}"
+                filterBy="#{car.year}" filterMatchMode="contains">
+        <h:outputText id="yearCell" value="#{car.year}"/>
+    </ace:column>
+    <ace:column id="manufacturer" headerText="Manufacturer" sortBy="#{car.manufacturer}"
+                filterBy="#{car.manufacturer}" filterMatchMode="contains">
+        <h:outputText id="manufacturerCell" value="#{car.manufacturer}"/>
+    </ace:column>
+    <ace:column id="color" headerText="Color" sortBy="#{car.color}"
+                filterBy="#{car.color}" filterMatchMode="contains">
+        <h:outputText id="colorCell" value="#{car.color}"/>
+    </ace:column>
+  </ace:dataTable>
+ </h:form> 
+</h:body>
+</html>

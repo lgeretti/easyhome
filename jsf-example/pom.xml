@@ -40,12 +40,11 @@
             <artifactId>icefaces</artifactId>
             <version>${ice.version}</version>
         </dependency>
-        <!--
         <dependency>
             <groupId>org.icefaces</groupId>
             <artifactId>icefaces-ace</artifactId>
             <version>${ice.version}</version>
-        </dependency> -->
+        </dependency>
         <dependency>
             <groupId>org.icepush</groupId>
             <artifactId>icepush</artifactId>
