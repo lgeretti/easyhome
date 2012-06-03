@@ -4,18 +4,12 @@
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core">
 <h:head>
-    <title>Counter</title>
-    <script type="text/javascript" src="script/jquery-1.7.2.min.js"></script>
-    <script type="text/javascript" src="script/jquery.icepush.js"></script>
-    <script type="text/javascript" src="script/counter-addition.js"></script>
+    <title>Counter2</title>
 </h:head>
 <h:body>
     <h:form>
-        <i>Count: </i><h:outputText value="#{pushController.count}"/>
-        <br/>
         <h:commandButton value="Increase" action="#{pushController.doIncreaseCounter}"/>
     </h:form>
     <hr/>
-    <p class="pushedText">Number of pushes: </p>
 </h:body>
 </html>

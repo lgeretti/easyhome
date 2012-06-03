@@ -7,22 +7,20 @@
       xmlns:p="http://primefaces.org/ui">
 <h:head>
     <title>Carousel</title>
+    <script type="text/javascript" src="script/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="script/jquery.icepush.js"></script>
+    <script type="text/javascript" src="script/jcarousellite_1.0.1.js"></script>
+    <script type="text/javascript" src="script/carousel-addition.js"></script>    
 </h:head>
 <h:body>
-<p:carousel id="basicCarousel" value="#{carouselController.cars.content}" var="car" itemStyleClass="carItem">
-    <f:facet name="header">
-            Cars
-    </f:facet>
-    <h:panelGrid columns="1" style="width:100%" cellpadding="5">        
-        <h:outputText value="Model: #{car.model}" />
+
+<p>Number of cars: <h:outputText value="#{fn:length(carouselController.cars.content)}" /></p>
+<p class="pushedText">Number of pushes: </p>
+<button class="prev">&lt;</button>
+<button class="next">&gt;</button>
         
-        <h:outputText value="Year: #{car.year}" />
-        
-        <h:outputText value="Color: #{car.color}" />
-    </h:panelGrid>
-    <f:facet name="footer">
-            In total there are #{fn:length(carouselController.cars.content)} cars.
-    </f:facet>
-</p:carousel>
+<div class="myJCarouselLite">
+</div>
+
 </h:body>
 </html>

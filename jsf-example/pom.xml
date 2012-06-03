@@ -20,21 +20,10 @@
         <repository>
             <id>ICEsoft Release Repository</id>
             <url>http://anonsvn.icefaces.org/repo/maven2/releases</url>
-        </repository>
-        <repository>
-            <id>prime-repo</id>
-            <name>PrimeFaces Maven Repository</name>
-            <url>http://repository.primefaces.org</url>
-            <layout>default</layout>
-        </repository>        
+        </repository>       
     </repositories>
 
     <dependencies>
-        <dependency>
-            <groupId>org.primefaces</groupId>
-            <artifactId>primefaces</artifactId>
-            <version>3.3</version>
-        </dependency>
         
         <dependency>
             <groupId>org.icefaces</groupId>
@@ -46,11 +35,11 @@
             <artifactId>icefaces-ace</artifactId>
             <version>${ice.version}</version>
         </dependency>
-        <!-- <dependency>
+        <dependency>
             <groupId>org.icepush</groupId>
             <artifactId>icepush</artifactId>
             <version>${ice.version}</version>
-        </dependency> -->
+        </dependency>
         <dependency>
             <groupId>javax.faces</groupId>
             <artifactId>jsf-api</artifactId>

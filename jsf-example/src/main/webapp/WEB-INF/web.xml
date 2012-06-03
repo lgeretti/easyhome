@@ -17,6 +17,17 @@
         <servlet-name>Faces Servlet</servlet-name>
         <url-pattern>*.faces</url-pattern>
     </servlet-mapping>
+    <!-- 
+    <servlet> 
+    <servlet-name>icepush</servlet-name> 
+    <servlet-class>org.icepush.servlet.ICEpushServlet</servlet-class> 
+    <load-on-startup>1</load-on-startup> 
+    </servlet> 
+    <servlet-mapping> 
+    <servlet-name>icepush</servlet-name> 
+    <url-pattern>*.icepush</url-pattern> 
+    </servlet-mapping>
+     -->
     <context-param>
         <param-name>javax.faces.PROJECT_STAGE</param-name>
         <param-value>Development</param-value>
@@ -24,10 +35,6 @@
     <context-param>
         <param-name>javax.faces.FACELETS_SKIP_COMMENTS</param-name>
         <param-value>true</param-value>
-    </context-param>
-    <context-param>
-        <param-name>primefaces.PUSH_SERVER_URL</param-name>
-        <param-value>ws://localhost:8989/</param-value>
     </context-param>
 
 </web-app>
