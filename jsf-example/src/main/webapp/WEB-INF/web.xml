@@ -25,5 +25,9 @@
         <param-name>javax.faces.FACELETS_SKIP_COMMENTS</param-name>
         <param-value>true</param-value>
     </context-param>
+    <context-param>
+        <param-name>primefaces.PUSH_SERVER_URL</param-name>
+        <param-value>ws://localhost:8989/push</param-value>
+    </context-param>
 
 </web-app>
