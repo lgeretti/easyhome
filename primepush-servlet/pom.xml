@@ -13,7 +13,7 @@
     </parent>
     
     <properties>
-        <prime.version>3.2</prime.version>
+        <prime.version>3.3</prime.version>
     </properties>
     
     <repositories>
@@ -32,12 +32,6 @@
             <version>${prime.version}</version>
         </dependency>
         <dependency>
-            <groupId>javax.faces</groupId>
-            <artifactId>jsf-api</artifactId>
-            <version>${jsf-version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-websocket</artifactId>
             <version>8.1.2.v20120308</version>
@@ -46,6 +40,11 @@
           <groupId>org.eclipse.jetty</groupId>
           <artifactId>jetty-server</artifactId>
           <version>8.1.4.v20120524</version>
+        </dependency>
+        <dependency>
+          <groupId>org.eclipse.jetty</groupId>
+          <artifactId>jetty-servlet</artifactId>
+          <version>8.1.2.v20120308</version>
         </dependency>
       <dependency>
           <groupId>org.slf4j</groupId>
@@ -64,7 +63,6 @@
           <version>1.0.3</version>
           <scope>runtime</scope>
       </dependency>
-
     </dependencies>
 
   <build>

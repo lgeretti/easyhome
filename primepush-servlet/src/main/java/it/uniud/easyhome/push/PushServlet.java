@@ -40,7 +40,7 @@ public class PushServlet extends WebSocketServlet {
     private class PrimeWebSocket implements WebSocket, WebSocket.OnTextMessage {
         Connection connection;
         String channel;
-        private final Logger logger = LoggerFactory.getLogger(PushServlet.class);
+        private final Logger logger = LoggerFactory.getLogger(PrimeWebSocket.class);
 
         public PrimeWebSocket(String channel) {
             this.channel = channel;
@@ -48,11 +48,13 @@ public class PushServlet extends WebSocketServlet {
 
         public void onClose(int closeCode, String message) {
             connectedClients.get(this.channel).remove(this);
-        }
+            logger.info("Connection closed");
+        } 
 
         public void onOpen(Connection connection) {
             this.connection = connection;
             connectedClients.get(this.channel).add(this);
+            logger.info("Connection opened");
         }
 
         public void onMessage(String message) {

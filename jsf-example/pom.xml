@@ -33,23 +33,24 @@
         <dependency>
             <groupId>org.primefaces</groupId>
             <artifactId>primefaces</artifactId>
-            <version>3.2</version>
+            <version>3.3</version>
         </dependency>
+        
         <dependency>
             <groupId>org.icefaces</groupId>
             <artifactId>icefaces</artifactId>
             <version>${ice.version}</version>
-        </dependency>
+        </dependency> 
         <dependency>
             <groupId>org.icefaces</groupId>
             <artifactId>icefaces-ace</artifactId>
             <version>${ice.version}</version>
         </dependency>
-        <dependency>
+        <!-- <dependency>
             <groupId>org.icepush</groupId>
             <artifactId>icepush</artifactId>
             <version>${ice.version}</version>
-        </dependency>  
+        </dependency> -->
         <dependency>
             <groupId>javax.faces</groupId>
             <artifactId>jsf-api</artifactId>
