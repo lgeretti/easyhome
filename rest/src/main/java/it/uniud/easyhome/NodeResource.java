@@ -12,7 +12,6 @@ public class NodeResource {
     @Context
     private UriInfo uriInfo;
     
-    /*
     @GET
     @Path("{nodeid}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -20,8 +19,8 @@ public class NodeResource {
         
         return new Node(nodeId,"test");
     }
-    */
     
+    /*
     @GET
     @Path("{nodeid}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -33,6 +32,7 @@ public class NodeResource {
         
         return json;
     }
+    */
 
     @GET
     @Path("testme")

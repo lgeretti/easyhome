@@ -29,7 +29,7 @@ public class NodeTest extends JerseyTest {
     
     @Override
     protected ResourceConfig configure() {
-        //enable(TestProperties.LOG_TRAFFIC);
+        enable(TestProperties.LOG_TRAFFIC);
         return createApp();
     }
     
@@ -44,15 +44,14 @@ public class NodeTest extends JerseyTest {
         assertEquals(str,"test");
     }
     
-    @Ignore
     @Test 
-    public void getJSON() throws JSONException {   
+    public void getNodeJSON() throws JSONException {   
         JSONObject node = target().path("nodes/1").request(MediaType.APPLICATION_JSON).get(JSONObject.class);        
-        assertEquals(node.getString("name"),"[\"test\"]");
+        assertEquals(node.getString("name"),"test");
     }
     
     @Test 
-    public void getNode() {
+    public void getNodePOJO() {
         Node node = target().path("nodes/1").request(MediaType.APPLICATION_JSON).get(Node.class);        
         assertEquals(node.getName(),"test");
     }

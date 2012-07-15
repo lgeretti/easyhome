@@ -16,11 +16,11 @@ public final class EHContextResolver implements ContextResolver<JAXBContext> {
 
     private final JAXBContext context;
     private final Set<Class<?>> types;
-    private final Class<?>[] cTypes = {Node.class};
+    private final Class<?>[] cTypes = {};
 
     public EHContextResolver() throws Exception {
         this.types = new HashSet<Class<?>>(Arrays.asList(cTypes));
-        this.context = new JsonJaxbContext(JsonConfiguration.natural().build(), cTypes);
+        this.context = new JsonJaxbContext(JsonConfiguration.natural().build());
     }
 
     @Override
