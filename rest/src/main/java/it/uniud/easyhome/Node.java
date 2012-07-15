@@ -9,8 +9,7 @@ public class Node {
     
     private String name;
     
-    public Node() {
-    }
+    public Node() {}
     
     public Node(int id, String name) {
         this.id = id;
