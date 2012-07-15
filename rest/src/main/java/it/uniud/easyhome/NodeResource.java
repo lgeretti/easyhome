@@ -1,5 +1,8 @@
 package it.uniud.easyhome;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.ws.rs.core.*;
 import javax.ws.rs.*;
 
@@ -11,6 +14,18 @@ public class NodeResource {
     
     @Context
     private UriInfo uriInfo;
+    
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Node> getNodes() {
+        
+        List<Node> nodes = new ArrayList<Node>();
+        
+        nodes.add(new Node(1,"first"));
+        nodes.add(new Node(2,"second"));
+        
+        return nodes;
+    }
     
     @GET
     @Path("{nodeid}")

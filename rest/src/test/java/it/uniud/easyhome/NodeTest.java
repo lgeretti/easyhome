@@ -2,7 +2,10 @@ package it.uniud.easyhome;
 
 import static org.junit.Assert.*;
 
+import java.util.List;
+
 import javax.ws.rs.client.Configuration;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 
 import org.junit.*;
@@ -35,7 +38,7 @@ public class NodeTest extends JerseyTest {
     
     @Override
     protected void configureClient(Configuration config) {
-        config.register(new JsonJaxbFeature()).register(EHContextResolver.class);
+        config.register(new JsonJaxbFeature()).register(JsonJaxbContextResolver.class);
     }
     
     @Test 
@@ -54,6 +57,13 @@ public class NodeTest extends JerseyTest {
     public void getNodePOJO() {
         Node node = target().path("nodes/1").request(MediaType.APPLICATION_JSON).get(Node.class);        
         assertEquals(node.getName(),"test");
+    }
+    
+    @Test
+    public void getNodes() {
+        GenericType<List<Node>> nodesType = new GenericType<List<Node>>() {};
+        List<Node> nodes = target().path("nodes").request(MediaType.APPLICATION_JSON).get(nodesType);
+        assertEquals(nodes.size(),2);
     }
     
 }

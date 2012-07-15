@@ -12,13 +12,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Provider
-public final class EHContextResolver implements ContextResolver<JAXBContext> {
+public final class JsonJaxbContextResolver implements ContextResolver<JAXBContext> {
 
     private final JAXBContext context;
     private final Set<Class<?>> types;
     private final Class<?>[] cTypes = {};
 
-    public EHContextResolver() throws Exception {
+    public JsonJaxbContextResolver() throws Exception {
         this.types = new HashSet<Class<?>>(Arrays.asList(cTypes));
         this.context = new JsonJaxbContext(JsonConfiguration.natural().build());
     }
