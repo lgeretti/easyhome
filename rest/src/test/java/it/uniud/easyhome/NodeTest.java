@@ -4,11 +4,6 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
-import javax.persistence.Query;
 import javax.ws.rs.client.Configuration;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericType;
@@ -48,25 +43,7 @@ public class NodeTest extends JerseyTest {
     protected void configureClient(Configuration config) {
         config.register(new JsonJaxbFeature()).register(JsonJaxbContextResolver.class);
     }
-    
-    @Before
-    public void cleanTable() {
         
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("EasyHome");
-        EntityManager em = emf.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
-        
-        tx.begin();
-        
-        Query deletion = em.createQuery("DELETE FROM Node");
-        deletion.executeUpdate();
-        
-        tx.commit();    
-       
-        em.close();
-        emf.close();
-    }
-    
     @Test
     public void noNodes() {
         GenericType<List<Node>> nodesType = new GenericType<List<Node>>() {};

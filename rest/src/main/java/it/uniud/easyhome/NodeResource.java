@@ -9,6 +9,11 @@ import javax.ws.rs.*;
 @Path("/nodes")
 public class NodeResource {
     
+    private static final String PERSISTENCE_CONTEXT = "EasyHome";
+    
+    private static final EntityManager em = Persistence.createEntityManagerFactory(PERSISTENCE_CONTEXT)
+                                                          .createEntityManager();
+    
     @Context
     private UriInfo uriInfo;
     
@@ -16,13 +21,8 @@ public class NodeResource {
     @Produces(MediaType.APPLICATION_JSON)
     public List<Node> getNodes() {
         
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("EasyHome");
-        EntityManager em = emf.createEntityManager();
         TypedQuery<Node> query = em.createQuery("SELECT n FROM Node n", Node.class);
         List<Node> nodes = query.getResultList();
-        
-        em.close();
-        emf.close();
         
         return nodes;
     }
@@ -32,16 +32,10 @@ public class NodeResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Node getNode(@PathParam("nodeid") int nodeId) {
         
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("EasyHome");
-        EntityManager em = emf.createEntityManager();
-        
         Node node = em.find(Node.class, nodeId);
 
         if (node == null) 
             throw new WebApplicationException(Response.Status.NOT_FOUND);
-        
-        em.close();
-        emf.close();
         
         return node;
     }
@@ -49,9 +43,7 @@ public class NodeResource {
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     public Response insertNode(Node node) {
-    	
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("EasyHome");
-        EntityManager em = emf.createEntityManager();
+
         EntityTransaction tx = em.getTransaction();
         
         Node existing = em.find(Node.class, node.getId());
@@ -62,9 +54,6 @@ public class NodeResource {
         tx.begin();
         em.persist(node);
         tx.commit();
-       
-        em.close();
-        emf.close();
         
 	    return Response.created(
 	                         uriInfo.getAbsolutePathBuilder()
@@ -77,8 +66,6 @@ public class NodeResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateOrInsertNode(Node node) {
         
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("EasyHome");
-        EntityManager em = emf.createEntityManager();
         EntityTransaction tx = em.getTransaction();
         tx.begin();
         Node otherNode = em.find(Node.class, node.getId());
@@ -90,8 +77,6 @@ public class NodeResource {
             otherNode.copyFrom(node);
         
         tx.commit();
-        em.close();
-        emf.close();
         
         if (!existed)
             return Response.created(
@@ -107,8 +92,6 @@ public class NodeResource {
     @Path("{nodeid}")
     public Response deleteNode(@PathParam("nodeid") int nodeId) {
         
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("EasyHome");
-        EntityManager em = emf.createEntityManager();
         EntityTransaction tx = em.getTransaction();
         
         Node existing = em.find(Node.class, nodeId);
@@ -119,9 +102,6 @@ public class NodeResource {
         tx.begin();
         em.remove(existing);
         tx.commit();    
-       
-        em.close();
-        emf.close();
         
         return Response.ok().build();
     }    
