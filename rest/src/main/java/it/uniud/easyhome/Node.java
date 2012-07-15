@@ -41,4 +41,29 @@ public class Node {
     public void setName(String name) {
         this.name = name;
     }
+    
+    @Override
+    public boolean equals(Object other) {
+        
+        if (!(other instanceof Node))
+            throw new ClassCastException();
+        Node otherNode = (Node) other;
+        
+        boolean result = true;
+        result &= (this.id == otherNode.id);
+        result &= (this.name.equals(otherNode.name));
+        
+        return result;
+    }
+    
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+
+        int result = 1;
+        result = prime * result + id;
+        result = prime * result + name.hashCode();
+        
+        return result;
+    }
 }

@@ -2,11 +2,7 @@ package it.uniud.easyhome;
 
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
-import javax.persistence.TypedQuery;
+import javax.persistence.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.*;
 
@@ -24,9 +20,6 @@ public class NodeResource {
         EntityManager em = emf.createEntityManager();
         TypedQuery<Node> query = em.createQuery("SELECT n FROM Node n", Node.class);
         List<Node> nodes = query.getResultList();
-        
-        if (nodes.isEmpty()) 
-            throw new WebApplicationException(Response.Status.NO_CONTENT);
         
         em.close();
         emf.close();
@@ -125,7 +118,7 @@ public class NodeResource {
         
         tx.begin();
         em.remove(existing);
-        tx.commit();
+        tx.commit();    
        
         em.close();
         emf.close();
