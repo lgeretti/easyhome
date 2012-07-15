@@ -1,12 +1,14 @@
 package it.uniud.easyhome;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.*;
 
 @XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Node {
 
+    @XmlElement
     private int id;
-    
+    @XmlElement
     private String name;
     
     public Node() {}
@@ -30,5 +32,10 @@ public class Node {
     
     public void setName(String name) {
         this.name = name;
+    }
+    
+    @Override
+    public String toString() {
+        return "{\"id\": \"" + this.id + "\", \"name\" : \"" + name + "\"}";
     }
 }
