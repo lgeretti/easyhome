@@ -3,6 +3,11 @@ package it.uniud.easyhome;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
 import javax.ws.rs.core.*;
 import javax.ws.rs.*;
 
@@ -19,10 +24,19 @@ public class NodeResource {
     @Produces(MediaType.APPLICATION_JSON)
     public List<Node> getNodes() {
         
-        List<Node> nodes = new ArrayList<Node>();
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("EasyHome");
+        EntityManager em = emf.createEntityManager();
+        
+        /*List<Node> nodes = new ArrayList<Node>();
         
         nodes.add(new Node(1,"first"));
         nodes.add(new Node(2,"second"));
+        */
+        
+        TypedQuery<Node> query = em.createQuery("SELECT n FROM Node n", Node.class);
+        List<Node> nodes = query.getResultList();
+        em.close();
+        emf.close();
         
         return nodes;
     }
