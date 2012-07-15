@@ -41,18 +41,14 @@ public class NodeTest extends JerseyTest {
         config.register(new JsonJaxbFeature()).register(JsonJaxbContextResolver.class);
     }
     
-    @Test 
-    public void getPlainText() {        
-        String str = target().path("nodes/testme").request(MediaType.TEXT_PLAIN).get(String.class);
-        assertEquals(str,"test");
-    }
-    
+    @Ignore
     @Test 
     public void getNodeJSON() throws JSONException {   
         JSONObject node = target().path("nodes/1").request(MediaType.APPLICATION_JSON).get(JSONObject.class);        
         assertEquals(node.getString("name"),"test");
     }
-    
+
+    @Ignore
     @Test 
     public void getNodePOJO() {
         Node node = target().path("nodes/1").request(MediaType.APPLICATION_JSON).get(Node.class);        

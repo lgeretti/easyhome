@@ -1,6 +1,5 @@
 package it.uniud.easyhome;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -10,9 +9,6 @@ import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 import javax.ws.rs.core.*;
 import javax.ws.rs.*;
-
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 
 @Path("/nodes")
 public class NodeResource {
@@ -26,15 +22,12 @@ public class NodeResource {
         
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("EasyHome");
         EntityManager em = emf.createEntityManager();
-        
-        /*List<Node> nodes = new ArrayList<Node>();
-        
-        nodes.add(new Node(1,"first"));
-        nodes.add(new Node(2,"second"));
-        */
-        
         TypedQuery<Node> query = em.createQuery("SELECT n FROM Node n", Node.class);
         List<Node> nodes = query.getResultList();
+        
+        if (nodes.isEmpty()) 
+            throw new WebApplicationException(Response.Status.NO_CONTENT);
+        
         em.close();
         emf.close();
         
@@ -46,41 +39,98 @@ public class NodeResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Node getNode(@PathParam("nodeid") int nodeId) {
         
-        return new Node(nodeId,"test");
-    }
-    
-    /*
-    @GET
-    @Path("{nodeid}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public JSONObject getNode(@PathParam("nodeid") int nodeId) throws JSONException {
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("EasyHome");
+        EntityManager em = emf.createEntityManager();
         
-        JSONObject json = new JSONObject();
-        json.append("id", String.valueOf(nodeId))
-            .append("name", "test");
-        
-        return json;
-    }
-    */
+        Node node = em.find(Node.class, nodeId);
 
-    @GET
-    @Path("testme")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getTestMe() {
+        if (node == null) 
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
         
-        return "test";
+        em.close();
+        emf.close();
+        
+        return node;
     }
-
     
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response changeNode(Node node) {
+    public Response insertNode(Node node) {
     	
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("EasyHome");
+        EntityManager em = emf.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        
+        Node existing = em.find(Node.class, node.getId());
+        
+        if (existing != null) 
+            throw new WebApplicationException(Response.Status.CONFLICT);
+        
+        tx.begin();
+        em.persist(node);
+        tx.commit();
+       
+        em.close();
+        emf.close();
+        
 	    return Response.created(
 	                         uriInfo.getAbsolutePathBuilder()
 	                                .path(String.valueOf(node.getId()))
 	                                .build())
 	                    .build();
     }
+    
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateOrInsertNode(Node node) {
+        
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("EasyHome");
+        EntityManager em = emf.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        tx.begin();
+        Node otherNode = em.find(Node.class, node.getId());
+        boolean existed = (otherNode != null);
+        
+        if (!existed)
+            em.persist(node);
+        else 
+            otherNode.copyFrom(node);
+        
+        tx.commit();
+        em.close();
+        emf.close();
+        
+        if (!existed)
+            return Response.created(
+                             uriInfo.getAbsolutePathBuilder()
+                                    .path(String.valueOf(node.getId()))
+                                    .build())
+                        .build();
+        else
+            return Response.ok().build();
+    }
       
+    @DELETE
+    @Path("{nodeid}")
+    public Response deleteNode(@PathParam("nodeid") int nodeId) {
+        
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("EasyHome");
+        EntityManager em = emf.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        
+        Node existing = em.find(Node.class, nodeId);
+        
+        if (existing == null) 
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        
+        tx.begin();
+        em.remove(existing);
+        tx.commit();
+       
+        em.close();
+        emf.close();
+        
+        return Response.ok().build();
+    }    
+    
 }
