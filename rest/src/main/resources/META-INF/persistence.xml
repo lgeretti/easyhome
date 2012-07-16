@@ -6,7 +6,7 @@
     
     <persistence-unit name="EasyHome" transaction-type="RESOURCE_LOCAL">
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-        <class>it.uniud.easyhome.Node</class>
+        <class>it.uniud.easyhome.network.Node</class>
         <properties>
             <property name="eclipselink.ddl-generation" value="drop-and-create-tables"/>
             <property name="eclipselink.logging.level" value="INFO"/>
@@ -20,7 +20,7 @@
     <persistence-unit name="EasyHome-JTA" transaction-type="JTA">
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
         <jta-data-source>jdbc/EasyHome</jta-data-source>
-        <class>it.uniud.easyhome.Node</class>
+        <class>it.uniud.easyhome.network.Node</class>
         <properties>
             <property name="eclipselink.ddl-generation" value="create-tables"/>
             <property name="eclipselink.logging.level" value="INFO"/>

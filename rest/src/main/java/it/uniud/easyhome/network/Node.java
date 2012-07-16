@@ -1,5 +1,7 @@
 package it.uniud.easyhome.network;
 
+import it.uniud.easyhome.common.ConcreteClassBuilder;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -17,24 +19,26 @@ public class Node {
     
     private Node() {}
     
-    public static class Builder implements it.uniud.easyhome.common.Builder<Node> {
+    public static class Builder implements ConcreteClassBuilder<Node> {
         
         private Node node;
         
         public Builder(int id) {
-            
+            if (id <= 0)
+                throw new IllegalArgumentException();            
             node = new Node();
             node.id = id;
         }
         
         public Builder setName(String name) {
+            if (name == null)
+                throw new IllegalArgumentException();
             node.name = name;
             return this;
         }
         
         public Node build() {
-            if (node.name == null)
-                throw new IllegalStateException("The name has not been set.");
+            
             return node;
         }
     }

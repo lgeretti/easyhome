@@ -1,10 +1,14 @@
 package it.uniud.easyhome.rest;
 
+
 import it.uniud.easyhome.network.Node;
 
 import java.util.List;
 
 import javax.persistence.*;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import javax.ws.rs.core.*;
 import javax.ws.rs.*;
 
@@ -23,7 +27,12 @@ public final class NodeResource {
     @Produces(MediaType.APPLICATION_JSON)
     public List<Node> getNodes() {
         
-        TypedQuery<Node> query = em.createQuery("SELECT n FROM Node n", Node.class);
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<Node> criteria = builder.createQuery(Node.class);
+        Root<Node> root = criteria.from(Node.class);
+        criteria.select(root);
+        
+        TypedQuery<Node> query = em.createQuery(criteria);
         List<Node> nodes = query.getResultList();
         
         return nodes;

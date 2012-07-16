@@ -1,6 +1,6 @@
 package it.uniud.easyhome.common;
 
-public interface Builder<T> {
+public interface ConcreteClassBuilder<T> {
 
     public T build();
     

@@ -26,12 +26,14 @@ import org.glassfish.jersey.test.JerseyTest;
 
 public class NodeResourceTest extends JerseyTest {
 
-    private static final String PACKAGE_NAME = "it.uniud.easyhome";
+    private static final String[] PACKAGE_NAMES = { 
+        "it.uniud.easyhome.network",
+        "it.uniud.easyhome.rest"};
     
     private static ResourceConfig createApp() {
         final ResourceConfig rc = new ResourceConfig()
                 .addModules(new JsonJaxbModule())
-                .packages(PACKAGE_NAME);
+                .packages(PACKAGE_NAMES);
 
         return rc;
     }
@@ -59,7 +61,7 @@ public class NodeResourceTest extends JerseyTest {
         List<Node> nodes = target().path("nodes").request(MediaType.APPLICATION_JSON).get(nodesType);
         assertEquals(0,nodes.size());
     }
-    
+
     @Test
     public void testInsertion() throws JSONException {
         
@@ -79,7 +81,7 @@ public class NodeResourceTest extends JerseyTest {
         assertEquals(1,jsonNode.getInt("id"));
         assertEquals("first",jsonNode.getString("name"));
     }
-    
+
     @Test
     public void testUpdate() {
         
@@ -93,7 +95,7 @@ public class NodeResourceTest extends JerseyTest {
         Node recoveredNode = target().path("nodes/1").request(MediaType.APPLICATION_JSON).get(Node.class);
         assertEquals("modifiedFirst",recoveredNode.getName());
     }
-    
+
     @Test
     public void testDelete() {
         
