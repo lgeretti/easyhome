@@ -7,7 +7,7 @@ import javax.ws.rs.core.*;
 import javax.ws.rs.*;
 
 @Path("/nodes")
-public class NodeResource {
+public final class NodeResource {
     
     private static final String PERSISTENCE_CONTEXT = "EasyHome";
     
@@ -40,41 +40,19 @@ public class NodeResource {
         return node;
     }
     
-    @PUT
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response insertNode(Node node) {
-
-        EntityTransaction tx = em.getTransaction();
-        
-        Node existing = em.find(Node.class, node.getId());
-        
-        if (existing != null) 
-            throw new WebApplicationException(Response.Status.CONFLICT);
-        
-        tx.begin();
-        em.persist(node);
-        tx.commit();
-        
-	    return Response.created(
-	                         uriInfo.getAbsolutePathBuilder()
-	                                .path(String.valueOf(node.getId()))
-	                                .build())
-	                    .build();
-    }
-    
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateOrInsertNode(Node node) {
         
         EntityTransaction tx = em.getTransaction();
         tx.begin();
-        Node otherNode = em.find(Node.class, node.getId());
-        boolean existed = (otherNode != null);
+        Node persistedNode = em.find(Node.class, node.getId());
+        boolean existed = (persistedNode != null);
         
         if (!existed)
             em.persist(node);
         else 
-            otherNode.copyFrom(node);
+            persistedNode.copyFrom(node);
         
         tx.commit();
         
@@ -105,5 +83,22 @@ public class NodeResource {
         
         return Response.ok().build();
     }    
+    
+    /** Removes all the nodes.
+     * 
+     * This is not implemented as a DELETE on /nodes since we want the path to always exist.
+     */
+    public static void clear() {
+        
+        EntityTransaction tx = em.getTransaction();
+        
+        Query query = em.createQuery("DELETE FROM Node");
+                
+        tx.begin();
+        query.executeUpdate();
+        tx.commit();  
+        
+        em.clear();
+    }
     
 }
