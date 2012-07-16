@@ -51,9 +51,10 @@ public final class NodeResource {
         
         if (!existed)
             em.persist(node);
-        else 
-            persistedNode.copyFrom(node);
-        
+        else {
+            em.merge(node);
+        }
+            
         tx.commit();
         
         if (!existed)

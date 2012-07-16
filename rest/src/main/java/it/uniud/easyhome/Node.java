@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.*;
 
 @Entity
 @XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Node {
 
     @Id
@@ -14,16 +15,29 @@ public class Node {
     @Column(nullable = false, length = 200)
     private String name;
     
-    public Node() {}
+    private Node() {}
     
-    public Node(int id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-    
-    public void copyFrom(Node other) {
-        this.id = other.id;
-        this.name = other.name;
+    public static class Builder implements it.uniud.easyhome.Builder<Node> {
+        
+        private Node node;
+        
+        public Builder(int id) {
+            
+            node = new Node();
+            node.id = id;
+        }
+        
+        Builder setName(String name) {
+            node.name = name;
+            
+            return this;
+        }
+        
+        public Node build() {
+            if (node.name == null)
+                throw new IllegalStateException("The name has not been set.");
+            return node;
+        }
     }
     
     public int getId() {
@@ -33,15 +47,7 @@ public class Node {
     public String getName() {
         return this.name;
     }
-    
-    public void setId(int id) { 
-        this.id = id;
-    }
-    
-    public void setName(String name) {
-        this.name = name;
-    }
-    
+
     @Override
     public boolean equals(Object other) {
         

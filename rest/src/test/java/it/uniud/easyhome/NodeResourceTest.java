@@ -20,7 +20,7 @@ import org.glassfish.jersey.media.json.JsonJaxbModule;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 
-public class NodeTest extends JerseyTest {
+public class NodeResourceTest extends JerseyTest {
 
     private static final String PACKAGE_NAME = "it.uniud.easyhome";
     
@@ -34,7 +34,7 @@ public class NodeTest extends JerseyTest {
     
     @Override
     protected ResourceConfig configure() {
-        enable(org.glassfish.jersey.test.TestProperties.LOG_TRAFFIC);
+        //enable(org.glassfish.jersey.test.TestProperties.LOG_TRAFFIC);
         return createApp();
     }
     
@@ -59,7 +59,8 @@ public class NodeTest extends JerseyTest {
     @Test
     public void testInsertion() throws JSONException {
         
-        Node node = new Node(1,"first");
+        Node.Builder nodeBuilder = new Node.Builder(1);
+        Node node = nodeBuilder.setName("first").build();
         Response insertionResponse = target().path("nodes").request().post(Entity.json(node));
         assertEquals(insertionResponse.getStatusInfo(),Status.CREATED);
         
@@ -80,7 +81,8 @@ public class NodeTest extends JerseyTest {
         
         createOneNode();
         
-        Node modifiedNode = new Node(1,"modifiedFirst");
+        Node.Builder nodeBuilder = new Node.Builder(1);
+        Node modifiedNode = nodeBuilder.setName("modifiedFirst").build();
         Response updateResponse = target().path("nodes").request().post(Entity.json(modifiedNode));
         assertEquals(updateResponse.getStatusInfo(),Status.OK);
         
@@ -102,7 +104,8 @@ public class NodeTest extends JerseyTest {
     
     private void createOneNode() {
 
-        Node node = new Node(1,"first");
+        Node.Builder nodeBuilder = new Node.Builder(1);
+        Node node = nodeBuilder.setName("first").build();
         target().path("nodes").request().post(Entity.json(node));
     }
 }
