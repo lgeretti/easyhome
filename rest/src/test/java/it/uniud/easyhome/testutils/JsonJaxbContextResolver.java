@@ -1,4 +1,4 @@
-package it.uniud.easyhome;
+package it.uniud.easyhome.testutils;
 
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;

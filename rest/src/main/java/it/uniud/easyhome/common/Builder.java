@@ -1,4 +1,4 @@
-package it.uniud.easyhome;
+package it.uniud.easyhome.common;
 
 public interface Builder<T> {
 

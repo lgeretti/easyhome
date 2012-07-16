@@ -1,6 +1,10 @@
-package it.uniud.easyhome;
+package it.uniud.easyhome.rest;
 
 import static org.junit.Assert.*;
+
+import it.uniud.easyhome.network.Node;
+import it.uniud.easyhome.rest.NodeResource;
+import it.uniud.easyhome.testutils.JsonJaxbContextResolver;
 
 import java.util.List;
 
@@ -53,7 +57,7 @@ public class NodeResourceTest extends JerseyTest {
         
         GenericType<List<Node>> nodesType = new GenericType<List<Node>>() {};
         List<Node> nodes = target().path("nodes").request(MediaType.APPLICATION_JSON).get(nodesType);
-        assertEquals(nodes.size(),0);
+        assertEquals(0,nodes.size());
     }
     
     @Test
@@ -62,18 +66,18 @@ public class NodeResourceTest extends JerseyTest {
         Node.Builder nodeBuilder = new Node.Builder(1);
         Node node = nodeBuilder.setName("first").build();
         Response insertionResponse = target().path("nodes").request().post(Entity.json(node));
-        assertEquals(insertionResponse.getStatusInfo(),Status.CREATED);
+        assertEquals(Status.CREATED,insertionResponse.getStatusInfo());
         
         GenericType<List<Node>> nodesType = new GenericType<List<Node>>() {};
         List<Node> nodes = target().path("nodes").request(MediaType.APPLICATION_JSON).get(nodesType);
-        assertEquals(nodes.size(),1);
+        assertEquals(1,nodes.size());
         
         Node recoveredNode = target().path("nodes/1").request(MediaType.APPLICATION_JSON).get(Node.class);
         assertTrue(node.equals(recoveredNode));
 
         JSONObject jsonNode = target().path("nodes/1").request(MediaType.APPLICATION_JSON).get(JSONObject.class);
-        assertEquals(jsonNode.getInt("id"),1);
-        assertEquals(jsonNode.getString("name"),"first");
+        assertEquals(1,jsonNode.getInt("id"));
+        assertEquals("first",jsonNode.getString("name"));
     }
     
     @Test
@@ -84,10 +88,10 @@ public class NodeResourceTest extends JerseyTest {
         Node.Builder nodeBuilder = new Node.Builder(1);
         Node modifiedNode = nodeBuilder.setName("modifiedFirst").build();
         Response updateResponse = target().path("nodes").request().post(Entity.json(modifiedNode));
-        assertEquals(updateResponse.getStatusInfo(),Status.OK);
+        assertEquals(Status.OK,updateResponse.getStatusInfo());
         
         Node recoveredNode = target().path("nodes/1").request(MediaType.APPLICATION_JSON).get(Node.class);
-        assertEquals(recoveredNode.getName(),"modifiedFirst");
+        assertEquals("modifiedFirst",recoveredNode.getName());
     }
     
     @Test
@@ -96,10 +100,10 @@ public class NodeResourceTest extends JerseyTest {
         createOneNode();
         
         Response deleteResponse = target().path("nodes/1").request().delete();
-        assertEquals(deleteResponse.getStatusInfo(),Status.OK);
+        assertEquals(Status.OK,deleteResponse.getStatusInfo());
         
         Response getResponse = target().path("nodes/1").request(MediaType.APPLICATION_JSON).get();
-        assertEquals(getResponse.getStatusInfo(),Status.NOT_FOUND);
+        assertEquals(Status.NOT_FOUND,getResponse.getStatusInfo());
     }
     
     private void createOneNode() {

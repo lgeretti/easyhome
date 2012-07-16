@@ -1,4 +1,6 @@
-package it.uniud.easyhome;
+package it.uniud.easyhome.rest;
+
+import it.uniud.easyhome.network.Node;
 
 import java.util.List;
 

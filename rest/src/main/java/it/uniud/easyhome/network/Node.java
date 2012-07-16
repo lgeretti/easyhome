@@ -1,4 +1,4 @@
-package it.uniud.easyhome;
+package it.uniud.easyhome.network;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,7 +17,7 @@ public class Node {
     
     private Node() {}
     
-    public static class Builder implements it.uniud.easyhome.Builder<Node> {
+    public static class Builder implements it.uniud.easyhome.common.Builder<Node> {
         
         private Node node;
         
@@ -27,9 +27,8 @@ public class Node {
             node.id = id;
         }
         
-        Builder setName(String name) {
+        public Builder setName(String name) {
             node.name = name;
-            
             return this;
         }
         
@@ -52,14 +51,13 @@ public class Node {
     public boolean equals(Object other) {
         
         if (!(other instanceof Node))
-            throw new ClassCastException();
+            throw new IllegalArgumentException();
         Node otherNode = (Node) other;
         
-        boolean result = true;
-        result &= (this.id == otherNode.id);
-        result &= (this.name.equals(otherNode.name));
+        if (this.id != otherNode.id) return false;
+        if (!this.name.equals(otherNode.name)) return false;
         
-        return result;
+        return true;
     }
     
     @Override
