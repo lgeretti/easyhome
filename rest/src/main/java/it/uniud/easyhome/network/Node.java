@@ -18,7 +18,7 @@ public class Node {
     private String name;
     
     private Node() {}
-    
+
     public static class Builder implements ConcreteClassBuilder<Node> {
         
         private Node node;
