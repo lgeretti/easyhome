@@ -17,15 +17,15 @@
         <servlet-name>Jersey Web Application</servlet-name>
         <url-pattern>/rest/*</url-pattern>
     </servlet-mapping>
-    <!-- 
+    
   <servlet>
         <servlet-name>Echo</servlet-name>
         <servlet-class>it.uniud.easyhome.network.EchoServlet</servlet-class>
-        
+ 
         <init-param>
-            <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>it.uniud.easyhome</param-value>
+            <param-name>it.uniud.easyhome.gateway.port</param-name>
+            <param-value>6969</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
-    </servlet> -->   
+    </servlet>   
 </web-app>

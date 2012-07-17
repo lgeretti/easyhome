@@ -8,12 +8,13 @@ import java.net.Socket;
 import java.net.SocketException;
 
 import javax.servlet.GenericServlet;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-public class EchoServlet extends GenericServlet {
-
+public class EchoServlet extends GenericServlet implements Runnable {
+    
     /**
      * 
      */
@@ -22,18 +23,31 @@ public class EchoServlet extends GenericServlet {
     @Override
     public void init() {
         
+        log("Port: " + Integer.parseInt(super.getServletConfig().getInitParameter("it.uniud.easyhome.gateway.port")));
+        
+        try {
+            
+          Thread serviceThread = new Thread(this);  
+          serviceThread.start();
+        }
+        catch (Exception ex) {
+          ex.printStackTrace();
+        }
+    }
+    
+    public void run() {
+        
         int port = 6969;
         
         try {
           ServerSocket server = new ServerSocket(port, 1);
-          System.out.println("Listening for connections on port " 
+          log("Listening for connections on port " 
            + server.getLocalPort());
 
           while (true) {
             Socket connection = server.accept();
             try {
-              System.out.println("Connection established with " 
-               + connection);
+              log("Connection established with " + connection);
               Thread input = new EchoThread(connection.getInputStream(),connection.getOutputStream());
               input.start();
               // wait for input to finish 
@@ -57,14 +71,11 @@ public class EchoServlet extends GenericServlet {
         catch (IOException ex) {
           ex.printStackTrace();
         }
-        
-        
     }
     
     @Override
     public void service(ServletRequest req, ServletResponse res)
             throws ServletException, IOException {
-        // TODO Auto-generated method stub
         
     }
     
