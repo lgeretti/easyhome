@@ -60,6 +60,7 @@ public class EchoServer implements Runnable {
             finally {
               try {
                 if (connection != null) connection.close();
+                System.out.println("Connection with " + connection + " closed");
               }
               catch (IOException ex) {}
             }
@@ -76,6 +77,9 @@ public class EchoServer implements Runnable {
             server.close();
         } catch (IOException ex) {
             // We swallow any error
+        } finally {
+            System.out.println("Stopped listening for connections on port " 
+                    + server.getLocalPort());
         }
     }
     
