@@ -24,7 +24,7 @@
  
         <init-param>
             <param-name>it.uniud.easyhome.gateway.port</param-name>
-            <param-value>7000</param-value>
+            <param-value>7002</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>   

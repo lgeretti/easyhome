@@ -8,6 +8,7 @@ import javax.servlet.ServletConfig;
 public class EchoServer implements Runnable {
     
     private ServletConfig config;
+    private ServerSocket server;
     
     public EchoServer(ServletConfig config) {
         this.config = config;
@@ -18,22 +19,40 @@ public class EchoServer implements Runnable {
         int port = Integer.parseInt(config.getInitParameter("it.uniud.easyhome.gateway.port"));
         
         try {
-          ServerSocket server = new ServerSocket(port, 1);
+          server = new ServerSocket(port, 1);
           System.out.println("Listening for connections on port " 
            + server.getLocalPort());
 
           while (true) {
+              
             Socket connection = server.accept();
             try {
-              System.out.println("Connection established with " + connection);
-              Thread input = new EchoThread(connection.getInputStream(),connection.getOutputStream());
-              input.start();
-              // wait for input to finish 
-              try {
-                input.join();
-              }
-              catch (InterruptedException ex) {
-              }
+                System.out.println("Connection established with " + connection);
+              
+                InputStream in = connection.getInputStream();
+                OutputStream out = connection.getOutputStream();
+                
+                try {     
+                  while (true) {
+                    int i = in.read();
+                    if (i == -1) 
+                        break;
+                    System.out.write(i);
+                    out.write(i);
+                    out.flush();
+                  }
+                }
+                catch (SocketException ex) {
+                }
+                catch (IOException ex) {
+                  System.err.println(ex);
+                }
+                try {
+                  in.close();
+                }
+                catch (IOException ex) { 
+                } 
+              
             }
             catch (IOException ex) {
               System.err.println(ex); 
@@ -47,45 +66,17 @@ public class EchoServer implements Runnable {
           }
         }
         catch (IOException ex) {
-          ex.printStackTrace();
+            if (!(ex instanceof SocketException))
+                ex.printStackTrace();
+        }
+    }
+
+    public void closeConnection() {
+        try {
+            server.close();
+        } catch (IOException ex) {
+            // We swallow any error
         }
     }
     
-    private static class EchoThread extends Thread {
-        
-        InputStream in;
-        OutputStream out;
-        
-         public EchoThread(InputStream in, OutputStream out) {
-           this.in = in;
-           this.out = out;
-         }
-
-         public void run()  {
-         
-           try {     
-             while (true) {
-               int i = in.read();
-               if (i == -1) 
-                   break;
-               System.out.write(i);
-               out.write(i);
-               out.flush();
-             }
-           }
-           catch (SocketException ex) {
-           }
-           catch (IOException ex) {
-             System.err.println(ex);
-           }
-           try {
-             in.close();
-           }
-           catch (IOException ex) { 
-           } 
-
-        }
-
-    }
-
 }

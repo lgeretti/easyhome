@@ -33,4 +33,9 @@ public class EchoServletContainer extends GenericServlet {
             throws ServletException, IOException {
     }
 
+    @Override
+    public void destroy() {
+        server.closeConnection();
+    }
+    
 }
