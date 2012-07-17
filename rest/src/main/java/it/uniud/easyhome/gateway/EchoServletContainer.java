@@ -1,4 +1,4 @@
-package it.uniud.easyhome.network;
+package it.uniud.easyhome.gateway;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,7 +13,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-public class EchoServlet extends GenericServlet implements Runnable {
+public class EchoServletContainer extends GenericServlet implements Runnable {
     
     /**
      * 
@@ -22,8 +22,6 @@ public class EchoServlet extends GenericServlet implements Runnable {
 
     @Override
     public void init() {
-        
-        log("Port: " + Integer.parseInt(super.getServletConfig().getInitParameter("it.uniud.easyhome.gateway.port")));
         
         try {
             
@@ -37,7 +35,7 @@ public class EchoServlet extends GenericServlet implements Runnable {
     
     public void run() {
         
-        int port = 6969;
+        int port = Integer.parseInt(super.getServletConfig().getInitParameter("it.uniud.easyhome.gateway.port"));
         
         try {
           ServerSocket server = new ServerSocket(port, 1);
@@ -76,7 +74,6 @@ public class EchoServlet extends GenericServlet implements Runnable {
     @Override
     public void service(ServletRequest req, ServletResponse res)
             throws ServletException, IOException {
-        
     }
     
     private static class EchoThread extends Thread {
