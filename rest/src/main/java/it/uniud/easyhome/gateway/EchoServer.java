@@ -3,7 +3,53 @@ package it.uniud.easyhome.gateway;
 import java.net.*;
 import java.io.*;
 
-public class EchoServer {
+import javax.servlet.ServletConfig;
+
+public class EchoServer implements Runnable {
+    
+    private ServletConfig config;
+    
+    public EchoServer(ServletConfig config) {
+        this.config = config;
+    }
+    
+    public void run() {
+        
+        int port = Integer.parseInt(config.getInitParameter("it.uniud.easyhome.gateway.port"));
+        
+        try {
+          ServerSocket server = new ServerSocket(port, 1);
+          System.out.println("Listening for connections on port " 
+           + server.getLocalPort());
+
+          while (true) {
+            Socket connection = server.accept();
+            try {
+              System.out.println("Connection established with " + connection);
+              Thread input = new EchoThread(connection.getInputStream(),connection.getOutputStream());
+              input.start();
+              // wait for input to finish 
+              try {
+                input.join();
+              }
+              catch (InterruptedException ex) {
+              }
+            }
+            catch (IOException ex) {
+              System.err.println(ex); 
+            }
+            finally {
+              try {
+                if (connection != null) connection.close();
+              }
+              catch (IOException ex) {}
+            }
+          }
+        }
+        catch (IOException ex) {
+          ex.printStackTrace();
+        }
+    }
     
     private static class EchoThread extends Thread {
         
@@ -28,8 +74,6 @@ public class EchoServer {
              }
            }
            catch (SocketException ex) {
-             // output thread closed the socket
-               System.out.println("wut?");
            }
            catch (IOException ex) {
              System.err.println(ex);
@@ -42,53 +86,6 @@ public class EchoServer {
 
         }
 
-      }
-
-  public static void main(String[] args) {
-
-    int port;
-    
-    try {
-      port = Integer.parseInt(args[0]);
-    }  
-    catch (Exception ex) {
-      port = 0;
     }
-    
-    try {
-      ServerSocket server = new ServerSocket(port, 1);
-      System.out.println("Listening for connections on port " 
-       + server.getLocalPort());
-
-      while (true) {
-        Socket connection = server.accept();
-        try {
-          System.out.println("Connection established with " 
-           + connection);
-          Thread input = new EchoThread(connection.getInputStream(),connection.getOutputStream());
-          input.start();
-          // wait for input to finish 
-          try {
-            input.join();
-          }
-          catch (InterruptedException ex) {
-          }
-        }
-        catch (IOException ex) {
-          System.err.println(ex); 
-        }
-        finally {
-          try {
-            if (connection != null) connection.close();
-          }
-          catch (IOException ex) {}
-        }
-      }
-    }
-    catch (IOException ex) {
-      ex.printStackTrace();
-    }
-  
-  }
 
 }

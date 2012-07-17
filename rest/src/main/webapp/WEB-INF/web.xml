@@ -20,7 +20,7 @@
     
   <servlet>
         <servlet-name>Echo</servlet-name>
-        <servlet-class>it.uniud.easyhome.gateway.EchoServlet</servlet-class>
+        <servlet-class>it.uniud.easyhome.gateway.EchoServletContainer</servlet-class>
  
         <init-param>
             <param-name>it.uniud.easyhome.gateway.port</param-name>
