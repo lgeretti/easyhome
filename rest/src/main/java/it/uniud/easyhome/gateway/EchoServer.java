@@ -7,13 +7,13 @@ import javax.servlet.ServletConfig;
 
 public class EchoServer implements Runnable {
     
-    private ServerSocket server;
+    private ServerSocket server = null;
     
-    int port;
+    private int port;
     
-    public EchoServer(ServletConfig config) {
+    public EchoServer(int port) {
         
-        this.port = Integer.parseInt(config.getInitParameter("it.uniud.easyhome.gateway.port"));
+        this.port = port;
     }
     
     public void run() {
@@ -66,10 +66,9 @@ public class EchoServer implements Runnable {
         try {
             server.close();
         } catch (IOException ex) {
-            // We swallow any error
+            // We swallow any IO error
         } finally {
-            System.out.println("Stopped server on port " 
-                    + server.getLocalPort());
+            System.out.println("Stopped server on port " + server.getLocalPort());
         }
     }
     

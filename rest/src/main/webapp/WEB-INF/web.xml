@@ -23,7 +23,7 @@
         <servlet-class>it.uniud.easyhome.gateway.EchoServletContainer</servlet-class>
  
         <init-param>
-            <param-name>it.uniud.easyhome.gateway.port</param-name>
+            <param-name>it.uniud.easyhome.gateway.property.port</param-name>
             <param-value>7002</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
