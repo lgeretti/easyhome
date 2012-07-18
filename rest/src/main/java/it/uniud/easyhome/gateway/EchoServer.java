@@ -3,8 +3,6 @@ package it.uniud.easyhome.gateway;
 import java.net.*;
 import java.io.*;
 
-import javax.servlet.ServletConfig;
-
 public class EchoServer implements Runnable {
     
     private ServerSocket server = null;
