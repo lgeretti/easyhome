@@ -18,21 +18,20 @@ public class EchoServer implements Runnable {
         
         try {
           server = new ServerSocket(port, 1);
-          System.out.println("Listening for a connection on port " 
-           + server.getLocalPort());
+          System.out.println("Listening for a connection on port " + server.getLocalPort());
 
           while (true) {
               
             Socket connection = server.accept();
             try {
                 System.out.println("Connection established with " + connection);
-              
+                
                 InputStream in = connection.getInputStream();
                 OutputStream out = connection.getOutputStream();
                 
                 while (true) {
                     int i = in.read();
-                    if (i == -1) 
+                    if (i == -1)
                         break;
                     System.out.write(i);
                     out.write(i);
@@ -42,10 +41,10 @@ public class EchoServer implements Runnable {
                 try {
                   in.close();
                 } catch (IOException ex) {
-                } 
-              
+                }
+            
             } catch (IOException ex) {
-              System.err.println(ex); 
+              System.err.println(ex);
             } finally {
               try {
                 if (connection != null) connection.close();

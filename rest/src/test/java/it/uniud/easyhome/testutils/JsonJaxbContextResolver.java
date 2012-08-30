@@ -16,7 +16,7 @@ public final class JsonJaxbContextResolver implements ContextResolver<JAXBContex
 
     private final JAXBContext context;
     private final Set<Class<?>> types;
-    private final Class<?>[] cTypes = {};
+    private final Class<?>[] cTypes = { };
 
     public JsonJaxbContextResolver() throws Exception {
         this.types = new HashSet<Class<?>>(Arrays.asList(cTypes));

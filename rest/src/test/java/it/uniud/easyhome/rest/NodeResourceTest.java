@@ -26,7 +26,7 @@ import org.glassfish.jersey.test.JerseyTest;
 
 public class NodeResourceTest extends JerseyTest {
 
-    private static final String[] PACKAGE_NAMES = { 
+    private static final String[] PACKAGE_NAMES = {
         "it.uniud.easyhome.network",
         "it.uniud.easyhome.rest"};
     

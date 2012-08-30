@@ -73,7 +73,7 @@ public final class NodeResource {
                              uriInfo.getAbsolutePathBuilder()
                                     .path(String.valueOf(node.getId()))
                                     .build())
-                        .build();
+                           .build();
         else
             return Response.ok().build();
     }
