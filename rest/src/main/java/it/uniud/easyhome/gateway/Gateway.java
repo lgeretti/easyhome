@@ -1,37 +1,14 @@
 package it.uniud.easyhome.gateway;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
-public class Gateway {
+public interface Gateway {
     
-    private int id;
+    public int getId();
     
-    private ProtocolType protocol;
+    public ProtocolType getProtocolType();
     
-    private int port;
+    public int getPort();
     
-    public int getId() {
-        return id;
-    }
+    public void open();
     
-    public ProtocolType getProtocolType() {
-        return protocol;
-    }
-    
-    public int getPort() {
-        return port;
-    }
-    
-    private Gateway() {}
-    
-    public Gateway(int id, ProtocolType protocol, int port) {
-        this.id = id;
-        this.protocol = protocol;
-        this.port = port;
-    }
-    
+    public void close();
 }

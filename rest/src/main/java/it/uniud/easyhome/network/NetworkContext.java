@@ -2,6 +2,8 @@ package it.uniud.easyhome.network;
 
 import it.uniud.easyhome.gateway.Gateway;
 import it.uniud.easyhome.gateway.ProtocolType;
+import it.uniud.easyhome.gateway.XBeeGateway;
+import it.uniud.easyhome.network.exceptions.PortAlreadyBoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +17,8 @@ import java.util.List;
 public class NetworkContext {
 
     private final List<Gateway> gateways = new ArrayList<Gateway>();
+    
+    // Identifiers are guaranteed as unique, hence we cannot rely on the gateways size
     private int gidCount = 0;
     
     public List<Gateway> getGateways() {
@@ -36,7 +40,27 @@ public class NetworkContext {
         
         int gid = ++gidCount;
         
-        gateways.add(new Gateway(gid,protocol,port));
+        Gateway gw = null;
+        
+        switch (protocol) {
+        
+            case XBEE:  
+        
+                gw = new XBeeGateway(gid,port,this);
+                break;
+                
+            case ZIGBEE:
+                
+                break;
+                
+            case EHS:    
+        
+                break;
+        }
+        
+        gw.open();
+        
+        gateways.add(gw);
         
         return gid;
     }
@@ -52,12 +76,15 @@ public class NetworkContext {
     public void removeGateway(int gid) {
         for (int i=0; i<gateways.size(); i++) 
             if (gateways.get(i).getId() == gid) {
+                gateways.get(i).close();
                 gateways.remove(i);
                 break;
             }
     }
     
     public void removeAllGateways() {
+        for (Gateway gw : gateways)
+            gw.close();
         gateways.clear();
     }
 }

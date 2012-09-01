@@ -1,18 +1,18 @@
 package it.uniud.easyhome.rest;
 
 import it.uniud.easyhome.gateway.Gateway;
+import it.uniud.easyhome.gateway.GatewayInfo;
 import it.uniud.easyhome.gateway.ProtocolType;
 import it.uniud.easyhome.network.NetworkContext;
-import it.uniud.easyhome.network.PortAlreadyBoundException;
+import it.uniud.easyhome.network.exceptions.PortAlreadyBoundException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.core.*;
 import javax.ws.rs.*;
 
-@Path("/gateways")
-public class GatewayResource {
+@Path("/hub")
+public class HubResource {
     
     @Context
     private UriInfo uriInfo;
@@ -20,14 +20,16 @@ public class GatewayResource {
     private static NetworkContext networkContext = new NetworkContext();
 
     @GET
+    @Path("gateways")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Gateway> getGateways() {
+    public List<GatewayInfo> getGateways() {
 
-        return networkContext.getGateways();
+        return GatewayInfo.createFromAll(networkContext.getGateways());
     }
     
-    // curl -X POST http://localhost:8080/easyhome/rest/gateways -H "Content-Type: application/x-www-form-urlencoded" --data-binary "port=3000&protocol=EHS" 
+    // curl -X POST http://localhost:8080/easyhome/rest/hub/gateways -H "Content-Type: application/x-www-form-urlencoded" --data-binary "port=3000&protocol=EHS" 
     @POST
+    @Path("gateways")
     public Response registerGateway(@FormParam("protocol") ProtocolType protocol,
             @FormParam("port") int port) {
 
@@ -38,13 +40,13 @@ public class GatewayResource {
                 uriInfo.getAbsolutePathBuilder().path(String.valueOf(gid)).build())                
                 .build();
         } catch (PortAlreadyBoundException ex) {
-            // We accept trying to bind on the same port multiple times
-            return Response.ok().build();
+            // Precondition failure
+            return Response.status(412).build();
         }
     }
 
     @DELETE
-    @Path("{gid}")
+    @Path("gateways/{gid}")
     public Response unregisterGateway(@PathParam("gid") int gid) {
         
         if (networkContext.hasGateway(gid)) {
@@ -55,6 +57,7 @@ public class GatewayResource {
     }
     
     @DELETE
+    @Path("gateways")
     public Response clearAll() {
         
         networkContext.removeAllGateways();
