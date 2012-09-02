@@ -41,12 +41,19 @@ public class HubResource {
                                   @PathParam("port") int port) {
         
         ModuleCoordinates coords = new ModuleCoordinates(gid,address,port);
+
+        Integer retrievedPort = networkContext.getPortFor(coords);
+                
+        if (retrievedPort == null) 
+             throw new WebApplicationException(Response.Status.NOT_FOUND);
         
-        String val = String.valueOf(networkContext.getPortFor(coords));
-        
-        return "For " + gid + ", " + address + ", " + port + ": " + String.valueOf(networkContext.getPortFor(coords));
+        return String.valueOf(retrievedPort);
     }
     
+    /**
+     * Associates a new gateway port to a gid/address/port. 
+     * If an entry already exists, it is updated with a new port value.
+     */
     @POST
     @Path("routing")
     public Response putGatewayPort(@FormParam("gid") int gid,
@@ -84,8 +91,7 @@ public class HubResource {
                 uriInfo.getAbsolutePathBuilder().path(String.valueOf(gid)).build())                
                 .build();
         } catch (PortAlreadyBoundException ex) {
-            // Precondition failure
-            return Response.status(412).build();
+            return Response.status(Response.Status.PRECONDITION_FAILED).build();
         }
     }
 
@@ -97,7 +103,7 @@ public class HubResource {
             networkContext.removeGateway(gid);
             return Response.ok().build();
         } else
-            return Response.status(404).build();
+            return Response.status(Response.Status.NOT_FOUND).build();
     }
     
     @DELETE
