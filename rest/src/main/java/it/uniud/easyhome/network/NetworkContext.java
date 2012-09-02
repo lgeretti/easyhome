@@ -6,7 +6,11 @@ import it.uniud.easyhome.gateway.XBeeGateway;
 import it.uniud.easyhome.network.exceptions.PortAlreadyBoundException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /***
  * Provides the context related to the hub and gateways.
@@ -16,13 +20,52 @@ import java.util.List;
  */
 public class NetworkContext {
 
+    private static final NetworkContext INSTANCE = new NetworkContext();
+    
     private final List<Gateway> gateways = new ArrayList<Gateway>();
+    
+    private final Map<ModuleCoordinates,Integer> routingTable = new HashMap<ModuleCoordinates,Integer>();
+    
+    private final Map<Integer,Integer> gatewayPortCounts = new HashMap<Integer,Integer>();
     
     // Identifiers are guaranteed as unique, hence we cannot rely on the gateways size
     private int gidCount = 0;
     
     public List<Gateway> getGateways() {
         return gateways;
+    }
+    
+    public Map<ModuleCoordinates,Integer> getRoutingTable() {
+        return routingTable;
+    }
+    
+    public int addRoutingEntry(ModuleCoordinates coords) {
+        
+        int portCount = gatewayPortCounts.get(coords.getGatewayId());
+        portCount++;
+        gatewayPortCounts.put(coords.getGatewayId(), portCount);
+        routingTable.put(coords, portCount);
+        
+        return portCount;
+    }
+    
+    public void removeRoutingEntry(ModuleCoordinates coords) {
+        routingTable.remove(coords);
+    }    
+    
+    public boolean hasRoutingEntry(ModuleCoordinates coords) {
+        return routingTable.containsKey(coords);
+    }
+    
+    public Integer getPortFor(ModuleCoordinates coords) {
+        return routingTable.get(coords);
+    }
+    
+    private NetworkContext() {}
+    
+    public static NetworkContext getInstance() {
+     
+        return INSTANCE;
     }
     
     /** 
@@ -61,6 +104,7 @@ public class NetworkContext {
         gw.open();
         
         gateways.add(gw);
+        gatewayPortCounts.put(gid, 0);
         
         return gid;
     }
@@ -78,6 +122,7 @@ public class NetworkContext {
             if (gateways.get(i).getId() == gid) {
                 gateways.get(i).close();
                 gateways.remove(i);
+                gatewayPortCounts.remove(gid);
                 break;
             }
     }
@@ -86,5 +131,6 @@ public class NetworkContext {
         for (Gateway gw : gateways)
             gw.close();
         gateways.clear();
+        gatewayPortCounts.clear();
     }
 }

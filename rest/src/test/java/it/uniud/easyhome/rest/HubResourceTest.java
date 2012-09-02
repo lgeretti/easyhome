@@ -78,11 +78,41 @@ public class HubResourceTest extends JerseyTest {
         assertEquals(port,gw.getPort());
         assertEquals(protocol,gw.getProtocolType());
     }
+    
+    @Test
+    public void testRoutingEntry() {
+        
+        int port = 5000;
+        int address = 20;
+        ProtocolType protocol = ProtocolType.XBEE;
+        
+        Response gwInsertionResponse = insertGateway(port,protocol);
+        String locationPath = gwInsertionResponse.getLocation().getPath();
+        String[] segments = locationPath.split("/");
+        int gid = Integer.parseInt(segments[segments.length-1]);
+        
+        MultivaluedMap<String,String> formData = new MultivaluedHashMap<String,String>();
+        
+        formData.add("gid",String.valueOf(gid));
+        formData.add("address",String.valueOf(address));
+        formData.add("port",String.valueOf(port));
+        
+        Response routingInsertionResponse = target().path("hub/routing").request().post(Entity.form(formData)); 
+        
+        assertEquals(Status.CREATED,routingInsertionResponse.getStatusInfo());
+        
+        String content = target().path(routingInsertionResponse.getLocation().getPath()).request().get(String.class);
+
+        assertNotNull(content);
+    }
 
     @Test
     public void testDeleteGateway() {
         
-        Response insertionResponse = insertGateway(5000,ProtocolType.XBEE);
+        int port = 5000;
+        ProtocolType protocol = ProtocolType.XBEE;
+        
+        Response insertionResponse = insertGateway(port,protocol);
         URI location = insertionResponse.getLocation();
         
         Response deleteResponse1 = target().path(location.getPath()).request().delete();
@@ -104,4 +134,6 @@ public class HubResourceTest extends JerseyTest {
         
         return target().path("hub/gateways").request().post(Entity.form(formData));        
     }
+    
+    
 }

@@ -1,12 +1,13 @@
 package it.uniud.easyhome.rest;
 
-import it.uniud.easyhome.gateway.Gateway;
 import it.uniud.easyhome.gateway.GatewayInfo;
 import it.uniud.easyhome.gateway.ProtocolType;
+import it.uniud.easyhome.network.ModuleCoordinates;
 import it.uniud.easyhome.network.NetworkContext;
 import it.uniud.easyhome.network.exceptions.PortAlreadyBoundException;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.*;
 import javax.ws.rs.*;
@@ -17,7 +18,50 @@ public class HubResource {
     @Context
     private UriInfo uriInfo;
     
-    private static NetworkContext networkContext = new NetworkContext();
+    private static NetworkContext networkContext = NetworkContext.getInstance();
+    
+    /*
+    @GET
+    @Path("routing")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Map<ModuleCoordinates,Integer> getRoutingTable() {
+        return networkContext.getRoutingTable();
+    }*/
+    
+    @GET
+    @Path("routing/count")
+    public String getRoutingTableCount() {
+        return String.valueOf(networkContext.getRoutingTable().size());
+    }
+    
+    @GET
+    @Path("routing/{gid}/{address}/{port}")
+    public String getGatewayPort(@PathParam("gid") int gid,
+                                  @PathParam("address") int address,
+                                  @PathParam("port") int port) {
+        
+        ModuleCoordinates coords = new ModuleCoordinates(gid,address,port);
+        
+        String val = String.valueOf(networkContext.getPortFor(coords));
+        
+        return "For " + gid + ", " + address + ", " + port + ": " + String.valueOf(networkContext.getPortFor(coords));
+    }
+    
+    @POST
+    @Path("routing")
+    public Response putGatewayPort(@FormParam("gid") int gid,
+            @FormParam("address") int address,
+            @FormParam("port") int port) {
+        
+        ModuleCoordinates coords = new ModuleCoordinates(gid,address,port);
+        
+        networkContext.addRoutingEntry(coords);
+        
+        return Response.created(uriInfo.getAbsolutePathBuilder()
+                                .path(String.valueOf(gid)).path(String.valueOf(address)).path(String.valueOf(port))
+                                .build())                
+                .build();
+    }
 
     @GET
     @Path("gateways")
