@@ -62,13 +62,12 @@ public class HubResourceTest extends JerseyTest {
     }
 
     @Test
-    public void testInsertion() throws JSONException, IOException {
+    public void testCreateGateway() throws JSONException, IOException {
         
-        MultivaluedMap<String,String> formData = new MultivaluedHashMap<String,String>();
-        formData.add("port","5000");
-        formData.add("protocol",ProtocolType.XBEE.toString());
+        int port = 5000;
+        ProtocolType protocol = ProtocolType.XBEE;
         
-        Response insertionResponse = target().path("hub/gateways").request().post(Entity.form(formData));
+        Response insertionResponse = insertGateway(port,protocol);
         assertEquals(Status.CREATED,insertionResponse.getStatusInfo());
         
         GenericType<List<GatewayInfo>> gatewaysType = new GenericType<List<GatewayInfo>>() {};
@@ -76,17 +75,14 @@ public class HubResourceTest extends JerseyTest {
         assertEquals(1,gateways.size());
         GatewayInfo gw = gateways.get(0);
         assertTrue(gw.getId()>0);
-        assertEquals(5000,gw.getPort());
-        assertEquals(ProtocolType.XBEE,gw.getProtocolType());
+        assertEquals(port,gw.getPort());
+        assertEquals(protocol,gw.getProtocolType());
     }
 
     @Test
-    public void testDelete() {
+    public void testDeleteGateway() {
         
-        MultivaluedMap<String,String> formData = new MultivaluedHashMap<String,String>();
-        formData.add("port","2000");
-        formData.add("protocol",ProtocolType.XBEE.toString());
-        Response insertionResponse = target().path("hub/gateways").request().post(Entity.form(formData));
+        Response insertionResponse = insertGateway(5000,ProtocolType.XBEE);
         URI location = insertionResponse.getLocation();
         
         Response deleteResponse1 = target().path(location.getPath()).request().delete();
@@ -96,7 +92,16 @@ public class HubResourceTest extends JerseyTest {
     }
     
     @After
-    public void clear() {
+    public void clearGateways() {
         target().path("hub/gateways").request().delete();
+    }
+    
+    private Response insertGateway(int port, ProtocolType protocol) {
+        
+        MultivaluedMap<String,String> formData = new MultivaluedHashMap<String,String>();
+        formData.add("port",String.valueOf(port));
+        formData.add("protocol",protocol.toString());
+        
+        return target().path("hub/gateways").request().post(Entity.form(formData));        
     }
 }
