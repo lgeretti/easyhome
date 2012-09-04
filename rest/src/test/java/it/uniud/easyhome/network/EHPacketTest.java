@@ -21,8 +21,10 @@ public class EHPacketTest {
                         0x02,       // destination network
                         0x00, 0x0F, // destination address
                         0x00, 0x01, // destination port
+                        0x01,       // operation flags
+                        0x00, 0x10, // operation domain
                         0x00, 0x03, // operation context
-                        0x00, (byte)0xA1, // operation method
+                        (byte)0xA1, // operation command
                         0x05, 0x01, 0x01, (byte)0xFF // operation data
                        };
         
@@ -46,13 +48,7 @@ public class EHPacketTest {
         
         EHPacket pkt = new EHPacket(packetBytes);
         
-        StringBuilder strb = new StringBuilder();
-        for (byte b: pkt.getBytes()) {
-            if ((0xFF & b) < 0x10)
-                strb.append("0");
-            strb.append(Integer.toHexString(0xFF & b).toUpperCase()).append(" ");
-        }
-        System.out.println("Packet bytes: " + strb.toString());
+        System.out.println("Packet bytes: " + pkt.printBytes());
         
         assertTrue(Arrays.equals(pkt.getBytes(), packetBytes));
     }

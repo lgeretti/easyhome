@@ -7,7 +7,6 @@ import it.uniud.easyhome.network.NetworkContext;
 import it.uniud.easyhome.network.exceptions.PortAlreadyBoundException;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.core.*;
 import javax.ws.rs.*;
@@ -19,14 +18,6 @@ public class HubResource {
     private UriInfo uriInfo;
     
     private static NetworkContext networkContext = NetworkContext.getInstance();
-    
-    /*
-    @GET
-    @Path("routing")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Map<ModuleCoordinates,Integer> getRoutingTable() {
-        return networkContext.getRoutingTable();
-    }*/
     
     @GET
     @Path("routing/count")
@@ -49,6 +40,7 @@ public class HubResource {
         
         return String.valueOf(retrievedPort);
     }
+    
     
     /**
      * Associates a new gateway port to a gid/address/port. 
@@ -78,7 +70,7 @@ public class HubResource {
         return GatewayInfo.createFromAll(networkContext.getGateways());
     }
     
-    // curl -X POST http://localhost:8080/easyhome/rest/hub/gateways -H "Content-Type: application/x-www-form-urlencoded" --data-binary "port=3000&protocol=EHS" 
+    // curl -X POST http://localhost:8080/easyhome/rest/hub/gateways -H "Content-Type: application/x-www-form-urlencoded" --data-binary "port=3000&protocol=XBEE" 
     @POST
     @Path("gateways")
     public Response registerGateway(@FormParam("protocol") ProtocolType protocol,

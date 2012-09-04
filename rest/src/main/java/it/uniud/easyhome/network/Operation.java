@@ -6,31 +6,56 @@ import java.io.IOException;
 
 public class Operation {
 
-    public final static int FIXED_OCTETS = 4;
+    public final static int FIXED_OCTETS = 6;
     
+    private boolean isContextSpecific;
+    private int domain;
     private int context;
-    private int method;
+    private int command;
     private byte[] data;
+    
+    public int getDomain() {
+        return domain;
+    }
     
     public int getContext() {
         return context;
     }
     
-    public int getMethod() {
-        return method;
+    public boolean isContextSpecific() {
+        return isContextSpecific;
+    }
+    
+    public int getCommand() {
+        return command;
     }
     
     public byte[] getData() {
         return data;
     }
     
+    public Operation(int flags, int domain, int context, int command, byte[] data) {
+        
+        isContextSpecific = ((flags & 0x01) == 1);
+        
+        this.domain = domain;
+        this.context = context;
+        this.command = command;
+        this.data = data;
+    }
+    
     public Operation(ByteArrayInputStream bais, int dataSize) {
+        
+        int flags = bais.read();
+        isContextSpecific = ((flags & 0x01) == 1);
+        
+        int highDomain = bais.read();
+        domain = highDomain*256+bais.read();
         
         int highContext = bais.read();
         context = highContext*256+bais.read();
         
-        int highMethod = bais.read();
-        method = highMethod*256+bais.read();
+        command = bais.read();
         
         data = new byte[dataSize];
         bais.read(data, 0, dataSize);
@@ -38,10 +63,12 @@ public class Operation {
     
     public void writeBytes(ByteArrayOutputStream baos) {
         
+        baos.write(isContextSpecific ? 0x01 : 0x00);
+        baos.write((domain >>> 8) & 0xFF);
+        baos.write(domain & 0xFF);
         baos.write((context >>> 8) & 0xFF);
         baos.write(context & 0xFF);
-        baos.write((method >>> 8) & 0xFF);
-        baos.write(method & 0xFF);
+        baos.write(command & 0xFF);
         
         try {
             baos.write(data);

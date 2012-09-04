@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /***
@@ -60,6 +61,17 @@ public class NetworkContext {
     public Integer getPortFor(ModuleCoordinates coords) {
         return routingTable.get(coords);
     }
+    
+    public ModuleCoordinates getCoordinatesFor(int gid, int port) {
+        ModuleCoordinates coords = null;
+        for (Entry<ModuleCoordinates,Integer> pair : routingTable.entrySet()) 
+            if (pair.getKey().getGatewayId() == gid && pair.getValue() == port) {
+                coords = pair.getKey();
+                break;
+            }
+        
+        return coords;
+    }    
     
     private NetworkContext() {}
     

@@ -28,6 +28,12 @@ public class EHPacket {
         return operation;
     }
     
+    public EHPacket(ModuleCoordinates srcCoords, ModuleCoordinates dstCoords, Operation op) {
+        this.srcCoords = srcCoords;
+        this.dstCoords = dstCoords;
+        this.operation = op;
+    }
+    
     public EHPacket(byte[] bytes) {
         
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
@@ -72,5 +78,17 @@ public class EHPacket {
         baos.write(checksum);
         
         return baos.toByteArray();
+    }
+    
+    public String printBytes() {
+        
+        StringBuilder strb = new StringBuilder();
+        for (byte b: getBytes()) {
+            if ((0xFF & b) < 0x10)
+                strb.append("0");
+            strb.append(Integer.toHexString(0xFF & b).toUpperCase()).append(" ");
+        }
+        
+        return strb.toString();
     }
 }

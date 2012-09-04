@@ -87,6 +87,7 @@ public class HubResourceTest extends JerseyTest {
         ProtocolType protocol = ProtocolType.XBEE;
         
         Response gwInsertionResponse = insertGateway(port,protocol);
+        assertEquals(Status.CREATED,gwInsertionResponse.getStatusInfo());
         String locationPath = gwInsertionResponse.getLocation().getPath();
         String[] segments = locationPath.split("/");
         int gid = Integer.parseInt(segments[segments.length-1]);
@@ -101,9 +102,13 @@ public class HubResourceTest extends JerseyTest {
         
         assertEquals(Status.CREATED,routingInsertionResponse.getStatusInfo());
         
-        String content = target().path(routingInsertionResponse.getLocation().getPath()).request().get(String.class);
+        String count = target().path("hub/routing/count").request().get(String.class);
+        
+        assertEquals(Integer.parseInt(count),1);
+        
+        String routedPort = target().path(routingInsertionResponse.getLocation().getPath()).request().get(String.class);
 
-        assertNotNull(content);
+        assertNotNull(routedPort);
     }
 
     @Test
@@ -113,11 +118,12 @@ public class HubResourceTest extends JerseyTest {
         ProtocolType protocol = ProtocolType.XBEE;
         
         Response insertionResponse = insertGateway(port,protocol);
-        URI location = insertionResponse.getLocation();
+        assertEquals(Status.CREATED,insertionResponse.getStatusInfo());
+        String insertionPath = insertionResponse.getLocation().getPath();
         
-        Response deleteResponse1 = target().path(location.getPath()).request().delete();
+        Response deleteResponse1 = target().path(insertionPath).request().delete();
         assertEquals(Status.OK,deleteResponse1.getStatusInfo());
-        Response deleteResponse2 = target().path(location.getPath()).request().delete();
+        Response deleteResponse2 = target().path(insertionPath).request().delete();
         assertEquals(Status.NOT_FOUND,deleteResponse2.getStatusInfo());
     }
     

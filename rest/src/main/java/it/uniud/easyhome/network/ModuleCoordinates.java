@@ -52,7 +52,7 @@ public class ModuleCoordinates {
     @Override
     public boolean equals(Object other) {
         
-        if (! (other instanceof ModuleCoordinates))
+        if (!(other instanceof ModuleCoordinates))
             return false;
         
         ModuleCoordinates otherCoords = (ModuleCoordinates) other;
