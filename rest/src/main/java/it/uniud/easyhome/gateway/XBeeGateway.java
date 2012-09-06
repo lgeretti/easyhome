@@ -134,7 +134,7 @@ public class XBeeGateway implements Gateway {
                                     
                                     EHPacket pkt = convertFrom(new ByteArrayInputStream(packetPayload));
                                     
-                                    System.out.println(pkt.printBytes());
+                                    
                                 }
                             }
                         }
