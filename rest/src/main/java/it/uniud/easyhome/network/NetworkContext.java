@@ -135,6 +135,14 @@ public class NetworkContext {
                 gateways.get(i).close();
                 gateways.remove(i);
                 gatewayPortCounts.remove(gid);
+                Map<ModuleCoordinates,Integer> newRoutingTable = new HashMap<ModuleCoordinates,Integer>();
+                for (Entry<ModuleCoordinates,Integer> entry : routingTable.entrySet()) {
+                    if (entry.getKey().getGatewayId() != gid)
+                        newRoutingTable.put(entry.getKey(), entry.getValue());
+                }
+                routingTable.clear();
+                routingTable.putAll(newRoutingTable);
+                
                 break;
             }
     }
@@ -144,5 +152,6 @@ public class NetworkContext {
             gw.close();
         gateways.clear();
         gatewayPortCounts.clear();
+        routingTable.clear();
     }
 }
