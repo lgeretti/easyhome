@@ -8,6 +8,7 @@ import it.uniud.easyhome.network.exceptions.PortAlreadyBoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -135,15 +136,11 @@ public class NetworkContext {
                 gateways.get(i).close();
                 gateways.remove(i);
                 gatewayPortCounts.remove(gid);
-                Map<ModuleCoordinates,Integer> newRoutingTable = new HashMap<ModuleCoordinates,Integer>();
-                for (Entry<ModuleCoordinates,Integer> entry : routingTable.entrySet()) {
-                    if (entry.getKey().getGatewayId() != gid)
-                        newRoutingTable.put(entry.getKey(), entry.getValue());
-                }
-                routingTable.clear();
-                routingTable.putAll(newRoutingTable);
                 
-                break;
+                Iterator<Map.Entry<ModuleCoordinates,Integer>> it = routingTable.entrySet().iterator();
+                while (it.hasNext())
+                    if (it.next().getKey().getGatewayId() == gid)
+                        it.remove();
             }
     }
     
