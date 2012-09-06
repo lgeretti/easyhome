@@ -3,6 +3,7 @@ package it.uniud.easyhome.network;
 import it.uniud.easyhome.gateway.Gateway;
 import it.uniud.easyhome.gateway.ProtocolType;
 import it.uniud.easyhome.gateway.XBeeGateway;
+import it.uniud.easyhome.network.exceptions.MissingGatewayException;
 import it.uniud.easyhome.network.exceptions.PortAlreadyBoundException;
 
 import java.util.ArrayList;
@@ -28,8 +29,6 @@ public class NetworkContext {
     
     private final Map<ModuleCoordinates,Integer> routingTable = new HashMap<ModuleCoordinates,Integer>();
     
-    private final Map<Integer,Integer> gatewayPortCounts = new HashMap<Integer,Integer>();
-    
     // Identifiers are guaranteed as unique, hence we cannot rely on the gateways size
     private int gidCount = 0;
     
@@ -43,12 +42,16 @@ public class NetworkContext {
     
     public int addRoutingEntry(ModuleCoordinates coords) {
         
-        int portCount = gatewayPortCounts.get(coords.getGatewayId());
-        portCount++;
-        gatewayPortCounts.put(coords.getGatewayId(), portCount);
-        routingTable.put(coords, portCount);
+        Gateway gw = getGatewayForId(coords.getGatewayId());
         
-        return portCount;
+        if (gw == null)
+            throw new MissingGatewayException();
+        
+        int mappedPort = gw.getNewMappedPort();
+        
+        routingTable.put(coords, mappedPort);
+        
+        return mappedPort;
     }
     
     public void removeRoutingEntry(ModuleCoordinates coords) {
@@ -81,6 +84,15 @@ public class NetworkContext {
         return INSTANCE;
     }
     
+    public Gateway getGatewayForId(int gid) {
+        
+        for (Gateway gw : gateways)
+            if (gw.getId() == gid)
+                return gw;
+
+        return null;
+    }
+    
     /** 
      * Adds a new gateway.
      * 
@@ -91,7 +103,7 @@ public class NetworkContext {
     public int addGateway(ProtocolType protocol, int port) {
         
         for (Gateway gw : gateways)
-            if (gw.getPort() == port)
+            if (gw.getTCPPort() == port)
                 throw new PortAlreadyBoundException();
         
         int gid = ++gidCount;
@@ -117,7 +129,6 @@ public class NetworkContext {
         gw.open();
         
         gateways.add(gw);
-        gatewayPortCounts.put(gid, 0);
         
         return gid;
     }
@@ -135,7 +146,6 @@ public class NetworkContext {
             if (gateways.get(i).getId() == gid) {
                 gateways.get(i).close();
                 gateways.remove(i);
-                gatewayPortCounts.remove(gid);
                 
                 Iterator<Map.Entry<ModuleCoordinates,Integer>> it = routingTable.entrySet().iterator();
                 while (it.hasNext())
@@ -148,7 +158,6 @@ public class NetworkContext {
         for (Gateway gw : gateways)
             gw.close();
         gateways.clear();
-        gatewayPortCounts.clear();
         routingTable.clear();
     }
 }

@@ -6,7 +6,9 @@ public interface Gateway {
     
     public ProtocolType getProtocolType();
     
-    public int getPort();
+    public int getTCPPort();
+    
+    public int getNewMappedPort();
     
     public void open();
     

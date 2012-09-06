@@ -20,6 +20,8 @@ public class XBeeGateway implements Gateway {
     
     private int port;
     
+    private int mappedPortCounter = 0;
+    
     private int id;
     
     public int getId() {
@@ -30,8 +32,12 @@ public class XBeeGateway implements Gateway {
         return ProtocolType.XBEE;
     }
     
-    public int getPort() {
+    public int getTCPPort() {
         return port;
+    }
+    
+    public int getNewMappedPort() {
+        return mappedPortCounter++;
     }
     
     public XBeeGateway(int id, int port, NetworkContext context) {
