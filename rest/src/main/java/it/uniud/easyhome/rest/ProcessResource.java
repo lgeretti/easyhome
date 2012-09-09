@@ -19,6 +19,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.ws.rs.core.*;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.*;
 
 @Path("/processes")
@@ -60,7 +61,7 @@ public class ProcessResource {
     
     @POST
     @Path("listen")
-    public void startListening() throws NamingException, JMSException {
+    public void startListening() {
         
         Thread thr = new Thread(new Runnable() { public void run() {
             
@@ -94,8 +95,6 @@ public class ProcessResource {
         
         thr.start();
     }
-    
-    
     
     @GET
     @Path("/howmany")
@@ -136,7 +135,7 @@ public class ProcessResource {
             }
         }
         
-        return Response.status(404).build();
+        return Response.status(Status.NOT_FOUND).build();
     }
     
     @DELETE
