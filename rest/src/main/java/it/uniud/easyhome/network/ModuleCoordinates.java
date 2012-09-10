@@ -7,11 +7,14 @@ public class ModuleCoordinates {
 
     public static final int OCTETS = 5;
     
+    // Gateway (and consequently subnetwork) identifier (>0, =0 for broadcast, =1 for EasyHome TCP/IP)
     private int gid;
+    // Address within the network (>0, =0 if broadcast to a specific network, irrelevant if broadcast to all subnetworks)
     private int address;
+    // Port of the interested module (>0, no broadcast is supported)
     private int port;
     
-    public int getGatewayId() { 
+    public int getGatewayId() {
         return gid;
     }
     

@@ -49,9 +49,9 @@ public class XBeeGateway implements Gateway {
     
     /**
      * Converts an XBee API received packet, starting from the 16 bit source network address forth,
-     * checksum excluded
+     * checksum excluded.
      */
-    private EHPacket convertFrom(ByteArrayInputStream bais) {
+    private EHPacket convertFromPayload(ByteArrayInputStream bais) {
         
         int srcAddress = (bais.read() << 8) + bais.read();
         int srcPort = bais.read();
@@ -89,6 +89,40 @@ public class XBeeGateway implements Gateway {
     
     private class GatewayRunnable implements Runnable {
     
+        private void handleInboundPacketFrom(InputStream in) throws IOException {
+            
+            int highLength = in.read();
+            // The frame type and source 64 bit address (hence 5 octets) are not stored
+            int length = highLength*256 + in.read() - 5;
+            
+            byte[] packetPayload = new byte[length];
+            
+            int sum = EXPLICIT_RX_INDICATOR_FRAME_TYPE;
+            byte frameType = (byte)in.read();
+            if (frameType == EXPLICIT_RX_INDICATOR_FRAME_TYPE) {
+            
+                // Read out the source 64 bit address
+                for (int i=0; i<4; i++) {
+                    byte readValue = (byte)in.read();
+                    sum += readValue;
+                }
+                    
+                for (int i=0; i<length; i++) {
+                    byte readValue = (byte)in.read();
+                    packetPayload[i] = readValue;
+                    sum += readValue;
+                }
+                sum += (byte)in.read();
+                 
+                if (0xFF == (sum & 0xFF)) {
+                    
+                    EHPacket pkt = convertFromPayload(new ByteArrayInputStream(packetPayload));
+                    
+                    
+                }
+            }
+        }
+        
         public void run() {
             
             try {
@@ -105,39 +139,8 @@ public class XBeeGateway implements Gateway {
                     
                     while (true) {
                         int octet = in.read();
-                        if (octet == START_DELIMITER) {
-                            
-                            int highLength = in.read();
-                            // The frame type and source 64 bit address (hence 5 octets) are not stored
-                            int length = highLength*256 + in.read() - 5;
-                            
-                            byte[] packetPayload = new byte[length];
-                            
-                            int sum = EXPLICIT_RX_INDICATOR_FRAME_TYPE;
-                            byte frameType = (byte)in.read();
-                            if (frameType == EXPLICIT_RX_INDICATOR_FRAME_TYPE) {
-                            
-                                // Read out the source 64 bit address
-                                for (int i=0; i<4; i++) {
-                                    byte readValue = (byte)in.read();
-                                    sum += readValue;
-                                }
-                                    
-                                for (int i=0; i<length; i++) {
-                                    byte readValue = (byte)in.read();
-                                    packetPayload[i] = readValue;
-                                    sum += readValue;
-                                }
-                                sum += (byte)in.read();
-                                 
-                                if (0xFF == (sum & 0xFF)) {
-                                    
-                                    EHPacket pkt = convertFrom(new ByteArrayInputStream(packetPayload));
-                                    
-                                    
-                                }
-                            }
-                        }
+                        if (octet == START_DELIMITER) 
+                            handleInboundPacketFrom(in);
                     }
                 
                 } catch (IOException ex) {
