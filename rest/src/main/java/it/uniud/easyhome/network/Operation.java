@@ -3,8 +3,11 @@ package it.uniud.easyhome.network;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 
-public class Operation {
+public class Operation implements Serializable {
+
+    private static final long serialVersionUID = -5552129172588857832L;
 
     public final static int FIXED_OCTETS = 6;
     

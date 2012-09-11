@@ -6,9 +6,12 @@ import it.uniud.easyhome.network.exceptions.InvalidPacketLengthException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Serializable;
 
-public class EHPacket {
+public class EHPacket implements Serializable {
 
+    private static final long serialVersionUID = -6680743462870235932L;
+    
     private ModuleCoordinates srcCoords;
     private ModuleCoordinates dstCoords;
     private Operation operation;

@@ -2,8 +2,11 @@ package it.uniud.easyhome.network;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Serializable;
 
-public class ModuleCoordinates {
+public class ModuleCoordinates implements Serializable {
+
+    private static final long serialVersionUID = -5009839141486612459L;
 
     public static final int OCTETS = 5;
     

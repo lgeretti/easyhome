@@ -7,7 +7,20 @@ import it.uniud.easyhome.network.Operation;
 import it.uniud.easyhome.network.exceptions.RoutingEntryMissingException;
 
 import java.net.*;
+import java.util.Date;
 import java.io.*;
+
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.MessageProducer;
+import javax.jms.ObjectMessage;
+import javax.jms.Queue;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+import javax.jms.Topic;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
 public class XBeeGateway implements Gateway {
     
@@ -37,7 +50,7 @@ public class XBeeGateway implements Gateway {
     }
     
     public int getNewMappedPort() {
-        return mappedPortCounter++;
+        return ++mappedPortCounter;
     }
     
     public XBeeGateway(int id, int port, NetworkContext context) {
@@ -56,9 +69,13 @@ public class XBeeGateway implements Gateway {
         int srcAddress = (bais.read() << 8) + bais.read();
         int srcPort = bais.read();
         
+        System.out.println("Source address and port: " + srcAddress + ", " + srcPort);
+        
         ModuleCoordinates srcCoords = new ModuleCoordinates(id,srcAddress,srcPort);
         
         int dstPort = bais.read();
+        
+        System.out.println("Looking for gateway id " + id + " and destination port " + dstPort);
         
         ModuleCoordinates dstCoords = networkContext.getCoordinatesFor(id, dstPort);
         
@@ -87,22 +104,57 @@ public class XBeeGateway implements Gateway {
         return new EHPacket(srcCoords,dstCoords,op);
     }
     
+    /**
+     * Dispatches the packet to the processes and the gateways
+     */
+    private void dispatchPacket(EHPacket pkt) {
+        
+        try {
+            Context jndiContext = new InitialContext();
+
+            // Looks up the administered objects
+            ConnectionFactory connectionFactory = (ConnectionFactory) jndiContext.lookup("jms/easyhome/ConnectionFactory");
+            Topic topic = (Topic) jndiContext.lookup("jms/easyhome/OutboundPacketsTopic");
+    
+            // Creates the needed artifacts to connect to the queue
+            Connection connection = connectionFactory.createConnection();
+            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            MessageProducer producer = session.createProducer(topic);
+    
+            // Sends a text message to the queue
+            ObjectMessage message = session.createObjectMessage(pkt);
+            producer.send(message);
+            System.out.println("Message sent!");
+    
+            connection.close();
+            
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+        // If the source and destination subnetwork are the same, the packet is not dispatched further   
+        
+    }
+    
     private class GatewayRunnable implements Runnable {
     
         private void handleInboundPacketFrom(InputStream in) throws IOException {
             
+            System.out.println("Recognized XBee packet");
+            
             int highLength = in.read();
-            // The frame type and source 64 bit address (hence 5 octets) are not stored
-            int length = highLength*256 + in.read() - 5;
+            // The frame type and source 64 bit address (hence 9 octets) are not stored
+            int length = highLength*256 + in.read() - 9;
             
             byte[] packetPayload = new byte[length];
             
             int sum = EXPLICIT_RX_INDICATOR_FRAME_TYPE;
             byte frameType = (byte)in.read();
             if (frameType == EXPLICIT_RX_INDICATOR_FRAME_TYPE) {
-            
+                
                 // Read out the source 64 bit address
-                for (int i=0; i<4; i++) {
+                for (int i=0; i<8; i++) {
                     byte readValue = (byte)in.read();
                     sum += readValue;
                 }
@@ -116,9 +168,13 @@ public class XBeeGateway implements Gateway {
                  
                 if (0xFF == (sum & 0xFF)) {
                     
+                    System.out.println("Checksum success, converting and dispatching");
+                    
                     EHPacket pkt = convertFromPayload(new ByteArrayInputStream(packetPayload));
                     
-                    
+                    dispatchPacket(pkt);
+                } else {
+                    System.out.println("Checksum failure");
                 }
             }
         }
@@ -139,8 +195,14 @@ public class XBeeGateway implements Gateway {
                     
                     while (true) {
                         int octet = in.read();
-                        if (octet == START_DELIMITER) 
-                            handleInboundPacketFrom(in);
+                        if (octet == START_DELIMITER) {
+                            try {
+                                handleInboundPacketFrom(in);
+                            } catch (Exception e) {
+                                // We want to gracefully handle incorrect packets
+                                System.out.println("Incorrect packet discarded");
+                            }
+                        }
                     }
                 
                 } catch (IOException ex) {
@@ -148,9 +210,9 @@ public class XBeeGateway implements Gateway {
                 } finally {
                   try {
                     if (connection != null) connection.close();
-                    System.out.println("Connection with " + connection + " closed");
                   } catch (IOException ex) {
                   }
+                  System.out.println("Connection with " + connection + " closed");
                 }
               }
             } catch (IOException ex) {
