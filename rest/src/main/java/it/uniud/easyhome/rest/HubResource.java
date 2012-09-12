@@ -1,5 +1,6 @@
 package it.uniud.easyhome.rest;
 
+import it.uniud.easyhome.gateway.Gateway;
 import it.uniud.easyhome.gateway.GatewayInfo;
 import it.uniud.easyhome.gateway.ProtocolType;
 import it.uniud.easyhome.network.ModuleCoordinates;
@@ -19,49 +20,6 @@ public class HubResource {
     
     private static NetworkContext networkContext = NetworkContext.getInstance();
     
-    @GET
-    @Path("routing/count")
-    public String getRoutingTableCount() {
-        return String.valueOf(networkContext.getRoutingTable().size());
-    }
-    
-    @GET
-    @Path("routing/{gid}/{address}/{port}")
-    public String getGatewayPort(@PathParam("gid") int gid,
-                                  @PathParam("address") int address,
-                                  @PathParam("port") int port) {
-        
-        ModuleCoordinates coords = new ModuleCoordinates(gid,address,port);
-
-        Integer retrievedPort = networkContext.getPortFor(coords);
-                
-        if (retrievedPort == null) 
-             throw new WebApplicationException(Response.Status.NOT_FOUND);
-        
-        return String.valueOf(retrievedPort);
-    }
-    
-    
-    /**
-     * Associates a new gateway port to a gid/address/port. 
-     * If an entry already exists, it is updated with a new port value.
-     */
-    @POST
-    @Path("routing")
-    public Response putGatewayPort(@FormParam("gid") int gid,
-            @FormParam("address") int address,
-            @FormParam("port") int port) {
-        
-        ModuleCoordinates coords = new ModuleCoordinates(gid,address,port);
-        
-        networkContext.addRoutingEntry(coords);
-        
-        return Response.created(uriInfo.getAbsolutePathBuilder()
-                                .path(String.valueOf(gid)).path(String.valueOf(address)).path(String.valueOf(port))
-                                .build())                
-                .build();
-    }
-
     @GET
     @Path("gateways")
     @Produces(MediaType.APPLICATION_JSON)
@@ -105,6 +63,64 @@ public class HubResource {
         networkContext.removeAllGateways();
         
         return Response.ok().build();
+    }
+    
+    @GET
+    @Path("gateways/{gid}/routing/count")
+    public String getRoutingTableCount(@PathParam("gid") int gid) {
+        Gateway gw = networkContext.getGatewayForId(gid);
+        return String.valueOf(gw.getRoutingTable().size());
+    }
+    
+    @GET
+    @Path("gateways/{srcgid}/routing/{dstgid}/{address}/{port}")
+    public String getGatewayPort(@PathParam("srcgid") int srcGid,
+                                 @PathParam("dstgid") int dstGid,
+                                 @PathParam("address") int address,
+                                 @PathParam("port") int port) {
+        
+        ModuleCoordinates coords = new ModuleCoordinates(dstGid,address,port);
+
+        Gateway gw = networkContext.getGatewayForId(srcGid);
+        
+        if (gw == null) 
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        
+        Integer retrievedPort = gw.getPortFor(coords);
+                
+        if (retrievedPort == null) 
+             throw new WebApplicationException(Response.Status.NOT_FOUND);
+        
+        return String.valueOf(retrievedPort);
+    }
+    
+    
+    /**
+     * Associates a new gateway port to a gid/address/port. 
+     * If an entry already exists, it is updated with a new port value.
+     */
+    @POST
+    @Path("gateways/{srcgid}/routing")
+    public Response putRoutingEntry(@PathParam("srcgid") int srcGid,
+            @FormParam("gid") int entryGid,
+            @FormParam("address") int entryAddress,
+            @FormParam("port") int entryPort) {
+        
+        ModuleCoordinates coords = new ModuleCoordinates(entryGid,entryAddress,entryPort);
+        
+        Gateway gw = networkContext.getGatewayForId(srcGid);
+        
+        if (gw == null) 
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+
+        gw.addRoutingEntry(coords);
+        
+        return Response.created(uriInfo.getAbsolutePathBuilder()
+                                .path(String.valueOf(entryGid))
+                                .path(String.valueOf(entryAddress))
+                                .path(String.valueOf(entryPort))
+                                .build())                
+                .build();
     }
     
 }

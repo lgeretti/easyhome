@@ -4,10 +4,15 @@ import it.uniud.easyhome.network.EHPacket;
 import it.uniud.easyhome.network.ModuleCoordinates;
 import it.uniud.easyhome.network.NetworkContext;
 import it.uniud.easyhome.network.Operation;
+import it.uniud.easyhome.network.exceptions.MissingGatewayException;
 import it.uniud.easyhome.network.exceptions.RoutingEntryMissingException;
 
 import java.net.*;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.io.*;
 
 import javax.jms.Connection;
@@ -29,7 +34,7 @@ public class XBeeGateway implements Gateway {
     
     private ServerSocket server = null;
     
-    private NetworkContext networkContext;
+    private final Map<ModuleCoordinates,Integer> routingTable = new HashMap<ModuleCoordinates,Integer>();
     
     private int port;
     
@@ -49,16 +54,51 @@ public class XBeeGateway implements Gateway {
         return port;
     }
     
-    public int getNewMappedPort() {
-        return ++mappedPortCounter;
+    public Map<ModuleCoordinates,Integer> getRoutingTable() {
+        return routingTable;
     }
     
-    public XBeeGateway(int id, int port, NetworkContext context) {
+    public XBeeGateway(int id, int port) {
         
         this.id = id;
         this.port = port;
-        this.networkContext = context;
     }
+    
+    public int addRoutingEntry(ModuleCoordinates coords) {
+        
+        routingTable.put(coords, ++mappedPortCounter);
+        
+        return mappedPortCounter;
+    }
+    
+    public void removeRoutingEntry(ModuleCoordinates coords) {
+        routingTable.remove(coords);
+    }    
+    
+    public void removeRoutingEntriesForGateway(int gid) {
+        
+        Iterator<Map.Entry<ModuleCoordinates,Integer>> it = routingTable.entrySet().iterator();
+        while (it.hasNext())
+            if (it.next().getKey().getGatewayId() == gid)
+                it.remove();
+    }
+    
+    public Integer getPortFor(ModuleCoordinates coords) {
+        return routingTable.get(coords);
+    }
+    
+    private ModuleCoordinates getCoordinatesFor(int port) {
+        ModuleCoordinates coords = null;
+
+        for (Entry<ModuleCoordinates,Integer> pair : routingTable.entrySet()) 
+            if (pair.getValue() == port) {
+                coords = pair.getKey();
+                break;
+            }
+        
+        return coords;
+    }  
+    
     
     /**
      * Converts an XBee API received packet, starting from the 16 bit source network address forth,
@@ -77,7 +117,7 @@ public class XBeeGateway implements Gateway {
         
         System.out.println("Looking for gateway id " + id + " and destination port " + dstPort);
         
-        ModuleCoordinates dstCoords = networkContext.getCoordinatesFor(id, dstPort);
+        ModuleCoordinates dstCoords = getCoordinatesFor(dstPort);
         
         if (dstCoords == null)
             throw new RoutingEntryMissingException();
@@ -212,6 +252,7 @@ public class XBeeGateway implements Gateway {
                   try {
                     if (connection != null) connection.close();
                   } catch (IOException ex) {
+                      // Whatever the case, the connection is not available anymore
                   }
                   System.out.println("Connection with " + connection + " closed");
                 }

@@ -27,55 +27,12 @@ public class NetworkContext {
     
     private final List<Gateway> gateways = new ArrayList<Gateway>();
     
-    private final Map<ModuleCoordinates,Integer> routingTable = new HashMap<ModuleCoordinates,Integer>();
-    
     // Identifiers are guaranteed as unique, hence we cannot rely on the gateways size
     private int gidCount = 0;
     
     public List<Gateway> getGateways() {
         return gateways;
-    }
-    
-    public Map<ModuleCoordinates,Integer> getRoutingTable() {
-        return routingTable;
-    }
-    
-    public int addRoutingEntry(ModuleCoordinates coords) {
-        
-        Gateway gw = getGatewayForId(coords.getGatewayId());
-        
-        if (gw == null)
-            throw new MissingGatewayException();
-        
-        int mappedPort = gw.getNewMappedPort();
-        
-        routingTable.put(coords, mappedPort);
-        
-        return mappedPort;
-    }
-    
-    public void removeRoutingEntry(ModuleCoordinates coords) {
-        routingTable.remove(coords);
-    }    
-    
-    public boolean hasRoutingEntry(ModuleCoordinates coords) {
-        return routingTable.containsKey(coords);
-    }
-    
-    public Integer getPortFor(ModuleCoordinates coords) {
-        return routingTable.get(coords);
-    }
-    
-    public ModuleCoordinates getCoordinatesFor(int gid, int port) {
-        ModuleCoordinates coords = null;
-        for (Entry<ModuleCoordinates,Integer> pair : routingTable.entrySet()) 
-            if (pair.getKey().getGatewayId() == gid && pair.getValue() == port) {
-                coords = pair.getKey();
-                break;
-            }
-        
-        return coords;
-    }    
+    }  
     
     private NetworkContext() {}
     
@@ -114,7 +71,7 @@ public class NetworkContext {
         
             case XBEE:  
         
-                gw = new XBeeGateway(gid,port,this);
+                gw = new XBeeGateway(gid,port);
                 break;
                 
             case ZIGBEE:
@@ -147,10 +104,11 @@ public class NetworkContext {
                 gateways.get(i).close();
                 gateways.remove(i);
                 
-                Iterator<Map.Entry<ModuleCoordinates,Integer>> it = routingTable.entrySet().iterator();
-                while (it.hasNext())
-                    if (it.next().getKey().getGatewayId() == gid)
-                        it.remove();
+                for (Gateway gw: gateways) {
+                    gw.removeRoutingEntriesForGateway(gid);
+                }
+                
+                break;
             }
     }
     
@@ -158,6 +116,5 @@ public class NetworkContext {
         for (Gateway gw : gateways)
             gw.close();
         gateways.clear();
-        routingTable.clear();
     }
 }

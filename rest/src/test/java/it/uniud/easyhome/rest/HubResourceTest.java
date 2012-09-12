@@ -7,8 +7,6 @@ import it.uniud.easyhome.gateway.ProtocolType;
 import it.uniud.easyhome.testutils.JsonJaxbContextResolver;
 
 import java.io.IOException;
-import java.net.Socket;
-import java.net.URI;
 import java.util.List;
 
 import javax.ws.rs.client.Configuration;
@@ -82,11 +80,14 @@ public class HubResourceTest extends JerseyTest {
     @Test
     public void testRoutingEntry() {
         
-        int port = 5000;
-        int address = 20;
+        int srcGatewayPort = 5000;
+        int dstGid = 2;
+        int dstAddress = 20;
+        int dstPort = 4;
+        
         ProtocolType protocol = ProtocolType.XBEE;
         
-        Response gwInsertionResponse = insertGateway(port,protocol);
+        Response gwInsertionResponse = insertGateway(srcGatewayPort,protocol);
         assertEquals(Status.CREATED,gwInsertionResponse.getStatusInfo());
         String locationPath = gwInsertionResponse.getLocation().getPath();
         String[] segments = locationPath.split("/");
@@ -94,15 +95,23 @@ public class HubResourceTest extends JerseyTest {
         
         MultivaluedMap<String,String> formData = new MultivaluedHashMap<String,String>();
         
-        formData.add("gid",String.valueOf(gid));
-        formData.add("address",String.valueOf(address));
-        formData.add("port",String.valueOf(port));
+        formData.add("gid",String.valueOf(dstGid));
+        formData.add("address",String.valueOf(dstAddress));
+        formData.add("port",String.valueOf(dstPort));
         
-        Response routingInsertionResponse = target().path("hub/routing").request().post(Entity.form(formData)); 
+        Response routingInsertionResponse = target()
+                                            .path("hub/gateways")
+                                            .path(String.valueOf(gid))
+                                            .path("routing")
+                                            .request().post(Entity.form(formData)); 
         
-        assertEquals(Status.CREATED,routingInsertionResponse.getStatusInfo());
+        //assertEquals(Status.CREATED,routingInsertionResponse.getStatusInfo());
         
-        String count = target().path("hub/routing/count").request().get(String.class);
+        String count = target()
+                       .path("hub/gateways")
+                       .path(String.valueOf(gid))
+                       .path("routing/count")
+                       .request().get(String.class);
         
         assertEquals(Integer.parseInt(count),1);
         

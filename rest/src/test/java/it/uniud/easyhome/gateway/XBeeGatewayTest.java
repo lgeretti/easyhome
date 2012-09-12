@@ -82,10 +82,14 @@ public class XBeeGatewayTest extends JerseyTest {
         formData.add("address",String.valueOf(dstAddress));
         formData.add("port",String.valueOf(dstPort));
         
-        Response routingInsertionResponse = target().path("hub/routing").request().post(Entity.form(formData)); 
+        Response routingInsertionResponse = target()
+                                            .path("hub/gateways")
+                                            .path(String.valueOf(srcGid))
+                                            .path("routing").request().post(Entity.form(formData)); 
         
-        int mappedDstEndpoint = Integer.parseInt(target().path(routingInsertionResponse.getLocation().getPath()).request().get(String.class));
-
+        String routingInsertionPath = routingInsertionResponse.getLocation().getPath();
+        int mappedDstEndpoint = Integer.parseInt(target().path(routingInsertionPath).request().get(String.class));
+        
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         
         int sum = 0;
