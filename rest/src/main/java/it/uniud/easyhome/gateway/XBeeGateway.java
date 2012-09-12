@@ -176,6 +176,8 @@ public class XBeeGateway implements Gateway {
                 } else {
                     System.out.println("Checksum failure");
                 }
+            } else {
+                System.out.println("Incorrect packet type: discarding");
             }
         }
         
@@ -200,7 +202,6 @@ public class XBeeGateway implements Gateway {
                                 handleInboundPacketFrom(in);
                             } catch (Exception e) {
                                 // We want to gracefully handle incorrect packets
-                                System.out.println("Incorrect packet discarded");
                             }
                         }
                     }
@@ -215,13 +216,10 @@ public class XBeeGateway implements Gateway {
                   System.out.println("Connection with " + connection + " closed");
                 }
               }
-           /* } catch (IOException ex) {
+            } catch (IOException ex) {
                 if (!(ex instanceof SocketException))
-                    ex.printStackTrace();*/
-            }
-            catch (Exception ex) {
-                System.out.println("Server closed");
-                  System.out.println(ex);
+                    ex.printStackTrace();
+                System.out.println("Gateway closed");
             }
         }
     
@@ -238,8 +236,6 @@ public class XBeeGateway implements Gateway {
             server.close();
         } catch (IOException ex) {
             // We swallow any IO error
-        } finally {
-            System.out.println("Gateway closed");
         }
     }
 }
