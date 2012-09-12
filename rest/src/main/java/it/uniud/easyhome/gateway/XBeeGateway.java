@@ -193,8 +193,8 @@ public class XBeeGateway implements Gateway {
                     
                     InputStream in = connection.getInputStream();
                     
-                    while (true) {
-                        int octet = in.read();
+                    int octet;
+                    while ((octet = in.read()) != -1) {
                         if (octet == START_DELIMITER) {
                             try {
                                 handleInboundPacketFrom(in);
@@ -206,7 +206,7 @@ public class XBeeGateway implements Gateway {
                     }
                 
                 } catch (IOException ex) {
-                  System.err.println(ex);
+                  System.out.println(ex);
                 } finally {
                   try {
                     if (connection != null) connection.close();
@@ -215,9 +215,13 @@ public class XBeeGateway implements Gateway {
                   System.out.println("Connection with " + connection + " closed");
                 }
               }
-            } catch (IOException ex) {
+           /* } catch (IOException ex) {
                 if (!(ex instanceof SocketException))
-                    ex.printStackTrace();
+                    ex.printStackTrace();*/
+            }
+            catch (Exception ex) {
+                System.out.println("Server closed");
+                  System.out.println(ex);
             }
         }
     
