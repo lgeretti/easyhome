@@ -34,6 +34,10 @@ public class NetworkContext {
         return gateways;
     }  
     
+    public int getGidCount() {
+    	return gidCount;
+    }
+    
     private NetworkContext() {}
     
     public static NetworkContext getInstance() {

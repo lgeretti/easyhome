@@ -18,7 +18,7 @@ public class XBeeGatewayIT {
     static ProtocolType dstGwProtocol = ProtocolType.XBEE;
     
     static int dstAddress = 20;
-    static int dstPort = 2;
+    static int dstPort = 1;
     static int srcEndpoint = 15;
     
     public static void main(String[] args) throws NumberFormatException, UnknownHostException, IOException {

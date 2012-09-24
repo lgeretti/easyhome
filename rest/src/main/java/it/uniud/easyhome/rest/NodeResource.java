@@ -103,7 +103,7 @@ public final class NodeResource {
     public static void clear() {
         
         EntityTransaction tx = em.getTransaction();
-        
+
         Query query = em.createQuery("DELETE FROM Node");
                 
         tx.begin();

@@ -123,4 +123,19 @@ public class HubResource {
                 .build();
     }
     
+    @POST
+    @Path("populate")
+    public Response populate() {
+    	
+    	if (networkContext.getGidCount() > 0)
+    		return Response.notModified().build();
+    	
+    	registerGateway(ProtocolType.XBEE,5050);
+    	registerGateway(ProtocolType.XBEE,6060);
+        
+    	putRoutingEntry(1,2,15,7);
+    	
+    	return Response.ok().build();
+    }
+    
 }

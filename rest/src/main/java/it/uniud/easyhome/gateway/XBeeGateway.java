@@ -104,7 +104,7 @@ public class XBeeGateway implements Gateway {
      * Converts an XBee API received packet, starting from the 16 bit source network address forth,
      * checksum excluded.
      */
-    private EHPacket convertFromPayload(ByteArrayInputStream bais) {
+    private EHPacket convertFromPayload(ByteArrayInputStream bais) throws RoutingEntryMissingException {
         
         int srcAddress = (bais.read() << 8) + bais.read();
         int srcPort = bais.read();
@@ -115,7 +115,7 @@ public class XBeeGateway implements Gateway {
         
         int dstPort = bais.read();
         
-        System.out.println("Looking for gateway id " + id + " and destination port " + dstPort);
+        System.out.println("Looking for entry for destination port " + dstPort);
         
         ModuleCoordinates dstCoords = getCoordinatesFor(dstPort);
         
@@ -149,32 +149,37 @@ public class XBeeGateway implements Gateway {
      */
     private void dispatchPacket(EHPacket pkt) {
         
-        try {
-            Context jndiContext = new InitialContext();
-
-            // Looks up the administered objects
+    	try {
+    		Context jndiContext = new InitialContext();
             ConnectionFactory connectionFactory = (ConnectionFactory) jndiContext.lookup("jms/easyhome/ConnectionFactory");
-            Topic topic = (Topic) jndiContext.lookup("jms/easyhome/OutboundPacketsTopic");
-    
-            // Creates the needed artifacts to connect to the queue
             Connection connection = connectionFactory.createConnection();
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            MessageProducer producer = session.createProducer(topic);
-    
-            // Sends a text message to the queue
-            ObjectMessage message = session.createObjectMessage(pkt);
-            producer.send(message);
-            System.out.println("Message sent!");
-    
+    		
+            try {
+                Topic inboundTopic = (Topic) jndiContext.lookup("jms/easyhome/InboundPacketsTopic");
+                MessageProducer inboundProducer = session.createProducer(inboundTopic);
+                ObjectMessage inboundMessage = session.createObjectMessage(pkt);
+                inboundProducer.send(inboundMessage);
+                System.out.println("Message dispatched to inbound packets topic");
+            } catch (Exception e) {
+            	System.out.println("Message not dispatched to inbound packets topic");
+            }
+
+            try {
+	            Topic outboundTopic = (Topic) jndiContext.lookup("jms/easyhome/OutboundPacketsTopic");
+	            MessageProducer outboundProducer = session.createProducer(outboundTopic);
+	            ObjectMessage outboundMessage = session.createObjectMessage(pkt);
+	            outboundProducer.send(outboundMessage);
+	            System.out.println("Message dispatched to outbound packets topic");            	
+            } catch (Exception e) {
+            	System.out.println("Message could not be dispatched to outbound packets topic");
+            }
+            
             connection.close();
             
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        
-        // If the source and destination subnetwork are the same, the packet is not dispatched further   
-        
+    	} catch (Exception e) {
+    		System.out.println("Session could not be created");
+    	}
     }
     
     private class GatewayRunnable implements Runnable {
@@ -210,9 +215,16 @@ public class XBeeGateway implements Gateway {
                     
                     System.out.println("Checksum success, converting and dispatching");
                     
-                    EHPacket pkt = convertFromPayload(new ByteArrayInputStream(packetPayload));
+                    try {
                     
-                    dispatchPacket(pkt);
+                    	EHPacket pkt = convertFromPayload(new ByteArrayInputStream(packetPayload));
+                    
+                    	dispatchPacket(pkt);
+                    	
+                    } catch (RoutingEntryMissingException ex) {
+                    	
+                    	System.out.println("No routing entry exists for the given destination port, unable to dispatch");
+                    }
                 } else {
                     System.out.println("Checksum failure");
                 }

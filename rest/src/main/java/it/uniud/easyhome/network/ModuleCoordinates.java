@@ -4,6 +4,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 
+/** 
+ * Immutable class for absolute coordinates of a module across the EasyHome network. 
+ */
 public class ModuleCoordinates implements Serializable {
 
     private static final long serialVersionUID = -5009839141486612459L;

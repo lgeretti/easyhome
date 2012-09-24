@@ -24,6 +24,7 @@ import org.glassfish.jersey.media.json.JsonJaxbModule;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 
+@Ignore
 public class NodeResourceTest extends JerseyTest {
 
     private static final String[] PACKAGE_NAMES = {
