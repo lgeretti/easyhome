@@ -108,6 +108,8 @@ public class HubResource {
         
         ModuleCoordinates coords = new ModuleCoordinates(entryGid,entryAddress,entryPort);
         
+        System.out.println("Putting routing entry for gateway " + srcGid);
+        
         Gateway gw = networkContext.getGatewayForId(srcGid);
         
         if (gw == null) 
@@ -127,13 +129,14 @@ public class HubResource {
     @Path("populate")
     public Response populate() {
     	
-    	if (networkContext.getGidCount() > 0)
+    	// We can have more than 1 network only if at least one gateway has been registered
+    	if (networkContext.getGidCount() > 1)
     		return Response.notModified().build();
     	
     	registerGateway(ProtocolType.XBEE,5050);
     	registerGateway(ProtocolType.XBEE,6060);
         
-    	putRoutingEntry(1,2,15,7);
+    	putRoutingEntry(2,3,15,7);
     	
     	return Response.ok().build();
     }

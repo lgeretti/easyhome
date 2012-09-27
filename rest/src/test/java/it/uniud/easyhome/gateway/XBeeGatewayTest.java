@@ -1,29 +1,19 @@
 package it.uniud.easyhome.gateway;
 
-import static org.junit.Assert.*;
-
-import it.uniud.easyhome.gateway.GatewayInfo;
 import it.uniud.easyhome.gateway.ProtocolType;
 import it.uniud.easyhome.testutils.JsonJaxbContextResolver;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.Socket;
-import java.net.URI;
-import java.util.List;
 
 import javax.ws.rs.client.Configuration;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.junit.*;
 
-import org.codehaus.jettison.json.JSONException;
 import org.glassfish.jersey.media.json.JsonJaxbFeature;
 import org.glassfish.jersey.media.json.JsonJaxbModule;
 import org.glassfish.jersey.server.ResourceConfig;

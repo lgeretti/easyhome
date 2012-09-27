@@ -13,11 +13,11 @@ public class ModuleCoordinates implements Serializable {
 
     public static final int OCTETS = 5;
     
-    // Gateway (and consequently subnetwork) identifier (>0, =0 for broadcast, =1 for EasyHome TCP/IP)
+    // Gateway (and consequently subnetwork) identifier (>0, =0 for broadcast, =1 for EasyHome TCP/IP subnetwork)
     private int gid;
-    // Address within the network (>0, =0 if broadcast to a specific network, irrelevant if broadcast to all subnetworks)
+    // Address within the network (>0, =0 if broadcast)
     private int address;
-    // Port of the interested module (>0, no broadcast is supported)
+    // Port of the interested module (>=0, =0 addresses the device port of the EH subnetwork)
     private int port;
     
     public int getGatewayId() {

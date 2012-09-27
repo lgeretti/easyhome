@@ -3,17 +3,10 @@ package it.uniud.easyhome.network;
 import it.uniud.easyhome.gateway.Gateway;
 import it.uniud.easyhome.gateway.ProtocolType;
 import it.uniud.easyhome.gateway.XBeeGateway;
-import it.uniud.easyhome.network.exceptions.MissingGatewayException;
 import it.uniud.easyhome.network.exceptions.PortAlreadyBoundException;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 /***
  * Provides the context related to the hub and gateways.
@@ -28,7 +21,10 @@ public class NetworkContext {
     private final List<Gateway> gateways = new ArrayList<Gateway>();
     
     // Identifiers are guaranteed as unique, hence we cannot rely on the gateways size
-    private int gidCount = 0;
+    // gid = 0 for broadcast
+    // gid = 1 for the EasyHome network
+    // hence actual gateways start from 2 onwards
+    private int gidCount = 1;
     
     public List<Gateway> getGateways() {
         return gateways;

@@ -6,7 +6,6 @@ import it.uniud.easyhome.gateway.XBeeGateway;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -57,9 +56,9 @@ public class XBeeGatewayIT {
         baos.write(new byte[]{0x01,0x04});
         sum += 0x01;
         sum += 0x04;
-        // Receive options (packet was a broadcast)
-        baos.write(0x02);
-        sum += 0x02;
+        // Receive options (0x02: packet was a broadcast; 0x00 otherwise)
+        baos.write(0x00);
+        sum += 0x00;
         // Frame control (Cluster specific)
         baos.write(0x01);
         sum += 0x01;

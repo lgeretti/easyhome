@@ -16,7 +16,6 @@ import javax.ws.rs.core.Response.Status;
 import org.junit.*;
 
 import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 import org.glassfish.jersey.media.json.JsonJaxbFeature;
 import org.glassfish.jersey.media.json.JsonJaxbModule;
 import org.glassfish.jersey.server.ResourceConfig;

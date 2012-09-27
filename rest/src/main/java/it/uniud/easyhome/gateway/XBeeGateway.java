@@ -2,13 +2,11 @@ package it.uniud.easyhome.gateway;
 
 import it.uniud.easyhome.network.EHPacket;
 import it.uniud.easyhome.network.ModuleCoordinates;
-import it.uniud.easyhome.network.NetworkContext;
 import it.uniud.easyhome.network.Operation;
-import it.uniud.easyhome.network.exceptions.MissingGatewayException;
+import it.uniud.easyhome.network.exceptions.IllegalBroadcastPortException;
 import it.uniud.easyhome.network.exceptions.RoutingEntryMissingException;
 
 import java.net.*;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -19,13 +17,10 @@ import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
-import javax.jms.Queue;
 import javax.jms.Session;
-import javax.jms.TextMessage;
 import javax.jms.Topic;
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
 public class XBeeGateway implements Gateway {
     
@@ -109,23 +104,38 @@ public class XBeeGateway implements Gateway {
         int srcAddress = (bais.read() << 8) + bais.read();
         int srcPort = bais.read();
         
-        System.out.println("Source address and port: " + srcAddress + ", " + srcPort);
-        
         ModuleCoordinates srcCoords = new ModuleCoordinates(id,srcAddress,srcPort);
         
         int dstPort = bais.read();
         
-        System.out.println("Looking for entry for destination port " + dstPort);
-        
-        ModuleCoordinates dstCoords = getCoordinatesFor(dstPort);
-        
-        if (dstCoords == null)
-            throw new RoutingEntryMissingException();
-        
+        System.out.println("Source address and port: " + srcAddress + ", " + srcPort 
+        		+ " Destination port: " + dstPort);
+                
         int opContext = (bais.read() << 8) + bais.read();
         int opDomain = (bais.read() << 8) + bais.read();
         
-        bais.read(); // Read out the Receive Options
+        int receiveOptions = bais.read();
+        
+        ModuleCoordinates dstCoords = null;
+        
+        // If a broadcast, we use the broadcast format for the destination coordinates, but only
+        // if the destination port is actually the administration port
+        if (receiveOptions == 0x02) {
+        	if (dstPort == 0x00) {        		
+	        	dstCoords = new ModuleCoordinates(0,0,0);
+	        	System.out.println("Setting destination as broadcast");
+        	} else {
+        		throw new IllegalBroadcastPortException();
+        	}
+        } else {
+	        
+	        dstCoords = getCoordinatesFor(dstPort);
+	        
+	        if (dstCoords == null)
+	            throw new RoutingEntryMissingException();
+	        
+	        System.out.println("Retrieved coordinates for mapped port " + dstPort);
+	    }
         
         int opFlags = bais.read();
         
