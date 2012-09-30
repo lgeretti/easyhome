@@ -58,6 +58,20 @@ public class ModuleCoordinates implements Serializable {
         baos.write(port & 0xFF);
     }
     
+    public String toString() {
+    	StringBuilder strb = new StringBuilder();
+    	
+    	strb.append("{G: ")
+    		.append(gid)
+    		.append("; A:")
+    		.append(address)
+    		.append("; P: ")
+    		.append(port)
+    		.append("}");
+    	
+    	return strb.toString();
+    }
+    
     @Override
     public boolean equals(Object other) {
         

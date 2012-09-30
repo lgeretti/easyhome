@@ -15,6 +15,7 @@ import java.io.*;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
+import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
 import javax.jms.Session;
@@ -157,44 +158,29 @@ public class XBeeGateway implements Gateway {
     /**
      * Dispatches the packet to the processes and the gateways
      */
-    private void dispatchPacket(EHPacket pkt) {
-        
-    	try {
-    		Context jndiContext = new InitialContext();
-            ConnectionFactory connectionFactory = (ConnectionFactory) jndiContext.lookup("jms/easyhome/ConnectionFactory");
-            Connection connection = connectionFactory.createConnection();
-            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-    		
-            try {
-                Topic inboundTopic = (Topic) jndiContext.lookup("jms/easyhome/InboundPacketsTopic");
-                MessageProducer inboundProducer = session.createProducer(inboundTopic);
-                ObjectMessage inboundMessage = session.createObjectMessage(pkt);
-                inboundProducer.send(inboundMessage);
-                System.out.println("Message dispatched to inbound packets topic");
-            } catch (Exception e) {
-            	System.out.println("Message not dispatched to inbound packets topic");
-            }
+    private void dispatchPacket(EHPacket pkt, Session session, MessageProducer inboundProducer, MessageProducer outboundProducer) {
+  
+        try {
+            ObjectMessage inboundMessage = session.createObjectMessage(pkt);
+            inboundProducer.send(inboundMessage);
+            System.out.println("Message dispatched to inbound packets topic");
+        } catch (Exception e) {
+        	System.out.println("Message not dispatched to inbound packets topic");
+        }
 
-            try {
-	            Topic outboundTopic = (Topic) jndiContext.lookup("jms/easyhome/OutboundPacketsTopic");
-	            MessageProducer outboundProducer = session.createProducer(outboundTopic);
-	            ObjectMessage outboundMessage = session.createObjectMessage(pkt);
-	            outboundProducer.send(outboundMessage);
-	            System.out.println("Message dispatched to outbound packets topic");            	
-            } catch (Exception e) {
-            	System.out.println("Message could not be dispatched to outbound packets topic");
-            }
-            
-            connection.close();
-            
-    	} catch (Exception e) {
-    		System.out.println("Session could not be created");
-    	}
+        try {
+            ObjectMessage outboundMessage = session.createObjectMessage(pkt);
+            outboundProducer.send(outboundMessage);
+            System.out.println("Message dispatched to outbound packets topic");            	
+        } catch (Exception e) {
+        	System.out.println("Message could not be dispatched to outbound packets topic");
+        }
     }
     
     private class GatewayRunnable implements Runnable {
     
-        private void handleInboundPacketFrom(InputStream in) throws IOException {
+        private void handleInboundPacketFrom(InputStream in, Session session,
+        		MessageProducer inboundProducer, MessageProducer outboundProducer) throws IOException {
             
             System.out.println("Recognized XBee packet");
             
@@ -229,7 +215,7 @@ public class XBeeGateway implements Gateway {
                     
                     	EHPacket pkt = convertFromPayload(new ByteArrayInputStream(packetPayload));
                     
-                    	dispatchPacket(pkt);
+                    	dispatchPacket(pkt,session,inboundProducer,outboundProducer);
                     	
                     } catch (RoutingEntryMissingException ex) {
                     	
@@ -243,6 +229,20 @@ public class XBeeGateway implements Gateway {
             }
         }
         
+        private void handleOutboundPacketsTo(OutputStream os, Session session, MessageConsumer consumer) {
+        	
+            try {
+                while (true) {
+                    EHPacket pkt = (EHPacket) consumer.receiveNoWait();
+                    System.out.println("Packet received from " + pkt.getSrcCoords());
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        	
+        }
+        
         public void run() {
             
             try {
@@ -251,38 +251,61 @@ public class XBeeGateway implements Gateway {
     
               while (true) {
                   
-                Socket connection = server.accept();
+                Socket skt = server.accept();
                 try {
-                    System.out.println("Connection established with " + connection);
+                    System.out.println("Connection established with " + skt);
                     
-                    InputStream in = connection.getInputStream();
+                    InputStream in = skt.getInputStream();
+                    OutputStream out = skt.getOutputStream();
                     
-                    int octet;
-                    while ((octet = in.read()) != -1) {
-                        if (octet == START_DELIMITER) {
-                            try {
-                                handleInboundPacketFrom(in);
-                            } catch (Exception e) {
-                                // We want to gracefully handle incorrect packets
-                            }
-                        }
+               		Context jndiContext = new InitialContext();
+                    ConnectionFactory connectionFactory = (ConnectionFactory) jndiContext.lookup("jms/easyhome/ConnectionFactory");
+                    Connection connection = connectionFactory.createConnection();
+                    Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+                    Topic outboundTopic = (Topic) jndiContext.lookup("jms/easyhome/OutboundPacketsTopic");
+                    Topic inboundTopic = (Topic) jndiContext.lookup("jms/easyhome/InboundPacketsTopic");
+                    
+                    MessageConsumer outboundConsumer = session.createConsumer(outboundTopic);
+                    MessageProducer inboundProducer = session.createProducer(inboundTopic);
+                    MessageProducer outboundProducer = session.createProducer(outboundTopic);
+                    
+                    connection.start();
+                    
+                    while(true) {
+                    
+	                    int octet;
+	                    while ((octet = in.read()) != -1) {
+	                        if (octet == START_DELIMITER) {
+	                            try {
+	                                handleInboundPacketFrom(in,session,inboundProducer,outboundProducer);
+	                            } catch (Exception e) {
+	                                // We want to gracefully handle incorrect packets
+	                            } 
+	                            break;
+	                        }
+	                    }
+	                    
+	                    handleOutboundPacketsTo(out,session,outboundConsumer);
+	                    
                     }
                 
-                } catch (IOException ex) {
+                } catch (Exception ex) {
                   System.out.println(ex);
                 } finally {
                   try {
-                    if (connection != null) connection.close();
+                    if (skt != null) skt.close();
                   } catch (IOException ex) {
                       // Whatever the case, the connection is not available anymore
                   }
-                  System.out.println("Connection with " + connection + " closed");
+                  
+                  System.out.println("Connection with " + skt + " closed");
                 }
               }
             } catch (IOException ex) {
-                if (!(ex instanceof SocketException))
-                    ex.printStackTrace();
-                System.out.println("Gateway closed");
+                if (ex instanceof SocketException)
+                	System.out.println("Gateway cannot accept connections anymore");
+                else
+                	System.out.println("Gateway could not be opened");
             }
         }
     
