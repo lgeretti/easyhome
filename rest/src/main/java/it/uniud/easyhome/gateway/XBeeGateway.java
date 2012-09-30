@@ -15,6 +15,7 @@ import java.io.*;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
+import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
@@ -37,6 +38,8 @@ public class XBeeGateway implements Gateway {
     private int mappedPortCounter = 0;
     
     private int id;
+    
+	private volatile boolean stopped = false;
     
     public int getId() {
         return id;
@@ -233,7 +236,11 @@ public class XBeeGateway implements Gateway {
         	
             try {
                 while (true) {
-                    EHPacket pkt = (EHPacket) consumer.receiveNoWait();
+                	ObjectMessage msg = (ObjectMessage) consumer.receiveNoWait();
+                    if (msg == null) {
+                    	break;
+                    }
+                	EHPacket pkt = (EHPacket) msg.getObject();
                     System.out.println("Packet received from " + pkt.getSrcCoords());
                 }
 
@@ -271,7 +278,7 @@ public class XBeeGateway implements Gateway {
                     
                     connection.start();
                     
-                    while(true) {
+                    while(!stopped) {
                     
 	                    int octet;
 	                    while ((octet = in.read()) != -1) {
@@ -301,7 +308,7 @@ public class XBeeGateway implements Gateway {
                   System.out.println("Connection with " + skt + " closed");
                 }
               }
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 if (ex instanceof SocketException)
                 	System.out.println("Gateway cannot accept connections anymore");
                 else
@@ -320,6 +327,7 @@ public class XBeeGateway implements Gateway {
     public void close() {
         try {
             server.close();
+            stopped = true;
         } catch (IOException ex) {
             // We swallow any IO error
         }
