@@ -24,6 +24,8 @@ public class XBeeGatewayIT {
         
         Socket skt = new Socket(args[0],Integer.parseInt(args[1]));
         
+        Socket skt2 = new Socket(args[0],6060);
+        
         int mappedDstEndpoint = Integer.parseInt(args[2]);
         
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -86,7 +88,15 @@ public class XBeeGatewayIT {
         os.flush();
         os.close();
         
+        try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
         skt.close();
+        skt2.close();
         
     }
     

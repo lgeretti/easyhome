@@ -15,7 +15,6 @@ import java.io.*;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
-import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
@@ -28,6 +27,25 @@ public class XBeeGateway implements Gateway {
     
     public static final byte START_DELIMITER = 0x7E;
     public static final byte EXPLICIT_RX_INDICATOR_FRAME_TYPE = (byte)0x91;
+    
+    private static ConnectionFactory connectionFactory;
+    private static Topic outboundTopic;
+    private static Topic inboundTopic;
+    
+    static {
+    	
+    	try {
+    	
+	   		Context jndiContext = new InitialContext();
+	        connectionFactory = (ConnectionFactory) jndiContext.lookup("jms/easyhome/ConnectionFactory");
+	        
+            outboundTopic = (Topic) jndiContext.lookup("jms/easyhome/OutboundPacketsTopic");
+            inboundTopic = (Topic) jndiContext.lookup("jms/easyhome/InboundPacketsTopic");
+            	        
+    	} catch (Exception ex) {
+    		// Silently ignoring, since we do not want tests (which do not test JMS) to display errors 
+	    }
+    }
     
     private ServerSocket server = null;
     
@@ -161,10 +179,10 @@ public class XBeeGateway implements Gateway {
     /**
      * Dispatches the packet to the processes and the gateways
      */
-    private void dispatchPacket(EHPacket pkt, Session session, MessageProducer inboundProducer, MessageProducer outboundProducer) {
+    private void dispatchPacket(EHPacket pkt, Session jmsSession, MessageProducer inboundProducer, MessageProducer outboundProducer) {
   
         try {
-            ObjectMessage inboundMessage = session.createObjectMessage(pkt);
+            ObjectMessage inboundMessage = jmsSession.createObjectMessage(pkt);
             inboundProducer.send(inboundMessage);
             System.out.println("Message dispatched to inbound packets topic");
         } catch (Exception e) {
@@ -172,7 +190,7 @@ public class XBeeGateway implements Gateway {
         }
 
         try {
-            ObjectMessage outboundMessage = session.createObjectMessage(pkt);
+            ObjectMessage outboundMessage = jmsSession.createObjectMessage(pkt);
             outboundProducer.send(outboundMessage);
             System.out.println("Message dispatched to outbound packets topic");            	
         } catch (Exception e) {
@@ -180,9 +198,17 @@ public class XBeeGateway implements Gateway {
         }
     }
     
+    /**
+     * Injects the packet into the subnetwork
+     */
+    private void injectPacket(EHPacket pkt, OutputStream os) {
+    	
+    	
+    }
+    
     private class GatewayRunnable implements Runnable {
     
-        private void handleInboundPacketFrom(InputStream in, Session session,
+        private void handleInboundPacketFrom(InputStream in, Session jmsSession,
         		MessageProducer inboundProducer, MessageProducer outboundProducer) throws IOException {
             
             System.out.println("Recognized XBee packet");
@@ -218,7 +244,7 @@ public class XBeeGateway implements Gateway {
                     
                     	EHPacket pkt = convertFromPayload(new ByteArrayInputStream(packetPayload));
                     
-                    	dispatchPacket(pkt,session,inboundProducer,outboundProducer);
+                    	dispatchPacket(pkt,jmsSession,inboundProducer,outboundProducer);
                     	
                     } catch (RoutingEntryMissingException ex) {
                     	
@@ -232,7 +258,7 @@ public class XBeeGateway implements Gateway {
             }
         }
         
-        private void handleOutboundPacketsTo(OutputStream os, Session session, MessageConsumer consumer) {
+        private void handleOutboundPacketsTo(OutputStream os, MessageConsumer consumer) {
         	
             try {
                 while (true) {
@@ -241,7 +267,12 @@ public class XBeeGateway implements Gateway {
                     	break;
                     }
                 	EHPacket pkt = (EHPacket) msg.getObject();
-                    System.out.println("Packet received from " + pkt.getSrcCoords());
+                	if (pkt.getDstCoords().getGatewayId() == id) {
+                		System.out.println("Gw #" + id + ": Packet received from " + pkt.getSrcCoords() + ", injecting");
+                		injectPacket(pkt,os);
+                	} else {
+                		System.out.println("Gw #" + id + ": Packet received from self, discarding");
+                	}
                 }
 
             } catch (Exception e) {
@@ -265,35 +296,30 @@ public class XBeeGateway implements Gateway {
                     InputStream in = skt.getInputStream();
                     OutputStream out = skt.getOutputStream();
                     
-               		Context jndiContext = new InitialContext();
-                    ConnectionFactory connectionFactory = (ConnectionFactory) jndiContext.lookup("jms/easyhome/ConnectionFactory");
-                    Connection connection = connectionFactory.createConnection();
-                    Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-                    Topic outboundTopic = (Topic) jndiContext.lookup("jms/easyhome/OutboundPacketsTopic");
-                    Topic inboundTopic = (Topic) jndiContext.lookup("jms/easyhome/InboundPacketsTopic");
+        	        Connection connection = connectionFactory.createConnection();
+        	        Session jmsSession = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
                     
-                    MessageConsumer outboundConsumer = session.createConsumer(outboundTopic);
-                    MessageProducer inboundProducer = session.createProducer(inboundTopic);
-                    MessageProducer outboundProducer = session.createProducer(outboundTopic);
+                    MessageConsumer outboundConsumer = jmsSession.createConsumer(outboundTopic);
+                    MessageProducer inboundProducer = jmsSession.createProducer(inboundTopic);
+                    MessageProducer outboundProducer = jmsSession.createProducer(outboundTopic);
                     
                     connection.start();
-                    
-                    while(!stopped) {
-                    
-	                    int octet;
-	                    while ((octet = in.read()) != -1) {
-	                        if (octet == START_DELIMITER) {
+
+                    while (!stopped) {
+	                    
+                    	int octet = -1;
+                    	while ((octet = in.read()) != -1) {
+		                    if (octet == START_DELIMITER) {
 	                            try {
-	                                handleInboundPacketFrom(in,session,inboundProducer,outboundProducer);
+	                                handleInboundPacketFrom(in,jmsSession, inboundProducer,outboundProducer);
+	                                break; // We avoid to process a continuous flow of inbound packets without handling outbound packets too
 	                            } catch (Exception e) {
 	                                // We want to gracefully handle incorrect packets
-	                            } 
-	                            break;
-	                        }
-	                    }
+	                            }
+		                    }
+                    	}
 	                    
-	                    handleOutboundPacketsTo(out,session,outboundConsumer);
-	                    
+	                    handleOutboundPacketsTo(out,outboundConsumer);	                    
                     }
                 
                 } catch (Exception ex) {
