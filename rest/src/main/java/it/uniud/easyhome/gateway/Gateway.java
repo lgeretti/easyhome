@@ -25,4 +25,7 @@ public interface Gateway {
     public void open();
     
     public void close();
+    
+    /** Drop any existing connection */ 
+    public void disconnect();
 }

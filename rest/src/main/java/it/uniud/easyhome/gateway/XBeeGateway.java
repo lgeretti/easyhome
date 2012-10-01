@@ -57,7 +57,7 @@ public class XBeeGateway implements Gateway {
     
     private int id;
     
-	private volatile boolean stopped = false;
+	private volatile boolean disconnected = false;
     
     public int getId() {
         return id;
@@ -293,8 +293,10 @@ public class XBeeGateway implements Gateway {
                 try {
                     System.out.println("Connection established with " + skt);
                     
-                    InputStream in = skt.getInputStream();
-                    OutputStream out = skt.getOutputStream();
+                    disconnected = false;
+                    
+                    InputStream istream = skt.getInputStream();
+                    OutputStream ostream = skt.getOutputStream();
                     
         	        Connection connection = connectionFactory.createConnection();
         	        Session jmsSession = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -305,13 +307,13 @@ public class XBeeGateway implements Gateway {
                     
                     connection.start();
 
-                    while (!stopped) {
+                    while (!disconnected) {
 	                    
                     	int octet = -1;
-                    	while ((octet = in.read()) != -1) {
+                    	while ((octet = istream.read()) != -1) {
 		                    if (octet == START_DELIMITER) {
 	                            try {
-	                                handleInboundPacketFrom(in,jmsSession, inboundProducer,outboundProducer);
+	                                handleInboundPacketFrom(istream,jmsSession,inboundProducer,outboundProducer);
 	                                break; // We avoid to process a continuous flow of inbound packets without handling outbound packets too
 	                            } catch (Exception e) {
 	                                // We want to gracefully handle incorrect packets
@@ -319,7 +321,7 @@ public class XBeeGateway implements Gateway {
 		                    }
                     	}
 	                    
-	                    handleOutboundPacketsTo(out,outboundConsumer);	                    
+	                    handleOutboundPacketsTo(ostream,outboundConsumer);	                    
                     }
                 
                 } catch (Exception ex) {
@@ -350,10 +352,14 @@ public class XBeeGateway implements Gateway {
         thr.start();
     }
     
+    public void disconnect() {
+    	disconnected = true;
+    }
+    
     public void close() {
         try {
+        	disconnect();
             server.close();
-            stopped = true;
         } catch (IOException ex) {
             // We swallow any IO error
         }

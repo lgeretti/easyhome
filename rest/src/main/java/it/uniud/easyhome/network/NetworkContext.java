@@ -98,6 +98,12 @@ public class NetworkContext {
         return false;
     }
     
+    public void disconnectGateway(int gid) {
+        for (Gateway gw : gateways)
+            if (gw.getId() == gid)
+                gw.disconnect();    	
+    }
+    
     public void removeGateway(int gid) {
         for (int i=0; i<gateways.size(); i++) 
             if (gateways.get(i).getId() == gid) {

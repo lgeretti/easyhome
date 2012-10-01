@@ -56,6 +56,17 @@ public class HubResource {
             return Response.status(Response.Status.NOT_FOUND).build();
     }
     
+    @POST
+    @Path("gateways/{gid}/disconnect")
+    public Response disconnectGateway(@PathParam("gid") int gid) {
+        
+        if (networkContext.hasGateway(gid)) {
+            networkContext.disconnectGateway(gid);
+            return Response.ok().build();
+        } else
+            return Response.status(Response.Status.NOT_FOUND).build();
+    }
+    
     @DELETE
     @Path("gateways")
     public Response clearAll() {
