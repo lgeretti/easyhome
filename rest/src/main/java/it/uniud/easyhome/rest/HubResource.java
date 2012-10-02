@@ -67,6 +67,14 @@ public class HubResource {
             return Response.status(Response.Status.NOT_FOUND).build();
     }
     
+    @POST
+    @Path("gateways/disconnect")
+    public Response disconnectAllGateways() {
+        
+        networkContext.disconnectAllGateways();
+        return Response.ok().build();
+    }
+    
     @DELETE
     @Path("gateways")
     public Response clearAll() {
@@ -118,8 +126,6 @@ public class HubResource {
             @FormParam("port") int entryPort) {
         
         ModuleCoordinates coords = new ModuleCoordinates(entryGid,entryAddress,entryPort);
-        
-        System.out.println("Putting routing entry for gateway " + srcGid);
         
         Gateway gw = networkContext.getGatewayForId(srcGid);
         

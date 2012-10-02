@@ -83,6 +83,8 @@ public class XBeeGateway implements Gateway {
     
     public int addRoutingEntry(ModuleCoordinates coords) {
         
+        println("Putting routing entry (port " + (mappedPortCounter+1) + ") for " + coords);
+    	
         routingTable.put(coords, ++mappedPortCounter);
         
         return mappedPortCounter;
@@ -130,7 +132,7 @@ public class XBeeGateway implements Gateway {
         
         int dstPort = bais.read();
         
-        System.out.println("Source address and port: " + srcAddress + ", " + srcPort 
+        println("Source address and port: " + srcAddress + ", " + srcPort 
         		+ " Destination port: " + dstPort);
                 
         int opContext = (bais.read() << 8) + bais.read();
@@ -145,7 +147,7 @@ public class XBeeGateway implements Gateway {
         if (receiveOptions == 0x02) {
         	if (dstPort == 0x00) {        		
 	        	dstCoords = new ModuleCoordinates(0,0,0);
-	        	System.out.println("Setting destination as broadcast");
+	        	println("Setting destination as broadcast");
         	} else {
         		throw new IllegalBroadcastPortException();
         	}
@@ -156,7 +158,7 @@ public class XBeeGateway implements Gateway {
 	        if (dstCoords == null)
 	            throw new RoutingEntryMissingException();
 	        
-	        System.out.println("Retrieved coordinates for mapped port " + dstPort);
+	        println("Retrieved coordinates for mapped port " + dstPort);
 	    }
         
         int opFlags = bais.read();
@@ -184,17 +186,17 @@ public class XBeeGateway implements Gateway {
         try {
             ObjectMessage inboundMessage = jmsSession.createObjectMessage(pkt);
             inboundProducer.send(inboundMessage);
-            System.out.println("Message dispatched to inbound packets topic");
+            println("Message dispatched to inbound packets topic");
         } catch (Exception e) {
-        	System.out.println("Message not dispatched to inbound packets topic");
+        	println("Message not dispatched to inbound packets topic");
         }
 
         try {
             ObjectMessage outboundMessage = jmsSession.createObjectMessage(pkt);
             outboundProducer.send(outboundMessage);
-            System.out.println("Message dispatched to outbound packets topic");            	
+            println("Message dispatched to outbound packets topic");            	
         } catch (Exception e) {
-        	System.out.println("Message could not be dispatched to outbound packets topic");
+        	println("Message could not be dispatched to outbound packets topic");
         }
     }
     
@@ -211,7 +213,7 @@ public class XBeeGateway implements Gateway {
         private void handleInboundPacketFrom(InputStream in, Session jmsSession,
         		MessageProducer inboundProducer, MessageProducer outboundProducer) throws IOException {
             
-            System.out.println("Recognized XBee packet");
+            println("Recognized XBee packet");
             
             int highLength = in.read();
             // The frame type and source 64 bit address (hence 9 octets) are not stored
@@ -238,7 +240,7 @@ public class XBeeGateway implements Gateway {
                  
                 if (0xFF == (sum & 0xFF)) {
                     
-                    System.out.println("Checksum success, converting and dispatching");
+                    println("Checksum success, converting and dispatching");
                     
                     try {
                     
@@ -248,13 +250,13 @@ public class XBeeGateway implements Gateway {
                     	
                     } catch (RoutingEntryMissingException ex) {
                     	
-                    	System.out.println("No routing entry exists for the given destination port, unable to dispatch");
+                    	println("No routing entry exists for the given destination port, unable to dispatch");
                     }
                 } else {
-                    System.out.println("Checksum failure");
+                    println("Checksum failure");
                 }
             } else {
-                System.out.println("Incorrect packet type: discarding");
+                println("Incorrect packet type: discarding");
             }
         }
         
@@ -268,10 +270,10 @@ public class XBeeGateway implements Gateway {
                     }
                 	EHPacket pkt = (EHPacket) msg.getObject();
                 	if (pkt.getDstCoords().getGatewayId() == id) {
-                		System.out.println("Gw #" + id + ": Packet received from " + pkt.getSrcCoords() + ", injecting");
+                		println("Packet received from " + pkt.getSrcCoords() + ", injecting");
                 		injectPacket(pkt,os);
                 	} else {
-                		System.out.println("Gw #" + id + ": Packet received from self, discarding");
+                		println("Packet received from self, discarding");
                 	}
                 }
 
@@ -285,13 +287,13 @@ public class XBeeGateway implements Gateway {
             
             try {
               server = new ServerSocket(port, 1);
-              System.out.println("Gateway opened on port " + server.getLocalPort());
+              println("Gateway opened on port " + server.getLocalPort());
     
               while (true) {
                   
                 Socket skt = server.accept();
                 try {
-                    System.out.println("Connection established with " + skt);
+                    println("Connection established with " + skt);
                     
                     disconnected = false;
                     
@@ -333,14 +335,14 @@ public class XBeeGateway implements Gateway {
                       // Whatever the case, the connection is not available anymore
                   }
                   
-                  System.out.println("Connection with " + skt + " closed");
+                  println("Connection with " + skt + " closed");
                 }
               }
             } catch (Exception ex) {
                 if (ex instanceof SocketException)
-                	System.out.println("Gateway cannot accept connections anymore");
+                	println("Gateway cannot accept connections anymore");
                 else
-                	System.out.println("Gateway could not be opened");
+                	println("Gateway could not be opened");
             }
         }
     
@@ -363,5 +365,9 @@ public class XBeeGateway implements Gateway {
         } catch (IOException ex) {
             // We swallow any IO error
         }
+    }
+    
+    private void println(String msg) {
+    	System.out.println("Gw #" + id + ": " + msg);
     }
 }

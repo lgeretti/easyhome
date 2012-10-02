@@ -104,6 +104,11 @@ public class NetworkContext {
                 gw.disconnect();    	
     }
     
+    public void disconnectAllGateways() {
+        for (Gateway gw : gateways)
+            gw.disconnect();    	    	
+    }
+    
     public void removeGateway(int gid) {
         for (int i=0; i<gateways.size(); i++) 
             if (gateways.get(i).getId() == gid) {
