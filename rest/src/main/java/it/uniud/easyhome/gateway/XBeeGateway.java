@@ -27,10 +27,13 @@ public class XBeeGateway implements Gateway {
     
     public static final byte START_DELIMITER = 0x7E;
     public static final byte EXPLICIT_RX_INDICATOR_FRAME_TYPE = (byte)0x91;
+    public static final byte EXPLICIT_ADDRESSING_COMMAND_FRAME_TYPE = 0x11;
     
     private static ConnectionFactory connectionFactory;
     private static Topic outboundTopic;
     private static Topic inboundTopic;
+    
+    private int transactionSequenceNumber = 0;
     
     static {
     	
@@ -205,7 +208,98 @@ public class XBeeGateway implements Gateway {
      */
     private void injectPacket(EHPacket pkt, OutputStream os) {
     	
-    	
+    	try {
+    		os.write(START_DELIMITER);
+    		
+    		byte[] opData = pkt.getOperation().getData();
+    		int length = 23 + opData.length;
+    		
+    		// High and low lengths
+    		os.write((length >>> 8) & 0xFF);
+    		os.write(length & 0xFF);
+    		
+    		int sum = 0;
+    		
+    		// Frame type
+    		byte frameType = EXPLICIT_ADDRESSING_COMMAND_FRAME_TYPE; 
+    		os.write(frameType);
+    		sum += frameType;
+    		// Frame ID (0 for no response)
+    		byte frameId = 0x00;
+    		os.write(frameId);
+    		sum += frameId;
+    		// 64 bit destination address (broadcast in order to left it unspecified)
+    		byte[] ieeeDestAddr = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, (byte)0xFF, (byte)0xFF}; 
+    		for (byte b: ieeeDestAddr) {
+    			os.write(b);
+    			sum += b;
+    		}
+    		// 16 bit destination address
+    		int nwkDestAddr = pkt.getDstCoords().getAddress();
+    		byte highNwkDestAddr = (byte)((nwkDestAddr >>> 8) & 0xFF);
+    		byte lowNwkDestAddr = (byte)(nwkDestAddr & 0xFF);
+    		os.write(highNwkDestAddr);
+    		sum += highNwkDestAddr;
+    		os.write(lowNwkDestAddr);
+    		sum += lowNwkDestAddr;
+    		// Source endpoint
+    		int srcEndpoint = pkt.getSrcCoords().getPort();
+    		os.write(srcEndpoint);
+    		sum += srcEndpoint;
+    		// Destination endpoint
+    		int dstEndpoint = pkt.getDstCoords().getPort();
+    		os.write(dstEndpoint);
+    		sum += dstEndpoint;
+    		// Cluster ID
+    		int clusterId = pkt.getOperation().getContext();
+    		byte highClusterId = (byte)((clusterId >>> 8) & 0xFF);
+    		byte lowClusterId = (byte)(clusterId & 0xFF);
+    		os.write(highClusterId);
+    		sum += highClusterId;
+    		os.write(lowClusterId);
+    		sum += lowClusterId;
+    		// Profile ID
+    		int profileId = pkt.getOperation().getDomain();
+    		byte highProfileId = (byte)((profileId >>> 8) & 0xFF);
+    		byte lowProfileId = (byte)(profileId & 0xFF);
+    		os.write(highProfileId);
+    		sum += highProfileId;
+    		os.write(lowProfileId);
+    		sum += lowProfileId;
+    		// Broadcast radius (unlimited)
+    		int broadcastRadius = 0x00;
+    		os.write(broadcastRadius);
+    		sum += broadcastRadius;
+    		// Transmit options (none)
+    		int transmitOptions = 0x00;
+    		os.write(transmitOptions);
+    		sum += transmitOptions;
+    		// Frame control
+    		int frameControl = (pkt.getOperation().isContextSpecific() ? 0x01 : 0x00);
+    		os.write(frameControl);
+    		sum += frameControl;
+    		// Transaction sequence number
+    		int tsn = ++transactionSequenceNumber;
+    		os.write(tsn);
+    		sum += tsn;
+    		// Command
+    		int command = pkt.getOperation().getCommand();
+    		os.write(command);
+    		sum += command;
+    		// Command payload
+    		for (byte b: opData) {
+    			os.write(b);
+    			sum += b;
+    		}
+    		// Checksum
+    		os.write(0xFF - (sum & 0xFF));
+    		os.flush();
+    		
+    		println("XBee packet written");
+    		
+    	} catch (IOException ex) {
+    		println(ex.getMessage());
+    	}
     }
     
     private class GatewayRunnable implements Runnable {
@@ -297,8 +391,8 @@ public class XBeeGateway implements Gateway {
                     
                     disconnected = false;
                     
-                    InputStream istream = skt.getInputStream();
-                    OutputStream ostream = skt.getOutputStream();
+                    InputStream istream = new BufferedInputStream(skt.getInputStream());
+                    BufferedOutputStream ostream = new BufferedOutputStream(skt.getOutputStream());
                     
         	        Connection connection = connectionFactory.createConnection();
         	        Session jmsSession = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -312,15 +406,17 @@ public class XBeeGateway implements Gateway {
                     while (!disconnected) {
 	                    
                     	int octet = -1;
-                    	while ((octet = istream.read()) != -1) {
-		                    if (octet == START_DELIMITER) {
-	                            try {
-	                                handleInboundPacketFrom(istream,jmsSession,inboundProducer,outboundProducer);
-	                                break; // We avoid to process a continuous flow of inbound packets without handling outbound packets too
-	                            } catch (Exception e) {
-	                                // We want to gracefully handle incorrect packets
-	                            }
-		                    }
+                    	if (istream.available() > 0) {
+	                    	while ((octet = istream.read()) != -1) {
+			                    if (octet == START_DELIMITER) {
+		                            try {
+		                                handleInboundPacketFrom(istream,jmsSession,inboundProducer,outboundProducer);
+		                                break; // We avoid to process a continuous flow of inbound packets without handling outbound packets too
+		                            } catch (Exception e) {
+		                                // We want to gracefully handle incorrect packets
+		                            }
+			                    }
+	                    	}
                     	}
 	                    
 	                    handleOutboundPacketsTo(ostream,outboundConsumer);	                    

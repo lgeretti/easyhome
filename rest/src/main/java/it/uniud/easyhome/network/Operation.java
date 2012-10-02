@@ -17,10 +17,12 @@ public class Operation implements Serializable {
     private int command;
     private byte[] data;
     
+    /** A domain is equivalent to the Profile of ZigBee */
     public int getDomain() {
         return domain;
     }
     
+    /** A context is equivalent to the Cluster of ZigBee */
     public int getContext() {
         return context;
     }

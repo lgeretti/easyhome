@@ -1,21 +1,18 @@
 package it.uniud.easyhome.gateway.it;
 
-import it.uniud.easyhome.gateway.ProtocolType;
 import it.uniud.easyhome.gateway.XBeeGateway;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import org.codehaus.jackson.util.ByteArrayBuilder;
+
 public class XBeeGatewayIT {
 
-    static int srcGwPort = 5000;
-    static ProtocolType srcGwProtocol = ProtocolType.XBEE;
-    static int dstGwPort = 4000;
-    static ProtocolType dstGwProtocol = ProtocolType.XBEE;
-    
     static int dstAddress = 20;
     static int dstPort = 1;
     static int srcEndpoint = 15;
@@ -74,30 +71,49 @@ public class XBeeGatewayIT {
         // Checksum
         baos.write(0xFF - (sum & 0xFF));
         
-        byte[] bytes = baos.toByteArray();
+        byte[] bytesToSend = baos.toByteArray();
+        printBytes(bytesToSend);
+        
+        BufferedOutputStream os = new BufferedOutputStream(skt.getOutputStream());
+        BufferedInputStream is = new BufferedInputStream(skt2.getInputStream());
+        
+        os.write(bytesToSend);
+        os.flush();
+        os.close();
+
+        
+        ByteArrayBuilder ba = new ByteArrayBuilder();
+        ba.append(is.read());
+        int highLength = is.read();
+        ba.append(highLength);
+        int lowLength = is.read();
+        ba.append(lowLength);
+        int length = (highLength << 8) + lowLength;
+        int receivedSum = 0;
+        for (int i=0; i<length+1; i++) {
+        	int byteRead = is.read();
+        	ba.append(byteRead);
+        	receivedSum += byteRead;
+        }
+        if ((receivedSum & 0xFF) != 0xFF)
+        	System.out.println("Checksum failed");
+        
+        printBytes(ba.toByteArray());
+        ba.close();
+        
+        skt.close();
+        skt2.close();
+        
+    }
+    
+    private static void printBytes(byte[] bytes) {
         StringBuilder strb = new StringBuilder();
         for (byte b: bytes) {
             if ((0xFF & b) < 0x10)
                 strb.append("0");
             strb.append(Integer.toHexString(0xFF & b).toUpperCase()).append(" ");
         }
-        System.out.println(strb.toString());
-        
-        BufferedOutputStream os = new BufferedOutputStream(skt.getOutputStream());
-        os.write(bytes);
-        os.flush();
-        os.close();
-        
-        try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        
-        skt.close();
-        skt2.close();
-        
+        System.out.println(strb.toString());    	
     }
     
 }
