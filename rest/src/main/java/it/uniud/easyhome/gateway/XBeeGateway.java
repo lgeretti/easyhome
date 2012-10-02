@@ -386,6 +386,7 @@ public class XBeeGateway implements Gateway {
               while (true) {
                   
                 Socket skt = server.accept();
+                Connection jmsConnection = null;
                 try {
                     println("Connection established with " + skt);
                     
@@ -394,14 +395,14 @@ public class XBeeGateway implements Gateway {
                     InputStream istream = new BufferedInputStream(skt.getInputStream());
                     BufferedOutputStream ostream = new BufferedOutputStream(skt.getOutputStream());
                     
-        	        Connection connection = connectionFactory.createConnection();
-        	        Session jmsSession = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        	        jmsConnection = connectionFactory.createConnection();
+        	        Session jmsSession = jmsConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
                     
                     MessageConsumer outboundConsumer = jmsSession.createConsumer(outboundTopic);
                     MessageProducer inboundProducer = jmsSession.createProducer(inboundTopic);
                     MessageProducer outboundProducer = jmsSession.createProducer(outboundTopic);
                     
-                    connection.start();
+                    jmsConnection.start();
 
                     while (!disconnected) {
 	                    
@@ -430,6 +431,8 @@ public class XBeeGateway implements Gateway {
                   } catch (IOException ex) {
                       // Whatever the case, the connection is not available anymore
                   }
+                  
+                  jmsConnection.close();
                   
                   println("Connection with " + skt + " closed");
                 }
