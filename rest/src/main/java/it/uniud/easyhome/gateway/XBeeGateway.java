@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.io.*;
 
+import javax.annotation.Resource;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.MessageConsumer;
@@ -29,34 +30,15 @@ public class XBeeGateway implements Gateway {
     public static final byte EXPLICIT_RX_INDICATOR_FRAME_TYPE = (byte)0x91;
     public static final byte EXPLICIT_ADDRESSING_COMMAND_FRAME_TYPE = 0x11;
     
-    private static ConnectionFactory connectionFactory;
-    private static Topic outboundTopic;
-    private static Topic inboundTopic;
-    
-    private int transactionSequenceNumber = 0;
-    
-    static {
-    	
-    	try {
-    	
-	   		Context jndiContext = new InitialContext();
-	        connectionFactory = (ConnectionFactory) jndiContext.lookup("jms/easyhome/ConnectionFactory");
-	        
-            outboundTopic = (Topic) jndiContext.lookup("jms/easyhome/OutboundPacketsTopic");
-            inboundTopic = (Topic) jndiContext.lookup("jms/easyhome/InboundPacketsTopic");
-            	        
-    	} catch (Exception ex) {
-    		// Silently ignoring, since we do not want tests (which do not test JMS) to display errors 
-	    }
-    }
+    private int transactionSequenceNumberCounter = 0;
+
+    private int mappedPortCounter = 0;
     
     private ServerSocket server = null;
     
     private final Map<ModuleCoordinates,Integer> routingTable = new HashMap<ModuleCoordinates,Integer>();
     
     private int port;
-    
-    private int mappedPortCounter = 0;
     
     private int id;
     
@@ -279,7 +261,7 @@ public class XBeeGateway implements Gateway {
     		os.write(frameControl);
     		sum += frameControl;
     		// Transaction sequence number
-    		int tsn = ++transactionSequenceNumber;
+    		int tsn = ++transactionSequenceNumberCounter;
     		os.write(tsn);
     		sum += tsn;
     		// Command
@@ -395,6 +377,12 @@ public class XBeeGateway implements Gateway {
                     InputStream istream = new BufferedInputStream(skt.getInputStream());
                     BufferedOutputStream ostream = new BufferedOutputStream(skt.getOutputStream());
                     
+        	   		Context jndiContext = new InitialContext();
+        	        ConnectionFactory connectionFactory = (ConnectionFactory) jndiContext.lookup("jms/easyhome/ConnectionFactory");
+        	        
+                    Topic outboundTopic = (Topic) jndiContext.lookup("jms/easyhome/OutboundPacketsTopic");
+                    Topic inboundTopic = (Topic) jndiContext.lookup("jms/easyhome/InboundPacketsTopic");
+                    
         	        jmsConnection = connectionFactory.createConnection();
         	        Session jmsSession = jmsConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
                     
@@ -428,11 +416,10 @@ public class XBeeGateway implements Gateway {
                 } finally {
                   try {
                     if (skt != null) skt.close();
-                  } catch (IOException ex) {
+                    jmsConnection.close();
+                  } catch (Exception ex) {
                       // Whatever the case, the connection is not available anymore
                   }
-                  
-                  jmsConnection.close();
                   
                   println("Connection with " + skt + " closed");
                 }
