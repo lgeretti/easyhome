@@ -33,7 +33,7 @@ public class GatewayInfo {
     public GatewayInfo(Gateway gw) {
         id = gw.getId();
         protocol = gw.getProtocolType();
-        port = gw.getTCPPort();
+        port = gw.getPort();
     }
     
     public static List<GatewayInfo> createFromAll(List<Gateway> gws) {

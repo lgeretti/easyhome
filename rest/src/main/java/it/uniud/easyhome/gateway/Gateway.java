@@ -10,7 +10,7 @@ public interface Gateway {
     
     public ProtocolType getProtocolType();
     
-    public int getTCPPort();
+    public int getPort();
     
     public Map<ModuleCoordinates,Integer> getRoutingTable();
     
@@ -20,7 +20,7 @@ public interface Gateway {
     
     public void removeRoutingEntriesForGateway(int gid);
     
-    public Integer getPortFor(ModuleCoordinates coords);
+    public Integer getEndpointFor(ModuleCoordinates coords);
     
     public void open();
     

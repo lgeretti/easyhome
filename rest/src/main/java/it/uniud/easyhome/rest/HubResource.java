@@ -105,7 +105,7 @@ public class HubResource {
         if (gw == null) 
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         
-        Integer retrievedPort = gw.getPortFor(coords);
+        Integer retrievedPort = gw.getEndpointFor(coords);
                 
         if (retrievedPort == null) 
              throw new WebApplicationException(Response.Status.NOT_FOUND);

@@ -60,7 +60,7 @@ public class NetworkContext {
     public int addGateway(ProtocolType protocol, int port) {
         
         for (Gateway gw : gateways)
-            if (gw.getTCPPort() == port)
+            if (gw.getPort() == port)
                 throw new PortAlreadyBoundException();
         
         int gid = ++gidCount;

@@ -13,14 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.io.*;
 
-import javax.annotation.Resource;
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.ObjectMessage;
-import javax.jms.Session;
-import javax.jms.Topic;
+import javax.jms.*;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
@@ -32,7 +25,7 @@ public class XBeeGateway implements Gateway {
     
     private int transactionSequenceNumberCounter = 0;
 
-    private int mappedPortCounter = 0;
+    private int mappedEndpointCounter = 0;
     
     private ServerSocket server = null;
     
@@ -52,7 +45,7 @@ public class XBeeGateway implements Gateway {
         return ProtocolType.XBEE;
     }
     
-    public int getTCPPort() {
+    public int getPort() {
         return port;
     }
     
@@ -68,16 +61,16 @@ public class XBeeGateway implements Gateway {
     
     public int addRoutingEntry(ModuleCoordinates coords) {
         
-        println("Putting routing entry (port " + (mappedPortCounter+1) + ") for " + coords);
+        println("Putting routing entry (endpoint " + (mappedEndpointCounter+1) + ") for " + coords);
     	
-        routingTable.put(coords, ++mappedPortCounter);
+        routingTable.put(coords, ++mappedEndpointCounter);
         
-        return mappedPortCounter;
+        return mappedEndpointCounter;
     }
     
     public void removeRoutingEntry(ModuleCoordinates coords) {
         routingTable.remove(coords);
-    }    
+    }
     
     public void removeRoutingEntriesForGateway(int gid) {
         
@@ -87,21 +80,21 @@ public class XBeeGateway implements Gateway {
                 it.remove();
     }
     
-    public Integer getPortFor(ModuleCoordinates coords) {
+    public Integer getEndpointFor(ModuleCoordinates coords) {
         return routingTable.get(coords);
     }
     
-    private ModuleCoordinates getCoordinatesFor(int port) {
+    private ModuleCoordinates getCoordinatesFor(int endpoint) {
         ModuleCoordinates coords = null;
 
         for (Entry<ModuleCoordinates,Integer> pair : routingTable.entrySet()) 
-            if (pair.getValue() == port) {
+            if (pair.getValue() == endpoint) {
                 coords = pair.getKey();
                 break;
             }
         
         return coords;
-    }  
+    }
     
     
     /**
@@ -111,14 +104,14 @@ public class XBeeGateway implements Gateway {
     private EHPacket convertFromPayload(ByteArrayInputStream bais) throws RoutingEntryMissingException {
         
         int srcAddress = (bais.read() << 8) + bais.read();
-        int srcPort = bais.read();
+        int srcEndpoint = bais.read();
         
-        ModuleCoordinates srcCoords = new ModuleCoordinates(id,srcAddress,srcPort);
+        ModuleCoordinates srcCoords = new ModuleCoordinates(id,srcAddress,srcEndpoint);
         
-        int dstPort = bais.read();
+        int dstEndpoint = bais.read();
         
-        println("Source address and port: " + srcAddress + ", " + srcPort 
-        		+ " Destination port: " + dstPort);
+        println("Source address and port: " + srcAddress + ", " + srcEndpoint 
+        		+ " Destination port: " + dstEndpoint);
                 
         int opContext = (bais.read() << 8) + bais.read();
         int opDomain = (bais.read() << 8) + bais.read();
@@ -130,7 +123,7 @@ public class XBeeGateway implements Gateway {
         // If a broadcast, we use the broadcast format for the destination coordinates, but only
         // if the destination port is actually the administration port
         if (receiveOptions == 0x02) {
-        	if (dstPort == 0x00) {        		
+        	if (dstEndpoint == 0x00) {        		
 	        	dstCoords = new ModuleCoordinates(0,0,0);
 	        	println("Setting destination as broadcast");
         	} else {
@@ -138,12 +131,12 @@ public class XBeeGateway implements Gateway {
         	}
         } else {
 	        
-	        dstCoords = getCoordinatesFor(dstPort);
+	        dstCoords = getCoordinatesFor(dstEndpoint);
 	        
 	        if (dstCoords == null)
 	            throw new RoutingEntryMissingException();
 	        
-	        println("Retrieved coordinates for mapped port " + dstPort);
+	        println("Retrieved coordinates for mapped endpoint " + dstEndpoint);
 	    }
         
         int opFlags = bais.read();
@@ -225,11 +218,11 @@ public class XBeeGateway implements Gateway {
     		os.write(lowNwkDestAddr);
     		sum += lowNwkDestAddr;
     		// Source endpoint
-    		int srcEndpoint = pkt.getSrcCoords().getPort();
+    		int srcEndpoint = pkt.getSrcCoords().getEndpoint();
     		os.write(srcEndpoint);
     		sum += srcEndpoint;
     		// Destination endpoint
-    		int dstEndpoint = pkt.getDstCoords().getPort();
+    		int dstEndpoint = pkt.getDstCoords().getEndpoint();
     		os.write(dstEndpoint);
     		sum += dstEndpoint;
     		// Cluster ID
@@ -316,17 +309,13 @@ public class XBeeGateway implements Gateway {
                  
                 if (0xFF == (sum & 0xFF)) {
                     
-                    println("Checksum success, converting and dispatching");
-                    
                     try {
                     
                     	EHPacket pkt = convertFromPayload(new ByteArrayInputStream(packetPayload));
-                    
                     	dispatchPacket(pkt,jmsSession,inboundProducer,outboundProducer);
                     	
                     } catch (RoutingEntryMissingException ex) {
-                    	
-                    	println("No routing entry exists for the given destination port, unable to dispatch");
+                    	println("No routing entry exists for the given destination endpoint, unable to dispatch");
                     }
                 } else {
                     println("Checksum failure");
@@ -366,7 +355,7 @@ public class XBeeGateway implements Gateway {
               println("Gateway opened on port " + server.getLocalPort());
     
               while (true) {
-                  
+                
                 Socket skt = server.accept();
                 Connection jmsConnection = null;
                 try {
@@ -394,8 +383,8 @@ public class XBeeGateway implements Gateway {
 
                     while (!disconnected) {
 	                    
-                    	int octet = -1;
                     	if (istream.available() > 0) {
+                    		int octet;
 	                    	while ((octet = istream.read()) != -1) {
 			                    if (octet == START_DELIMITER) {
 		                            try {
@@ -415,8 +404,8 @@ public class XBeeGateway implements Gateway {
                   System.out.println(ex);
                 } finally {
                   try {
-                    if (skt != null) skt.close();
-                    jmsConnection.close();
+                	  if (skt != null) skt.close();
+                	  jmsConnection.close();
                   } catch (Exception ex) {
                       // Whatever the case, the connection is not available anymore
                   }

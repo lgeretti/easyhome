@@ -15,10 +15,12 @@ public class ModuleCoordinates implements Serializable {
     
     // Gateway (and consequently subnetwork) identifier (>0, =0 for broadcast, =1 for EasyHome TCP/IP subnetwork)
     private int gid;
+    // Unit unique id (global address, like a IEEE MAC address, fixed for a unit)
+    private long uuid;
     // Address within the network (>0, =0 if broadcast)
     private int address;
-    // Port of the interested module (>=0, =0 addresses the device port of the EH subnetwork)
-    private int port;
+    // Endpoint of the interested module (>=0, =0 addresses the device endpoint of the EH subnetwork)
+    private int endpoint;
     
     public int getGatewayId() {
         return gid;
@@ -28,14 +30,14 @@ public class ModuleCoordinates implements Serializable {
         return address;
     }
     
-    public int getPort() {
-        return port;
+    public int getEndpoint() {
+        return endpoint;
     }
     
-    public ModuleCoordinates(int gid, int address, int port) {
+    public ModuleCoordinates(int gid, int address, int endpoint) {
         this.gid = gid;
         this.address = address;
-        this.port = port;
+        this.endpoint = endpoint;
     }
     
     public ModuleCoordinates(ByteArrayInputStream bais) {
@@ -46,7 +48,7 @@ public class ModuleCoordinates implements Serializable {
         address = highAddr*256+bais.read();
         
         int highPort = bais.read();
-        port = highPort*256+bais.read();
+        endpoint = highPort*256+bais.read();
     }
     
     public void writeBytes(ByteArrayOutputStream baos) {
@@ -54,8 +56,8 @@ public class ModuleCoordinates implements Serializable {
         baos.write(gid & 0xFF);
         baos.write((address >>> 8) & 0xFF);
         baos.write(address & 0xFF);
-        baos.write((port >>> 8) & 0xFF);
-        baos.write(port & 0xFF);
+        baos.write((endpoint >>> 8) & 0xFF);
+        baos.write(endpoint & 0xFF);
     }
     
     public String toString() {
@@ -65,8 +67,8 @@ public class ModuleCoordinates implements Serializable {
     		.append(gid)
     		.append("; A:")
     		.append(address)
-    		.append("; P: ")
-    		.append(port)
+    		.append("; E: ")
+    		.append(endpoint)
     		.append("}");
     	
     	return strb.toString();
@@ -84,7 +86,7 @@ public class ModuleCoordinates implements Serializable {
             return false;
         if (otherCoords.getAddress() != this.getAddress())
             return false;
-        if (otherCoords.getPort() != this.getPort())
+        if (otherCoords.getEndpoint() != this.getEndpoint())
             return false;
         
         return true;
@@ -95,7 +97,7 @@ public class ModuleCoordinates implements Serializable {
         int hash = 1;
         hash = hash * 31 + gid;
         hash = hash * 31 + address;
-        hash = hash * 31 + port;
+        hash = hash * 31 + endpoint;
         return hash;
     }
     
