@@ -52,6 +52,7 @@ public class XBeeGatewayTest extends JerseyTest {
         int dstGwPort = 4000;
         ProtocolType dstGwProtocol = ProtocolType.XBEE;
         
+        long dstUuid = 0xFEDCBA98;
         int dstAddress = 20;
         int dstPort = 2;
         int srcEndpoint = 15;
@@ -69,6 +70,7 @@ public class XBeeGatewayTest extends JerseyTest {
         MultivaluedMap<String,String> formData = new MultivaluedHashMap<String,String>();
         
         formData.add("gid",String.valueOf(dstGid));
+        formData.add("uuid",String.valueOf(dstUuid));
         formData.add("address",String.valueOf(dstAddress));
         formData.add("port",String.valueOf(dstPort));
         
@@ -78,6 +80,7 @@ public class XBeeGatewayTest extends JerseyTest {
                                             .path("routing").request().post(Entity.form(formData)); 
         
         String routingInsertionPath = routingInsertionResponse.getLocation().getPath();
+        
         int mappedDstEndpoint = Integer.parseInt(target().path(routingInsertionPath).request().get(String.class));
         
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

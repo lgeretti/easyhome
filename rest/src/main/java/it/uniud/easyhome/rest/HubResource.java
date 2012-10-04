@@ -92,13 +92,14 @@ public class HubResource {
     }
     
     @GET
-    @Path("gateways/{srcgid}/routing/{dstgid}/{address}/{port}")
+    @Path("gateways/{srcgid}/routing/{dstgid}/{dstuuid}/{address}/{port}")
     public String getGatewayPort(@PathParam("srcgid") int srcGid,
                                  @PathParam("dstgid") int dstGid,
+                                 @PathParam("dstuuid") long dstUuid,
                                  @PathParam("address") int address,
                                  @PathParam("port") int port) {
         
-        ModuleCoordinates coords = new ModuleCoordinates(dstGid,address,port);
+        ModuleCoordinates coords = new ModuleCoordinates(dstGid,dstUuid,address,port);
 
         Gateway gw = networkContext.getGatewayForId(srcGid);
         
@@ -122,10 +123,11 @@ public class HubResource {
     @Path("gateways/{srcgid}/routing")
     public Response putRoutingEntry(@PathParam("srcgid") int srcGid,
             @FormParam("gid") int entryGid,
+            @FormParam("uuid") long entryUuid,
             @FormParam("address") int entryAddress,
             @FormParam("port") int entryPort) {
         
-        ModuleCoordinates coords = new ModuleCoordinates(entryGid,entryAddress,entryPort);
+        ModuleCoordinates coords = new ModuleCoordinates(entryGid,entryUuid,entryAddress,entryPort);
         
         Gateway gw = networkContext.getGatewayForId(srcGid);
         
@@ -136,6 +138,7 @@ public class HubResource {
         
         return Response.created(uriInfo.getAbsolutePathBuilder()
                                 .path(String.valueOf(entryGid))
+                                .path(String.valueOf(entryUuid))
                                 .path(String.valueOf(entryAddress))
                                 .path(String.valueOf(entryPort))
                                 .build())                
@@ -153,7 +156,7 @@ public class HubResource {
     	registerGateway(ProtocolType.XBEE,5050);
     	registerGateway(ProtocolType.XBEE,6060);
         
-    	putRoutingEntry(2,3,15,7);
+    	putRoutingEntry(2,3,2309737967L,15,7);
     	
     	return Response.ok().build();
     }

@@ -13,8 +13,6 @@ import org.codehaus.jackson.util.ByteArrayBuilder;
 
 public class XBeeGatewayIT {
 
-    static int dstAddress = 20;
-    static int dstPort = 1;
     static int srcEndpoint = 15;
     
     public static void main(String[] args) throws NumberFormatException, UnknownHostException, IOException {

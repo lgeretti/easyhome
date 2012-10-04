@@ -11,19 +11,23 @@ public class ModuleCoordinates implements Serializable {
 
     private static final long serialVersionUID = -5009839141486612459L;
 
-    public static final int OCTETS = 5;
+    public static final int OCTETS = 13;
     
-    // Gateway (and consequently subnetwork) identifier (>0, =0 for broadcast, =1 for EasyHome TCP/IP subnetwork)
+    // Gateway (and consequently subnetwork) identifier (>=0, =0 for broadcast, =1 for EasyHome TCP/IP subnetwork)
     private int gid;
-    // Unit unique id (global address, like a IEEE MAC address, fixed for a unit)
+    // Unit unique id (global address, like a IEEE MAC address, fixed for a unit) (0x0 for the gateway, 0xFFFF for a broadcast)
     private long uuid;
-    // Address within the network (>0, =0 if broadcast)
+    // Address within the network (>=0, 0xFFFE if broadcast or unknown)
     private int address;
     // Endpoint of the interested module (>=0, =0 addresses the device endpoint of the EH subnetwork)
     private int endpoint;
     
     public int getGatewayId() {
         return gid;
+    }
+    
+    public long getUnitUid() {
+    	return uuid;
     }
     
     public int getAddress() {
@@ -34,8 +38,9 @@ public class ModuleCoordinates implements Serializable {
         return endpoint;
     }
     
-    public ModuleCoordinates(int gid, int address, int endpoint) {
+    public ModuleCoordinates(int gid, long uuid, int address, int endpoint) {
         this.gid = gid;
+        this.uuid = uuid;
         this.address = address;
         this.endpoint = endpoint;
     }
@@ -43,17 +48,30 @@ public class ModuleCoordinates implements Serializable {
     public ModuleCoordinates(ByteArrayInputStream bais) {
         
         gid = bais.read();
-        
-        int highAddr = bais.read();
-        address = highAddr*256+bais.read();
-        
-        int highPort = bais.read();
-        endpoint = highPort*256+bais.read();
+    	uuid = (((long)bais.read()) << 56) + 
+    		   (((long)bais.read()) << 48) + 
+    		   (((long)bais.read()) << 40) + 
+    		   (((long)bais.read()) << 32) +
+			   (((long)bais.read()) << 24) + 
+			   (((long)bais.read()) << 16) + 
+			   (((long)bais.read()) << 8) + 
+			   (long)bais.read();
+        address = (bais.read()<<8)+bais.read();
+        endpoint = (bais.read()<<8)+bais.read();
     }
     
     public void writeBytes(ByteArrayOutputStream baos) {
         
         baos.write(gid & 0xFF);
+        baos.write((int)((uuid >>> 56) & 0xFF)); 
+        baos.write((int)((uuid >>> 48) & 0xFF));
+        baos.write((int)((uuid >>> 40) & 0xFF));
+        baos.write((int)((uuid >>> 32) & 0xFF));
+        baos.write((int)((uuid >>> 24) & 0xFF)); 
+        baos.write((int)((uuid >>> 16) & 0xFF));
+        baos.write((int)((uuid >>> 8) & 0xFF));
+        baos.write((int)(uuid & 0xFF));
+        
         baos.write((address >>> 8) & 0xFF);
         baos.write(address & 0xFF);
         baos.write((endpoint >>> 8) & 0xFF);
@@ -65,6 +83,8 @@ public class ModuleCoordinates implements Serializable {
     	
     	strb.append("{G: ")
     		.append(gid)
+    		.append("; U: ")
+    		.append(uuid)
     		.append("; A:")
     		.append(address)
     		.append("; E: ")
@@ -84,6 +104,8 @@ public class ModuleCoordinates implements Serializable {
         
         if (otherCoords.getGatewayId() != this.getGatewayId())
             return false;
+        if (otherCoords.getUnitUid() != this.getUnitUid())
+            return false;
         if (otherCoords.getAddress() != this.getAddress())
             return false;
         if (otherCoords.getEndpoint() != this.getEndpoint())
@@ -96,6 +118,7 @@ public class ModuleCoordinates implements Serializable {
     public int hashCode() {
         int hash = 1;
         hash = hash * 31 + gid;
+        hash = (int)(hash * 31 + uuid);
         hash = hash * 31 + address;
         hash = hash * 31 + endpoint;
         return hash;

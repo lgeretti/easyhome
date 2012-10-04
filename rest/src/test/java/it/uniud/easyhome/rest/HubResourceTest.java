@@ -82,6 +82,7 @@ public class HubResourceTest extends JerseyTest {
         
         int srcGatewayPort = 5000;
         int dstGid = 2;
+        long dstUuid = 0xFAAAAAAA;
         int dstAddress = 20;
         int dstPort = 4;
         
@@ -96,6 +97,7 @@ public class HubResourceTest extends JerseyTest {
         MultivaluedMap<String,String> formData = new MultivaluedHashMap<String,String>();
         
         formData.add("gid",String.valueOf(dstGid));
+        formData.add("uuid",String.valueOf(dstUuid));
         formData.add("address",String.valueOf(dstAddress));
         formData.add("port",String.valueOf(dstPort));
         

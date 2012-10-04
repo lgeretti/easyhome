@@ -98,15 +98,23 @@ public class XBeeGateway implements Gateway {
     
     
     /**
-     * Converts an XBee API received packet, starting from the 16 bit source network address forth,
+     * Converts an XBee API received packet, starting from the 64 bit source network address forth,
      * checksum excluded.
      */
     private EHPacket convertFromPayload(ByteArrayInputStream bais) throws RoutingEntryMissingException {
         
+    	long srcUuid = (((long)bais.read()) << 56) + 
+    			       (((long)bais.read()) << 48) + 
+    			       (((long)bais.read()) << 40) + 
+    			       (((long)bais.read()) << 32) +
+    			       (((long)bais.read()) << 24) + 
+    			       (((long)bais.read()) << 16) + 
+    			       (((long)bais.read()) << 8) + 
+    			       (long)bais.read();
         int srcAddress = (bais.read() << 8) + bais.read();
         int srcEndpoint = bais.read();
         
-        ModuleCoordinates srcCoords = new ModuleCoordinates(id,srcAddress,srcEndpoint);
+        ModuleCoordinates srcCoords = new ModuleCoordinates(id,srcUuid,srcAddress,srcEndpoint);
         
         int dstEndpoint = bais.read();
         
@@ -124,7 +132,7 @@ public class XBeeGateway implements Gateway {
         // if the destination port is actually the administration port
         if (receiveOptions == 0x02) {
         	if (dstEndpoint == 0x00) {        		
-	        	dstCoords = new ModuleCoordinates(0,0,0);
+	        	dstCoords = new ModuleCoordinates(0,0xFFFF,0xFFFE,0);
 	        	println("Setting destination as broadcast");
         	} else {
         		throw new IllegalBroadcastPortException();
@@ -203,8 +211,17 @@ public class XBeeGateway implements Gateway {
     		byte frameId = 0x00;
     		os.write(frameId);
     		sum += frameId;
-    		// 64 bit destination address (broadcast in order to left it unspecified)
-    		byte[] ieeeDestAddr = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, (byte)0xFF, (byte)0xFF}; 
+    		// 64 bit destination address
+    		byte[] ieeeDestAddr = new byte[8];
+    		long uuid = pkt.getDstCoords().getUnitUid();
+    		ieeeDestAddr[0] = (byte)((uuid >>> 56) & 0xFF);
+    		ieeeDestAddr[1] = (byte)((uuid >>> 48) & 0xFF);
+    		ieeeDestAddr[2] = (byte)((uuid >>> 40) & 0xFF);
+    		ieeeDestAddr[3] = (byte)((uuid >>> 32) & 0xFF);
+    		ieeeDestAddr[4] = (byte)((uuid >>> 24) & 0xFF);
+    		ieeeDestAddr[5] = (byte)((uuid >>> 16) & 0xFF);
+    		ieeeDestAddr[6] = (byte)((uuid >>> 8) & 0xFF);
+    		ieeeDestAddr[7] = (byte)(uuid & 0xFF); 
     		for (byte b: ieeeDestAddr) {
     			os.write(b);
     			sum += b;
@@ -285,20 +302,14 @@ public class XBeeGateway implements Gateway {
             println("Recognized XBee packet");
             
             int highLength = in.read();
-            // The frame type and source 64 bit address (hence 9 octets) are not stored
-            int length = highLength*256 + in.read() - 9;
+            // (The frame type is not stored)
+            int length = highLength*256 + in.read() - 1;
             
             byte[] packetPayload = new byte[length];
             
             int sum = EXPLICIT_RX_INDICATOR_FRAME_TYPE;
             byte frameType = (byte)in.read();
             if (frameType == EXPLICIT_RX_INDICATOR_FRAME_TYPE) {
-                
-                // Read out the source 64 bit address
-                for (int i=0; i<8; i++) {
-                    byte readValue = (byte)in.read();
-                    sum += readValue;
-                }
                     
                 for (int i=0; i<length; i++) {
                     byte readValue = (byte)in.read();
