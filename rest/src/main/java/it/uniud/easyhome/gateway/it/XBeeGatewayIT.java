@@ -37,8 +37,8 @@ public class XBeeGatewayIT {
         // Source 64 bit address (arbitrary)
         baos.write(new byte[8]);
         // Source 16 bit address (arbitrary)
-        baos.write(new byte[]{(byte)0xA2,(byte)0xB3});
-        sum += 0xA2;
+        baos.write(new byte[]{(byte)0x7D,(byte)0xB3});
+        sum += 0x7D;
         sum += 0xB3;
         // Source endpoint
         baos.write(srcEndpoint);

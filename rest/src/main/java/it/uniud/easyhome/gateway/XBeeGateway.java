@@ -312,11 +312,11 @@ public class XBeeGateway implements Gateway {
             if (frameType == EXPLICIT_RX_INDICATOR_FRAME_TYPE) {
                     
                 for (int i=0; i<length; i++) {
-                    byte readValue = (byte)in.read();
-                    packetPayload[i] = readValue;
+                    int readValue = in.read();
+                    packetPayload[i] = (byte)readValue;
                     sum += readValue;
                 }
-                sum += (byte)in.read();
+                sum += in.read();
                  
                 if (0xFF == (sum & 0xFF)) {
                     
