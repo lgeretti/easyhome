@@ -11,7 +11,7 @@ public class Operation implements Serializable {
 
     public final static int FIXED_OCTETS = 6;
     
-    private boolean isContextSpecific;
+    private int flags;
     private int domain;
     private int context;
     private int command;
@@ -28,7 +28,7 @@ public class Operation implements Serializable {
     }
     
     public boolean isContextSpecific() {
-        return isContextSpecific;
+        return ((flags & 0x01) == 1);
     }
     
     public int getCommand() {
@@ -41,8 +41,7 @@ public class Operation implements Serializable {
     
     public Operation(int flags, int domain, int context, int command, byte[] data) {
         
-        isContextSpecific = ((flags & 0x01) == 1);
-        
+        this.flags = flags;
         this.domain = domain;
         this.context = context;
         this.command = command;
@@ -51,8 +50,7 @@ public class Operation implements Serializable {
     
     public Operation(ByteArrayInputStream bais, int dataSize) {
         
-        int flags = bais.read();
-        isContextSpecific = ((flags & 0x01) == 1);
+        flags = bais.read();
         
         int highDomain = bais.read();
         domain = highDomain*256+bais.read();
@@ -68,7 +66,7 @@ public class Operation implements Serializable {
     
     public void writeBytes(ByteArrayOutputStream baos) {
         
-        baos.write(isContextSpecific ? 0x01 : 0x00);
+        baos.write(flags & 0xFF);
         baos.write((domain >>> 8) & 0xFF);
         baos.write(domain & 0xFF);
         baos.write((context >>> 8) & 0xFF);
