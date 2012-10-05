@@ -24,7 +24,7 @@ public class NetworkContext {
     // gid = 0 for broadcast
     // gid = 1 for the EasyHome network
     // hence actual gateways start from 2 onwards
-    private int gidCount = 1;
+    private byte gidCount = 1;
     
     public List<Gateway> getGateways() {
         return gateways;
@@ -63,7 +63,7 @@ public class NetworkContext {
             if (gw.getPort() == port)
                 throw new PortAlreadyBoundException();
         
-        int gid = ++gidCount;
+        byte gid = ++gidCount;
         
         Gateway gw = null;
         

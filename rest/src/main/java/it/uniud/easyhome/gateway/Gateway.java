@@ -6,7 +6,7 @@ import java.util.Map;
 
 public interface Gateway {
     
-    public int getId();
+    public byte getId();
     
     public ProtocolType getProtocolType();
     

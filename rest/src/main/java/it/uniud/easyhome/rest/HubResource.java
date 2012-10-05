@@ -47,7 +47,7 @@ public class HubResource {
 
     @DELETE
     @Path("gateways/{gid}")
-    public Response unregisterGateway(@PathParam("gid") int gid) {
+    public Response unregisterGateway(@PathParam("gid") byte gid) {
         
         if (networkContext.hasGateway(gid)) {
             networkContext.removeGateway(gid);
@@ -58,7 +58,7 @@ public class HubResource {
     
     @POST
     @Path("gateways/{gid}/disconnect")
-    public Response disconnectGateway(@PathParam("gid") int gid) {
+    public Response disconnectGateway(@PathParam("gid") byte gid) {
         
         if (networkContext.hasGateway(gid)) {
             networkContext.disconnectGateway(gid);
@@ -86,18 +86,18 @@ public class HubResource {
     
     @GET
     @Path("gateways/{gid}/routing/count")
-    public String getRoutingTableCount(@PathParam("gid") int gid) {
+    public String getRoutingTableCount(@PathParam("gid") byte gid) {
         Gateway gw = networkContext.getGatewayForId(gid);
         return String.valueOf(gw.getRoutingTable().size());
     }
     
     @GET
     @Path("gateways/{srcgid}/routing/{dstgid}/{dstuuid}/{address}/{port}")
-    public String getGatewayPort(@PathParam("srcgid") int srcGid,
-                                 @PathParam("dstgid") int dstGid,
+    public String getGatewayPort(@PathParam("srcgid") byte srcGid,
+                                 @PathParam("dstgid") byte dstGid,
                                  @PathParam("dstuuid") long dstUuid,
-                                 @PathParam("address") int address,
-                                 @PathParam("port") int port) {
+                                 @PathParam("address") short address,
+                                 @PathParam("port") byte port) {
         
         ModuleCoordinates coords = new ModuleCoordinates(dstGid,dstUuid,address,port);
 
@@ -121,11 +121,11 @@ public class HubResource {
      */
     @POST
     @Path("gateways/{srcgid}/routing")
-    public Response putRoutingEntry(@PathParam("srcgid") int srcGid,
-            @FormParam("gid") int entryGid,
+    public Response putRoutingEntry(@PathParam("srcgid") byte srcGid,
+            @FormParam("gid") byte entryGid,
             @FormParam("uuid") long entryUuid,
-            @FormParam("address") int entryAddress,
-            @FormParam("port") int entryPort) {
+            @FormParam("address") short entryAddress,
+            @FormParam("port") byte entryPort) {
         
         ModuleCoordinates coords = new ModuleCoordinates(entryGid,entryUuid,entryAddress,entryPort);
         
@@ -156,7 +156,7 @@ public class HubResource {
     	registerGateway(ProtocolType.XBEE,5050);
     	registerGateway(ProtocolType.XBEE,6060);
         
-    	putRoutingEntry(2,3,2309737967L,15,7);
+    	putRoutingEntry((byte)2,(byte)3,2309737967L,(short)15,(byte)7);
     	
     	return Response.ok().build();
     }

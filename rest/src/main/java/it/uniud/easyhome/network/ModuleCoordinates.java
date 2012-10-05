@@ -14,15 +14,15 @@ public class ModuleCoordinates implements Serializable {
     public static final int OCTETS = 13;
     
     // Gateway (and consequently subnetwork) identifier (>=0, =0 for broadcast, =1 for EasyHome TCP/IP subnetwork)
-    private int gid;
+    private byte gid;
     // Unit unique id (global address, like a IEEE MAC address, fixed for a unit) (0x0 for the gateway, 0xFFFF for a broadcast)
     private long uuid;
     // Address within the network (>=0, 0xFFFE if broadcast or unknown)
-    private int address;
+    private short address;
     // Endpoint of the interested module (>=0, =0 addresses the device endpoint of the EH subnetwork)
-    private int endpoint;
+    private byte endpoint;
     
-    public int getGatewayId() {
+    public byte getGatewayId() {
         return gid;
     }
     
@@ -30,15 +30,15 @@ public class ModuleCoordinates implements Serializable {
     	return uuid;
     }
     
-    public int getAddress() {
+    public short getAddress() {
         return address;
     }
     
-    public int getEndpoint() {
+    public byte getEndpoint() {
         return endpoint;
     }
     
-    public ModuleCoordinates(int gid, long uuid, int address, int endpoint) {
+    public ModuleCoordinates(byte gid, long uuid, short address, byte endpoint) {
         this.gid = gid;
         this.uuid = uuid;
         this.address = address;
@@ -47,7 +47,7 @@ public class ModuleCoordinates implements Serializable {
     
     public ModuleCoordinates(ByteArrayInputStream bais) {
         
-        gid = bais.read();
+        gid = (byte)bais.read();
     	uuid = (((long)bais.read()) << 56) + 
     		   (((long)bais.read()) << 48) + 
     		   (((long)bais.read()) << 40) + 
@@ -56,8 +56,8 @@ public class ModuleCoordinates implements Serializable {
 			   (((long)bais.read()) << 16) + 
 			   (((long)bais.read()) << 8) + 
 			   (long)bais.read();
-        address = (bais.read()<<8)+bais.read();
-        endpoint = (bais.read()<<8)+bais.read();
+        address = (short)((bais.read()<<8)+bais.read());
+        endpoint = (byte)((bais.read()<<8)+bais.read());
     }
     
     public void writeBytes(ByteArrayOutputStream baos) {

@@ -33,11 +33,11 @@ public class XBeeGateway implements Gateway {
     
     private int port;
     
-    private int id;
+    private byte id;
     
 	private volatile boolean disconnected = false;
     
-    public int getId() {
+    public byte getId() {
         return id;
     }
     
@@ -53,7 +53,7 @@ public class XBeeGateway implements Gateway {
         return routingTable;
     }
     
-    public XBeeGateway(int id, int port) {
+    public XBeeGateway(byte id, int port) {
         
         this.id = id;
         this.port = port;
@@ -111,20 +111,20 @@ public class XBeeGateway implements Gateway {
     			       (((long)bais.read()) << 16) + 
     			       (((long)bais.read()) << 8) + 
     			       (long)bais.read();
-        int srcAddress = (bais.read() << 8) + bais.read();
-        int srcEndpoint = bais.read();
+        short srcAddress = (short)((bais.read() << 8) + bais.read());
+        byte srcEndpoint = (byte)bais.read();
         
         ModuleCoordinates srcCoords = new ModuleCoordinates(id,srcUuid,srcAddress,srcEndpoint);
         
-        int dstEndpoint = bais.read();
+        byte dstEndpoint = (byte)bais.read();
         
         println("Source address and port: " + srcAddress + ", " + srcEndpoint 
         		+ " Destination port: " + dstEndpoint);
                 
-        int opContext = (bais.read() << 8) + bais.read();
-        int opDomain = (bais.read() << 8) + bais.read();
+        short opContext = (short)((bais.read() << 8) + bais.read());
+        short opDomain = (short)((bais.read() << 8) + bais.read());
         
-        int receiveOptions = bais.read();
+        byte receiveOptions = (byte)bais.read();
         
         ModuleCoordinates dstCoords = null;
         
@@ -132,7 +132,7 @@ public class XBeeGateway implements Gateway {
         // if the destination port is actually the administration port
         if (receiveOptions == 0x02) {
         	if (dstEndpoint == 0x00) {        		
-	        	dstCoords = new ModuleCoordinates(0,0xFFFF,0xFFFE,0);
+	        	dstCoords = new ModuleCoordinates((byte)0,(short)0xFFFF,(short)0xFFFE,(byte)0);
 	        	println("Setting destination as broadcast");
         	} else {
         		throw new IllegalBroadcastPortException();
@@ -147,11 +147,11 @@ public class XBeeGateway implements Gateway {
 	        println("Retrieved coordinates for mapped endpoint " + dstEndpoint);
 	    }
         
-        int opFlags = bais.read();
+        byte opFlags = (byte)bais.read();
         
         bais.read(); // Read out the transaction sequence number
         
-        int opCommand = bais.read();
+        byte opCommand = (byte)bais.read();
         
         int readByte;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
