@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-class XBeeTransmittedPacket implements TransmittedPacket {
+public class XBeeTransmittedPacket implements TransmittedPacket {
 	
     private static final byte START_DELIMITER = 0x7E;
     private static final byte EXPLICIT_ADDRESSING_COMMAND_FRAME_TYPE = 0x11;

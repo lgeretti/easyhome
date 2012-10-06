@@ -3,6 +3,7 @@ package it.uniud.easyhome.gateway;
 import it.uniud.easyhome.network.EHPacket;
 import it.uniud.easyhome.network.ModuleCoordinates;
 import it.uniud.easyhome.network.Operation;
+import it.uniud.easyhome.network.xbee.XBeeReceivedPacket;
 import it.uniud.easyhome.network.exceptions.IllegalBroadcastPortException;
 import it.uniud.easyhome.network.exceptions.RoutingEntryMissingException;
 
@@ -101,30 +102,13 @@ public class XBeeGateway implements Gateway {
      * Converts an XBee API received packet, starting from the 64 bit source network address forth,
      * checksum excluded.
      */
-    private EHPacket convertFromPayload(ByteArrayInputStream bais) throws RoutingEntryMissingException {
+    private EHPacket convertFrom(XBeeReceivedPacket xpkt) throws RoutingEntryMissingException {
         
-    	long srcUuid = (((long)bais.read()) << 56) + 
-    			       (((long)bais.read()) << 48) + 
-    			       (((long)bais.read()) << 40) + 
-    			       (((long)bais.read()) << 32) +
-    			       (((long)bais.read()) << 24) + 
-    			       (((long)bais.read()) << 16) + 
-    			       (((long)bais.read()) << 8) + 
-    			       (long)bais.read();
-        short srcAddress = (short)((bais.read() << 8) + bais.read());
-        byte srcEndpoint = (byte)bais.read();
+        ModuleCoordinates srcCoords = new ModuleCoordinates(
+        		id,xpkt.get64BitSrcAddr(),xpkt.get16BitSrcAddr(),xpkt.getSrcEndpoint());
         
-        ModuleCoordinates srcCoords = new ModuleCoordinates(id,srcUuid,srcAddress,srcEndpoint);
-        
-        byte dstEndpoint = (byte)bais.read();
-        
-        println("Source address and port: " + srcAddress + ", " + srcEndpoint 
-        		+ " Destination port: " + dstEndpoint);
-                
-        short opContext = (short)((bais.read() << 8) + bais.read());
-        short opDomain = (short)((bais.read() << 8) + bais.read());
-        
-        byte receiveOptions = (byte)bais.read();
+        byte receiveOptions = xpkt.getReceiveOptions();
+        byte dstEndpoint = xpkt.getDstEndpoint();
         
         ModuleCoordinates dstCoords = null;
         
@@ -147,19 +131,8 @@ public class XBeeGateway implements Gateway {
 	        println("Retrieved coordinates for mapped endpoint " + dstEndpoint);
 	    }
         
-        byte opFlags = (byte)bais.read();
-        
-        byte transactionSequenceNumber = (byte)bais.read(); // Read out the transaction sequence number
-        
-        byte opCommand = (byte)bais.read();
-        
-        int readByte;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        while ((readByte = bais.read()) != -1) {
-            baos.write(readByte);
-        }
-        
-        Operation op = new Operation(transactionSequenceNumber,opDomain,opContext,opFlags,opCommand,baos.toByteArray());
+        Operation op = new Operation(xpkt.getTransactionSeqNumber(),xpkt.getProfileId(),
+        		xpkt.getClusterId(),xpkt.getFrameControl(),xpkt.getCommand(),xpkt.getApsPayload());
         
         return new EHPacket(srcCoords,dstCoords,op);
     }
@@ -301,38 +274,15 @@ public class XBeeGateway implements Gateway {
             
             println("Recognized XBee packet");
             
-            int highLength = in.read();
-            // (The frame type is not stored)
-            int length = highLength*256 + in.read() - 1;
-            
-            byte[] packetPayload = new byte[length];
-            
-            int sum = EXPLICIT_RX_INDICATOR_FRAME_TYPE;
-            byte frameType = (byte)in.read();
-            if (frameType == EXPLICIT_RX_INDICATOR_FRAME_TYPE) {
-                    
-                for (int i=0; i<length; i++) {
-                    int readValue = in.read();
-                    packetPayload[i] = (byte)readValue;
-                    sum += readValue;
-                }
-                sum += in.read();
-                 
-                if (0xFF == (sum & 0xFF)) {
-                    
-                    try {
-                    
-                    	EHPacket pkt = convertFromPayload(new ByteArrayInputStream(packetPayload));
-                    	dispatchPacket(pkt,jmsSession,inboundProducer,outboundProducer);
-                    	
-                    } catch (RoutingEntryMissingException ex) {
-                    	println("No routing entry exists for the given destination endpoint, unable to dispatch");
-                    }
-                } else {
-                    println("Checksum failure");
-                }
-            } else {
-                println("Incorrect packet type: discarding");
+            try {
+            	
+            	XBeeReceivedPacket xbeePkt = new XBeeReceivedPacket();
+            	xbeePkt.read(in);
+            	EHPacket ehPkt = convertFrom(xbeePkt);
+            	dispatchPacket(ehPkt,jmsSession,inboundProducer,outboundProducer);
+            	
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
         
@@ -395,17 +345,7 @@ public class XBeeGateway implements Gateway {
                     while (!disconnected) {
 	                    
                     	if (istream.available() > 0) {
-                    		int octet;
-	                    	while ((octet = istream.read()) != -1) {
-			                    if (octet == START_DELIMITER) {
-		                            try {
-		                                handleInboundPacketFrom(istream,jmsSession,inboundProducer,outboundProducer);
-		                                break; // We avoid to process a continuous flow of inbound packets without handling outbound packets too
-		                            } catch (Exception e) {
-		                                // We want to gracefully handle incorrect packets
-		                            }
-			                    }
-	                    	}
+		                    handleInboundPacketFrom(istream,jmsSession,inboundProducer,outboundProducer);
                     	}
 	                    
 	                    handleOutboundPacketsTo(ostream,outboundConsumer);	                    
