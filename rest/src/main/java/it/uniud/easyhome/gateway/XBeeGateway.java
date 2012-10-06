@@ -4,6 +4,7 @@ import it.uniud.easyhome.network.EHPacket;
 import it.uniud.easyhome.network.ModuleCoordinates;
 import it.uniud.easyhome.network.Operation;
 import it.uniud.easyhome.network.xbee.XBeeReceivedPacket;
+import it.uniud.easyhome.network.xbee.XBeeTransmittedPacket;
 import it.uniud.easyhome.network.exceptions.IllegalBroadcastPortException;
 import it.uniud.easyhome.network.exceptions.RoutingEntryMissingException;
 
@@ -159,114 +160,6 @@ public class XBeeGateway implements Gateway {
         }
     }
     
-    /**
-     * Injects the packet into the subnetwork
-     */
-    private void injectPacket(EHPacket pkt, OutputStream os) {
-    	
-    	try {
-    		os.write(START_DELIMITER);
-    		
-    		byte[] opData = pkt.getOperation().getData();
-    		int length = 23 + opData.length;
-    		
-    		// High and low lengths
-    		os.write((length >>> 8) & 0xFF);
-    		os.write(length & 0xFF);
-    		
-    		int sum = 0;
-    		
-    		// Frame type
-    		byte frameType = EXPLICIT_ADDRESSING_COMMAND_FRAME_TYPE; 
-    		os.write(frameType);
-    		sum += frameType;
-    		// Frame ID (0 for no response)
-    		byte frameId = 0x00;
-    		os.write(frameId);
-    		sum += frameId;
-    		// 64 bit destination address
-    		byte[] ieeeDestAddr = new byte[8];
-    		long uuid = pkt.getDstCoords().getUuid();
-    		ieeeDestAddr[0] = (byte)((uuid >>> 56) & 0xFF);
-    		ieeeDestAddr[1] = (byte)((uuid >>> 48) & 0xFF);
-    		ieeeDestAddr[2] = (byte)((uuid >>> 40) & 0xFF);
-    		ieeeDestAddr[3] = (byte)((uuid >>> 32) & 0xFF);
-    		ieeeDestAddr[4] = (byte)((uuid >>> 24) & 0xFF);
-    		ieeeDestAddr[5] = (byte)((uuid >>> 16) & 0xFF);
-    		ieeeDestAddr[6] = (byte)((uuid >>> 8) & 0xFF);
-    		ieeeDestAddr[7] = (byte)(uuid & 0xFF); 
-    		for (byte b: ieeeDestAddr) {
-    			os.write(b);
-    			sum += b;
-    		}
-    		// 16 bit destination address
-    		int nwkDestAddr = pkt.getDstCoords().getAddress();
-    		byte highNwkDestAddr = (byte)((nwkDestAddr >>> 8) & 0xFF);
-    		byte lowNwkDestAddr = (byte)(nwkDestAddr & 0xFF);
-    		os.write(highNwkDestAddr);
-    		sum += highNwkDestAddr;
-    		os.write(lowNwkDestAddr);
-    		sum += lowNwkDestAddr;
-    		// Source endpoint
-    		int srcEndpoint = pkt.getSrcCoords().getEndpoint();
-    		os.write(srcEndpoint);
-    		sum += srcEndpoint;
-    		// Destination endpoint
-    		int dstEndpoint = pkt.getDstCoords().getEndpoint();
-    		os.write(dstEndpoint);
-    		sum += dstEndpoint;
-    		// Cluster ID
-    		int clusterId = pkt.getOperation().getContext();
-    		byte highClusterId = (byte)((clusterId >>> 8) & 0xFF);
-    		byte lowClusterId = (byte)(clusterId & 0xFF);
-    		os.write(highClusterId);
-    		sum += highClusterId;
-    		os.write(lowClusterId);
-    		sum += lowClusterId;
-    		// Profile ID
-    		int profileId = pkt.getOperation().getDomain();
-    		byte highProfileId = (byte)((profileId >>> 8) & 0xFF);
-    		byte lowProfileId = (byte)(profileId & 0xFF);
-    		os.write(highProfileId);
-    		sum += highProfileId;
-    		os.write(lowProfileId);
-    		sum += lowProfileId;
-    		// Broadcast radius (unlimited)
-    		int broadcastRadius = 0x00;
-    		os.write(broadcastRadius);
-    		sum += broadcastRadius;
-    		// Transmit options (none)
-    		int transmitOptions = 0x00;
-    		os.write(transmitOptions);
-    		sum += transmitOptions;
-    		// Frame control
-    		int frameControl = (pkt.getOperation().isContextSpecific() ? 0x01 : 0x00);
-    		os.write(frameControl);
-    		sum += frameControl;
-    		// Transaction sequence number
-    		int tsn = ++transactionSequenceNumberCounter;
-    		os.write(tsn);
-    		sum += tsn;
-    		// Command
-    		int command = pkt.getOperation().getCommand();
-    		os.write(command);
-    		sum += command;
-    		// Command payload
-    		for (byte b: opData) {
-    			os.write(b);
-    			sum += b;
-    		}
-    		// Checksum
-    		os.write(0xFF - (sum & 0xFF));
-    		os.flush();
-    		
-    		println("XBee packet written");
-    		
-    	} catch (IOException ex) {
-    		println(ex.getMessage());
-    	}
-    }
-    
     private class GatewayRunnable implements Runnable {
     
         private void handleInboundPacketFrom(InputStream in, Session jmsSession,
@@ -294,10 +187,11 @@ public class XBeeGateway implements Gateway {
                     if (msg == null) {
                     	break;
                     }
-                	EHPacket pkt = (EHPacket) msg.getObject();
-                	if (pkt.getDstCoords().getGatewayId() == id) {
-                		println("Packet received from " + pkt.getSrcCoords() + ", injecting");
-                		injectPacket(pkt,os);
+                	EHPacket ehPkt = (EHPacket) msg.getObject();
+                	if (ehPkt.getDstCoords().getGatewayId() == id) {
+                		println("Packet received from " + ehPkt.getSrcCoords() + ", injecting");
+                		XBeeTransmittedPacket xbeePkt = new XBeeTransmittedPacket(ehPkt);
+                		xbeePkt.write(os);
                 	} else {
                 		println("Packet received from self, discarding");
                 	}
