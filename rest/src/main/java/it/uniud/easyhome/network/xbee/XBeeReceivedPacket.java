@@ -10,9 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class XBeeReceivedPacket implements ReceivedPacket {
-	
-    private static final byte START_DELIMITER = 0x7E;
-    private static final byte EXPLICIT_RX_INDICATOR_FRAME_TYPE = (byte)0x91;
 
 	private long srcAddr64;
 	private short srcAddr16;
@@ -114,7 +111,7 @@ public class XBeeReceivedPacket implements ReceivedPacket {
     	if (octet == -1)
     		throw new IOException();
     	
-        if (octet != START_DELIMITER)
+        if (octet != XBeeConstants.START_DELIMITER)
         	throw new InvalidDelimiterException();
         	
         int highLength = is.read();
@@ -123,9 +120,9 @@ public class XBeeReceivedPacket implements ReceivedPacket {
         
         byte[] packetPayload = new byte[length];
         
-        int sum = EXPLICIT_RX_INDICATOR_FRAME_TYPE;
+        int sum = XBeeConstants.EXPLICIT_RX_INDICATOR_FRAME_TYPE;
         byte frameType = (byte)is.read();
-        if (frameType != EXPLICIT_RX_INDICATOR_FRAME_TYPE) 
+        if (frameType != XBeeConstants.EXPLICIT_RX_INDICATOR_FRAME_TYPE) 
         	throw new InvalidPacketTypeException();
                 
         for (int i=0; i<length; i++) {

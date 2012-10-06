@@ -15,7 +15,8 @@ public class ModuleCoordinates implements Serializable {
     
     // Gateway (and consequently subnetwork) identifier (>=0, =0 for broadcast, =1 for EasyHome TCP/IP subnetwork)
     private byte gid;
-    // Unit unique id (global address, like a IEEE MAC address, fixed for a unit) (0x0 for the gateway, 0xFFFF for a broadcast)
+    // Unit unique id (global address, like a IEEE MAC address, fixed for a unit) (0x0 for the gateway, 
+    // 0x0000FFFF for a broadcast, 0xFFFFFFFF for unknown)
     private long uuid;
     // Address within the network (>=0, 0xFFFE if broadcast or unknown)
     private short address;

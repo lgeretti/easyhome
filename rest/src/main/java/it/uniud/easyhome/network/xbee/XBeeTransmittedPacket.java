@@ -4,13 +4,9 @@ import it.uniud.easyhome.network.EHPacket;
 import it.uniud.easyhome.network.TransmittedPacket;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 public class XBeeTransmittedPacket implements TransmittedPacket {
-	
-    private static final byte START_DELIMITER = 0x7E;
-    private static final byte EXPLICIT_ADDRESSING_COMMAND_FRAME_TYPE = 0x11;
 	
 	private byte frameId = 0x00;
 	private long dstAddr64;
@@ -136,7 +132,7 @@ public class XBeeTransmittedPacket implements TransmittedPacket {
 	@Override
 	public void write(OutputStream os) throws IOException {
     	
-		os.write(START_DELIMITER);
+		os.write(XBeeConstants.START_DELIMITER);
 		
 		int length = 23 + apsPayload.length;
 		
@@ -147,33 +143,24 @@ public class XBeeTransmittedPacket implements TransmittedPacket {
 		int sum = 0;
 		
 		// Frame type
-		byte frameType = EXPLICIT_ADDRESSING_COMMAND_FRAME_TYPE; 
+		byte frameType = XBeeConstants.EXPLICIT_ADDRESSING_COMMAND_FRAME_TYPE; 
 		os.write(frameType);
 		sum += frameType;
 		// Frame Id
 		os.write(frameId);
 		sum += frameId;
 		// 64 bit destination address
-		byte[] ieeeDestAddr = new byte[8];
-		ieeeDestAddr[0] = (byte)((dstAddr64 >>> 56) & 0xFF);
-		ieeeDestAddr[1] = (byte)((dstAddr64 >>> 48) & 0xFF);
-		ieeeDestAddr[2] = (byte)((dstAddr64 >>> 40) & 0xFF);
-		ieeeDestAddr[3] = (byte)((dstAddr64 >>> 32) & 0xFF);
-		ieeeDestAddr[4] = (byte)((dstAddr64 >>> 24) & 0xFF);
-		ieeeDestAddr[5] = (byte)((dstAddr64 >>> 16) & 0xFF);
-		ieeeDestAddr[6] = (byte)((dstAddr64 >>> 8) & 0xFF);
-		ieeeDestAddr[7] = (byte)(dstAddr64 & 0xFF); 
-		for (byte b: ieeeDestAddr) {
-			os.write(b);
-			sum += b;
+		for (int j=56; j>=0; j-=8) {
+			byte val = (byte)((dstAddr64 >>> j) & 0xFF);
+			os.write(val);
+			sum += val;
 		}
 		// 16 bit destination address
-		byte highNwkDestAddr = (byte)((dstAddr16 >>> 8) & 0xFF);
-		byte lowNwkDestAddr = (byte)(dstAddr16 & 0xFF);
-		os.write(highNwkDestAddr);
-		sum += highNwkDestAddr;
-		os.write(lowNwkDestAddr);
-		sum += lowNwkDestAddr;
+		for (int j=8; j>=0; j-=8) {
+			byte val = (byte)((dstAddr16 >>> j) & 0xFF);
+			os.write(val);
+			sum += val;
+		}		
 		// Source endpoint;
 		os.write(srcEndpoint);
 		sum += srcEndpoint;
@@ -181,19 +168,17 @@ public class XBeeTransmittedPacket implements TransmittedPacket {
 		os.write(dstEndpoint);
 		sum += dstEndpoint;
 		// Cluster ID
-		byte highClusterId = (byte)((clusterId >>> 8) & 0xFF);
-		byte lowClusterId = (byte)(clusterId & 0xFF);
-		os.write(highClusterId);
-		sum += highClusterId;
-		os.write(lowClusterId);
-		sum += lowClusterId;
+		for (int j=8; j>=0; j-=8) {
+			byte val = (byte)((clusterId >>> j) & 0xFF);
+			os.write(val);
+			sum += val;
+		}			
 		// Profile ID
-		byte highProfileId = (byte)((profileId >>> 8) & 0xFF);
-		byte lowProfileId = (byte)(profileId & 0xFF);
-		os.write(highProfileId);
-		sum += highProfileId;
-		os.write(lowProfileId);
-		sum += lowProfileId;
+		for (int j=8; j>=0; j-=8) {
+			byte val = (byte)((profileId >>> j) & 0xFF);
+			os.write(val);
+			sum += val;
+		}			
 		// Broadcast radius
 		os.write(broadcastRadius);
 		sum += broadcastRadius;

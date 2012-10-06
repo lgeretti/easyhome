@@ -1,6 +1,6 @@
 package it.uniud.easyhome.gateway.it;
 
-import it.uniud.easyhome.gateway.XBeeGateway;
+import it.uniud.easyhome.network.xbee.XBeeConstants;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -27,13 +27,13 @@ public class XBeeGatewayIT {
         
         int sum = 0;
         // Delimiter
-        baos.write(XBeeGateway.START_DELIMITER);
+        baos.write(XBeeConstants.START_DELIMITER);
         // Length (21)
         baos.write(0x00);
         baos.write(0x15);
         // Frame type
-        baos.write(XBeeGateway.EXPLICIT_RX_INDICATOR_FRAME_TYPE);
-        sum += XBeeGateway.EXPLICIT_RX_INDICATOR_FRAME_TYPE;
+        baos.write(XBeeConstants.EXPLICIT_RX_INDICATOR_FRAME_TYPE);
+        sum += XBeeConstants.EXPLICIT_RX_INDICATOR_FRAME_TYPE;
         // Source 64 bit address (arbitrary)
         baos.write(new byte[8]);
         // Source 16 bit address (arbitrary)
