@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-class XbeeTransmittedPacket implements TransmittedPacket {
+class XBeeTransmittedPacket implements TransmittedPacket {
 	
     private static final byte START_DELIMITER = 0x7E;
     private static final byte EXPLICIT_ADDRESSING_COMMAND_FRAME_TYPE = 0x11;
@@ -26,19 +26,19 @@ class XbeeTransmittedPacket implements TransmittedPacket {
 	private byte command = 0x00;
 	private byte[] apsPayload = new byte[0];
 	
-	public XbeeTransmittedPacket() { 
-		apsPayload = new byte[0]; 
+	public XBeeTransmittedPacket() {
 	}
 	
-	public XbeeTransmittedPacket(EHPacket ehp) {
+	public XBeeTransmittedPacket(EHPacket ehp) {
 		
-		dstAddr64 = ehp.getDstCoords().getUnitUid();
+		dstAddr64 = ehp.getDstCoords().getUuid();
 		dstAddr16 = ehp.getDstCoords().getAddress();
 		srcEndpoint = ehp.getSrcCoords().getEndpoint();
 		dstEndpoint = ehp.getDstCoords().getEndpoint();
 		clusterId = ehp.getOperation().getContext();
 		profileId = ehp.getOperation().getDomain();
 		frameControl = ehp.getOperation().getFlags();
+		transactionSeqNumber = ehp.getOperation().getSequenceNumber();
 		command = ehp.getOperation().getFlags();
 		apsPayload = ehp.getOperation().getData();
 	}

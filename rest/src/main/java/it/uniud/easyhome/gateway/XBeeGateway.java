@@ -149,7 +149,7 @@ public class XBeeGateway implements Gateway {
         
         byte opFlags = (byte)bais.read();
         
-        bais.read(); // Read out the transaction sequence number
+        byte transactionSequenceNumber = (byte)bais.read(); // Read out the transaction sequence number
         
         byte opCommand = (byte)bais.read();
         
@@ -159,7 +159,7 @@ public class XBeeGateway implements Gateway {
             baos.write(readByte);
         }
         
-        Operation op = new Operation(opFlags,opDomain,opContext,opCommand,baos.toByteArray());
+        Operation op = new Operation(transactionSequenceNumber,opDomain,opContext,opFlags,opCommand,baos.toByteArray());
         
         return new EHPacket(srcCoords,dstCoords,op);
     }
@@ -213,7 +213,7 @@ public class XBeeGateway implements Gateway {
     		sum += frameId;
     		// 64 bit destination address
     		byte[] ieeeDestAddr = new byte[8];
-    		long uuid = pkt.getDstCoords().getUnitUid();
+    		long uuid = pkt.getDstCoords().getUuid();
     		ieeeDestAddr[0] = (byte)((uuid >>> 56) & 0xFF);
     		ieeeDestAddr[1] = (byte)((uuid >>> 48) & 0xFF);
     		ieeeDestAddr[2] = (byte)((uuid >>> 40) & 0xFF);

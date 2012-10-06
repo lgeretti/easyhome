@@ -26,7 +26,7 @@ public class ModuleCoordinates implements Serializable {
         return gid;
     }
     
-    public long getUnitUid() {
+    public long getUuid() {
     	return uuid;
     }
     
@@ -104,7 +104,7 @@ public class ModuleCoordinates implements Serializable {
         
         if (otherCoords.getGatewayId() != this.getGatewayId())
             return false;
-        if (otherCoords.getUnitUid() != this.getUnitUid())
+        if (otherCoords.getUuid() != this.getUuid())
             return false;
         if (otherCoords.getAddress() != this.getAddress())
             return false;
