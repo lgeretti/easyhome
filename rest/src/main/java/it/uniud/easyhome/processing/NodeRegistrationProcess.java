@@ -45,7 +45,7 @@ public class NodeRegistrationProcess extends Process implements Runnable {
 	        
 	    	while (!isStopped()) {
 	    		
-            	ObjectMessage msg = (ObjectMessage) consumer.receive();
+            	ObjectMessage msg = (ObjectMessage) consumer.receive(1000);
 
             	EHPacket pkt = (EHPacket) msg.getObject();
             	println("Packet received from " + pkt.getSrcCoords());

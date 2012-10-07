@@ -34,22 +34,9 @@ public class ProcessResource {
     public List<Process> getProcesses() {
 
         return processes;
-    }           
-    
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getNum() {
-        
-        StringBuilder strb = new StringBuilder();
-        strb.append("There are ").append(processes.size()).append(" processes around, with ids");
-        for (Process p : processes)
-            strb.append(p.getPid()).append(",");
-        strb.deleteCharAt(strb.length()-1);
-        
-        return strb.toString();
     }
     
- // curl -X POST http://localhost:8080/easyhome/rest/processes -H "Content-Type: application/x-www-form-urlencoded" --data-binary "kind=nodeRegistration"
+    // curl -X POST http://localhost:8080/easyhome/rest/processes -H "Content-Type: application/x-www-form-urlencoded" --data-binary "kind=nodeRegistration"
     @POST
     public Response postProcess(@FormParam("kind") String kind) {
         
@@ -77,6 +64,7 @@ public class ProcessResource {
         
         for (int i=0; i<processes.size(); i++) {
             if (processes.get(i).getPid() == pid) {
+            	processes.get(i).stop();
                 processes.remove(i);
                 return Response.ok().build();
             }
@@ -88,7 +76,10 @@ public class ProcessResource {
     @DELETE
     public Response clearAll() {
         
-        processes.clear();
+    	for (Process pr : processes) {
+    		pr.stop();
+    	}
+    	processes.clear();
         
         return Response.ok().build();
     }
