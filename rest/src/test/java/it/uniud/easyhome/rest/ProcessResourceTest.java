@@ -64,11 +64,10 @@ public class ProcessResourceTest extends JerseyTest {
         
         formData.add("kind","nodeRegistration");
         
-        Response insertionResponse = target()
-                                            .path("processes")
-                                            .request().post(Entity.form(formData)); 
+        Response insertionResponse = target().path("processes")
+                                             .request().post(Entity.form(formData)); 
     	
-        assertEquals(Status.OK,insertionResponse.getStatusInfo());
+        assertEquals(Status.CREATED,insertionResponse.getStatusInfo());
         
         GenericType<List<Process>> processesType = new GenericType<List<Process>>() {};
         List<Process> processes = target().path("processes").request(MediaType.APPLICATION_JSON).get(processesType);
@@ -82,14 +81,17 @@ public class ProcessResourceTest extends JerseyTest {
         
         formData.add("kind","nodeRegistration");
         
-        Response insertionResponse = target()
-                                            .path("processes")
-                                            .request().post(Entity.form(formData)); 
-        assertEquals(Status.OK,insertionResponse.getStatusInfo());
+        Response insertionResponse = target().path("processes")
+                                             .request().post(Entity.form(formData)); 
+        assertEquals(Status.CREATED,insertionResponse.getStatusInfo());
+
+        String locationPath = insertionResponse.getLocation().getPath();
+        String[] segments = locationPath.split("/");
+        String pidString = segments[segments.length-1];
         
-        Response deleteResponse1 = target().path("processes/1").request().delete();
+        Response deleteResponse1 = target().path("processes").path(pidString).request().delete();
         assertEquals(Status.OK,deleteResponse1.getStatusInfo());
-        Response deleteResponse2 = target().path("processes/1").request().delete();
+        Response deleteResponse2 = target().path("processes").path(pidString).request().delete();
         assertEquals(Status.NOT_FOUND,deleteResponse2.getStatusInfo());
     }
     

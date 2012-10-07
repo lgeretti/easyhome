@@ -50,7 +50,7 @@ public class Process {
 	}
 	
 	public void stop() {
-		stopped = false;
+		stopped = true;
 	}
 	
 	protected void println(String msg) {

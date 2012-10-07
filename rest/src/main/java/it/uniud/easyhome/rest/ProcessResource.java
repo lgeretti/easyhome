@@ -4,20 +4,8 @@ import it.uniud.easyhome.processing.NodeRegistrationProcess;
 import it.uniud.easyhome.processing.Process;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Queue;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.*;
@@ -25,10 +13,13 @@ import javax.ws.rs.*;
 @Path("/processes")
 public class ProcessResource {
     
+    @Context
+    private UriInfo uriInfo;
+	
     private static final List<Process> processes = new ArrayList<Process>();
     
-    private int pidCounter = 0;
-
+    private static int pidCounter = 0;
+    
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<Process> getProcesses() {
@@ -42,20 +33,23 @@ public class ProcessResource {
         
     	int pid = ++pidCounter;
     	
-    	Process process = null;
+    	Process process = null; 
     	
     	switch (kind) {
 	    	case "nodeRegistration":
 	    		process = new NodeRegistrationProcess(pid);
 	    		break;
 	    	default:
+	    		return Response.status(Status.BAD_REQUEST).build();
     	}
     	
         processes.add(process);
         
         process.start();
         
-        return Response.ok().build();
+        return Response.created(uriInfo.getAbsolutePathBuilder()
+                .path(String.valueOf(pid))
+                .build()).build();
     }
 
     @DELETE

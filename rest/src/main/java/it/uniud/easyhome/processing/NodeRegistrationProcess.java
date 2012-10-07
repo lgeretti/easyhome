@@ -43,12 +43,15 @@ public class NodeRegistrationProcess extends Process implements Runnable {
 	    	
 	        jmsConnection.start();
 	        
+	        println("processing started");
+	        
 	    	while (!isStopped()) {
 	    		
-            	ObjectMessage msg = (ObjectMessage) consumer.receive(1000);
-
-            	EHPacket pkt = (EHPacket) msg.getObject();
-            	println("Packet received from " + pkt.getSrcCoords());
+            	ObjectMessage msg = (ObjectMessage) consumer.receive(5000);
+            	if (msg != null) {
+	            	EHPacket pkt = (EHPacket) msg.getObject();
+	            	println("Packet received from " + pkt.getSrcCoords());
+            	}
 	    	}
 	    	
     	} catch (NamingException ex) {
