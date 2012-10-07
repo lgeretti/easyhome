@@ -26,6 +26,8 @@ import javax.ws.rs.*;
 public class ProcessResource {
     
     private static final List<Process> processes = new ArrayList<Process>();
+    
+    private int pidCounter = 0;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -34,70 +36,7 @@ public class ProcessResource {
         return processes;
     }           
     
-    @POST
-    @Path("produceMessage")
-    public void produceMessage() throws NamingException, JMSException {
-        
-        // Gets the JNDI context
-        Context jndiContext = new InitialContext();
-
-        // Looks up the administered objects
-        ConnectionFactory connectionFactory = (ConnectionFactory) jndiContext.lookup("jms/javaee6/ConnectionFactory");
-        Queue queue = (Queue) jndiContext.lookup("jms/javaee6/Queue");
-
-        // Creates the needed artifacts to connect to the queue
-        Connection connection = connectionFactory.createConnection();
-        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        MessageProducer producer = session.createProducer(queue);
-
-        // Sends a text message to the queue
-        TextMessage message = session.createTextMessage();
-        message.setText("This is a text message sent at " + new Date());
-        producer.send(message);
-        System.out.println("\nMessage sent !");
-
-        connection.close();
-    }
-    
-    @POST
-    @Path("listen")
-    public void startListening() {
-        
-        Thread thr = new Thread(new Runnable() { public void run() {
-            
-                try {
-                    Context jndiContext = new InitialContext();
-                
-                    // Looks up the administered objects
-                    ConnectionFactory connectionFactory = (ConnectionFactory) jndiContext.lookup("jms/javaee6/ConnectionFactory");
-                    Queue queue = (Queue) jndiContext.lookup("jms/javaee6/Queue");
-        
-                    // Creates the needed artifacts to connect to the queue
-                    Connection connection = connectionFactory.createConnection();
-                    Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-                    MessageConsumer consumer = session.createConsumer(queue);
-                    connection.start();
-        
-                    // Loops to receive the messages
-                    System.out.println("\nInfinite loop. Waiting for a message...");            
-                
-                    while (true) {
-                        TextMessage message = (TextMessage) consumer.receive();
-                        System.out.println("Message received: " + message.getText());
-                    }
-                
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        });
-        
-        thr.start();
-    }
-    
     @GET
-    @Path("/howmany")
     @Produces(MediaType.TEXT_PLAIN)
     public String getNum() {
         
@@ -110,16 +49,24 @@ public class ProcessResource {
         return strb.toString();
     }
     
+ // curl -X POST http://localhost:8080/easyhome/rest/processes -H "Content-Type: application/x-www-form-urlencoded" --data-binary "kind=nodeRegistration"
     @POST
-    @Path("{pid}")
-    public Response postProcess(@PathParam("pid") int pid) {
+    public Response postProcess(@FormParam("kind") String kind) {
         
-        for (Process p : processes) {
-            if (p.getPid() == pid)
-                return Response.notModified().build();
-        }
+    	int pid = ++pidCounter;
+    	
+    	Process process = null;
+    	
+    	switch (kind) {
+	    	case "nodeRegistration":
+	    		process = new NodeRegistrationProcess(pid);
+	    		break;
+	    	default:
+    	}
+    	
+        processes.add(process);
         
-        processes.add(new NodeRegistrationProcess(pid,Process.Session.STATELESS,Process.Interaction.SYNC));
+        process.start();
         
         return Response.ok().build();
     }

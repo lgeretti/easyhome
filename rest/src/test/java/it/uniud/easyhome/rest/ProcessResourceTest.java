@@ -8,8 +8,11 @@ import it.uniud.easyhome.testutils.JsonJaxbContextResolver;
 import java.util.List;
 
 import javax.ws.rs.client.Configuration;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -57,7 +60,14 @@ public class ProcessResourceTest extends JerseyTest {
     @Test
     public void testInsertion() throws JSONException {
         
-        Response insertionResponse = target().path("processes").path("5").request().post(null);
+        MultivaluedMap<String,String> formData = new MultivaluedHashMap<String,String>();
+        
+        formData.add("kind","nodeRegistration");
+        
+        Response insertionResponse = target()
+                                            .path("processes")
+                                            .request().post(Entity.form(formData)); 
+    	
         assertEquals(Status.OK,insertionResponse.getStatusInfo());
         
         GenericType<List<Process>> processesType = new GenericType<List<Process>>() {};
@@ -68,11 +78,18 @@ public class ProcessResourceTest extends JerseyTest {
     @Test
     public void testDelete() {
         
-        target().path("processes").path("5").request().post(null);
+        MultivaluedMap<String,String> formData = new MultivaluedHashMap<String,String>();
         
-        Response deleteResponse1 = target().path("processes/5").request().delete();
+        formData.add("kind","nodeRegistration");
+        
+        Response insertionResponse = target()
+                                            .path("processes")
+                                            .request().post(Entity.form(formData)); 
+        assertEquals(Status.OK,insertionResponse.getStatusInfo());
+        
+        Response deleteResponse1 = target().path("processes/1").request().delete();
         assertEquals(Status.OK,deleteResponse1.getStatusInfo());
-        Response deleteResponse2 = target().path("processes/5").request().delete();
+        Response deleteResponse2 = target().path("processes/1").request().delete();
         assertEquals(Status.NOT_FOUND,deleteResponse2.getStatusInfo());
     }
     

@@ -244,12 +244,19 @@ public class XBeeGateway implements Gateway {
                 } finally {
                   try {
                 	  if (skt != null) skt.close();
-                	  jmsConnection.close();
-                  } catch (Exception ex) {
-                      // Whatever the case, the connection is not available anymore
+                  } catch (IOException ex) {
+              		// Whatever the case, the connection is not available anymore
+                  } finally {
+                	  println("Connection with " + skt + " closed");  
                   }
                   
-                  println("Connection with " + skt + " closed");
+            	  try {
+            		  jmsConnection.close();
+            	  } catch (JMSException jmsEx) {
+            		// Whatever the case, the connection is not available anymore  
+            	  } finally {
+            		  println("JMS connection closed");
+            	  }
                 }
               }
             } catch (Exception ex) {

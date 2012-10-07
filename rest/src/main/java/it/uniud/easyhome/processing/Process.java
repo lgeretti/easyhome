@@ -18,6 +18,8 @@ public class Process {
     
     private Interaction interaction;
     
+    private volatile boolean stopped = false;
+    
     @SuppressWarnings("unused")
     private Process() {}
     
@@ -37,5 +39,21 @@ public class Process {
     
     public final Interaction getInteraction() {
         return interaction;
+    }
+	
+	public void start() {
+		// Empty implementation to be overridden
+	}
+	
+	protected boolean isStopped() {
+		return stopped;
+	}
+	
+	public void stop() {
+		stopped = false;
+	}
+	
+	protected void println(String msg) {
+    	System.out.println("Pr #" + pid + ": " + msg);
     }
 }
