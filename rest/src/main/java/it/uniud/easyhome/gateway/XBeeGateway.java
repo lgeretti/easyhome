@@ -183,11 +183,9 @@ public class XBeeGateway implements Gateway {
                     }
                 	EHPacket ehPkt = (EHPacket) msg.getObject();
                 	if (ehPkt.getDstCoords().getGatewayId() == id) {
-                		println("Packet received from " + ehPkt.getSrcCoords() + ", injecting");
+                		println("Packet received from " + ehPkt.getSrcCoords());
                 		XBeeTransmittedPacket xbeePkt = new XBeeTransmittedPacket(ehPkt);
                 		xbeePkt.write(os);
-                	} else {
-                		println("Packet received from self, discarding");
                 	}
                 }
 
