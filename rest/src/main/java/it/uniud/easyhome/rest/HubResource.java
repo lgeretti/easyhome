@@ -41,7 +41,7 @@ public class HubResource {
                 uriInfo.getAbsolutePathBuilder().path(String.valueOf(gid)).build())                
                 .build();
         } catch (PortAlreadyBoundException ex) {
-            return Response.status(Response.Status.PRECONDITION_FAILED).build();
+            return Response.status(Response.Status.BAD_REQUEST).build();
         }
     }
 

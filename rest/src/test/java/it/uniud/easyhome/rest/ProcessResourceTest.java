@@ -62,12 +62,20 @@ public class ProcessResourceTest extends JerseyTest {
         
         MultivaluedMap<String,String> formData = new MultivaluedHashMap<String,String>();
         
-        formData.add("kind","nodeRegistration");
+        formData.putSingle("kind","nodeRegistration");
         
         Response insertionResponse = target().path("processes")
                                              .request().post(Entity.form(formData)); 
     	
         assertEquals(Status.CREATED,insertionResponse.getStatusInfo());
+        
+        formData.putSingle("kind","something");
+        
+        insertionResponse = target().path("processes")
+                					.request().post(Entity.form(formData)); 
+
+        assertEquals(Status.BAD_REQUEST,insertionResponse.getStatusInfo());
+        
         
         GenericType<List<Process>> processesType = new GenericType<List<Process>>() {};
         List<Process> processes = target().path("processes").request(MediaType.APPLICATION_JSON).get(processesType);
@@ -79,7 +87,7 @@ public class ProcessResourceTest extends JerseyTest {
         
         MultivaluedMap<String,String> formData = new MultivaluedHashMap<String,String>();
         
-        formData.add("kind","nodeRegistration");
+        formData.putSingle("kind","nodeRegistration");
         
         Response insertionResponse = target().path("processes")
                                              .request().post(Entity.form(formData)); 

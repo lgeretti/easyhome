@@ -33,7 +33,7 @@ public class ProcessResource {
         
     	int pid = ++pidCounter;
     	
-    	Process process = null; 
+    	Process process = null;
     	
     	switch (kind) {
 	    	case "nodeRegistration":

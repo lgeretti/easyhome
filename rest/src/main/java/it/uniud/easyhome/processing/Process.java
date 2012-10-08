@@ -1,21 +1,22 @@
 package it.uniud.easyhome.processing;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 public class Process {
     
     public enum Session { STATEFUL, STATELESS };
     
     public enum Interaction { ASYNC, SYNC };
     
+    @XmlElement(name="pid")
     private int pid;
     
+    @XmlElement(name="session")
     private Session session;
     
+    @XmlElement(name="interaction")
     private Interaction interaction;
     
     private volatile boolean stopped = false;

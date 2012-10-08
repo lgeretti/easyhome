@@ -14,6 +14,8 @@ import javax.naming.NamingException;
 
 public class NodeRegistrationProcess extends Process implements Runnable {
 	
+	private static long RECEPTION_WAIT_TIME_MS = 5000;
+	
     public NodeRegistrationProcess(int pid) {
         super(pid, Session.STATEFUL, Interaction.ASYNC);
     }
@@ -47,7 +49,7 @@ public class NodeRegistrationProcess extends Process implements Runnable {
 	        
 	    	while (!isStopped()) {
 	    		
-            	ObjectMessage msg = (ObjectMessage) consumer.receive(5000);
+            	ObjectMessage msg = (ObjectMessage) consumer.receive(RECEPTION_WAIT_TIME_MS);
             	if (msg != null) {
 	            	EHPacket pkt = (EHPacket) msg.getObject();
 	            	println("Packet received from " + pkt.getSrcCoords());
