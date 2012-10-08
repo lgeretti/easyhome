@@ -6,11 +6,17 @@ import it.uniud.easyhome.gateway.ProtocolType;
 import it.uniud.easyhome.network.ModuleCoordinates;
 import it.uniud.easyhome.network.NetworkContext;
 import it.uniud.easyhome.network.exceptions.PortAlreadyBoundException;
+import it.uniud.easyhome.rest.it.JsonJaxbContextResolver;
 
 import java.util.List;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientFactory;
+import javax.ws.rs.client.Configuration;
 import javax.ws.rs.core.*;
 import javax.ws.rs.*;
+
+import org.glassfish.jersey.media.json.JsonJaxbFeature;
 
 @Path("/hub")
 public class HubResource {
@@ -26,6 +32,13 @@ public class HubResource {
     public List<GatewayInfo> getGateways() {
 
         return GatewayInfo.createFromAll(networkContext.getGateways());
+    }
+    
+    @GET
+    @Path("gateways/howmany")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getHowManyGateways() {
+    	return String.valueOf(networkContext.getGateways().size());
     }
     
     // curl -X POST http://localhost:8080/easyhome/rest/hub/gateways -H "Content-Type: application/x-www-form-urlencoded" --data-binary "port=5000&protocol=XBEE" 
