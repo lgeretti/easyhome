@@ -73,14 +73,6 @@ public class NetworkContext {
         
                 gw = new XBeeGateway(gid,port);
                 break;
-                
-            case ZIGBEE:
-                
-                break;
-                
-            case EHS:    
-        
-                break;
         }
         
         gw.open();

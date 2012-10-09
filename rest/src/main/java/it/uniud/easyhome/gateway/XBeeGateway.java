@@ -8,12 +8,7 @@ import it.uniud.easyhome.network.xbee.XBeeTransmittedPacket;
 import it.uniud.easyhome.network.exceptions.IllegalBroadcastPortException;
 import it.uniud.easyhome.network.exceptions.RoutingEntryMissingException;
 
-import java.net.*;
 import java.io.*;
-
-import javax.jms.*;
-import javax.naming.Context;
-import javax.naming.InitialContext;
 
 public class XBeeGateway extends Gateway {
     
@@ -21,10 +16,6 @@ public class XBeeGateway extends Gateway {
     	super(id,ProtocolType.XBEE,port);
     }
     
-    /**
-     * Converts an XBee API received packet, starting from the 64 bit source network address forth,
-     * checksum excluded.
-     */
     private NativePacket convertFrom(XBeeReceivedPacket xpkt) throws RoutingEntryMissingException {
         
         ModuleCoordinates srcCoords = new ModuleCoordinates(
@@ -48,10 +39,10 @@ public class XBeeGateway extends Gateway {
 	        
 	        dstCoords = getCoordinatesFor(dstEndpoint);
 	        
-	        if (dstCoords == null)
-	            throw new RoutingEntryMissingException();
-	        
-	        println("Retrieved coordinates for mapped endpoint " + dstEndpoint);
+	        if (dstCoords == null) {
+		        println("Could not find coordinates for mapped endpoint " + dstEndpoint);
+		        throw new RoutingEntryMissingException();
+	        }
 	    }
         
         Operation op = new Operation(xpkt.getTransactionSeqNumber(),xpkt.getProfileId(),
@@ -60,143 +51,36 @@ public class XBeeGateway extends Gateway {
         return new NativePacket(srcCoords,dstCoords,op);
     }
     
-    /**
-     * Dispatches the packet to the processes and the gateways
-     */
-    private void dispatchPacket(NativePacket pkt, Session jmsSession, MessageProducer inboundProducer, MessageProducer outboundProducer) {
-  
-        try {
-            ObjectMessage inboundMessage = jmsSession.createObjectMessage(pkt);
-            inboundProducer.send(inboundMessage);
-            println("Message dispatched to inbound packets topic");
-        } catch (Exception e) {
-        	println("Message not dispatched to inbound packets topic");
-        }
-
-        try {
-            ObjectMessage outboundMessage = jmsSession.createObjectMessage(pkt);
-            outboundProducer.send(outboundMessage);
-            println("Message dispatched to outbound packets topic");            	
-        } catch (Exception e) {
-        	println("Message could not be dispatched to outbound packets topic");
-        }
-    }
-    
-    private void handleInboundPacketFrom(InputStream in, Session jmsSession,
-    		MessageProducer inboundProducer, MessageProducer outboundProducer) throws IOException {
-        
-        println("Recognized XBee packet");
-        
-        try {
-        	
-        	XBeeReceivedPacket xbeePkt = new XBeeReceivedPacket();
-        	xbeePkt.read(in);
-        	NativePacket ehPkt = convertFrom(xbeePkt);
-        	dispatchPacket(ehPkt,jmsSession,inboundProducer,outboundProducer);
-        	
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-    
-    private void handleOutboundPacketsTo(OutputStream os, MessageConsumer consumer) {
-    	
-        try {
-            while (true) {
-            	ObjectMessage msg = (ObjectMessage) consumer.receiveNoWait();
-                if (msg == null) {
-                	break;
-                }
-            	NativePacket ehPkt = (NativePacket) msg.getObject();
-            	if (ehPkt.getDstCoords().getGatewayId() == id) {
-            		println("Packet received from " + ehPkt.getSrcCoords());
-            		XBeeTransmittedPacket xbeePkt = new XBeeTransmittedPacket(ehPkt);
-            		xbeePkt.write(os);
-            	}
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    	
-    }
-    
     @Override
-    public void run() {
-        
-        try {
-          server = new ServerSocket(port, 1);
-          println("Gateway opened on port " + server.getLocalPort());
-
-          while (true) {
-            
-            Socket skt = server.accept();
-            Connection jmsConnection = null;
-            try {
-                println("Connection established with " + skt);
-                
-                disconnected = false;
-                
-                InputStream istream = new BufferedInputStream(skt.getInputStream());
-                BufferedOutputStream ostream = new BufferedOutputStream(skt.getOutputStream());
-                
-    	   		Context jndiContext = new InitialContext();
-    	        ConnectionFactory connectionFactory = (ConnectionFactory) jndiContext.lookup("jms/easyhome/ConnectionFactory");
-    	        
-                Topic outboundTopic = (Topic) jndiContext.lookup("jms/easyhome/OutboundPacketsTopic");
-                Topic inboundTopic = (Topic) jndiContext.lookup("jms/easyhome/InboundPacketsTopic");
-                
-    	        jmsConnection = connectionFactory.createConnection();
-    	        Session jmsSession = jmsConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-                
-                MessageConsumer outboundConsumer = jmsSession.createConsumer(outboundTopic);
-                MessageProducer inboundProducer = jmsSession.createProducer(inboundTopic);
-                MessageProducer outboundProducer = jmsSession.createProducer(outboundTopic);
-                
-                jmsConnection.start();
-
-                while (!disconnected) {
-                    
-                	if (istream.available() > 0) {
-	                    handleInboundPacketFrom(istream,jmsSession,inboundProducer,outboundProducer);
-                	}
-                    
-                    handleOutboundPacketsTo(ostream,outboundConsumer);	                    
-                }
-            
-            } catch (Exception ex) {
-              System.out.println(ex);
-            } finally {
-              try {
-            	  if (skt != null) skt.close();
-              } catch (IOException ex) {
-          		// Whatever the case, the connection is not available anymore
-              } finally {
-            	  println("Connection with " + skt + " closed");  
-              }
-              
-        	  try {
-        		  jmsConnection.close();
-        	  } catch (JMSException jmsEx) {
-        		// Whatever the case, the connection is not available anymore  
-        	  } finally {
-        		  println("JMS connection closed");
-        	  }
-            }
-          }
-        } catch (Exception ex) {
-            if (ex instanceof SocketException)
-            	println("Gateway cannot accept connections anymore");
-            else
-            	println("Gateway could not be opened");
-        }
-    }
-
-    @Override
-    public void open() {
+    public final void open() {
 
         Thread thr = new Thread(this);
         thr.start();
+    }
+    
+    @Override
+    final protected NativePacket readFrom(InputStream is) throws IOException {
+
+    	NativePacket result = null;
+    	try {
+	    	XBeeReceivedPacket xbeePkt = new XBeeReceivedPacket();
+	    	xbeePkt.read(is);
+	    	result = convertFrom(xbeePkt);
+    	} catch (Exception ex) {
+    		if (ex instanceof IOException)
+    			throw ex;
+    		
+    		ex.printStackTrace();
+    	}
+    	
+    	return result;
+    }
+    
+    @Override
+    final protected void write(NativePacket pkt, OutputStream os) throws IOException {
+    	
+		XBeeTransmittedPacket xbeePkt = new XBeeTransmittedPacket(pkt);
+		xbeePkt.write(os);
     }
   
 }
