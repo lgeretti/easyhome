@@ -17,9 +17,11 @@ public class XBeeGatewayIT {
     
     public static void main(String[] args) throws NumberFormatException, UnknownHostException, IOException {
         
-        Socket skt = new Socket(args[0],Integer.parseInt(args[1]));
+        Socket xbeeSkt1 = new Socket(args[0],Integer.parseInt(args[1]));
         
-        Socket skt2 = new Socket(args[0],6060);
+        Socket xbeeSkt2 = new Socket(args[0],6060);
+        
+        Socket nativeSkt = new Socket(args[0],5001);
         
         int mappedDstEndpoint = Integer.parseInt(args[2]);
         
@@ -54,8 +56,8 @@ public class XBeeGatewayIT {
         sum += 0x01;
         sum += 0x04;
         // Receive options (0x02: packet was a broadcast; 0x00 otherwise)
-        baos.write(0x00);
-        sum += 0x00;
+        baos.write(0x02);
+        sum += 0x02;
         // Frame control (Cluster specific)
         baos.write(0x01);
         sum += 0x01;
@@ -72,8 +74,8 @@ public class XBeeGatewayIT {
         byte[] bytesToSend = baos.toByteArray();
         printBytes(bytesToSend);
         
-        BufferedOutputStream os = new BufferedOutputStream(skt.getOutputStream());
-        BufferedInputStream is = new BufferedInputStream(skt2.getInputStream());
+        BufferedOutputStream os = new BufferedOutputStream(xbeeSkt1.getOutputStream());
+        BufferedInputStream is = new BufferedInputStream(xbeeSkt2.getInputStream());
         
         os.write(bytesToSend);
         os.flush();
@@ -99,8 +101,9 @@ public class XBeeGatewayIT {
         printBytes(ba.toByteArray());
         ba.close();
         
-        skt.close();
-        skt2.close();
+        xbeeSkt1.close();
+        xbeeSkt2.close();
+        nativeSkt.close();
     }
     
     private static void printBytes(byte[] bytes) {

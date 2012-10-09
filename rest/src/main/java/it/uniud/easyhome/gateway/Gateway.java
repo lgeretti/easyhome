@@ -252,10 +252,13 @@ public class Gateway implements Runnable {
                 	break;
                 }
             	NativePacket nativePkt = (NativePacket) msg.getObject();
-            	if (nativePkt.getDstCoords().getGatewayId() == id || 
-            			nativePkt.getDstCoords().getGatewayId() == 0) {
-            		println("Packet received from " + nativePkt.getSrcCoords());
-            		write(nativePkt,os);
+            	byte srcGid = nativePkt.getSrcCoords().getGatewayId();
+            	byte dstGid = nativePkt.getDstCoords().getGatewayId();
+            	if (srcGid != id) {
+	            	if (dstGid == id || dstGid == 0) {
+	            		println("Packet received from " + nativePkt.getSrcCoords());
+	            		write(nativePkt,os);
+	            	}
             	}
             }
 
