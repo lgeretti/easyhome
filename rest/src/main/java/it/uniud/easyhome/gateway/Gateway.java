@@ -33,6 +33,10 @@ public class Gateway implements Runnable {
 	
 	@XmlElement(name="port")
     protected int port;
+	
+	// Default behavior requires only one connection; the native gateway is an exception, 
+	// reachable by any node in the native subnetwork
+	protected int MAX_CONNECTIONS = 1;
     
     private final Map<ModuleCoordinates,Integer> routingTable = new HashMap<ModuleCoordinates,Integer>();
     
@@ -130,7 +134,7 @@ public class Gateway implements Runnable {
     public void run() {
         
         try {
-          server = new ServerSocket(port, 1);
+          server = new ServerSocket(port, MAX_CONNECTIONS);
           println("Gateway opened on port " + server.getLocalPort());
 
           while (true) {

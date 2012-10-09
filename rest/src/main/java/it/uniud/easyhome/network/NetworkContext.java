@@ -1,6 +1,7 @@
 package it.uniud.easyhome.network;
 
 import it.uniud.easyhome.gateway.Gateway;
+import it.uniud.easyhome.gateway.NativeGateway;
 import it.uniud.easyhome.gateway.ProtocolType;
 import it.uniud.easyhome.gateway.XBeeGateway;
 import it.uniud.easyhome.network.exceptions.PortAlreadyBoundException;
@@ -15,14 +16,14 @@ import java.util.List;
  *
  */
 public class NetworkContext {
-
+	
     private static final NetworkContext INSTANCE = new NetworkContext();
     
     private final List<Gateway> gateways = new ArrayList<Gateway>();
     
     // Identifiers are guaranteed as unique, hence we cannot rely on the gateways size
     // gid = 0 for broadcast
-    // gid = 1 for the EasyHome network
+    // gid = 1 for the native network
     // hence actual gateways start from 2 onwards
     private byte gidCount = 1;
     
@@ -34,7 +35,12 @@ public class NetworkContext {
     	return gidCount;
     }
     
-    private NetworkContext() {}
+    private NetworkContext() {
+    	
+    	Gateway nativeGw = new NativeGateway();
+    	nativeGw.open();
+    	gateways.add(nativeGw);
+    }
     
     public static NetworkContext getInstance() {
      
@@ -73,6 +79,10 @@ public class NetworkContext {
         
                 gw = new XBeeGateway(gid,port);
                 break;
+            
+            case NATIVE:
+            	
+            	throw new RuntimeException("Cannot register another native gateway");
         }
         
         gw.open();

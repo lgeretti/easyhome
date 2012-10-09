@@ -16,9 +16,6 @@ public class NativePacket implements Serializable {
     private ModuleCoordinates dstCoords;
     private Operation operation;
     
-    // Cached field
-    private int checksum;
-    
     public ModuleCoordinates getSrcCoords() {
         return srcCoords;
     }
