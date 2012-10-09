@@ -161,6 +161,7 @@ public class HubResource {
     	
     	registerGateway(ProtocolType.XBEE,5050);
     	registerGateway(ProtocolType.XBEE,6060);
+    	registerGateway(ProtocolType.XBEE,7070);
         
     	putRoutingEntry((byte)2,(byte)3,2309737967L,(short)15,(byte)7);
     	

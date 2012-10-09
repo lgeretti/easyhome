@@ -21,6 +21,8 @@ public class XBeeGatewayIT {
         
         Socket skt2 = new Socket(args[0],6060);
         
+        Socket skt3 = new Socket(args[0],7070);
+        
         int mappedDstEndpoint = Integer.parseInt(args[2]);
         
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -101,7 +103,7 @@ public class XBeeGatewayIT {
         
         skt.close();
         skt2.close();
-        
+        skt3.close();
     }
     
     private static void printBytes(byte[] bytes) {
