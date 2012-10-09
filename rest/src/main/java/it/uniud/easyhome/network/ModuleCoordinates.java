@@ -2,6 +2,9 @@ package it.uniud.easyhome.network;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 
 /** 
@@ -13,14 +16,14 @@ public class ModuleCoordinates implements Serializable {
 
     public static final int OCTETS = 13;
     
-    // Gateway (and consequently subnetwork) identifier (>=0, =0 for broadcast, =1 for EasyHome TCP/IP subnetwork)
+    // Gateway (and consequently subnetwork) identifier (>=0, =0 for broadcast, =1 for the native TCP/IP subnetwork)
     private byte gid;
     // Unit unique id (global address, like a IEEE MAC address, fixed for a unit) (0x0 for the gateway, 
     // 0x0000FFFF for a broadcast, 0xFFFFFFFF for unknown)
     private long uuid;
     // Address within the network (>=0, 0xFFFE if broadcast or unknown)
     private short address;
-    // Endpoint of the interested module (>=0, =0 addresses the device endpoint of the EH subnetwork)
+    // Endpoint of the interested module (>=0, =0 addresses the configuration endpoint)
     private byte endpoint;
     
     public byte getGatewayId() {
@@ -46,37 +49,37 @@ public class ModuleCoordinates implements Serializable {
         this.endpoint = endpoint;
     }
     
-    public ModuleCoordinates(ByteArrayInputStream bais) {
-        
-        gid = (byte)bais.read();
-    	uuid = (((long)bais.read()) << 56) + 
-    		   (((long)bais.read()) << 48) + 
-    		   (((long)bais.read()) << 40) + 
-    		   (((long)bais.read()) << 32) +
-			   (((long)bais.read()) << 24) + 
-			   (((long)bais.read()) << 16) + 
-			   (((long)bais.read()) << 8) + 
-			   (long)bais.read();
-        address = (short)((bais.read()<<8)+bais.read());
-        endpoint = (byte)((bais.read()<<8)+bais.read());
+    public ModuleCoordinates(InputStream is) throws IOException {
+
+        gid = (byte)is.read();
+    	uuid = (((long)is.read()) << 56) + 
+    		   (((long)is.read()) << 48) + 
+    		   (((long)is.read()) << 40) + 
+    		   (((long)is.read()) << 32) +
+			   (((long)is.read()) << 24) + 
+			   (((long)is.read()) << 16) + 
+			   (((long)is.read()) << 8) + 
+			   (long)is.read();
+        address = (short)((is.read()<<8)+is.read());
+        endpoint = (byte)((is.read()<<8)+is.read());
     }
     
-    public void writeBytes(ByteArrayOutputStream baos) {
+    public void write(OutputStream os) throws IOException {
         
-        baos.write(gid & 0xFF);
-        baos.write((int)((uuid >>> 56) & 0xFF)); 
-        baos.write((int)((uuid >>> 48) & 0xFF));
-        baos.write((int)((uuid >>> 40) & 0xFF));
-        baos.write((int)((uuid >>> 32) & 0xFF));
-        baos.write((int)((uuid >>> 24) & 0xFF)); 
-        baos.write((int)((uuid >>> 16) & 0xFF));
-        baos.write((int)((uuid >>> 8) & 0xFF));
-        baos.write((int)(uuid & 0xFF));
+        os.write(gid & 0xFF);
+        os.write((int)((uuid >>> 56) & 0xFF)); 
+        os.write((int)((uuid >>> 48) & 0xFF));
+        os.write((int)((uuid >>> 40) & 0xFF));
+        os.write((int)((uuid >>> 32) & 0xFF));
+        os.write((int)((uuid >>> 24) & 0xFF)); 
+        os.write((int)((uuid >>> 16) & 0xFF));
+        os.write((int)((uuid >>> 8) & 0xFF));
+        os.write((int)(uuid & 0xFF));
         
-        baos.write((address >>> 8) & 0xFF);
-        baos.write(address & 0xFF);
-        baos.write((endpoint >>> 8) & 0xFF);
-        baos.write(endpoint & 0xFF);
+        os.write((address >>> 8) & 0xFF);
+        os.write(address & 0xFF);
+        os.write((endpoint >>> 8) & 0xFF);
+        os.write(endpoint & 0xFF);
     }
     
     public String toString() {

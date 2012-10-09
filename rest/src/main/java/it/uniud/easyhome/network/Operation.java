@@ -1,8 +1,8 @@
 package it.uniud.easyhome.network;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 
 public class Operation implements Serializable {
@@ -59,38 +59,34 @@ public class Operation implements Serializable {
         this.data = data;
     }
     
-    public Operation(ByteArrayInputStream bais, int dataSize) {
-        
-    	sequenceNumber = (byte)bais.read();
+    public Operation(InputStream is, int dataSize) throws IOException {
+
+    	sequenceNumber = (byte)is.read();
     	
-        int highDomain = bais.read();
-        domain = (short)(highDomain*256+bais.read());
+        int highDomain = is.read();
+        domain = (short)(highDomain*256+is.read());
         
-        int highContext = bais.read();
-        context = (short)(highContext*256+bais.read());
+        int highContext = is.read();
+        context = (short)(highContext*256+is.read());
         
-        flags = (byte)bais.read();
+        flags = (byte)is.read();
         
-        command = (byte)bais.read();
+        command = (byte)is.read();
         
         data = new byte[dataSize];
-        bais.read(data, 0, dataSize);
+        is.read(data, 0, dataSize);
     }
     
-    public void writeBytes(ByteArrayOutputStream baos) {
-        
-        baos.write(sequenceNumber);
-        baos.write((domain >>> 8) & 0xFF);
-        baos.write(domain & 0xFF);
-        baos.write((context >>> 8) & 0xFF);
-        baos.write(context & 0xFF);
-        baos.write(flags);
-        baos.write(command);
-        
-        try {
-            baos.write(data);
-        } catch (IOException e) {
-            throw new RuntimeException("Unexpected error when writing operation data bytes");
-        }
+    public void write(OutputStream os) throws IOException {
+
+        os.write(sequenceNumber);
+        os.write((domain >>> 8) & 0xFF);
+        os.write(domain & 0xFF);
+        os.write((context >>> 8) & 0xFF);
+        os.write(context & 0xFF);
+        os.write(flags);
+        os.write(command);
+
+        os.write(data);
     }
 }

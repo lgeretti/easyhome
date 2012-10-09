@@ -3,13 +3,14 @@ package it.uniud.easyhome.network;
 
 import static org.junit.Assert.*;
 
+import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 
 import it.uniud.easyhome.network.NativePacket;
 
 import org.junit.*;
 
-public class EHPacketTest {
+public class NativePacketTest {
 
     @Test
     public void checkConstruction() {
@@ -32,12 +33,7 @@ public class EHPacketTest {
         
         assertTrue(sampleData.length < 65536);
         
-        int checksum = 0;
-        for (byte b : sampleData)
-            checksum += b;
-        checksum = 0xFF - (checksum & 0xFF);
-        
-        byte[] packetBytes = new byte[sampleData.length+4];
+        byte[] packetBytes = new byte[sampleData.length+3];
         
         packetBytes[0] = (byte)0xEA;
         packetBytes[1] = (byte)((sampleData.length >>> 8) & 0xFF);
@@ -46,7 +42,6 @@ public class EHPacketTest {
         int i=3;
         for (byte b : sampleData)
             packetBytes[i++] = b;
-        packetBytes[i] = (byte)checksum;
         
         StringBuilder strb = new StringBuilder();
         for (byte b: packetBytes) {
@@ -57,7 +52,7 @@ public class EHPacketTest {
         
         System.out.println("Original bytes: " + strb.toString());
         
-        NativePacket pkt = new NativePacket(packetBytes);
+        NativePacket pkt = new NativePacket(new ByteArrayInputStream(packetBytes));
         
         System.out.println("Recovered bytes: " + pkt.printBytes());
         

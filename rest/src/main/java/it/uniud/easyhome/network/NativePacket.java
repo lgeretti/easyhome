@@ -1,11 +1,11 @@
 package it.uniud.easyhome.network;
 
-import it.uniud.easyhome.network.exceptions.ChecksumException;
 import it.uniud.easyhome.network.exceptions.InvalidDelimiterException;
-import it.uniud.easyhome.network.exceptions.InvalidPacketLengthException;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 
 public class NativePacket implements Serializable {
@@ -37,33 +37,24 @@ public class NativePacket implements Serializable {
         this.operation = op;
     }
     
-    public NativePacket(byte[] bytes) {
+    public NativePacket(InputStream is) {
         
-        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+    	try {
+	        byte delimiter = (byte)is.read();
+	        
+	        if (delimiter != (byte)0xEA)
+	            throw new InvalidDelimiterException();
+	        
+	        int highLength = is.read();
+	        int length = highLength*256+is.read();
+	        
+	        srcCoords = new ModuleCoordinates(is);
+	        dstCoords = new ModuleCoordinates(is);
+	        operation = new Operation(is,length-2*ModuleCoordinates.OCTETS-Operation.FIXED_OCTETS);
         
-        int delimiter = bais.read();
-        
-        if (delimiter != 0xEA)
-            throw new InvalidDelimiterException();
-        
-        int highLength = bais.read();
-        int length = highLength*256+bais.read();
-        
-        if (length != bytes.length-4)
-            throw new InvalidPacketLengthException();
-        
-        int sum = 0;
-        for (int i=3; i<bytes.length; i++)
-            sum += bytes[i];
-        
-        if (0xFF != (sum & 0xFF))
-            throw new ChecksumException();
-        
-        checksum = bytes[bytes.length-1];
-        
-        srcCoords = new ModuleCoordinates(bais);
-        dstCoords = new ModuleCoordinates(bais);
-        operation = new Operation(bais,length-2*ModuleCoordinates.OCTETS-Operation.FIXED_OCTETS);
+    	} catch (IOException ex) {
+    		ex.printStackTrace();
+    	}
     }
     
     public byte[] getBytes() {
@@ -75,12 +66,24 @@ public class NativePacket implements Serializable {
         baos.write((byte)0xEA);
         baos.write((payloadLength >>> 8) & 0xFF);
         baos.write(payloadLength & 0xFF);
-        srcCoords.writeBytes(baos);
-        dstCoords.writeBytes(baos);
-        operation.writeBytes(baos);
-        baos.write(checksum);
+        try {
+	        srcCoords.write(baos);
+	        dstCoords.write(baos);
+	        operation.write(baos);
+        } catch (IOException ex) {
+        	ex.printStackTrace();
+        }
         
         return baos.toByteArray();
+    }
+    
+    public void write(OutputStream os) {
+    	try {
+	    	os.write(getBytes());
+	    	os.flush();
+    	} catch (IOException ex) {
+    		ex.printStackTrace();
+    	}
     }
     
     public String printBytes() {
