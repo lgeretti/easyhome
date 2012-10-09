@@ -7,7 +7,7 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
 
-public class NodeRegistrationProcess extends Process implements Runnable {
+public class NodeRegistrationProcess extends Process {
 	
 	private static long RECEPTION_WAIT_TIME_MS = 5000;
 	

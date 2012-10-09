@@ -2,7 +2,7 @@ package it.uniud.easyhome.rest;
 
 import static org.junit.Assert.*;
 
-import it.uniud.easyhome.gateway.GatewayInfo;
+import it.uniud.easyhome.gateway.Gateway;
 import it.uniud.easyhome.gateway.ProtocolType;
 import it.uniud.easyhome.testutils.JsonJaxbContextResolver;
 
@@ -54,8 +54,8 @@ public class HubResourceTest extends JerseyTest {
     @Test
     public void testNoGateways() {
         
-        GenericType<List<GatewayInfo>> gatewaysType = new GenericType<List<GatewayInfo>>() {};
-        List<GatewayInfo> gateways = target().path("hub/gateways").request(MediaType.APPLICATION_JSON).get(gatewaysType);
+        GenericType<List<Gateway>> gatewaysType = new GenericType<List<Gateway>>() {};
+        List<Gateway> gateways = target().path("hub/gateways").request(MediaType.APPLICATION_JSON).get(gatewaysType);
         assertEquals(0,gateways.size());
     }
 
@@ -68,10 +68,10 @@ public class HubResourceTest extends JerseyTest {
         Response insertionResponse = insertGateway(port,protocol);
         assertEquals(Status.CREATED,insertionResponse.getStatusInfo());
         
-        GenericType<List<GatewayInfo>> gatewaysType = new GenericType<List<GatewayInfo>>() {};
-        List<GatewayInfo> gateways = target().path("hub/gateways").request(MediaType.APPLICATION_JSON).get(gatewaysType);
+        GenericType<List<Gateway>> gatewaysType = new GenericType<List<Gateway>>() {};
+        List<Gateway> gateways = target().path("hub/gateways").request(MediaType.APPLICATION_JSON).get(gatewaysType);
         assertEquals(1,gateways.size());
-        GatewayInfo gw = gateways.get(0);
+        Gateway gw = gateways.get(0);
         assertTrue(gw.getId()>0);
         assertEquals(port,gw.getPort());
         assertEquals(protocol,gw.getProtocolType());

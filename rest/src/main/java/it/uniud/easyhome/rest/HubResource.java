@@ -1,22 +1,15 @@
 package it.uniud.easyhome.rest;
 
 import it.uniud.easyhome.gateway.Gateway;
-import it.uniud.easyhome.gateway.GatewayInfo;
 import it.uniud.easyhome.gateway.ProtocolType;
 import it.uniud.easyhome.network.ModuleCoordinates;
 import it.uniud.easyhome.network.NetworkContext;
 import it.uniud.easyhome.network.exceptions.PortAlreadyBoundException;
-import it.uniud.easyhome.rest.it.JsonJaxbContextResolver;
 
 import java.util.List;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientFactory;
-import javax.ws.rs.client.Configuration;
 import javax.ws.rs.core.*;
 import javax.ws.rs.*;
-
-import org.glassfish.jersey.media.json.JsonJaxbFeature;
 
 @Path("/hub")
 public class HubResource {
@@ -29,9 +22,9 @@ public class HubResource {
     @GET
     @Path("gateways")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<GatewayInfo> getGateways() {
+    public List<Gateway> getGateways() {
 
-        return GatewayInfo.createFromAll(networkContext.getGateways());
+        return networkContext.getGateways();
     }
     
     @GET
