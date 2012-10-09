@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 
 import java.util.Arrays;
 
-import it.uniud.easyhome.network.EHPacket;
+import it.uniud.easyhome.network.NativePacket;
 
 import org.junit.*;
 
@@ -57,7 +57,7 @@ public class EHPacketTest {
         
         System.out.println("Original bytes: " + strb.toString());
         
-        EHPacket pkt = new EHPacket(packetBytes);
+        NativePacket pkt = new NativePacket(packetBytes);
         
         System.out.println("Recovered bytes: " + pkt.printBytes());
         

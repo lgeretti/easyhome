@@ -1,6 +1,6 @@
 package it.uniud.easyhome.gateway;
 
-import it.uniud.easyhome.network.EHPacket;
+import it.uniud.easyhome.network.NativePacket;
 import it.uniud.easyhome.network.ModuleCoordinates;
 import it.uniud.easyhome.network.Operation;
 import it.uniud.easyhome.network.xbee.XBeeReceivedPacket;
@@ -97,7 +97,7 @@ public class XBeeGateway implements Gateway {
      * Converts an XBee API received packet, starting from the 64 bit source network address forth,
      * checksum excluded.
      */
-    private EHPacket convertFrom(XBeeReceivedPacket xpkt) throws RoutingEntryMissingException {
+    private NativePacket convertFrom(XBeeReceivedPacket xpkt) throws RoutingEntryMissingException {
         
         ModuleCoordinates srcCoords = new ModuleCoordinates(
         		id,xpkt.get64BitSrcAddr(),xpkt.get16BitSrcAddr(),xpkt.getSrcEndpoint());
@@ -129,13 +129,13 @@ public class XBeeGateway implements Gateway {
         Operation op = new Operation(xpkt.getTransactionSeqNumber(),xpkt.getProfileId(),
         		xpkt.getClusterId(),xpkt.getFrameControl(),xpkt.getCommand(),xpkt.getApsPayload());
         
-        return new EHPacket(srcCoords,dstCoords,op);
+        return new NativePacket(srcCoords,dstCoords,op);
     }
     
     /**
      * Dispatches the packet to the processes and the gateways
      */
-    private void dispatchPacket(EHPacket pkt, Session jmsSession, MessageProducer inboundProducer, MessageProducer outboundProducer) {
+    private void dispatchPacket(NativePacket pkt, Session jmsSession, MessageProducer inboundProducer, MessageProducer outboundProducer) {
   
         try {
             ObjectMessage inboundMessage = jmsSession.createObjectMessage(pkt);
@@ -165,7 +165,7 @@ public class XBeeGateway implements Gateway {
             	
             	XBeeReceivedPacket xbeePkt = new XBeeReceivedPacket();
             	xbeePkt.read(in);
-            	EHPacket ehPkt = convertFrom(xbeePkt);
+            	NativePacket ehPkt = convertFrom(xbeePkt);
             	dispatchPacket(ehPkt,jmsSession,inboundProducer,outboundProducer);
             	
             } catch (Exception ex) {
@@ -181,7 +181,7 @@ public class XBeeGateway implements Gateway {
                     if (msg == null) {
                     	break;
                     }
-                	EHPacket ehPkt = (EHPacket) msg.getObject();
+                	NativePacket ehPkt = (NativePacket) msg.getObject();
                 	if (ehPkt.getDstCoords().getGatewayId() == id) {
                 		println("Packet received from " + ehPkt.getSrcCoords());
                 		XBeeTransmittedPacket xbeePkt = new XBeeTransmittedPacket(ehPkt);

@@ -1,6 +1,6 @@
 package it.uniud.easyhome.processing;
 
-import it.uniud.easyhome.network.EHPacket;
+import it.uniud.easyhome.network.NativePacket;
 
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
@@ -18,7 +18,7 @@ public class NodeRegistrationProcess extends Process implements Runnable {
     @Override
     public void start() {
         Thread thr = new Thread(this);
-        thr.start();    	
+        thr.start();
     }
     
     @Override
@@ -26,8 +26,8 @@ public class NodeRegistrationProcess extends Process implements Runnable {
     	
     	ObjectMessage msg = (ObjectMessage) consumer.receive(RECEPTION_WAIT_TIME_MS);
     	if (msg != null) {
-        	EHPacket pkt = (EHPacket) msg.getObject();
+        	NativePacket pkt = (NativePacket) msg.getObject();
         	println("Packet received from " + pkt.getSrcCoords());
-    	}    	
+    	}
     }
 }

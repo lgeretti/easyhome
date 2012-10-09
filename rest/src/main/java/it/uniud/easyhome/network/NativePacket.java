@@ -8,7 +8,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 
-public class EHPacket implements Serializable {
+public class NativePacket implements Serializable {
 
     private static final long serialVersionUID = -6680743462870235932L;
     
@@ -31,13 +31,13 @@ public class EHPacket implements Serializable {
         return operation;
     }
     
-    public EHPacket(ModuleCoordinates srcCoords, ModuleCoordinates dstCoords, Operation op) {
+    public NativePacket(ModuleCoordinates srcCoords, ModuleCoordinates dstCoords, Operation op) {
         this.srcCoords = srcCoords;
         this.dstCoords = dstCoords;
         this.operation = op;
     }
     
-    public EHPacket(byte[] bytes) {
+    public NativePacket(byte[] bytes) {
         
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
         
