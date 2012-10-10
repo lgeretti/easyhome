@@ -11,9 +11,7 @@ import java.net.UnknownHostException;
 
 import org.codehaus.jackson.util.ByteArrayBuilder;
 
-public class XBeeGatewayIT {
-
-    static int srcEndpoint = 15;
+public class DeviceAnnounceIT {
     
     public static void main(String[] args) throws NumberFormatException, UnknownHostException, IOException {
         
@@ -21,18 +19,14 @@ public class XBeeGatewayIT {
         
         Socket xbeeSkt2 = new Socket(args[0],6060);
         
-        Socket nativeSkt = new Socket(args[0],5001);
-        
-        int mappedDstEndpoint = Integer.parseInt(args[2]);
-        
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         
         int sum = 0;
         // Delimiter
         baos.write(XBeeConstants.START_DELIMITER);
-        // Length (21)
+        // Length (32)
         baos.write(0x00);
-        baos.write(0x15);
+        baos.write(0x20);
         // Frame type
         baos.write(XBeeConstants.EXPLICIT_RX_INDICATOR_FRAME_TYPE);
         sum += XBeeConstants.EXPLICIT_RX_INDICATOR_FRAME_TYPE;
@@ -45,31 +39,44 @@ public class XBeeGatewayIT {
         sum += 0x7D;
         sum += 0xB3;
         // Source endpoint
-        baos.write(srcEndpoint);
-        sum += srcEndpoint;
-        // Destination endpoint (mapped by the hub)
-        baos.write(mappedDstEndpoint);
-        sum += mappedDstEndpoint;
-        // Cluster Id (On/Off)
-        baos.write(new byte[]{0x00,0x06});
-        sum += 0x06;
-        // Profile Id (Home Automation)
-        baos.write(new byte[]{0x01,0x04});
-        sum += 0x01;
-        sum += 0x04;
+        baos.write(0x00);
+        sum += 0x00;
+        // Destination endpoint
+        baos.write(0x00);
+        sum += 0x00;
+        // Cluster Id (DeviceAnnce)
+        baos.write(new byte[]{0x00,0x13});
+        sum += 0x13;
+        // Profile Id (ZDP)
+        baos.write(new byte[]{0x00,0x00});
+        sum += 0x00;
+        sum += 0x00;
         // Receive options (0x02: packet was a broadcast; 0x00 otherwise)
         baos.write(0x02);
         sum += 0x02;
-        // Frame control (Cluster specific)
-        baos.write(0x01);
-        sum += 0x01;
+        // Frame control
+        baos.write(0x00);
+        sum += 0x00;
         // Transaction sequence number (arbitrary)
         baos.write(0x71);
         sum += 0x71;
         // Command (toggle)
         baos.write(0x02);
         sum += 0x02;
-        // (empty data)
+        // Device announce data
+        // NWK addr
+        baos.write(0x5F);
+        sum += 0x5F;
+        baos.write(0x34);
+        sum += 0x34;
+        // IEEE addr
+        for (int i=0;i<8;i++) {
+	        baos.write(0x55);
+	        sum += 0x55;        
+        }
+        // Capability (random)
+        baos.write(0x7A);
+        sum += 0x7A;
         // Checksum
         baos.write(0xFF - (sum & 0xFF));
         
@@ -105,7 +112,6 @@ public class XBeeGatewayIT {
         
         xbeeSkt1.close();
         xbeeSkt2.close();
-        nativeSkt.close();
     }
     
     private static void printBytes(byte[] bytes) {

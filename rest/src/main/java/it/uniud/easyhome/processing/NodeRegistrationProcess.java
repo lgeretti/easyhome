@@ -5,9 +5,7 @@ import java.net.URI;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.packets.NativePacket;
-import it.uniud.easyhome.packets.Operation;
 import it.uniud.easyhome.packets.specific.NodeAnnouncePacket;
-import it.uniud.easyhome.rest.JsonJaxbContextResolver;
 
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
@@ -17,18 +15,16 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.codehaus.jettison.json.JSONObject;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.ClientResponse.Status;
 
 public class NodeRegistrationProcess extends Process {
 	
 	private static long RECEPTION_WAIT_TIME_MS = 5000;	
 	
-	// Necessary for calls to REST resources
-	private UriInfo uriInfo;
-	
     public NodeRegistrationProcess(int pid, UriInfo uriInfo) {
-        super(pid, Session.STATEFUL, Interaction.ASYNC);
-        this.uriInfo = uriInfo;
+        super(pid, Session.STATEFUL, Interaction.ASYNC,
+        		UriBuilder.fromUri(uriInfo.getBaseUri()).build(new Object[0]));
     }
     
     @Override
@@ -39,8 +35,6 @@ public class NodeRegistrationProcess extends Process {
     
     @Override
     final protected void process(MessageConsumer consumer, MessageProducer producer) throws JMSException {
-    	
-    	URI target = UriBuilder.fromUri(uriInfo.getBaseUri()).path("network").build(new Object[0]);
     	
     	ObjectMessage msg = (ObjectMessage) consumer.receive(RECEPTION_WAIT_TIME_MS);
     	if (msg != null) {
@@ -59,11 +53,19 @@ public class NodeRegistrationProcess extends Process {
                 					   .setAddress(address)
                 					   .setGatewayId(gatewayId).build();
                 
+                ClientResponse response = restResource.path("network")
+                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
+                
+                if (response.getClientResponseStatus() == Status.CREATED)
+                	println("Node announcement registered");
+                else if (response.getClientResponseStatus() == Status.OK)
+                	println("Node announcement re-registered");
+                else
+                	println("Node announcement registration failed");
+                
         	} catch (InvalidPacketTypeException ex) {
         		return;
         	}
-        	
-        	
     	}
     }
     

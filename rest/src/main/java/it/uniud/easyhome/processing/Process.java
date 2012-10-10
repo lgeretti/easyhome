@@ -1,5 +1,7 @@
 package it.uniud.easyhome.processing;
 
+import java.net.URI;
+
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
@@ -9,8 +11,14 @@ import javax.jms.Topic;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 @XmlRootElement
 public class Process implements Runnable {
@@ -30,13 +38,20 @@ public class Process implements Runnable {
     
     private volatile boolean stopped = false;
     
+    // REST client
+    private Client restClient;
+    
+    protected WebResource restResource;
+    
     @SuppressWarnings("unused")
     private Process() {}
     
-    protected Process(int pid, Session session, Interaction interaction) {
+    protected Process(int pid, Session session, Interaction interaction, URI restTarget) {
         this.pid = pid;
         this.session = session;
         this.interaction = interaction;
+        this.restClient = Client.create(new DefaultClientConfig());
+        this.restResource = restClient.resource(restTarget);
     }
     
     public final int getPid() {
@@ -109,6 +124,8 @@ public class Process implements Runnable {
     		} finally {
     			println("JMS connection stopped");
     		}
+    		
+    		restClient.destroy();
     	}
     	
     	println("processing stopped");
