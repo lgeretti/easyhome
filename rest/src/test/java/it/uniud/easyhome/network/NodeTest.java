@@ -2,7 +2,6 @@ package it.uniud.easyhome.network;
 
 import static org.junit.Assert.*;
 
-import it.uniud.easyhome.packets.Node;
 
 import org.junit.*;
 

@@ -1,10 +1,6 @@
-package it.uniud.easyhome.packets;
+package it.uniud.easyhome.gateway;
 
 import it.uniud.easyhome.exceptions.PortAlreadyBoundException;
-import it.uniud.easyhome.gateway.Gateway;
-import it.uniud.easyhome.gateway.NativeGateway;
-import it.uniud.easyhome.gateway.ProtocolType;
-import it.uniud.easyhome.gateway.XBeeGateway;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +11,9 @@ import java.util.List;
  * @author Luca Geretti
  *
  */
-public class NetworkContext {
+public class HubContext {
 	
-    private static final NetworkContext INSTANCE = new NetworkContext();
+    private static final HubContext INSTANCE = new HubContext();
     
     private final List<Gateway> gateways = new ArrayList<Gateway>();
     
@@ -35,14 +31,14 @@ public class NetworkContext {
     	return gidCount;
     }
     
-    private NetworkContext() {
+    private HubContext() {
     	
     	Gateway nativeGw = new NativeGateway();
     	nativeGw.open();
     	gateways.add(nativeGw);
     }
     
-    public static NetworkContext getInstance() {
+    public static HubContext getInstance() {
      
         return INSTANCE;
     }

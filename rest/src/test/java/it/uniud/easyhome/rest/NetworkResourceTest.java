@@ -2,7 +2,7 @@ package it.uniud.easyhome.rest;
 
 import static org.junit.Assert.*;
 
-import it.uniud.easyhome.packets.Node;
+import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.rest.NetworkResource;
 import it.uniud.easyhome.testutils.JsonJaxbContextResolver;
 
@@ -24,7 +24,6 @@ import org.glassfish.jersey.media.json.JsonJaxbModule;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 
-@Ignore
 public class NetworkResourceTest extends JerseyTest {
 
     private static final String[] PACKAGE_NAMES = {
@@ -59,33 +58,33 @@ public class NetworkResourceTest extends JerseyTest {
     public void testNoNodes() {
         
         GenericType<List<Node>> nodesType = new GenericType<List<Node>>() {};
-        List<Node> nodes = target().path("nodes").request(MediaType.APPLICATION_JSON).get(nodesType);
+        List<Node> nodes = target().path("network").request(MediaType.APPLICATION_JSON).get(nodesType);
         assertEquals(0,nodes.size());
     }
 
     @Test
     public void testInsertion() throws JSONException {
         
-        Node.Builder nodeBuilder = new Node.Builder(1);
+        Node.Builder nodeBuilder = new Node.Builder(1L);
         Node node = nodeBuilder.setName("first")
         					   .setGatewayId((byte)3)
-        					   .setAddress((short)50000)
+        					   .setAddress((short)5000)
         					   .build();
-        Response insertionResponse = target().path("nodes").request().post(Entity.json(node));
+        Response insertionResponse = target().path("network").request().post(Entity.json(node));
         assertEquals(Status.CREATED,insertionResponse.getStatusInfo());
         
         GenericType<List<Node>> nodesType = new GenericType<List<Node>>() {};
-        List<Node> nodes = target().path("nodes").request(MediaType.APPLICATION_JSON).get(nodesType);
+        List<Node> nodes = target().path("network").request(MediaType.APPLICATION_JSON).get(nodesType);
         assertEquals(1,nodes.size());
         
-        Node recoveredNode = target().path("nodes/1").request(MediaType.APPLICATION_JSON).get(Node.class);
+        Node recoveredNode = target().path("network/1").request(MediaType.APPLICATION_JSON).get(Node.class);
         assertTrue(node.equals(recoveredNode));
 
-        JSONObject jsonNode = target().path("nodes/1").request(MediaType.APPLICATION_JSON).get(JSONObject.class);
+        JSONObject jsonNode = target().path("network/1").request(MediaType.APPLICATION_JSON).get(JSONObject.class);
         assertEquals(1,jsonNode.getInt("id"));
         assertEquals("first",jsonNode.getString("name"));
         assertEquals(3,jsonNode.getInt("gatewayId"));
-        assertEquals(50000,jsonNode.getInt("address"));
+        assertEquals(5000,jsonNode.getInt("address"));
     }
 
     @Test
@@ -93,12 +92,13 @@ public class NetworkResourceTest extends JerseyTest {
         
         createOneNode();
         
-        Node.Builder nodeBuilder = new Node.Builder(1);
-        Node modifiedNode = nodeBuilder.setName("modifiedFirst").build();
-        Response updateResponse = target().path("nodes").request().post(Entity.json(modifiedNode));
+        Node.Builder nodeBuilder = new Node.Builder(1L);
+        Node modifiedNode = nodeBuilder.setName("modifiedFirst")
+        							   .setAddress((short)5000).setGatewayId((byte)3).build();
+        Response updateResponse = target().path("network").request().post(Entity.json(modifiedNode));
         assertEquals(Status.OK,updateResponse.getStatusInfo());
         
-        Node recoveredNode = target().path("nodes/1").request(MediaType.APPLICATION_JSON).get(Node.class);
+        Node recoveredNode = target().path("network/1").request(MediaType.APPLICATION_JSON).get(Node.class);
         assertEquals("modifiedFirst",recoveredNode.getName());
     }
 
@@ -107,17 +107,18 @@ public class NetworkResourceTest extends JerseyTest {
         
         createOneNode();
         
-        Response deleteResponse = target().path("nodes/1").request().delete();
+        Response deleteResponse = target().path("network/1").request().delete();
         assertEquals(Status.OK,deleteResponse.getStatusInfo());
         
-        Response getResponse = target().path("nodes/1").request(MediaType.APPLICATION_JSON).get();
+        Response getResponse = target().path("network/1").request(MediaType.APPLICATION_JSON).get();
         assertEquals(Status.NOT_FOUND,getResponse.getStatusInfo());
     }
     
     private void createOneNode() {
 
-        Node.Builder nodeBuilder = new Node.Builder(1);
-        Node node = nodeBuilder.setName("first").build();
-        target().path("nodes").request().post(Entity.json(node));
+        Node.Builder nodeBuilder = new Node.Builder(1L);
+        Node node = nodeBuilder.setName("first").setAddress((short)5000).setGatewayId((byte)3).build();
+        
+        target().path("network").request().post(Entity.json(node));
     }
 }

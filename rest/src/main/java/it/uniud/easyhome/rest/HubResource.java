@@ -2,9 +2,9 @@ package it.uniud.easyhome.rest;
 
 import it.uniud.easyhome.exceptions.PortAlreadyBoundException;
 import it.uniud.easyhome.gateway.Gateway;
+import it.uniud.easyhome.gateway.HubContext;
 import it.uniud.easyhome.gateway.ProtocolType;
 import it.uniud.easyhome.packets.ModuleCoordinates;
-import it.uniud.easyhome.packets.NetworkContext;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ public class HubResource {
     @Context
     private UriInfo uriInfo;
     
-    private static NetworkContext networkContext = NetworkContext.getInstance();
+    private static HubContext networkContext = HubContext.getInstance();
     
     @GET
     @Path("gateways")

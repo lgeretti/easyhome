@@ -1,4 +1,4 @@
-package it.uniud.easyhome.packets;
+package it.uniud.easyhome.network;
 
 import it.uniud.easyhome.common.ConcreteClassBuilder;
 import it.uniud.easyhome.exceptions.NodeConstructionException;

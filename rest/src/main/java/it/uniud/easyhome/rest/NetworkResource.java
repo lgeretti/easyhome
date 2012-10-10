@@ -1,7 +1,7 @@
 package it.uniud.easyhome.rest;
 
 
-import it.uniud.easyhome.packets.Node;
+import it.uniud.easyhome.network.Node;
 
 import java.util.List;
 
@@ -42,7 +42,7 @@ public final class NetworkResource {
     @GET
     @Path("{nodeid}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Node getNode(@PathParam("nodeid") int nodeId) {
+    public Node getNode(@PathParam("nodeid") long nodeId) {
         
         Node node = em.find(Node.class, nodeId);
 
@@ -81,7 +81,7 @@ public final class NetworkResource {
       
     @DELETE
     @Path("{nodeid}")
-    public Response deleteNode(@PathParam("nodeid") int nodeId) {
+    public Response deleteNode(@PathParam("nodeid") long nodeId) {
         
         EntityTransaction tx = em.getTransaction();
         
