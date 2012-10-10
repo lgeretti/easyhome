@@ -1,4 +1,4 @@
-package it.uniud.easyhome.network.exceptions;
+package it.uniud.easyhome.exceptions;
 
 public class InvalidDelimiterException extends RuntimeException {
 

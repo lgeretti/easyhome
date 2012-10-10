@@ -1,4 +1,4 @@
-package it.uniud.easyhome.network;
+package it.uniud.easyhome.packets;
 
 import java.io.IOException;
 import java.io.OutputStream;

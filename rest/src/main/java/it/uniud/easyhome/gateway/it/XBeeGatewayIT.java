@@ -1,6 +1,6 @@
 package it.uniud.easyhome.gateway.it;
 
-import it.uniud.easyhome.network.xbee.XBeeConstants;
+import it.uniud.easyhome.xbee.XBeeConstants;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

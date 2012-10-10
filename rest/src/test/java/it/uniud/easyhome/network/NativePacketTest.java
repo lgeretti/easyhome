@@ -6,7 +6,7 @@ import static org.junit.Assert.*;
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 
-import it.uniud.easyhome.network.NativePacket;
+import it.uniud.easyhome.packets.NativePacket;
 
 import org.junit.*;
 

@@ -1,12 +1,12 @@
 package it.uniud.easyhome.gateway;
 
-import it.uniud.easyhome.network.NativePacket;
-import it.uniud.easyhome.network.ModuleCoordinates;
-import it.uniud.easyhome.network.Operation;
-import it.uniud.easyhome.network.xbee.XBeeReceivedPacket;
-import it.uniud.easyhome.network.xbee.XBeeTransmittedPacket;
-import it.uniud.easyhome.network.exceptions.IllegalBroadcastPortException;
-import it.uniud.easyhome.network.exceptions.RoutingEntryMissingException;
+import it.uniud.easyhome.exceptions.IllegalBroadcastPortException;
+import it.uniud.easyhome.exceptions.RoutingEntryMissingException;
+import it.uniud.easyhome.packets.ModuleCoordinates;
+import it.uniud.easyhome.packets.NativePacket;
+import it.uniud.easyhome.packets.Operation;
+import it.uniud.easyhome.xbee.XBeeReceivedPacket;
+import it.uniud.easyhome.xbee.XBeeTransmittedPacket;
 
 import java.io.*;
 

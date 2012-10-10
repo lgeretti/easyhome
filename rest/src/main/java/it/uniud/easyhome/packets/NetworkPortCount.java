@@ -1,4 +1,4 @@
-package it.uniud.easyhome.network;
+package it.uniud.easyhome.packets;
 
 public class NetworkPortCount {
 

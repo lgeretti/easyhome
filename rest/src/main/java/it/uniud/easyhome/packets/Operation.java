@@ -1,4 +1,4 @@
-package it.uniud.easyhome.network;
+package it.uniud.easyhome.packets;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,10 +40,10 @@ public class Operation implements Serializable {
     	return sequenceNumber;
     }
     
+    /** The command is actually relevant only if the operation is not addressed to the management domain */
     public byte getCommand() {
         return command;
     }
-    
     
     public byte[] getData() {
         return data;

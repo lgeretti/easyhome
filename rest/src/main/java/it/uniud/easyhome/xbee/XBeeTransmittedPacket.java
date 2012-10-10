@@ -1,7 +1,7 @@
-package it.uniud.easyhome.network.xbee;
+package it.uniud.easyhome.xbee;
 
-import it.uniud.easyhome.network.NativePacket;
-import it.uniud.easyhome.network.TransmittedPacket;
+import it.uniud.easyhome.packets.NativePacket;
+import it.uniud.easyhome.packets.TransmittedPacket;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -27,7 +27,7 @@ public class XBeeTransmittedPacket implements TransmittedPacket {
 	
 	public XBeeTransmittedPacket(NativePacket ehp) {
 		
-		dstAddr64 = ehp.getDstCoords().getUuid();
+		dstAddr64 = ehp.getDstCoords().getNuid();
 		dstAddr16 = ehp.getDstCoords().getAddress();
 		srcEndpoint = ehp.getSrcCoords().getEndpoint();
 		dstEndpoint = ehp.getDstCoords().getEndpoint();

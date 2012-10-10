@@ -1,7 +1,7 @@
 package it.uniud.easyhome.gateway;
 
-import it.uniud.easyhome.network.ModuleCoordinates;
-import it.uniud.easyhome.network.NativePacket;
+import it.uniud.easyhome.packets.ModuleCoordinates;
+import it.uniud.easyhome.packets.NativePacket;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

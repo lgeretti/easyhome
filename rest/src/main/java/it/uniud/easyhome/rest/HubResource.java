@@ -1,10 +1,10 @@
 package it.uniud.easyhome.rest;
 
+import it.uniud.easyhome.exceptions.PortAlreadyBoundException;
 import it.uniud.easyhome.gateway.Gateway;
 import it.uniud.easyhome.gateway.ProtocolType;
-import it.uniud.easyhome.network.ModuleCoordinates;
-import it.uniud.easyhome.network.NetworkContext;
-import it.uniud.easyhome.network.exceptions.PortAlreadyBoundException;
+import it.uniud.easyhome.packets.ModuleCoordinates;
+import it.uniud.easyhome.packets.NetworkContext;
 
 import java.util.List;
 
@@ -98,14 +98,14 @@ public class HubResource {
     }
     
     @GET
-    @Path("gateways/{srcgid}/routing/{dstgid}/{dstuuid}/{address}/{port}")
+    @Path("gateways/{srcgid}/routing/{dstgid}/{dstnuid}/{address}/{port}")
     public String getGatewayPort(@PathParam("srcgid") byte srcGid,
                                  @PathParam("dstgid") byte dstGid,
-                                 @PathParam("dstuuid") long dstUuid,
+                                 @PathParam("dstnuid") long dstNuid,
                                  @PathParam("address") short address,
                                  @PathParam("port") byte port) {
         
-        ModuleCoordinates coords = new ModuleCoordinates(dstGid,dstUuid,address,port);
+        ModuleCoordinates coords = new ModuleCoordinates(dstGid,dstNuid,address,port);
 
         Gateway gw = networkContext.getGatewayForId(srcGid);
         
@@ -129,11 +129,11 @@ public class HubResource {
     @Path("gateways/{srcgid}/routing")
     public Response putRoutingEntry(@PathParam("srcgid") byte srcGid,
             @FormParam("gid") byte entryGid,
-            @FormParam("uuid") long entryUuid,
+            @FormParam("nuid") long entryNuid,
             @FormParam("address") short entryAddress,
             @FormParam("port") byte entryPort) {
         
-        ModuleCoordinates coords = new ModuleCoordinates(entryGid,entryUuid,entryAddress,entryPort);
+        ModuleCoordinates coords = new ModuleCoordinates(entryGid,entryNuid,entryAddress,entryPort);
         
         Gateway gw = networkContext.getGatewayForId(srcGid);
         
@@ -144,7 +144,7 @@ public class HubResource {
         
         return Response.created(uriInfo.getAbsolutePathBuilder()
                                 .path(String.valueOf(entryGid))
-                                .path(String.valueOf(entryUuid))
+                                .path(String.valueOf(entryNuid))
                                 .path(String.valueOf(entryAddress))
                                 .path(String.valueOf(entryPort))
                                 .build())                

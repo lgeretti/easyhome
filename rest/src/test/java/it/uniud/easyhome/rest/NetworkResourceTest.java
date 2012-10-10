@@ -2,8 +2,8 @@ package it.uniud.easyhome.rest;
 
 import static org.junit.Assert.*;
 
-import it.uniud.easyhome.network.Node;
-import it.uniud.easyhome.rest.NodeResource;
+import it.uniud.easyhome.packets.Node;
+import it.uniud.easyhome.rest.NetworkResource;
 import it.uniud.easyhome.testutils.JsonJaxbContextResolver;
 
 import java.util.List;
@@ -25,10 +25,10 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 
 @Ignore
-public class NodeResourceTest extends JerseyTest {
+public class NetworkResourceTest extends JerseyTest {
 
     private static final String[] PACKAGE_NAMES = {
-        "it.uniud.easyhome.network",
+        "it.uniud.easyhome.packets",
         "it.uniud.easyhome.rest"};
     
     private static ResourceConfig createApp() {
@@ -52,7 +52,7 @@ public class NodeResourceTest extends JerseyTest {
     
     @After
     public void deleteAll() {
-        NodeResource.clear();
+        NetworkResource.clear();
     }
     
     @Test
@@ -67,7 +67,10 @@ public class NodeResourceTest extends JerseyTest {
     public void testInsertion() throws JSONException {
         
         Node.Builder nodeBuilder = new Node.Builder(1);
-        Node node = nodeBuilder.setName("first").build();
+        Node node = nodeBuilder.setName("first")
+        					   .setGatewayId((byte)3)
+        					   .setAddress((short)50000)
+        					   .build();
         Response insertionResponse = target().path("nodes").request().post(Entity.json(node));
         assertEquals(Status.CREATED,insertionResponse.getStatusInfo());
         
@@ -81,6 +84,8 @@ public class NodeResourceTest extends JerseyTest {
         JSONObject jsonNode = target().path("nodes/1").request(MediaType.APPLICATION_JSON).get(JSONObject.class);
         assertEquals(1,jsonNode.getInt("id"));
         assertEquals("first",jsonNode.getString("name"));
+        assertEquals(3,jsonNode.getInt("gatewayId"));
+        assertEquals(50000,jsonNode.getInt("address"));
     }
 
     @Test

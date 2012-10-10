@@ -1,4 +1,4 @@
-package it.uniud.easyhome.network.exceptions;
+package it.uniud.easyhome.exceptions;
 
 public class ChecksumException extends RuntimeException {
 

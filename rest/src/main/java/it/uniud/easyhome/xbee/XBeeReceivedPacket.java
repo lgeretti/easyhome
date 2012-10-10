@@ -1,9 +1,9 @@
-package it.uniud.easyhome.network.xbee;
+package it.uniud.easyhome.xbee;
 
-import it.uniud.easyhome.network.ReceivedPacket;
-import it.uniud.easyhome.network.exceptions.ChecksumException;
-import it.uniud.easyhome.network.exceptions.InvalidDelimiterException;
-import it.uniud.easyhome.network.exceptions.InvalidPacketTypeException;
+import it.uniud.easyhome.exceptions.ChecksumException;
+import it.uniud.easyhome.exceptions.InvalidDelimiterException;
+import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
+import it.uniud.easyhome.packets.ReceivedPacket;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

@@ -37,7 +37,7 @@ public class ProcessResource {
     	
     	switch (kind) {
 	    	case "nodeRegistration":
-	    		process = new NodeRegistrationProcess(pid);
+	    		process = new NodeRegistrationProcess(pid,uriInfo);
 	    		break;
 	    	default:
 	    		return Response.status(Status.BAD_REQUEST).build();

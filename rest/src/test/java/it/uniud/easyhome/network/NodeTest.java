@@ -2,7 +2,7 @@ package it.uniud.easyhome.network;
 
 import static org.junit.Assert.*;
 
-import it.uniud.easyhome.network.Node;
+import it.uniud.easyhome.packets.Node;
 
 import org.junit.*;
 
@@ -28,6 +28,8 @@ public class NodeTest {
         Node.Builder nb = new Node.Builder(10);
         
         nb.setName("test");
+        nb.setGatewayId((byte)2);
+        nb.setAddress((short)15);
         
         Node node = nb.build();
         

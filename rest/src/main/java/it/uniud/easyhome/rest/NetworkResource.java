@@ -1,7 +1,7 @@
 package it.uniud.easyhome.rest;
 
 
-import it.uniud.easyhome.network.Node;
+import it.uniud.easyhome.packets.Node;
 
 import java.util.List;
 
@@ -12,8 +12,9 @@ import javax.persistence.criteria.Root;
 import javax.ws.rs.core.*;
 import javax.ws.rs.*;
 
-@Path("/nodes")
-public final class NodeResource {
+/** Handles the access to the network of nodes */
+@Path("/network")
+public final class NetworkResource {
     
     private static final String PERSISTENCE_CONTEXT = "EasyHome";
     

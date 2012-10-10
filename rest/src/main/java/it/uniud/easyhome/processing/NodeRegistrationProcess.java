@@ -1,18 +1,26 @@
 package it.uniud.easyhome.processing;
 
-import it.uniud.easyhome.network.NativePacket;
+import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
+import it.uniud.easyhome.packets.NativePacket;
+import it.uniud.easyhome.packets.Operation;
+import it.uniud.easyhome.packets.specific.NodeAnnouncePacket;
 
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
+import javax.ws.rs.core.UriInfo;
 
 public class NodeRegistrationProcess extends Process {
 	
-	private static long RECEPTION_WAIT_TIME_MS = 5000;
+	private static long RECEPTION_WAIT_TIME_MS = 5000;	
 	
-    public NodeRegistrationProcess(int pid) {
+	// Necessary for calls to REST resources
+	private UriInfo uriInfo;
+	
+    public NodeRegistrationProcess(int pid, UriInfo uriInfo) {
         super(pid, Session.STATEFUL, Interaction.ASYNC);
+        this.uriInfo = uriInfo;
     }
     
     @Override
@@ -28,6 +36,17 @@ public class NodeRegistrationProcess extends Process {
     	if (msg != null) {
         	NativePacket pkt = (NativePacket) msg.getObject();
         	println("Packet received from " + pkt.getSrcCoords());
+        	
+        	try {
+        		NodeAnnouncePacket announce = new NodeAnnouncePacket(pkt);
+        		
+        		
+        	} catch (InvalidPacketTypeException ex) {
+        		return;
+        	}
+        	
+        	
     	}
     }
+    
 }

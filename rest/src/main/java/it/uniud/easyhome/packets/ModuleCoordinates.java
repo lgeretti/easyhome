@@ -1,4 +1,4 @@
-package it.uniud.easyhome.network;
+package it.uniud.easyhome.packets;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,9 +16,9 @@ public class ModuleCoordinates implements Serializable {
     
     // Gateway (and consequently subnetwork) identifier (>=0, =0 for broadcast, =1 for the native TCP/IP subnetwork)
     private byte gid;
-    // Unit unique id (global address, like a IEEE MAC address, fixed for a unit) (0x0 for the gateway, 
+    // Node unique id (global address, like a IEEE MAC address, fixed for a node) (0x0 for the gateway, 
     // 0x0000FFFF for a broadcast, 0xFFFFFFFF for unknown)
-    private long uuid;
+    private long nuid;
     // Address within the network (>=0, 0xFFFE if broadcast or unknown)
     private short address;
     // Endpoint of the interested module (>=0, =0 addresses the configuration endpoint)
@@ -28,8 +28,8 @@ public class ModuleCoordinates implements Serializable {
         return gid;
     }
     
-    public long getUuid() {
-    	return uuid;
+    public long getNuid() {
+    	return nuid;
     }
     
     public short getAddress() {
@@ -40,9 +40,9 @@ public class ModuleCoordinates implements Serializable {
         return endpoint;
     }
     
-    public ModuleCoordinates(byte gid, long uuid, short address, byte endpoint) {
+    public ModuleCoordinates(byte gid, long nuid, short address, byte endpoint) {
         this.gid = gid;
-        this.uuid = uuid;
+        this.nuid = nuid;
         this.address = address;
         this.endpoint = endpoint;
     }
@@ -50,7 +50,7 @@ public class ModuleCoordinates implements Serializable {
     public ModuleCoordinates(InputStream is) throws IOException {
 
         gid = (byte)is.read();
-    	uuid = (((long)is.read()) << 56) + 
+    	nuid = (((long)is.read()) << 56) + 
     		   (((long)is.read()) << 48) + 
     		   (((long)is.read()) << 40) + 
     		   (((long)is.read()) << 32) +
@@ -65,14 +65,14 @@ public class ModuleCoordinates implements Serializable {
     public void write(OutputStream os) throws IOException {
         
         os.write(gid & 0xFF);
-        os.write((int)((uuid >>> 56) & 0xFF)); 
-        os.write((int)((uuid >>> 48) & 0xFF));
-        os.write((int)((uuid >>> 40) & 0xFF));
-        os.write((int)((uuid >>> 32) & 0xFF));
-        os.write((int)((uuid >>> 24) & 0xFF)); 
-        os.write((int)((uuid >>> 16) & 0xFF));
-        os.write((int)((uuid >>> 8) & 0xFF));
-        os.write((int)(uuid & 0xFF));
+        os.write((int)((nuid >>> 56) & 0xFF)); 
+        os.write((int)((nuid >>> 48) & 0xFF));
+        os.write((int)((nuid >>> 40) & 0xFF));
+        os.write((int)((nuid >>> 32) & 0xFF));
+        os.write((int)((nuid >>> 24) & 0xFF)); 
+        os.write((int)((nuid >>> 16) & 0xFF));
+        os.write((int)((nuid >>> 8) & 0xFF));
+        os.write((int)(nuid & 0xFF));
         
         os.write((address >>> 8) & 0xFF);
         os.write(address & 0xFF);
@@ -85,8 +85,8 @@ public class ModuleCoordinates implements Serializable {
     	
     	strb.append("{G: ")
     		.append(gid)
-    		.append("; U: ")
-    		.append(uuid)
+    		.append("; N: ")
+    		.append(nuid)
     		.append("; A:")
     		.append(address)
     		.append("; E: ")
@@ -106,7 +106,7 @@ public class ModuleCoordinates implements Serializable {
         
         if (otherCoords.getGatewayId() != this.getGatewayId())
             return false;
-        if (otherCoords.getUuid() != this.getUuid())
+        if (otherCoords.getNuid() != this.getNuid())
             return false;
         if (otherCoords.getAddress() != this.getAddress())
             return false;
@@ -120,7 +120,7 @@ public class ModuleCoordinates implements Serializable {
     public int hashCode() {
         int hash = 1;
         hash = hash * 31 + gid;
-        hash = (int)(hash * 31 + uuid);
+        hash = (int)(hash * 31 + nuid);
         hash = hash * 31 + address;
         hash = hash * 31 + endpoint;
         return hash;

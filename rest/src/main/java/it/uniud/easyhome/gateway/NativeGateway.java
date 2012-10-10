@@ -1,6 +1,6 @@
 package it.uniud.easyhome.gateway;
 
-import it.uniud.easyhome.network.NativePacket;
+import it.uniud.easyhome.packets.NativePacket;
 
 import java.io.*;
 

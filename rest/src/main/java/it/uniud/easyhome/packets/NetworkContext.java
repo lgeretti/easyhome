@@ -1,10 +1,10 @@
-package it.uniud.easyhome.network;
+package it.uniud.easyhome.packets;
 
+import it.uniud.easyhome.exceptions.PortAlreadyBoundException;
 import it.uniud.easyhome.gateway.Gateway;
 import it.uniud.easyhome.gateway.NativeGateway;
 import it.uniud.easyhome.gateway.ProtocolType;
 import it.uniud.easyhome.gateway.XBeeGateway;
-import it.uniud.easyhome.network.exceptions.PortAlreadyBoundException;
 
 import java.util.ArrayList;
 import java.util.List;
