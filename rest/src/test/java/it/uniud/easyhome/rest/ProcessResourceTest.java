@@ -3,7 +3,7 @@ package it.uniud.easyhome.rest;
 import static org.junit.Assert.*;
 
 import it.uniud.easyhome.processing.Process;
-import it.uniud.easyhome.testutils.JsonJaxbContextResolver;
+import it.uniud.easyhome.rest.JsonJaxbContextResolver;
 
 import java.util.List;
 

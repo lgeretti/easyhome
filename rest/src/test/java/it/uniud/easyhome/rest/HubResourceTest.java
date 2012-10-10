@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import it.uniud.easyhome.gateway.Gateway;
 import it.uniud.easyhome.gateway.ProtocolType;
-import it.uniud.easyhome.testutils.JsonJaxbContextResolver;
+import it.uniud.easyhome.rest.JsonJaxbContextResolver;
 
 import java.io.IOException;
 import java.util.List;

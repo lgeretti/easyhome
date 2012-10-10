@@ -1,6 +1,6 @@
 package it.uniud.easyhome.rest.it;
 
-import it.uniud.easyhome.rest.it.JsonJaxbContextResolver;
+import it.uniud.easyhome.rest.JsonJaxbContextResolver;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientFactory;

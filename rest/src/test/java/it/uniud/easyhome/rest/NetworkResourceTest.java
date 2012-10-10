@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.rest.NetworkResource;
-import it.uniud.easyhome.testutils.JsonJaxbContextResolver;
+import it.uniud.easyhome.rest.JsonJaxbContextResolver;
 
 import java.util.List;
 
@@ -77,10 +77,10 @@ public class NetworkResourceTest extends JerseyTest {
         List<Node> nodes = target().path("network").request(MediaType.APPLICATION_JSON).get(nodesType);
         assertEquals(1,nodes.size());
         
-        Node recoveredNode = target().path("network/1").request(MediaType.APPLICATION_JSON).get(Node.class);
+        Node recoveredNode = target().path("network").path("1").request(MediaType.APPLICATION_JSON).get(Node.class);
         assertTrue(node.equals(recoveredNode));
 
-        JSONObject jsonNode = target().path("network/1").request(MediaType.APPLICATION_JSON).get(JSONObject.class);
+        JSONObject jsonNode = target().path("network").path("1").request(MediaType.APPLICATION_JSON).get(JSONObject.class);
         assertEquals(1,jsonNode.getInt("id"));
         assertEquals("first",jsonNode.getString("name"));
         assertEquals(3,jsonNode.getInt("gatewayId"));
@@ -98,7 +98,7 @@ public class NetworkResourceTest extends JerseyTest {
         Response updateResponse = target().path("network").request().post(Entity.json(modifiedNode));
         assertEquals(Status.OK,updateResponse.getStatusInfo());
         
-        Node recoveredNode = target().path("network/1").request(MediaType.APPLICATION_JSON).get(Node.class);
+        Node recoveredNode = target().path("network").path("1").request(MediaType.APPLICATION_JSON).get(Node.class);
         assertEquals("modifiedFirst",recoveredNode.getName());
     }
 
@@ -107,10 +107,10 @@ public class NetworkResourceTest extends JerseyTest {
         
         createOneNode();
         
-        Response deleteResponse = target().path("network/1").request().delete();
+        Response deleteResponse = target().path("network").path("1").request().delete();
         assertEquals(Status.OK,deleteResponse.getStatusInfo());
         
-        Response getResponse = target().path("network/1").request(MediaType.APPLICATION_JSON).get();
+        Response getResponse = target().path("network").path("1").request(MediaType.APPLICATION_JSON).get();
         assertEquals(Status.NOT_FOUND,getResponse.getStatusInfo());
     }
     

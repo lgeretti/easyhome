@@ -1,7 +1,7 @@
 package it.uniud.easyhome.gateway;
 
 import it.uniud.easyhome.gateway.ProtocolType;
-import it.uniud.easyhome.testutils.JsonJaxbContextResolver;
+import it.uniud.easyhome.rest.JsonJaxbContextResolver;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

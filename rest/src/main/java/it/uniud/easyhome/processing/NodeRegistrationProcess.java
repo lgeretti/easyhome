@@ -1,15 +1,27 @@
 package it.uniud.easyhome.processing;
 
+import java.net.URI;
+
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
+import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.packets.NativePacket;
 import it.uniud.easyhome.packets.Operation;
 import it.uniud.easyhome.packets.specific.NodeAnnouncePacket;
+import it.uniud.easyhome.rest.JsonJaxbContextResolver;
 
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientFactory;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+
+import org.codehaus.jettison.json.JSONObject;
+import org.glassfish.jersey.media.json.JsonJaxbFeature;
 
 public class NodeRegistrationProcess extends Process {
 	
@@ -17,10 +29,13 @@ public class NodeRegistrationProcess extends Process {
 	
 	// Necessary for calls to REST resources
 	private UriInfo uriInfo;
+	//private Client client; 
 	
     public NodeRegistrationProcess(int pid, UriInfo uriInfo) {
         super(pid, Session.STATEFUL, Interaction.ASYNC);
         this.uriInfo = uriInfo;
+    	//client = ClientFactory.newClient();
+    	//client.configuration().register(new JsonJaxbFeature()).register(JsonJaxbContextResolver.class);
     }
     
     @Override
@@ -32,6 +47,8 @@ public class NodeRegistrationProcess extends Process {
     @Override
     final protected void process(MessageConsumer consumer, MessageProducer producer) throws JMSException {
     	
+    	URI target = UriBuilder.fromUri(uriInfo.getBaseUri()).path("network").build(new Object[0]);
+    	
     	ObjectMessage msg = (ObjectMessage) consumer.receive(RECEPTION_WAIT_TIME_MS);
     	if (msg != null) {
         	NativePacket pkt = (NativePacket) msg.getObject();
@@ -40,7 +57,16 @@ public class NodeRegistrationProcess extends Process {
         	try {
         		NodeAnnouncePacket announce = new NodeAnnouncePacket(pkt);
         		
+        		long nuid = announce.getAnnouncedNuid();
+        		short address = announce.getAnnouncedAddress();
+        		byte gatewayId = announce.getSrcCoords().getGatewayId();
         		
+                Node.Builder nodeBuilder = new Node.Builder(nuid);
+                Node node = nodeBuilder.setName(Long.toHexString(nuid))
+                					   .setAddress(address)
+                					   .setGatewayId(gatewayId).build();
+                
+                //client.target(target).request().post(Entity.json(node));
         	} catch (InvalidPacketTypeException ex) {
         		return;
         	}
