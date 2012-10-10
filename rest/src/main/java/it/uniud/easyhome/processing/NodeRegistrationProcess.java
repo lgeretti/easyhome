@@ -13,15 +13,11 @@ import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientFactory;
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.codehaus.jettison.json.JSONObject;
-import org.glassfish.jersey.media.json.JsonJaxbFeature;
 
 public class NodeRegistrationProcess extends Process {
 	
@@ -29,13 +25,10 @@ public class NodeRegistrationProcess extends Process {
 	
 	// Necessary for calls to REST resources
 	private UriInfo uriInfo;
-	//private Client client; 
 	
     public NodeRegistrationProcess(int pid, UriInfo uriInfo) {
         super(pid, Session.STATEFUL, Interaction.ASYNC);
         this.uriInfo = uriInfo;
-    	//client = ClientFactory.newClient();
-    	//client.configuration().register(new JsonJaxbFeature()).register(JsonJaxbContextResolver.class);
     }
     
     @Override
@@ -66,7 +59,6 @@ public class NodeRegistrationProcess extends Process {
                 					   .setAddress(address)
                 					   .setGatewayId(gatewayId).build();
                 
-                //client.target(target).request().post(Entity.json(node));
         	} catch (InvalidPacketTypeException ex) {
         		return;
         	}

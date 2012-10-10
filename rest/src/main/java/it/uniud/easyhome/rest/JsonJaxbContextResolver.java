@@ -5,8 +5,9 @@ import javax.ws.rs.ext.Provider;
 
 import javax.xml.bind.JAXBContext;
 
-import org.glassfish.jersey.media.json.JsonConfiguration;
-import org.glassfish.jersey.media.json.JsonJaxbContext;
+import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.api.json.JSONJAXBContext;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -20,7 +21,7 @@ public final class JsonJaxbContextResolver implements ContextResolver<JAXBContex
 
     public JsonJaxbContextResolver() throws Exception {
         this.types = new HashSet<Class<?>>(Arrays.asList(cTypes));
-        this.context = new JsonJaxbContext(JsonConfiguration.natural().build());
+        this.context = new JSONJAXBContext(JSONConfiguration.natural().build());
     }
 
     @Override
