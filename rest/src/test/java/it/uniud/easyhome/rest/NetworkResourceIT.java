@@ -1,12 +1,13 @@
-package it.uniud.easyhome.rest.it;
+package it.uniud.easyhome.rest;
 
 import it.uniud.easyhome.network.Node;
 
 import javax.ws.rs.core.MediaType;
 
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -17,11 +18,18 @@ public class NetworkResourceIT {
 	
 	private static final String target = "http://localhost:8080/easyhome/rest/network";
 	
-    public static void main(String[] args) throws JSONException {
+	private static Client client;
+	
+	@BeforeClass
+    public static void setup() {
     	
     	ClientConfig config = new DefaultClientConfig();
-        Client client = Client.create(config);
-        
+        client = Client.create(config);
+    }
+	
+	@Test
+	public void putNode() throws JSONException {
+		
         Node.Builder nb = new Node.Builder(10);
         
         nb.setName("test");
@@ -34,6 +42,6 @@ public class NetworkResourceIT {
         System.out.println("Response status code: " + response.getStatus());
         
         JSONObject jsonObj = client.resource(target).path("10").accept(MediaType.APPLICATION_JSON).get(JSONObject.class);
-        System.out.println("Recovered node address: " + jsonObj.getInt("address"));
+        System.out.println("Recovered node address: " + jsonObj.getInt("address"));	
     }
 }

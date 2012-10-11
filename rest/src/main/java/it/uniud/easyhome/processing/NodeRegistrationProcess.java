@@ -1,7 +1,5 @@
 package it.uniud.easyhome.processing;
 
-import java.net.URI;
-
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.packets.NativePacket;
@@ -20,7 +18,7 @@ import com.sun.jersey.api.client.ClientResponse.Status;
 
 public class NodeRegistrationProcess extends Process {
 	
-	private static long RECEPTION_WAIT_TIME_MS = 5000;	
+	private static long RECEPTION_WAIT_TIME_MS = 1000;	
 	
     public NodeRegistrationProcess(int pid, UriInfo uriInfo) {
         super(pid, Session.STATEFUL, Interaction.ASYNC,
