@@ -44,12 +44,6 @@ public class JsonUtils {
 	}
 	
 	public static <T> T getFrom(ClientResponse response, Class<T> cls) throws JSONException {
-		
-		//Gson gson = new Gson();
-		
-		//JSONObject jsonResponseObj = response.getEntity(JSONObject.class);
-		
-		//JSONObject jsonObj = jsonResponseObj.getJSONObject(cls.getSimpleName().toLowerCase());
 
 		T result = new Gson().fromJson(response.getEntity(String.class), cls);
 		

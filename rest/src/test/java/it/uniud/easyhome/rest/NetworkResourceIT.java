@@ -26,7 +26,6 @@ public class NetworkResourceIT {
 	
 	@BeforeClass
     public static void setup() {
-    	
         client = Client.create();
     }
 	
