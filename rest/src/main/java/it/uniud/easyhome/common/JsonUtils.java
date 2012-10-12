@@ -18,28 +18,41 @@ public class JsonUtils {
 		
 		String responseString = response.getEntity(String.class);
 		
-		List<T> nodeList;
+		List<T> objList;
 		
 		if (responseString.equals("null"))
-			nodeList = new ArrayList<T>();
+			objList = new ArrayList<T>();
 		else {
 			Gson gson = new Gson();
 			
-			JSONObject jsonObj = new JSONObject(responseString);
+			JSONObject jsonResponse = new JSONObject(responseString);
 			
 			try {
 				
-				JSONArray jsonArray = jsonObj.getJSONArray(cls.getSimpleName().toLowerCase());
+				JSONArray jsonArray = jsonResponse.getJSONArray(cls.getSimpleName().toLowerCase());
 				Type listType = new TypeToken<List<T>>() { }.getType();
-				nodeList = gson.fromJson(jsonArray.toString(), listType);
+				objList = gson.fromJson(jsonArray.toString(), listType);
 			} catch (JSONException ex) {
-				JSONObject jsonNode = jsonObj.getJSONObject(cls.getSimpleName().toLowerCase());
-				T node = gson.fromJson(jsonNode.toString(), cls);
-				nodeList = new ArrayList<T>();
-				nodeList.add(node);
+				JSONObject jsonObj = jsonResponse.getJSONObject(cls.getSimpleName().toLowerCase());
+				T node = gson.fromJson(jsonObj.toString(), cls);
+				objList = new ArrayList<T>();
+				objList.add(node);
 			}
 		}
 		
-		return nodeList;
+		return objList;
+	}
+	
+	public static <T> T getFrom(ClientResponse response, Class<T> cls) throws JSONException {
+		
+		//Gson gson = new Gson();
+		
+		//JSONObject jsonResponseObj = response.getEntity(JSONObject.class);
+		
+		//JSONObject jsonObj = jsonResponseObj.getJSONObject(cls.getSimpleName().toLowerCase());
+
+		T result = new Gson().fromJson(response.getEntity(String.class), cls);
+		
+		return result;
 	}
 }

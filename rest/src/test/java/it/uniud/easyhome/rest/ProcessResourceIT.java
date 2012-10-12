@@ -49,11 +49,24 @@ public class ProcessResourceIT {
         
     	insertProcess(ProcessKind.NodeRegistration);
     	
-    	ClientResponse response =  client.resource(TARGET).delete(ClientResponse.class);
+    	ClientResponse firstDeletion =  client.resource(TARGET).delete(ClientResponse.class);
     	
-    	assertEquals(ClientResponse.Status.OK,response.getClientResponseStatus());
+    	assertEquals(ClientResponse.Status.OK,firstDeletion.getClientResponseStatus());
     	
     	noProcesses();
+    	
+    	ClientResponse secondInsertion = insertProcess(ProcessKind.NodeRegistration);
+        String locationPath = secondInsertion.getLocation().getPath();
+        String[] segments = locationPath.split("/");
+        String pid = segments[segments.length-1];
+    	
+        ClientResponse secondDeletion = client.resource(TARGET).path(pid).delete(ClientResponse.class);
+        
+        assertEquals(ClientResponse.Status.OK,secondDeletion.getClientResponseStatus());
+        
+        ClientResponse thirdDeletion = client.resource(TARGET).path(pid).delete(ClientResponse.class);
+        
+        assertEquals(ClientResponse.Status.NOT_FOUND,thirdDeletion.getClientResponseStatus());
     }
 
     @After

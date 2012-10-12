@@ -42,7 +42,7 @@ public class NetworkResourceIT {
 	
 	
 	@Test
-	public void testPostNode() throws JSONException {
+	public void testInsert() throws JSONException {
 		
         Node.Builder nb = new Node.Builder(10L);
         
@@ -52,8 +52,8 @@ public class NetworkResourceIT {
         
         Node node = nb.build();
        
-        ClientResponse postResponse = postNode(node.getId(),node.getName(),node.getGatewayId(),node.getAddress());
-        assertEquals(ClientResponse.Status.CREATED,postResponse.getClientResponseStatus());
+        ClientResponse insertionResponse = postNode(node.getId(),node.getName(),node.getGatewayId(),node.getAddress());
+        assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
 
         Node recoveredNode = client.resource(TARGET).path("10").accept(MediaType.APPLICATION_JSON).get(Node.class);
         
@@ -64,9 +64,36 @@ public class NetworkResourceIT {
         assertEquals(1,nodeList.size());
         assertEquals(node,nodeList.get(0));
         
-        ClientResponse postResponse2 = postNode(node.getId(),node.getName(),node.getGatewayId(),node.getAddress());
-        assertEquals(ClientResponse.Status.OK,postResponse2.getClientResponseStatus());        
     }
+	
+	@Test
+	public void testUpdate() throws JSONException {
+		
+        Node.Builder nb = new Node.Builder(10L);
+        
+        nb.setName("test");
+        nb.setGatewayId((byte)2);
+        nb.setAddress((short)15);
+        
+        Node node = nb.build();
+       
+        postNode(node.getId(),node.getName(),node.getGatewayId(),node.getAddress());
+		
+		ClientResponse updateResponse = postNode(node.getId(),node.getName(),node.getGatewayId(),(short)(node.getAddress()+1));
+        assertEquals(ClientResponse.Status.OK,updateResponse.getClientResponseStatus());
+        
+        ClientResponse getUpdatedNodeResponse = client.resource(TARGET).path(String.valueOf(node.getId()))
+        											  .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        
+        Node updatedNode = JsonUtils.getFrom(getUpdatedNodeResponse, Node.class);
+        
+        assertFalse(node.equals(updatedNode));
+        
+		ClientResponse getResponse = client.resource(TARGET).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+		List<Node> nodeList = JsonUtils.getListFrom(getResponse,Node.class);
+		
+		assertEquals(1,nodeList.size());
+	}
 	
 	@Test
 	public void multipleNodes() throws JSONException {
