@@ -18,8 +18,7 @@ public final class NetworkResource {
     
     private static final String PERSISTENCE_CONTEXT = "EasyHome";
     
-    private static final EntityManager em = Persistence.createEntityManagerFactory(PERSISTENCE_CONTEXT)
-                                                          .createEntityManager();
+    private EntityManagerFactory emf = Persistence.createEntityManagerFactory(PERSISTENCE_CONTEXT);
     
     @Context
     private UriInfo uriInfo;
@@ -28,6 +27,8 @@ public final class NetworkResource {
     @Produces(MediaType.APPLICATION_JSON)
     public List<Node> getNodes() {
         
+    	EntityManager em = emf.createEntityManager();
+    	
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<Node> criteria = builder.createQuery(Node.class);
         Root<Node> root = criteria.from(Node.class);
@@ -35,6 +36,8 @@ public final class NetworkResource {
         
         TypedQuery<Node> query = em.createQuery(criteria);
         List<Node> nodes = query.getResultList();
+        
+        em.close();
         
         return nodes;
         
@@ -45,8 +48,12 @@ public final class NetworkResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Node getNode(@PathParam("nodeid") long nodeId) {
         
+    	EntityManager em = emf.createEntityManager();
+    	
         Node node = em.find(Node.class, nodeId);
 
+        em.close();
+        
         if (node == null) 
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         
@@ -57,6 +64,8 @@ public final class NetworkResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateOrInsertNode(Node node) {
         
+    	EntityManager em = emf.createEntityManager();
+    	
         EntityTransaction tx = em.getTransaction();
         tx.begin();
         Node persistedNode = em.find(Node.class, node.getId());
@@ -69,6 +78,8 @@ public final class NetworkResource {
         }
             
         tx.commit();
+        
+        em.close();
         
         if (!existed)
             return Response.created(
@@ -84,16 +95,22 @@ public final class NetworkResource {
     @Path("{nodeid}")
     public Response deleteNode(@PathParam("nodeid") long nodeId) {
         
+    	EntityManager em = emf.createEntityManager();
+    	
         EntityTransaction tx = em.getTransaction();
         
         Node existing = em.find(Node.class, nodeId);
         
-        if (existing == null) 
-            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        if (existing == null) {
+        	em.close();
+        	throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
         
         tx.begin();
         em.remove(existing);
         tx.commit();    
+        
+        em.close();
         
         return Response.ok().build();
     }    
@@ -102,8 +119,9 @@ public final class NetworkResource {
      * 
      * This is not implemented as a DELETE on /nodes since we want the path to always exist.
      */
-    public static void clear() {
+    public void clear() {
         
+    	EntityManager em = emf.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
         Query query = em.createQuery("DELETE FROM Node");
@@ -113,13 +131,9 @@ public final class NetworkResource {
         tx.commit();  
         
         em.clear();
+        
+        em.close();
+        
     }
-    
-    @POST
-    @Path("cleanup")
-    public void clearAndClose() {
-    	
-    	em.close();
-    }
-    
+       
 }

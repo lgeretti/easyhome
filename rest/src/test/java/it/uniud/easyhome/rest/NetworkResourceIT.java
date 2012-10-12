@@ -6,12 +6,10 @@ import it.uniud.easyhome.network.Node;
 import javax.ws.rs.core.MediaType;
 
 import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.google.gson.Gson;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 
@@ -44,13 +42,9 @@ public class NetworkResourceIT {
         ClientResponse response2 = client.resource(TARGET).type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
         assertEquals(ClientResponse.Status.OK,response2.getClientResponseStatus());        
         
-        //JSONObject jsonObj = client.resource(TARGET).path("10").accept(MediaType.APPLICATION_JSON).get(JSONObject.class);
-        //assertEquals(15,jsonObj.getInt("address"));
+        Node recoveredNode = client.resource(TARGET).path("10").accept(MediaType.APPLICATION_JSON).get(Node.class);
         
-        ClientResponse resp = client.resource(TARGET).path("10").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-        Node recoveredNode = new Gson().fromJson(resp.getEntity(String.class), Node.class);
-        
-        assertEquals(2,recoveredNode.getGatewayId());
+        assertEquals(node,recoveredNode);
         
     }
 	

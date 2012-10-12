@@ -19,7 +19,6 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.google.gson.Gson;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.config.ClientConfig;
@@ -40,9 +39,10 @@ public class HubResourceIT {
         client = Client.create();
     }
 	
-	//@Ignore
+	@Ignore
 	@Test
 	public void noGateways() {
+		
 		JSONObject jsonObj = client.resource(TARGET).accept(MediaType.APPLICATION_JSON).get(JSONObject.class);
 		assertTrue(jsonObj == null);
 	}
