@@ -1,5 +1,7 @@
 package it.uniud.easyhome.rest;
 
+import it.uniud.easyhome.network.Node;
+
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 

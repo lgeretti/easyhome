@@ -2,12 +2,7 @@ package it.uniud.easyhome.rest;
 
 import static org.junit.Assert.*;
 
-import it.uniud.easyhome.network.Node;
-import it.uniud.easyhome.processing.NodeRegistrationProcess;
-import it.uniud.easyhome.processing.Process;
 import it.uniud.easyhome.processing.ProcessKind;
-
-import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -15,7 +10,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.junit.*;
 
 import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;

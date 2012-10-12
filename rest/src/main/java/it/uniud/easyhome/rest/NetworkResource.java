@@ -117,9 +117,9 @@ public final class NetworkResource {
     
     /** Removes all the nodes.
      * 
-     * This is not implemented as a DELETE on /nodes since we want the path to always exist.
      */
-    public void clear() {
+    @DELETE
+    public Response clear() {
         
     	EntityManager em = emf.createEntityManager();
         EntityTransaction tx = em.getTransaction();
@@ -134,6 +134,7 @@ public final class NetworkResource {
         
         em.close();
         
+        return Response.ok().build();
     }
        
 }
