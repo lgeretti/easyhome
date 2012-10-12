@@ -6,8 +6,6 @@ import it.uniud.easyhome.gateway.HubContext;
 import it.uniud.easyhome.gateway.ProtocolType;
 import it.uniud.easyhome.packets.ModuleCoordinates;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.core.*;

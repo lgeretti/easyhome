@@ -26,6 +26,11 @@ public class NodeRegistrationProcess extends Process {
     }
     
     @Override
+    public ProcessKind getKind() {
+    	return ProcessKind.NodeRegistration;
+    }
+    
+    @Override
     public void start() {
         Thread thr = new Thread(this);
         thr.start();

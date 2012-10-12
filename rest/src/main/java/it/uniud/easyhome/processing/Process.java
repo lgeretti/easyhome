@@ -64,6 +64,10 @@ public class Process implements Runnable {
         return interaction;
     }
 	
+    public ProcessKind getKind() {
+    	return null;
+    }
+    
 	protected boolean isStopped() {
 		return stopped;
 	}
