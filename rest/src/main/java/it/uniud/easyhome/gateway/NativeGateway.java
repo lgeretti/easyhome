@@ -4,12 +4,12 @@ import it.uniud.easyhome.packets.NativePacket;
 
 import java.io.*;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 public class NativeGateway extends Gateway {
 	
-	private static final int PORT = 5001;
-	
-    public NativeGateway() {
-    	super((byte)1,ProtocolType.NATIVE,PORT);
+    public NativeGateway(byte id, int port) {
+    	super(id,ProtocolType.NATIVE,port);
     	MAX_CONNECTIONS = 32;
     }
     

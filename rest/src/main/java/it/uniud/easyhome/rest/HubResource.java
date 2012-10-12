@@ -6,6 +6,8 @@ import it.uniud.easyhome.gateway.HubContext;
 import it.uniud.easyhome.gateway.ProtocolType;
 import it.uniud.easyhome.packets.ModuleCoordinates;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.core.*;
@@ -22,9 +24,8 @@ public class HubResource {
     @GET
     @Path("gateways")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Gateway> getGateways() {
-
-        return networkContext.getGateways();
+    public List<Gateway> getGateways() { 
+    	return networkContext.getGateways();
     }
     
     @GET
@@ -61,7 +62,7 @@ public class HubResource {
         } else
             return Response.status(Response.Status.NOT_FOUND).build();
     }
-    
+
     @POST
     @Path("gateways/{gid}/disconnect")
     public Response disconnectGateway(@PathParam("gid") byte gid) {

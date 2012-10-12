@@ -37,6 +37,7 @@ public final class NetworkResource {
         List<Node> nodes = query.getResultList();
         
         return nodes;
+        
     }
     
     @GET
@@ -112,6 +113,13 @@ public final class NetworkResource {
         tx.commit();  
         
         em.clear();
+    }
+    
+    @POST
+    @Path("cleanup")
+    public void clearAndClose() {
+    	
+    	em.close();
     }
     
 }

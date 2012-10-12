@@ -21,7 +21,7 @@ public final class JsonJaxbContextResolver implements ContextResolver<JAXBContex
 
     public JsonJaxbContextResolver() throws Exception {
         this.types = new HashSet<Class<?>>(Arrays.asList(cTypes));
-        this.context = new JSONJAXBContext(JSONConfiguration.natural().build());
+        this.context = new JSONJAXBContext(JSONConfiguration.natural().rootUnwrapping(false).build(),cTypes);
     }
 
     @Override

@@ -32,10 +32,6 @@ public class HubContext {
     }
     
     private HubContext() {
-    	
-    	Gateway nativeGw = new NativeGateway();
-    	nativeGw.open();
-    	gateways.add(nativeGw);
     }
     
     public static HubContext getInstance() {

@@ -1,5 +1,7 @@
-package it.uniud.easyhome.gateway.it;
+package it.uniud.easyhome.rest;
 
+import static org.junit.Assert.*;
+import it.uniud.easyhome.gateway.ProtocolType;
 import it.uniud.easyhome.xbee.XBeeConstants;
 
 import java.io.BufferedInputStream;
@@ -9,15 +11,57 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+
 import org.codehaus.jackson.util.ByteArrayBuilder;
+import org.junit.After;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class DeviceAnnounceIT {
     
-    public static void main(String[] args) throws NumberFormatException, UnknownHostException, IOException {
+	private final static int XBEE_GATEWAY_PORT = 5050;
+	
+	private static final String TARGET = "http://localhost:8080/easyhome/rest/";
+	
+	private static Client client;
+	
+	@BeforeClass
+    public static void setup() {
+
+        client = Client.create();
+    }
+		
+    @After
+    public void clearGateways() {
+    	client.resource(TARGET).path("hub").path("gateways").delete();
+    }
+    
+    private ClientResponse insertGateway(int port, ProtocolType protocol) {
         
-        Socket xbeeSkt1 = new Socket(args[0],Integer.parseInt(args[1]));
-        
-        Socket xbeeSkt2 = new Socket(args[0],6060);
+    	MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+    	formData.add("port", String.valueOf(port));
+    	formData.add("protocol", protocol.toString());
+    	ClientResponse response = client.resource(TARGET).path("hub").path("gateways")
+    							  .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
+    	
+    	return response;
+    }
+	
+    @Ignore
+	@Test
+    public void testDeviceRegistration() throws NumberFormatException, UnknownHostException, IOException {
+		
+		insertGateway(XBEE_GATEWAY_PORT, ProtocolType.XBEE);    	
+		
+        Socket xbeeSkt = new Socket("localhost",XBEE_GATEWAY_PORT);
         
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         
@@ -81,47 +125,14 @@ public class DeviceAnnounceIT {
         baos.write(0xFF - (sum & 0xFF));
         
         byte[] bytesToSend = baos.toByteArray();
-        printBytes(bytesToSend);
         
-        BufferedOutputStream os = new BufferedOutputStream(xbeeSkt1.getOutputStream());
-        BufferedInputStream is = new BufferedInputStream(xbeeSkt2.getInputStream());
+        BufferedOutputStream os = new BufferedOutputStream(xbeeSkt.getOutputStream());
         
         os.write(bytesToSend);
         os.flush();
         os.close();
-
         
-        ByteArrayBuilder ba = new ByteArrayBuilder();
-        ba.append(is.read());
-        int highLength = is.read();
-        ba.append(highLength);
-        int lowLength = is.read();
-        ba.append(lowLength);
-        int length = (highLength << 8) + lowLength;
-        int receivedSum = 0;
-        for (int i=0; i<length+1; i++) {
-        	int byteRead = is.read();
-        	ba.append(byteRead);
-        	receivedSum += byteRead;
-        }
-        if ((receivedSum & 0xFF) != 0xFF)
-        	System.out.println("Checksum failed");
-        
-        printBytes(ba.toByteArray());
-        ba.close();
-        
-        xbeeSkt1.close();
-        xbeeSkt2.close();
-    }
-    
-    private static void printBytes(byte[] bytes) {
-        StringBuilder strb = new StringBuilder();
-        for (byte b: bytes) {
-            if ((0xFF & b) < 0x10)
-                strb.append("0");
-            strb.append(Integer.toHexString(0xFF & b).toUpperCase()).append(" ");
-        }
-        System.out.println(strb.toString());    	
+        xbeeSkt.close();
     }
     
 }

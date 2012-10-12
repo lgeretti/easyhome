@@ -10,6 +10,8 @@ import it.uniud.easyhome.xbee.XBeeTransmittedPacket;
 
 import java.io.*;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 public class XBeeGateway extends Gateway {
     
     public XBeeGateway(byte id, int port) {
