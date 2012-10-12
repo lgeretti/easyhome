@@ -5,6 +5,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
+import it.uniud.easyhome.common.JsonUtils;
+import it.uniud.easyhome.gateway.Gateway;
 import it.uniud.easyhome.gateway.ProtocolType;
 import it.uniud.easyhome.network.Node;
 
@@ -21,8 +23,6 @@ import org.junit.Test;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class HubResourceIT {
@@ -41,10 +41,11 @@ public class HubResourceIT {
 	
 	@Ignore
 	@Test
-	public void noGateways() {
+	public void noGateways() throws JSONException {
 		
-		JSONObject jsonObj = client.resource(TARGET).accept(MediaType.APPLICATION_JSON).get(JSONObject.class);
-		assertTrue(jsonObj == null);
+		ClientResponse response = client.resource(TARGET).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+		List<Gateway> gateways = JsonUtils.getListFrom(response, Gateway.class);
+		assertEquals(0,gateways.size());
 	}
 	
 	@Test
@@ -54,24 +55,76 @@ public class HubResourceIT {
 		
 		assertEquals(ClientResponse.Status.CREATED,creationResponse.getClientResponseStatus());
 		
-        JSONObject jsonObj = client.resource(TARGET).accept(MediaType.APPLICATION_JSON).get(JSONObject.class);
-        JSONObject innerJsonObj = jsonObj.getJSONObject("gateway");
-        assertEquals(GATEWAY_PORT,innerJsonObj.getInt("port"));
+		ClientResponse response = client.resource(TARGET).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+		List<Gateway> gateways = JsonUtils.getListFrom(response, Gateway.class);
+		assertEquals(1,gateways.size());
 	}
 	
 	@Test
 	public void createTwoGateways() throws JSONException {
 		
-		ClientResponse creationResponse = insertGateway(GATEWAY_PORT,GATEWAY_PROTOCOL);
-		assertEquals(ClientResponse.Status.CREATED,creationResponse.getClientResponseStatus());
-
+		insertGateway(GATEWAY_PORT,GATEWAY_PROTOCOL);
+		
 		ClientResponse creationResponse2 = insertGateway(GATEWAY_PORT+1,GATEWAY_PROTOCOL);
 		assertEquals(ClientResponse.Status.CREATED,creationResponse2.getClientResponseStatus());
 		
-        JSONObject jsonObj = client.resource(TARGET).accept(MediaType.APPLICATION_JSON).get(JSONObject.class);
-        JSONArray innerJsonArray = jsonObj.getJSONArray("gateway");
-        assertEquals(2,innerJsonArray.length());
+		ClientResponse response = client.resource(TARGET).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+		List<Gateway> gateways = JsonUtils.getListFrom(response, Gateway.class);
+		assertEquals(2,gateways.size());
 	}	
+	
+	@Test
+	public void deleteGateway() throws JSONException {
+		
+		insertGateway(GATEWAY_PORT,GATEWAY_PROTOCOL);
+		
+    	ClientResponse deletionResponse =  client.resource(TARGET).delete(ClientResponse.class);
+    	
+    	assertEquals(ClientResponse.Status.OK,deletionResponse.getClientResponseStatus());
+	}
+	
+    @Test
+    public void putRoutingEntry() {
+        
+        int srcGatewayPort = 5000;
+        int dstGid = 2;
+        long dstNuid = 0x55AAAAAA;
+        int dstAddress = 20;
+        int dstPort = 4;
+        
+        ProtocolType protocol = ProtocolType.XBEE;
+        
+        ClientResponse gwInsertionResponse = insertGateway(srcGatewayPort,protocol);
+        assertEquals(ClientResponse.Status.CREATED,gwInsertionResponse.getClientResponseStatus());
+        String locationPath = gwInsertionResponse.getLocation().getPath();
+        String[] segments = locationPath.split("/");
+        int gid = Integer.parseInt(segments[segments.length-1]);
+        
+        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+        
+        formData.add("gid",String.valueOf(dstGid));
+        formData.add("nuid",String.valueOf(dstNuid));
+        formData.add("address",String.valueOf(dstAddress));
+        formData.add("port",String.valueOf(dstPort));
+        
+        ClientResponse routingInsertionResponse = client.resource(TARGET)
+                                            		.path(String.valueOf(gid))
+                                            		.path("routing")
+                                            		.post(ClientResponse.class,formData); 
+        
+        assertEquals(ClientResponse.Status.CREATED,routingInsertionResponse.getClientResponseStatus());
+        
+        String count = client.resource(TARGET)
+                       .path(String.valueOf(gid))
+                       .path("routing/count")
+                       .get(String.class);
+        
+        assertEquals(1,Integer.parseInt(count));
+        
+        String routedPort = client.resource(routingInsertionResponse.getLocation().toString()).get(String.class);
+
+        assertTrue(Integer.parseInt(routedPort)>0);
+    }
 	
     @After
     public void clearGateways() {

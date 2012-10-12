@@ -29,7 +29,7 @@ public class Node {
         private Node node;
         
         public Builder(long id) {
-            if (id <= 0)
+            if (id == 0)
                 throw new IllegalArgumentException();            
             node = new Node();
             node.id = id;
@@ -43,14 +43,14 @@ public class Node {
         }
         
         public Builder setGatewayId(byte gid) {
-            if (gid <= 0)
+            if (gid == 0)
                 throw new IllegalArgumentException();
             node.gatewayId = gid;
             return this;
         }
         
         public Builder setAddress(short address) {
-            if (address <= 0)
+            if (address == 0)
                 throw new IllegalArgumentException();
             node.address = address;
             return this;

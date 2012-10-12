@@ -10,7 +10,7 @@ public class NodeTest {
     @Test(expected=IllegalArgumentException.class)
     public void testIncorrectConstruction() {
         
-        new Node.Builder(-2);
+        new Node.Builder(0);
     }
     
     @Test(expected=IllegalArgumentException.class)
