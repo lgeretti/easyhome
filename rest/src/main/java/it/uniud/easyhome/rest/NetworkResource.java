@@ -71,9 +71,9 @@ public final class NetworkResource {
         Node persistedNode = em.find(Node.class, node.getId());
         boolean existed = (persistedNode != null);
         
-        if (!existed)
+        if (!existed) {
             em.persist(node);
-        else {
+        } else {
             em.merge(node);
         }
             

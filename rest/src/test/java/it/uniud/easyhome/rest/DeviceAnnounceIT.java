@@ -1,24 +1,22 @@
 package it.uniud.easyhome.rest;
 
 import static org.junit.Assert.*;
+import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.gateway.ProtocolType;
+import it.uniud.easyhome.network.Node;
+import it.uniud.easyhome.processing.ProcessKind;
 import it.uniud.easyhome.xbee.XBeeConstants;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.net.Socket;
-import java.net.UnknownHostException;
+import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 
-import org.codehaus.jackson.util.ByteArrayBuilder;
 import org.junit.After;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.sun.jersey.api.client.Client;
@@ -42,6 +40,8 @@ public class DeviceAnnounceIT {
     @After
     public void clearGateways() {
     	client.resource(TARGET).path("hub").path("gateways").delete();
+    	client.resource(TARGET).path("processes").delete();
+    	client.resource(TARGET).path("network").delete();
     }
     
     private ClientResponse insertGateway(int port, ProtocolType protocol) {
@@ -54,12 +54,25 @@ public class DeviceAnnounceIT {
     	
     	return response;
     }
-	
-    @Ignore
+    
+    private ClientResponse insertNodeRegistrationProcess() {
+        
+    	MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+    	formData.add("kind", ProcessKind.NodeRegistration.toString());
+    	ClientResponse response = client.resource(TARGET).path("processes")
+    							  .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
+    	
+    	return response;
+    }    
+
 	@Test
-    public void testDeviceRegistration() throws NumberFormatException, UnknownHostException, IOException {
+    public void testDeviceRegistration() throws Exception {
 		
-		insertGateway(XBEE_GATEWAY_PORT, ProtocolType.XBEE);    	
+		ClientResponse gatewayInsertion = insertGateway(XBEE_GATEWAY_PORT, ProtocolType.XBEE);
+		assertEquals(ClientResponse.Status.CREATED,gatewayInsertion.getClientResponseStatus());
+		
+		ClientResponse processInsertion = insertNodeRegistrationProcess();
+		assertEquals(ClientResponse.Status.CREATED,processInsertion.getClientResponseStatus());
 		
         Socket xbeeSkt = new Socket("localhost",XBEE_GATEWAY_PORT);
         
@@ -109,15 +122,17 @@ public class DeviceAnnounceIT {
         sum += 0x02;
         // Device announce data
         // NWK addr
-        baos.write(0x5F);
-        sum += 0x5F;
+        baos.write(0x23);
+        sum += 0x23;
         baos.write(0x34);
         sum += 0x34;
         // IEEE addr
-        for (int i=0;i<8;i++) {
-	        baos.write(0x55);
-	        sum += 0x55;        
+        for (int i=0;i<7;i++) {
+	        baos.write(0x00);
+	        sum += 0x00;        
         }
+        baos.write(0x55);
+        sum += 0x55;
         // Capability (random)
         baos.write(0x7A);
         sum += 0x7A;
@@ -133,6 +148,24 @@ public class DeviceAnnounceIT {
         os.close();
         
         xbeeSkt.close();
+        
+        
+        // Robustly check that we persist the node within a reasonably high time, since 
+        // the process persists it asynchronously
+        int counter = 0;
+        long sleepTime = 500;
+        long maximumSleepTime = 5000;
+        while (sleepTime*counter < maximumSleepTime) {
+        	Thread.sleep(sleepTime);
+        	counter++;
+	    	ClientResponse getNodesResponse = client.resource(TARGET).path("network")
+						.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	    	List<Node> nodes = JsonUtils.getListFrom(getNodesResponse, Node.class);
+	    	if (nodes.size() > 0)
+	    		break;
+        }
+    	assertTrue(sleepTime*counter < maximumSleepTime);
+    	
     }
     
 }

@@ -1,21 +1,17 @@
 package it.uniud.easyhome.rest;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
 import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.gateway.Gateway;
 import it.uniud.easyhome.gateway.ProtocolType;
-import it.uniud.easyhome.network.Node;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -39,7 +35,6 @@ public class HubResourceIT {
         client = Client.create();
     }
 	
-	@Ignore
 	@Test
 	public void noGateways() throws JSONException {
 		
