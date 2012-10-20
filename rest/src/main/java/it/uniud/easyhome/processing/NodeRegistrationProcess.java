@@ -48,13 +48,16 @@ public class NodeRegistrationProcess extends Process {
         		NodeAnnouncePacket announce = new NodeAnnouncePacket(pkt);
         		
         		long nuid = announce.getAnnouncedNuid();
-        		short address = announce.getAnnouncedAddress();
         		byte gatewayId = announce.getSrcCoords().getGatewayId();
+        		short address = announce.getAnnouncedAddress();
+        		byte capability = announce.getAnnouncedCapability();
         		
                 Node.Builder nodeBuilder = new Node.Builder(nuid);
                 Node node = nodeBuilder.setName(Long.toHexString(nuid))
+                					   .setGatewayId(gatewayId)
                 					   .setAddress(address)
-                					   .setGatewayId(gatewayId).build();
+                					   .setCapability(capability)
+                					   .build();
                 
                 ClientResponse response = restResource.path("network")
                 		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);

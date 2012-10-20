@@ -29,6 +29,7 @@ public class NodeTest {
         nb.setName("test");
         nb.setGatewayId((byte)2);
         nb.setAddress((short)15);
+        nb.setCapability((byte)14);
         
         Node node = nb.build();
         

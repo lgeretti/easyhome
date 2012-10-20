@@ -21,6 +21,8 @@ public class Node {
     private byte gatewayId;
     @Column(nullable = false)
     private short address;    
+    @Column(nullable = false)
+    private byte capability;
     
     private Node() {}
 
@@ -56,9 +58,16 @@ public class Node {
             return this;
         }        
         
+        public Builder setCapability(byte capability) {
+        	if (capability == 0)
+                throw new IllegalArgumentException();
+            node.capability = capability;
+            return this;        		
+        }
+        
         public Node build() {
             
-        	if ((node.gatewayId == 0) || (node.address == 0) || (node.name == null))
+        	if ((node.gatewayId == 0) || (node.address == 0) || (node.capability == 0) || (node.name == null))
         		throw new NodeConstructionException();
         	
             return node;
@@ -80,6 +89,10 @@ public class Node {
     public short getAddress() {
         return this.address;
     }
+    
+    public byte getCapability() {
+    	return this.capability;
+    }
 
     @Override
     public boolean equals(Object other) {
@@ -92,6 +105,7 @@ public class Node {
         if (!this.name.equals(otherNode.name)) return false;
         if (!(this.gatewayId == otherNode.gatewayId)) return false;
         if (!(this.address == otherNode.address)) return false;
+        if (!(this.capability == otherNode.capability)) return false;
         
         return true;
     }
@@ -105,6 +119,7 @@ public class Node {
         result = prime * result + name.hashCode();
         result = prime * result + gatewayId;
         result = prime * result + address;
+        result = prime * result + capability;
         
         return (int)result;
     }

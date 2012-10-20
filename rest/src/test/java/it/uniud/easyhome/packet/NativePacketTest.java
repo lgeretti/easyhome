@@ -1,4 +1,4 @@
-package it.uniud.easyhome.network;
+package it.uniud.easyhome.packet;
 
 
 import static org.junit.Assert.*;

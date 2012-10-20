@@ -39,7 +39,6 @@ public class NetworkResourceIT {
 		assertEquals(0,nodeList.size());
 	}
 	
-	
 	@Test
 	public void testInsert() throws JSONException {
 		
@@ -48,10 +47,11 @@ public class NetworkResourceIT {
         nb.setName("test");
         nb.setGatewayId((byte)2);
         nb.setAddress((short)15);
+        nb.setCapability((byte)14);
         
         Node node = nb.build();
        
-        ClientResponse insertionResponse = postNode(node.getId(),node.getName(),node.getGatewayId(),node.getAddress());
+        ClientResponse insertionResponse = postNode(node.getId(),node.getName(),node.getGatewayId(),node.getAddress(),node.getCapability());
         assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
 
         Node recoveredNode = client.resource(TARGET).path("10").accept(MediaType.APPLICATION_JSON).get(Node.class);
@@ -73,12 +73,13 @@ public class NetworkResourceIT {
         nb.setName("test");
         nb.setGatewayId((byte)2);
         nb.setAddress((short)15);
+        nb.setCapability((byte)14);
         
         Node node = nb.build();
        
-        postNode(node.getId(),node.getName(),node.getGatewayId(),node.getAddress());
+        postNode(node.getId(),node.getName(),node.getGatewayId(),node.getAddress(),node.getCapability());
 		
-		ClientResponse updateResponse = postNode(node.getId(),node.getName(),node.getGatewayId(),(short)(node.getAddress()+1));
+		ClientResponse updateResponse = postNode(node.getId(),node.getName(),node.getGatewayId(),(short)(node.getAddress()+1),node.getCapability());
         assertEquals(ClientResponse.Status.OK,updateResponse.getClientResponseStatus());
         
         ClientResponse getUpdatedNodeResponse = client.resource(TARGET).path(String.valueOf(node.getId()))
@@ -97,8 +98,8 @@ public class NetworkResourceIT {
 	@Test
 	public void multipleNodes() throws JSONException {
 		
-		postNode(1L,"test",(byte)2,(short)3333);
-		postNode(2L,"test",(byte)2,(short)3333);
+		postNode(1L,"test",(byte)2,(short)3333,(byte)14);
+		postNode(2L,"test",(byte)2,(short)3333,(byte)14);
 		
 		ClientResponse response = client.resource(TARGET).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         List<Node> nodeList = JsonUtils.getListFrom(response,Node.class);
@@ -111,10 +112,10 @@ public class NetworkResourceIT {
 		client.resource(TARGET).delete();
 	}
 	
-	private ClientResponse postNode(long id, String name, byte gatewayId, short address) {
+	private ClientResponse postNode(long id, String name, byte gatewayId, short address, byte capability) {
 		
 		Node.Builder nb = new Node.Builder(id);
-        Node node = nb.setName(name).setGatewayId(gatewayId).setAddress(address).build();
+        Node node = nb.setName(name).setGatewayId(gatewayId).setAddress(address).setCapability(capability).build();
         
         return client.resource(TARGET).type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
 	}
