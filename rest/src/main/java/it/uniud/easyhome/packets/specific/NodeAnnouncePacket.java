@@ -15,8 +15,6 @@ public class NodeAnnouncePacket extends NativePacket {
 		
 		super(srcCoords,dstCoords,op);
 		
-		System.out.println(srcCoords + " " + dstCoords + " " + op + " length = " + op.getData().length);
-		
 		if (srcCoords.getEndpoint() != 0 || dstCoords.getEndpoint() != 0)
 			throw new InvalidPacketTypeException();
 		if (op.getDomain() != Domains.MANAGEMENT.getCode())

@@ -70,15 +70,8 @@ public class XBeeGateway extends Gateway {
     	
     	if (is.available() == 0)
     		throw new NoBytesAvailableException();
-    		
-    	byte[] bufferBytes = buffer.toByteArray();
-		StringBuffer strbb = new StringBuffer();
-		for (int i=0; i<bufferBytes.length;i++)
-			strbb.append(Integer.toHexString(bufferBytes[i]) + " ");
-		System.out.println("Buffer bytes: " + strbb.toString());
     	
     	int readByte = is.read();
-    	System.out.println("Read: " + Integer.toHexString(readByte));
     	if (buffer.size() == 0 && ((byte)readByte) != XBeeConstants.START_DELIMITER)
     		throw new IncompletePacketException();
     	
@@ -86,11 +79,6 @@ public class XBeeGateway extends Gateway {
     	if (is.available() > 0) {
     		byte[] readBytes = new byte[is.available()];
     		is.read(readBytes);
-    		
-    		StringBuffer strb = new StringBuffer();
-    		for (int i=0; i<readBytes.length;i++)
-    			strb.append(Integer.toHexString(readBytes[i]) + " ");
-    		System.out.println("Also read: " + strb.toString());
     		
     		buffer.write(readBytes);
     	}

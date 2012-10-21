@@ -8,7 +8,6 @@ import it.uniud.easyhome.packets.Domains;
 import it.uniud.easyhome.packets.ReceivedPacket;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -114,26 +113,20 @@ public class XBeeReceivedPacket implements ReceivedPacket {
     	if (octet == -1)
     		throw new IncompletePacketException();
     	
-        if (octet != XBeeConstants.START_DELIMITER) {
-        	System.out.println("Byte received: " + Integer.toHexString(octet));
+        if (octet != XBeeConstants.START_DELIMITER)
         	throw new InvalidDelimiterException();
-        }
-        	
         	
         int highLength = is.read();
-        // (-1 because the frame type is not stored)
-        int length = highLength*256 + is.read() - 1;
+        int length = highLength*256 + is.read();
         
         if (length < 0)
         	throw new IncompletePacketException();
         
+        waitForAvailability(is, length);
+        
         byte[] packetPayload = new byte[length];
         
-        int sum = XBeeConstants.EXPLICIT_RX_INDICATOR_FRAME_TYPE;
-        byte frameType = (byte)is.read();
-        if (frameType != XBeeConstants.EXPLICIT_RX_INDICATOR_FRAME_TYPE) 
-        	throw new InvalidPacketTypeException();
-                
+        int sum = 0;
         for (int i=0; i<length; i++) {
             int readValue = is.read();
             packetPayload[i] = (byte)readValue;
@@ -146,8 +139,29 @@ public class XBeeReceivedPacket implements ReceivedPacket {
         
         handlePacketPayload(new ByteArrayInputStream(packetPayload), length);
 	}
+	
+	private void waitForAvailability(InputStream is, int length) throws IOException {
+		
+		int i = 0;
+        for (; i < 100; i++) {
+        	
+        	if (is.available() > length)
+        		break;
+        	try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				throw new IncompletePacketException();
+			}
+        }
+        if (i == 100)
+        	throw new IncompletePacketException();
+	}
 
 	private void handlePacketPayload(ByteArrayInputStream is, int packetLength) {
+		
+        byte frameType = (byte)is.read();
+        if (frameType != XBeeConstants.EXPLICIT_RX_INDICATOR_FRAME_TYPE) 
+        	throw new InvalidPacketTypeException();
 		
 		srcAddr64 = (((long)is.read()) << 56) + 
 			       (((long)is.read()) << 48) + 
@@ -178,13 +192,13 @@ public class XBeeReceivedPacket implements ReceivedPacket {
 		int apsPayloadLength = 0;
 		
 		if (Domains.isManagement(profileId)) {
-			apsPayloadLength = packetLength - 19;
+			apsPayloadLength = packetLength - 20;
 			command = 0x00;
 		} else {
-			apsPayloadLength = packetLength - 20;
+			apsPayloadLength = packetLength - 21;
 			command = (byte)is.read();
 		}
-		 
+		
 		apsPayload = new byte[apsPayloadLength];
 		
 		for (int i=0; i<apsPayloadLength; i++)
