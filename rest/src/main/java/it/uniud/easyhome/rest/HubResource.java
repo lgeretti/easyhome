@@ -33,7 +33,7 @@ public class HubResource {
     	return String.valueOf(networkContext.getGateways().size());
     }
     
-    // curl -X POST http://localhost:8080/easyhome/rest/hub/gateways -H "Content-Type: application/x-www-form-urlencoded" --data-binary "port=5000&protocol=XBEE" 
+    // curl -X POST http://localhost:8080/easyhome/rest/hub/gateways -H "Content-Type: application/x-www-form-urlencoded" --data-binary "port=5100&protocol=XBEE" 
     @POST
     @Path("gateways")
     public Response registerGateway(@FormParam("protocol") ProtocolType protocol,

@@ -12,11 +12,11 @@ public class NodeCoordinates implements Serializable {
 
 	private static final long serialVersionUID = 458835586884747577L;
     
-    // Gateway (and consequently subnetwork) identifier (>0)
+    // Gateway (and consequently subnetwork) identifier (!=0)
     private byte gid;
     // Node unique id (global address, like a IEEE MAC address, fixed for a node)
     private long nuid;
-    // Address within the network (>0)
+    // Address within the network (!=0)
     private short address;
     
     public byte getGatewayId() {

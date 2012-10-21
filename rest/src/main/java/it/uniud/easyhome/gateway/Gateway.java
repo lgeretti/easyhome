@@ -1,10 +1,15 @@
 package it.uniud.easyhome.gateway;
 
+import it.uniud.easyhome.exceptions.IncompletePacketException;
+import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
+import it.uniud.easyhome.exceptions.NoBytesAvailableException;
 import it.uniud.easyhome.packets.ModuleCoordinates;
 import it.uniud.easyhome.packets.NativePacket;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -164,12 +169,11 @@ public class Gateway implements Runnable {
                 
                 jmsConnection.start();
 
+                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                
                 while (!disconnected) {
-                    
-                	if (istream.available() > 0) {
-	                    handleInboundPacketFrom(istream,jmsSession,inboundProducer,outboundProducer);
-                	}
-                    
+                	
+		            handleInboundPacketFrom(istream,buffer,jmsSession,inboundProducer,outboundProducer);
                     handleOutboundPacketsTo(ostream,outboundConsumer);	                    
                 }
             
@@ -221,20 +225,26 @@ public class Gateway implements Runnable {
         }
     }
     
-    private void handleInboundPacketFrom(InputStream is, Session jmsSession,
+    private void handleInboundPacketFrom(InputStream is, ByteArrayOutputStream buffer, Session jmsSession,
     		MessageProducer inboundProducer, MessageProducer outboundProducer) throws IOException {
         
         try {
         	
-        	NativePacket nativePkt = readFrom(is);
+        	NativePacket nativePkt = readFrom(is,buffer);
         	dispatchPacket(nativePkt,jmsSession,inboundProducer,outboundProducer);
-        	
-        } catch (IOException ex) {
+        	buffer.reset(); // Only if we successfully dispatched, then we can discard whatever we accumulated
+        } catch (NoBytesAvailableException ex) {
+        	// Just move on
+        } catch (IncompletePacketException ex) {
+        	// Just move on      
+        } catch (InvalidPacketTypeException ex) {
+        	// Just move on
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
     
-    protected NativePacket readFrom(InputStream is) throws IOException {
+    protected NativePacket readFrom(InputStream is, ByteArrayOutputStream buffer) throws IOException {
     	// To be overridden
     	return null;
     }

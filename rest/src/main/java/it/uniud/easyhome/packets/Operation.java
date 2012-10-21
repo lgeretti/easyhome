@@ -89,4 +89,20 @@ public class Operation implements Serializable {
 
         os.write(data);
     }
+    
+    public String toString() {
+    	StringBuilder strb = new StringBuilder();
+    	
+    	strb.append("{D: ")
+    		.append(domain)
+    		.append("; Cx: ")
+    		.append(context);
+    	
+    	if (Domains.isManagement(domain))
+    		strb.append("; Cm: ").append(command);
+    	
+    	strb.append("}");
+    	
+    	return strb.toString();    	
+    }
 }

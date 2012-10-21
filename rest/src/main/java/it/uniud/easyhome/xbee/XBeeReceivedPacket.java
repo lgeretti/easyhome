@@ -1,11 +1,14 @@
 package it.uniud.easyhome.xbee;
 
 import it.uniud.easyhome.exceptions.ChecksumException;
+import it.uniud.easyhome.exceptions.IncompletePacketException;
 import it.uniud.easyhome.exceptions.InvalidDelimiterException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
+import it.uniud.easyhome.packets.Domains;
 import it.uniud.easyhome.packets.ReceivedPacket;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -109,14 +112,20 @@ public class XBeeReceivedPacket implements ReceivedPacket {
     	int octet = is.read();
     	
     	if (octet == -1)
-    		throw new IOException();
+    		throw new IncompletePacketException();
     	
-        if (octet != XBeeConstants.START_DELIMITER)
+        if (octet != XBeeConstants.START_DELIMITER) {
+        	System.out.println("Byte received: " + Integer.toHexString(octet));
         	throw new InvalidDelimiterException();
+        }
+        	
         	
         int highLength = is.read();
         // (-1 because the frame type is not stored)
         int length = highLength*256 + is.read() - 1;
+        
+        if (length < 0)
+        	throw new IncompletePacketException();
         
         byte[] packetPayload = new byte[length];
         
@@ -135,10 +144,10 @@ public class XBeeReceivedPacket implements ReceivedPacket {
         if (0xFF != (sum & 0xFF)) 
         	throw new ChecksumException();
         
-        handlePacketPayload(new ByteArrayInputStream(packetPayload), length-20);
+        handlePacketPayload(new ByteArrayInputStream(packetPayload), length);
 	}
 
-	private void handlePacketPayload(ByteArrayInputStream is, int apsPayloadLength) {
+	private void handlePacketPayload(ByteArrayInputStream is, int packetLength) {
 		
 		srcAddr64 = (((long)is.read()) << 56) + 
 			       (((long)is.read()) << 48) + 
@@ -149,11 +158,16 @@ public class XBeeReceivedPacket implements ReceivedPacket {
 			       (((long)is.read()) << 8) + 
 			       (long)is.read();
 	    srcAddr16 = (short)((is.read() << 8) + is.read());
-		srcEndpoint = (byte)is.read(); 
-		dstEndpoint = (byte)is.read();
+	    
+	    byte readSrcEndpoint = (byte)is.read(); 
+		srcEndpoint = (readSrcEndpoint == 1 ? 0 : readSrcEndpoint);
+		byte readDstEndpoint = (byte)is.read();
+		dstEndpoint = (readDstEndpoint == 1 ? 0 : readSrcEndpoint);
 		         
 		clusterId = (short)((is.read() << 8) + is.read());
-		profileId = (short)((is.read() << 8) + is.read());
+		
+		short readProfile = (short)((is.read() << 8) + is.read());
+		profileId = (Domains.isManagement(readProfile) ? 0 : readProfile);
 		 
 		receiveOptions = (byte)is.read();
 		 
@@ -161,7 +175,15 @@ public class XBeeReceivedPacket implements ReceivedPacket {
 		 
 		transactionSeqNumber = (byte)is.read();
 		 
-		command = (byte)is.read();
+		int apsPayloadLength = 0;
+		
+		if (Domains.isManagement(profileId)) {
+			apsPayloadLength = packetLength - 19;
+			command = 0x00;
+		} else {
+			apsPayloadLength = packetLength - 20;
+			command = (byte)is.read();
+		}
 		 
 		apsPayload = new byte[apsPayloadLength];
 		

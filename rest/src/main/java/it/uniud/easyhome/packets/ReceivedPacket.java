@@ -5,5 +5,5 @@ import java.io.InputStream;
 
 public interface ReceivedPacket {
 
-	public void read(InputStream os) throws IOException;
+	public void read(InputStream is) throws IOException;
 }

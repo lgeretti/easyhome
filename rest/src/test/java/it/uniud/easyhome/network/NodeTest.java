@@ -19,12 +19,12 @@ public class NodeTest {
         Node.Builder nb = new Node.Builder(1);
         
         nb.setName(null);
-    }   
+    }
     
     @Test
     public void testConstruction() {
         
-        Node.Builder nb = new Node.Builder(10);
+        Node.Builder nb = new Node.Builder(10L);
         
         nb.setName("test");
         nb.setGatewayId((byte)2);
@@ -33,7 +33,7 @@ public class NodeTest {
         
         Node node = nb.build();
         
-        assertEquals(10, node.getId());
+        assertEquals(10L, node.getId());
         assertEquals("test", node.getName());
     }
     

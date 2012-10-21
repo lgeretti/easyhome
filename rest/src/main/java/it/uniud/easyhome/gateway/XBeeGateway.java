@@ -1,16 +1,17 @@
 package it.uniud.easyhome.gateway;
 
 import it.uniud.easyhome.exceptions.IllegalBroadcastPortException;
+import it.uniud.easyhome.exceptions.IncompletePacketException;
+import it.uniud.easyhome.exceptions.NoBytesAvailableException;
 import it.uniud.easyhome.exceptions.RoutingEntryMissingException;
 import it.uniud.easyhome.packets.ModuleCoordinates;
 import it.uniud.easyhome.packets.NativePacket;
 import it.uniud.easyhome.packets.Operation;
+import it.uniud.easyhome.xbee.XBeeConstants;
 import it.uniud.easyhome.xbee.XBeeReceivedPacket;
 import it.uniud.easyhome.xbee.XBeeTransmittedPacket;
 
 import java.io.*;
-
-import javax.xml.bind.annotation.XmlRootElement;
 
 public class XBeeGateway extends Gateway {
     
@@ -29,9 +30,9 @@ public class XBeeGateway extends Gateway {
         ModuleCoordinates dstCoords = null;
         
         // If a broadcast, we use the broadcast format for the destination coordinates, but only
-        // if the destination port is actually the administration port
+        // if the destination port are actually the administration ports
         if (receiveOptions == 0x02) {
-        	if (dstEndpoint == 0x00) {        		
+        	if (dstEndpoint == 0x00 || dstEndpoint == 0x01) {        		
 	        	dstCoords = new ModuleCoordinates((byte)0,(short)0xFFFF,(short)0xFFFE,(byte)0);
 	        	println("Setting destination as broadcast");
         	} else {
@@ -61,19 +62,41 @@ public class XBeeGateway extends Gateway {
     }
     
     @Override
-    final protected NativePacket readFrom(InputStream is) throws IOException {
-
+    final protected NativePacket readFrom(InputStream is, ByteArrayOutputStream buffer) throws IOException {
+    	
     	NativePacket result = null;
-    	try {
-	    	XBeeReceivedPacket xbeePkt = new XBeeReceivedPacket();
-	    	xbeePkt.read(is);
-	    	result = convertFrom(xbeePkt);
-    	} catch (Exception ex) {
-    		if (ex instanceof IOException)
-    			throw ex;
+    	
+    	XBeeReceivedPacket xbeePkt = new XBeeReceivedPacket();
+    	
+    	if (is.available() == 0)
+    		throw new NoBytesAvailableException();
     		
-    		ex.printStackTrace();
+    	byte[] bufferBytes = buffer.toByteArray();
+		StringBuffer strbb = new StringBuffer();
+		for (int i=0; i<bufferBytes.length;i++)
+			strbb.append(Integer.toHexString(bufferBytes[i]) + " ");
+		System.out.println("Buffer bytes: " + strbb.toString());
+    	
+    	int readByte = is.read();
+    	System.out.println("Read: " + Integer.toHexString(readByte));
+    	if (buffer.size() == 0 && ((byte)readByte) != XBeeConstants.START_DELIMITER)
+    		throw new IncompletePacketException();
+    	
+    	buffer.write(readByte);
+    	if (is.available() > 0) {
+    		byte[] readBytes = new byte[is.available()];
+    		is.read(readBytes);
+    		
+    		StringBuffer strb = new StringBuffer();
+    		for (int i=0; i<readBytes.length;i++)
+    			strb.append(Integer.toHexString(readBytes[i]) + " ");
+    		System.out.println("Also read: " + strb.toString());
+    		
+    		buffer.write(readBytes);
     	}
+    	
+    	xbeePkt.read(new ByteArrayInputStream(buffer.toByteArray()));
+    	result = convertFrom(xbeePkt);
     	
     	return result;
     }

@@ -17,6 +17,7 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.junit.After;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.sun.jersey.api.client.Client;
@@ -81,9 +82,9 @@ public class DeviceAnnounceIT {
         int sum = 0;
         // Delimiter
         baos.write(XBeeConstants.START_DELIMITER);
-        // Length (32)
+        // Length (31)
         baos.write(0x00);
-        baos.write(0x20);
+        baos.write(0x1F);
         // Frame type
         baos.write(XBeeConstants.EXPLICIT_RX_INDICATOR_FRAME_TYPE);
         sum += XBeeConstants.EXPLICIT_RX_INDICATOR_FRAME_TYPE;
@@ -96,18 +97,18 @@ public class DeviceAnnounceIT {
         sum += 0x7D;
         sum += 0xB3;
         // Source endpoint
-        baos.write(0x00);
-        sum += 0x00;
+        baos.write(0x01);
+        sum += 0x01;
         // Destination endpoint
-        baos.write(0x00);
-        sum += 0x00;
+        baos.write(0x01);
+        sum += 0x01;
         // Cluster Id (DeviceAnnce)
         baos.write(new byte[]{0x00,0x13});
         sum += 0x13;
-        // Profile Id (ZDP)
-        baos.write(new byte[]{0x00,0x00});
-        sum += 0x00;
-        sum += 0x00;
+        // Profile Id (EasyHome ZDP)
+        baos.write(new byte[]{(byte)0xEA,0x50});
+        sum += 0xEA;
+        sum += 0x50;
         // Receive options (0x02: packet was a broadcast; 0x00 otherwise)
         baos.write(0x02);
         sum += 0x02;
@@ -117,9 +118,6 @@ public class DeviceAnnounceIT {
         // Transaction sequence number (arbitrary)
         baos.write(0x71);
         sum += 0x71;
-        // Command (toggle)
-        baos.write(0x02);
-        sum += 0x02;
         // Device announce data
         // NWK addr
         baos.write(0x23);

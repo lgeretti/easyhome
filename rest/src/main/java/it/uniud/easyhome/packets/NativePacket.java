@@ -11,6 +11,7 @@ import java.io.Serializable;
 public class NativePacket implements Serializable {
 
     private static final long serialVersionUID = -6680743462870235932L;
+    public static final byte DELIMITER = (byte)0xEA;
     
     private ModuleCoordinates srcCoords;
     private ModuleCoordinates dstCoords;
@@ -39,7 +40,7 @@ public class NativePacket implements Serializable {
     	try {
 	        byte delimiter = (byte)is.read();
 	        
-	        if (delimiter != (byte)0xEA)
+	        if (delimiter != DELIMITER)
 	            throw new InvalidDelimiterException();
 	        
 	        int highLength = is.read();

@@ -70,6 +70,7 @@ public class NodeRegistrationProcess extends Process {
                 	println("Node announcement registration failed");
                 
         	} catch (InvalidPacketTypeException ex) {
+        		ex.printStackTrace();
         		return;
         	}
     	}

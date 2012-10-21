@@ -1,5 +1,6 @@
 package it.uniud.easyhome.xbee;
 
+import it.uniud.easyhome.packets.Domains;
 import it.uniud.easyhome.packets.NativePacket;
 import it.uniud.easyhome.packets.TransmittedPacket;
 
@@ -134,7 +135,8 @@ public class XBeeTransmittedPacket implements TransmittedPacket {
     	
 		os.write(XBeeConstants.START_DELIMITER);
 		
-		int length = 23 + apsPayload.length;
+		// If not using the management profile, the command byte is not present
+		int length = 22 + apsPayload.length + (Domains.isManagement(profileId) ? 0 : 1);
 		
 		// High and low lengths
 		os.write((length >>> 8) & 0xFF);
@@ -162,11 +164,14 @@ public class XBeeTransmittedPacket implements TransmittedPacket {
 			sum += val;
 		}		
 		// Source endpoint;
-		os.write(srcEndpoint);
-		sum += srcEndpoint;
+		
+		byte srcEndpointToWrite = (srcEndpoint == 0 ? 1 : srcEndpoint);
+		os.write(srcEndpointToWrite);
+		sum += srcEndpointToWrite;
 		// Destination endpoint
-		os.write(dstEndpoint);
-		sum += dstEndpoint;
+		byte dstEndpointToWrite = (dstEndpoint == 0 ? 1 : dstEndpoint);
+		os.write(dstEndpointToWrite);
+		sum += dstEndpointToWrite;
 		// Cluster ID
 		for (int j=8; j>=0; j-=8) {
 			byte val = (byte)((clusterId >>> j) & 0xFF);
@@ -174,8 +179,9 @@ public class XBeeTransmittedPacket implements TransmittedPacket {
 			sum += val;
 		}			
 		// Profile ID
+		short profileIdToWrite = (profileId == 0 ? Domains.EASYHOME_MANAGEMENT.getCode() : profileId);
 		for (int j=8; j>=0; j-=8) {
-			byte val = (byte)((profileId >>> j) & 0xFF);
+			byte val = (byte)((profileIdToWrite >>> j) & 0xFF);
 			os.write(val);
 			sum += val;
 		}			
@@ -191,8 +197,10 @@ public class XBeeTransmittedPacket implements TransmittedPacket {
 		// Transaction sequence number
 		os.write(transactionSeqNumber);
 		sum += transactionSeqNumber;
-		os.write(command);
-		sum += command;
+		if (!Domains.isManagement(profileId)) {
+			os.write(command);
+			sum += command;
+		}
 		// Aps payload
 		for (byte b: apsPayload) {
 			os.write(b);
