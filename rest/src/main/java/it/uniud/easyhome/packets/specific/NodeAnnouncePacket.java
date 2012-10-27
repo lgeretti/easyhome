@@ -11,6 +11,8 @@ public class NodeAnnouncePacket extends NativePacket {
 
 	private static final long serialVersionUID = -5541681898302354205L;
 
+	private static final int APS_PAYLOAD_LENGTH = 11;
+	
 	public NodeAnnouncePacket(ModuleCoordinates srcCoords, ModuleCoordinates dstCoords, Operation op) {
 		
 		super(srcCoords,dstCoords,op);
@@ -21,7 +23,7 @@ public class NodeAnnouncePacket extends NativePacket {
 			throw new InvalidPacketTypeException();
 		if (op.getContext() != Contexts.NODE_ANNOUNCE.getCode())
 			throw new InvalidPacketTypeException();
-		if (op.getData().length != 11)
+		if (op.getData().length != APS_PAYLOAD_LENGTH)
 			throw new InvalidPacketTypeException();
 	}
 	
@@ -39,10 +41,10 @@ public class NodeAnnouncePacket extends NativePacket {
 		long result = 0;
 		for (int i=56,j=2; i>=0; i-=8,j+=1)
 			result += ((long)data[j])<<i;
-		return result; 
+		return result;
 	}
 	
 	public byte getAnnouncedCapability() {
-		return getOperation().getData()[10];
+		return getOperation().getData()[APS_PAYLOAD_LENGTH-1];
 	}
 }

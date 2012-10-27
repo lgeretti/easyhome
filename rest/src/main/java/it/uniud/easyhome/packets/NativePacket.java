@@ -8,7 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 
-public class NativePacket implements Serializable {
+public class NativePacket implements Serializable, Packet {
 
     private static final long serialVersionUID = -6680743462870235932L;
     public static final byte DELIMITER = (byte)0xEA;
@@ -55,6 +55,7 @@ public class NativePacket implements Serializable {
     	}
     }
     
+    @Override
     public byte[] getBytes() {
         
         int payloadLength = 2*ModuleCoordinates.OCTETS+Operation.FIXED_OCTETS+operation.getData().length;

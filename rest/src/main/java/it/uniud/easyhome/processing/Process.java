@@ -108,7 +108,7 @@ public class Process implements Runnable {
 	    	
 	        jmsConnection.start();
 	        
-	        println("processing started");
+	        println("Processing started");
 	        
 	    	while (!isStopped()) 
 	    		process(consumer,producer);
@@ -130,6 +130,6 @@ public class Process implements Runnable {
     		restClient.destroy();
     	}
     	
-    	println("processing stopped");
+    	println("Processing stopped");
     }
 }

@@ -152,7 +152,7 @@ public class Gateway implements Runnable {
                 disconnected = false;
                 
                 InputStream istream = new BufferedInputStream(skt.getInputStream());
-                BufferedOutputStream ostream = new BufferedOutputStream(skt.getOutputStream());
+                OutputStream ostream = new BufferedOutputStream(skt.getOutputStream());
                 
     	   		Context jndiContext = new InitialContext();
     	        ConnectionFactory connectionFactory = (ConnectionFactory) jndiContext.lookup("jms/easyhome/ConnectionFactory");
