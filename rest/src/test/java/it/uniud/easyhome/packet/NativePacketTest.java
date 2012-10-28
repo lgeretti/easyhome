@@ -4,6 +4,7 @@ package it.uniud.easyhome.packet;
 import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.Arrays;
 
 import it.uniud.easyhome.packets.NativePacket;
@@ -13,7 +14,7 @@ import org.junit.*;
 public class NativePacketTest {
 
     @Test
-    public void checkConstruction() {
+    public void checkConstruction() throws IOException {
         
         byte[] sampleData = new byte[]
                        {0x00,       // source network

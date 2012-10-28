@@ -1,27 +1,22 @@
 package it.uniud.easyhome.xbee;
 
+import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.packets.Domains;
 import it.uniud.easyhome.packets.NativePacket;
-import it.uniud.easyhome.packets.TransmittedPacket;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
-public class XBeeTransmittedPacket implements TransmittedPacket {
+public class XBeeTransmittedPacket extends XBeePacket {
 	
-	private byte frameId = 0x00;
 	private long dstAddr64;
 	private short dstAddr16;
-	private byte srcEndpoint;
-	private byte dstEndpoint;
-	private short clusterId;
-	private short profileId;
+	private byte frameId = 0x00;
 	private byte broadcastRadius = 0x00;
 	private byte transmitOptions = 0x00;
-	private byte frameControl = 0x00;
-	private byte transactionSeqNumber = 0x00;
-	private byte command = 0x00;
-	private byte[] apsPayload = new byte[0];
 	
 	public XBeeTransmittedPacket() {
 	}
@@ -60,34 +55,6 @@ public class XBeeTransmittedPacket implements TransmittedPacket {
 	public void set16BitDstAddr(short dstAddr16) {
 		this.dstAddr16 = dstAddr16;
 	}
-
-	public byte getSrcEndpoint() {
-		return srcEndpoint;
-	}
-	public void setSrcEndpoint(byte srcEndpoint) {
-		this.srcEndpoint = srcEndpoint;
-	}
-
-	public byte getDstEndpoint() {
-		return dstEndpoint;
-	}
-	public void setDstEndpoint(byte dstEndpoint) {
-		this.dstEndpoint = dstEndpoint;
-	}
-	
-	public short getClusterId() {
-		return clusterId;
-	}
-	public void setClusterId(short clusterId) {
-		this.clusterId = clusterId;
-	}
-	
-	public short getProfileId() {
-		return profileId;
-	}
-	public void setProfileId(short profileId) {
-		this.profileId = profileId;
-	}
 	
 	public byte getBroadcastRadius() {
 		return broadcastRadius;
@@ -103,36 +70,11 @@ public class XBeeTransmittedPacket implements TransmittedPacket {
 		this.transmitOptions = transmitOptions;
 	}
 	
-	public byte getFrameControl() {
-		return frameControl;
-	}
-	public void setFrameControl(byte frameControl) {
-		this.frameControl = frameControl;
-	}
-	
-	public byte getTransactionSeqNumber() {
-		return transactionSeqNumber;
-	}
-	public void setTransactionSeqNumber(byte transactionSeqNumber) {
-		this.transactionSeqNumber = transactionSeqNumber;
-	}
-	
-	public byte getCommand() {
-		return command;
-	}
-	public void setCommand(byte command) {
-		this.command = command;
-	}
-	
-	public byte[] getApsPayload() {
-		return apsPayload;
-	}
-	public void setApsPayload(byte[] apsPayload) {
-		this.apsPayload = apsPayload;
-	}
 	@Override
-	public void write(OutputStream os) throws IOException {
-    	
+	public byte[] getBytes() {
+		
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		
 		os.write(XBeeConstants.START_DELIMITER);
 		
 		// If not using the management profile, the command byte is not present
@@ -208,6 +150,59 @@ public class XBeeTransmittedPacket implements TransmittedPacket {
 		}
 		// Checksum
 		os.write(0xFF - (sum & 0xFF));
-		os.flush();
+		
+		return os.toByteArray();
 	}
+
+	@Override
+	protected void handlePacketPayload(ByteArrayInputStream is, int packetLength) {
+
+        byte frameType = (byte)is.read();
+        if (frameType != XBeeConstants.EXPLICIT_ADDRESSING_COMMAND_FRAME_TYPE) 
+        	throw new InvalidPacketTypeException();
+		
+		dstAddr64 = (((long)is.read()) << 56) + 
+			       (((long)is.read()) << 48) + 
+			       (((long)is.read()) << 40) + 
+			       (((long)is.read()) << 32) +
+			       (((long)is.read()) << 24) + 
+			       (((long)is.read()) << 16) + 
+			       (((long)is.read()) << 8) + 
+			       (long)is.read();
+	    dstAddr16 = (short)((is.read() << 8) + is.read());
+	    
+	    byte readSrcEndpoint = (byte)is.read(); 
+		srcEndpoint = (readSrcEndpoint == 1 ? 0 : readSrcEndpoint);
+		byte readDstEndpoint = (byte)is.read();
+		dstEndpoint = (readDstEndpoint == 1 ? 0 : readSrcEndpoint);
+		         
+		clusterId = (short)((is.read() << 8) + is.read());
+		
+		short readProfile = (short)((is.read() << 8) + is.read());
+		profileId = (Domains.isManagement(readProfile) ? 0 : readProfile);
+		 
+		broadcastRadius = (byte)is.read();
+		
+		transmitOptions = (byte)is.read();
+		 
+		frameControl = (byte)is.read();
+		 
+		transactionSeqNumber = (byte)is.read();
+		 
+		int apsPayloadLength = 0;
+		
+		if (Domains.isManagement(profileId)) {
+			apsPayloadLength = packetLength - 20;
+			command = 0x00;
+		} else {
+			apsPayloadLength = packetLength - 21;
+			command = (byte)is.read();
+		}
+		
+		apsPayload = new byte[apsPayloadLength];
+		
+		for (int i=0; i<apsPayloadLength; i++)
+			apsPayload[i] = (byte)is.read();
+	}
+	
 }

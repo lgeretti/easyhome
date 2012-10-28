@@ -35,24 +35,9 @@ public class NativePacket implements Serializable, Packet {
         this.operation = op;
     }
     
-    public NativePacket(InputStream is) {
+    public NativePacket(InputStream is) throws IOException {
         
-    	try {
-	        byte delimiter = (byte)is.read();
-	        
-	        if (delimiter != DELIMITER)
-	            throw new InvalidDelimiterException();
-	        
-	        int highLength = is.read();
-	        int length = highLength*256+is.read();
-	        
-	        srcCoords = new ModuleCoordinates(is);
-	        dstCoords = new ModuleCoordinates(is);
-	        operation = new Operation(is,length-2*ModuleCoordinates.OCTETS-Operation.FIXED_OCTETS);
-        
-    	} catch (IOException ex) {
-    		ex.printStackTrace();
-    	}
+    	this.read(is);
     }
     
     @Override
@@ -76,13 +61,26 @@ public class NativePacket implements Serializable, Packet {
         return baos.toByteArray();
     }
     
-    public void write(OutputStream os) {
-    	try {
-	    	os.write(getBytes());
-	    	os.flush();
-    	} catch (IOException ex) {
-    		ex.printStackTrace();
-    	}
+    @Override
+    public void read(InputStream is) throws IOException {
+    	
+        byte delimiter = (byte)is.read();
+        
+        if (delimiter != DELIMITER)
+            throw new InvalidDelimiterException();
+        
+        int highLength = is.read();
+        int length = highLength*256+is.read();
+        
+        srcCoords = new ModuleCoordinates(is);
+        dstCoords = new ModuleCoordinates(is);
+        operation = new Operation(is,length-2*ModuleCoordinates.OCTETS-Operation.FIXED_OCTETS);
+    }
+    
+    @Override
+    public void write(OutputStream os) throws IOException {
+	    os.write(getBytes());
+	    os.flush();
     }
     
     public String printBytes() {

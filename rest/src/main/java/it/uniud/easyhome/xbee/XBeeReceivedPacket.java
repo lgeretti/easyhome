@@ -1,29 +1,16 @@
 package it.uniud.easyhome.xbee;
 
-import it.uniud.easyhome.exceptions.ChecksumException;
-import it.uniud.easyhome.exceptions.IncompletePacketException;
-import it.uniud.easyhome.exceptions.InvalidDelimiterException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.packets.Domains;
-import it.uniud.easyhome.packets.ReceivedPacket;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
 
-public class XBeeReceivedPacket implements ReceivedPacket {
+public class XBeeReceivedPacket extends XBeePacket {
 
 	private long srcAddr64;
 	private short srcAddr16;
-	private byte srcEndpoint;
-	private byte dstEndpoint;
-	private short clusterId;
-	private short profileId;
 	private byte receiveOptions = 0x00;
-	private byte frameControl = 0x00;
-	private byte transactionSeqNumber = 0x00;
-	private byte command = 0x00;
-	private byte[] apsPayload = new byte[0];
 	
 	public XBeeReceivedPacket() {
 	}
@@ -41,34 +28,6 @@ public class XBeeReceivedPacket implements ReceivedPacket {
 	public void set16BitSrcAddr(short srcAddr16) {
 		this.srcAddr16 = srcAddr16;
 	}
-
-	public byte getSrcEndpoint() {
-		return srcEndpoint;
-	}
-	public void setSrcEndpoint(byte srcEndpoint) {
-		this.srcEndpoint = srcEndpoint;
-	}
-
-	public byte getDstEndpoint() {
-		return dstEndpoint;
-	}
-	public void setDstEndpoint(byte dstEndpoint) {
-		this.dstEndpoint = dstEndpoint;
-	}
-	
-	public short getClusterId() {
-		return clusterId;
-	}
-	public void setClusterId(short clusterId) {
-		this.clusterId = clusterId;
-	}
-	
-	public short getProfileId() {
-		return profileId;
-	}
-	public void setProfileId(short profileId) {
-		this.profileId = profileId;
-	}
 	
 	public byte getReceiveOptions() {
 		return receiveOptions;
@@ -77,87 +36,85 @@ public class XBeeReceivedPacket implements ReceivedPacket {
 		this.receiveOptions = receiveOptions;
 	}
 	
-	public byte getFrameControl() {
-		return frameControl;
-	}
-	public void setFrameControl(byte frameControl) {
-		this.frameControl = frameControl;
-	}
-	
-	public byte getTransactionSeqNumber() {
-		return transactionSeqNumber;
-	}
-	public void setTransactionSeqNumber(byte transactionSeqNumber) {
-		this.transactionSeqNumber = transactionSeqNumber;
-	}
-	
-	public byte getCommand() {
-		return command;
-	}
-	public void setCommand(byte command) {
-		this.command = command;
-	}
-	
-	public byte[] getApsPayload() {
-		return apsPayload;
-	}
-	public void setApsPayload(byte[] apsPayload) {
-		this.apsPayload = apsPayload;
-	}
 	@Override
-	public void read(InputStream is) throws IOException, InvalidDelimiterException, 
-											InvalidPacketTypeException, ChecksumException {
+	public byte[] getBytes() {
 
-    	int octet = is.read();
-    	
-    	if (octet == -1)
-    		throw new IncompletePacketException();
-    	
-        if (octet != XBeeConstants.START_DELIMITER)
-        	throw new InvalidDelimiterException();
-        	
-        int highLength = is.read();
-        int length = highLength*256 + is.read();
-        
-        if (length < 0)
-        	throw new IncompletePacketException();
-        
-        waitForAvailability(is, length);
-        
-        byte[] packetPayload = new byte[length];
-        
-        int sum = 0;
-        for (int i=0; i<length; i++) {
-            int readValue = is.read();
-            packetPayload[i] = (byte)readValue;
-            sum += readValue;
-        }
-        sum += is.read();
-             
-        if (0xFF != (sum & 0xFF)) 
-        	throw new ChecksumException();
-        
-        handlePacketPayload(new ByteArrayInputStream(packetPayload), length);
-	}
-	
-	private void waitForAvailability(InputStream is, int length) throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		
-		int i = 0;
-        for (; i < 100; i++) {
-        	
-        	if (is.available() > length)
-        		break;
-        	try {
-				Thread.sleep(10);
-			} catch (InterruptedException e) {
-				throw new IncompletePacketException();
-			}
-        }
-        if (i == 100)
-        	throw new IncompletePacketException();
+		baos.write(XBeeConstants.START_DELIMITER);
+		
+		// If not using the management profile, the command byte is not present
+		int length = 20 + getApsPayload().length + (Domains.isManagement(getProfileId()) ? 0 : 1);
+		
+		// High and low lengths
+		baos.write((length >>> 8) & 0xFF);
+		baos.write(length & 0xFF);
+		
+		int sum = 0;
+		
+		// Frame type
+		byte frameType = XBeeConstants.EXPLICIT_RX_INDICATOR_FRAME_TYPE; 
+		baos.write(frameType);
+		sum += frameType;
+		// 64 bit source address
+		for (int j=56; j>=0; j-=8) {
+			byte val = (byte)((srcAddr64 >>> j) & 0xFF);
+			baos.write(val);
+			sum += val;
+		}
+		// 16 bit source address
+		for (int j=8; j>=0; j-=8) {
+			byte val = (byte)((srcAddr16 >>> j) & 0xFF);
+			baos.write(val);
+			sum += val;
+		}		
+		// Source endpoint
+		byte srcEndpointToWrite = (srcEndpoint == 0 ? 1 : srcEndpoint);
+		baos.write(srcEndpointToWrite);
+		sum += srcEndpointToWrite;
+		// Destination endpoint
+		byte dstEndpointToWrite = (dstEndpoint == 0 ? 1 : dstEndpoint);
+		baos.write(dstEndpointToWrite);
+		sum += dstEndpointToWrite;
+		// Cluster ID
+		for (int j=8; j>=0; j-=8) {
+			byte val = (byte)((clusterId >>> j) & 0xFF);
+			baos.write(val);
+			sum += val;
+		}			
+		// Profile ID
+		short profileIdToWrite = (profileId == 0 ? Domains.EASYHOME_MANAGEMENT.getCode() : profileId);
+		for (int j=8; j>=0; j-=8) {
+			byte val = (byte)((profileIdToWrite >>> j) & 0xFF);
+			baos.write(val);
+			sum += val;
+		}			
+		// Receive options
+		baos.write(receiveOptions);
+		sum += receiveOptions;
+		// Frame control
+		baos.write(frameControl);
+		sum += frameControl;
+		// Transaction sequence number
+		baos.write(transactionSeqNumber);
+		sum += transactionSeqNumber;
+		if (!Domains.isManagement(profileId)) {
+			baos.write(command);
+			sum += command;
+		}
+		// Aps payload
+		for (byte b: apsPayload) {
+			baos.write(b);
+			sum += b;
+		}
+		// Checksum
+		baos.write(0xFF - (sum & 0xFF));
+		
+		return baos.toByteArray();
 	}
 
-	private void handlePacketPayload(ByteArrayInputStream is, int packetLength) {
+	@Override
+	final protected void handlePacketPayload(ByteArrayInputStream is, int packetLength) {
 		
         byte frameType = (byte)is.read();
         if (frameType != XBeeConstants.EXPLICIT_RX_INDICATOR_FRAME_TYPE) 
@@ -204,4 +161,5 @@ public class XBeeReceivedPacket implements ReceivedPacket {
 		for (int i=0; i<apsPayloadLength; i++)
 			apsPayload[i] = (byte)is.read();
 	}
+
 }
