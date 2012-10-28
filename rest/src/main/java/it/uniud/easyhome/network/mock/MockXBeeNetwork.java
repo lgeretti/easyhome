@@ -10,26 +10,26 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /** 
- * A mock channel where packets can be received and forwarded to a gateway.
+ * A mock XBee network where packets can be received and forwarded to a gateway.
  * 
  * @author Luca Geretti
  *
  */
-public class MockNetwork implements Runnable {
+public class MockXBeeNetwork implements Runnable {
 
 	private RunnableState runningState;
 	
 	private Queue<Packet> packetsToGateway;
 	
-	private List<MockNode> nodes;
+	private List<MockXBeeNode> nodes;
 	
 	private String gwHost;
 	private int gwPort;
 	
-	public MockNetwork(String gwHost, int gwPort) {
+	public MockXBeeNetwork(String gwHost, int gwPort) {
 		runningState = RunnableState.STOPPED;
 		packetsToGateway = new ConcurrentLinkedQueue<Packet>();
-		nodes = new ArrayList<MockNode>();
+		nodes = new ArrayList<MockXBeeNode>();
 		
 		this.gwHost = gwHost;
 		this.gwPort = gwPort;
@@ -40,11 +40,11 @@ public class MockNetwork implements Runnable {
 	}
 	
 	public void register(Node node) {
-		nodes.add(new MockNode(node,this));
+		nodes.add(new MockXBeeNode(node,this));
 	}
 	
-	public List<MockNode> getNodes() {
-		return new ArrayList<MockNode>(nodes);
+	public List<MockXBeeNode> getNodes() {
+		return new ArrayList<MockXBeeNode>(nodes);
 	}
 	
 	@Override
@@ -64,6 +64,7 @@ public class MockNetwork implements Runnable {
 				
 				if (pkt != null) {
 					os.write(pkt.getBytes());
+					os.flush();
 				}
 			}
 			os.close();
@@ -85,7 +86,7 @@ public class MockNetwork implements Runnable {
     	if (runningState == RunnableState.STOPPED) {
     		Thread thr = new Thread(this);
     		thr.start();
-    		for (MockNode node : nodes)
+    		for (MockXBeeNode node : nodes)
     			node.turnOn();
     		runningState = RunnableState.RUNNING;
     	} else {
@@ -95,7 +96,7 @@ public class MockNetwork implements Runnable {
 	
 	public void turnOff() {
 		runningState = RunnableState.STOPPING;
-		for (MockNode node : nodes)
+		for (MockXBeeNode node : nodes)
 			node.turnOff();
 	}
 }

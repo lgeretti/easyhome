@@ -7,17 +7,17 @@ import it.uniud.easyhome.common.RunnableState;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.packets.Packet;
 
-public class MockNode implements Runnable {
+public class MockXBeeNode implements Runnable {
 
     private Node node;
     
-    private MockNetwork network;
+    private MockXBeeNetwork network;
     
     private Queue<Packet> packetsFromGateway;
     
     private volatile RunnableState runningState;
     
-    MockNode(Node node, MockNetwork network) {
+    MockXBeeNode(Node node, MockXBeeNetwork network) {
     	this.node = node;
     	this.network = network;
     	this.runningState = RunnableState.STOPPED;
@@ -77,9 +77,9 @@ public class MockNode implements Runnable {
     @Override
     public boolean equals(Object other) {
         
-        if (!(other instanceof MockNode))
+        if (!(other instanceof MockXBeeNode))
             throw new IllegalArgumentException();
-        MockNode otherNode = (MockNode) other;
+        MockXBeeNode otherNode = (MockXBeeNode) other;
         
         return node.equals(otherNode.node);
     }

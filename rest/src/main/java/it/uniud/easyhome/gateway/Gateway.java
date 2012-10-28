@@ -169,6 +169,8 @@ public class Gateway implements Runnable {
                 
                 jmsConnection.start();
 
+                println("JMS connection started");
+                
                 ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                 
                 while (!disconnected) {
@@ -227,7 +229,7 @@ public class Gateway implements Runnable {
     
     private void handleInboundPacketFrom(InputStream is, ByteArrayOutputStream buffer, Session jmsSession,
     		MessageProducer inboundProducer, MessageProducer outboundProducer) throws IOException {
-        
+    	
         try {
         	
         	NativePacket nativePkt = readFrom(is,buffer);

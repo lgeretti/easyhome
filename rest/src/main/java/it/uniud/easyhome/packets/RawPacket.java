@@ -25,6 +25,13 @@ public class RawPacket implements Packet {
 			return this;
 		}
 		
+		public Builder append(byte[] bytes) {
+			for (byte b : bytes)
+				ba.append(b);
+			
+			return this;
+		}
+		
 		@Override
 		public RawPacket build() {
 			return new RawPacket(ba.toByteArray());
