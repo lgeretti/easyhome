@@ -21,6 +21,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
+@Ignore
 public class HubResourceIT {
 	
 	private static final String TARGET = "http://localhost:8080/easyhome/rest/hub/gateways";

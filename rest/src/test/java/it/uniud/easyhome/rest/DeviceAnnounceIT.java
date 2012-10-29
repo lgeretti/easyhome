@@ -26,6 +26,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
+@Ignore
 public class DeviceAnnounceIT {
     
 	private final static int XBEE_GATEWAY_PORT = 5050;

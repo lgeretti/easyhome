@@ -45,7 +45,7 @@ public class Gateway implements Runnable {
     
     private final Map<ModuleCoordinates,Integer> routingTable = new HashMap<ModuleCoordinates,Integer>();
     
-    private int mappedEndpointCounter = 0;
+    private int mappedEndpointCounter = 1;
     
     protected ServerSocket server = null;
     

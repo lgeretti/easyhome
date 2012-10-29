@@ -133,7 +133,7 @@ public class XBeeReceivedPacket extends XBeePacket {
 	    byte readSrcEndpoint = (byte)is.read(); 
 		srcEndpoint = (readSrcEndpoint == 1 ? 0 : readSrcEndpoint);
 		byte readDstEndpoint = (byte)is.read();
-		dstEndpoint = (readDstEndpoint == 1 ? 0 : readSrcEndpoint);
+		dstEndpoint = (readDstEndpoint == 1 ? 0 : readDstEndpoint);
 		         
 		clusterId = (short)((is.read() << 8) + is.read());
 		
