@@ -6,6 +6,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import it.uniud.easyhome.common.RunnableState;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.packets.Packet;
+import it.uniud.easyhome.xbee.XBeeInboundPacket;
+import it.uniud.easyhome.xbee.XBeeOutboundPacket;
 
 public class MockXBeeNode implements Runnable {
 
@@ -13,7 +15,7 @@ public class MockXBeeNode implements Runnable {
     
     private MockXBeeNetwork network;
     
-    private Queue<Packet> packetsFromGateway;
+    private Queue<XBeeInboundPacket> inboundPacketQueue;
     
     private volatile RunnableState runningState;
     
@@ -21,7 +23,7 @@ public class MockXBeeNode implements Runnable {
     	this.node = node;
     	this.network = network;
     	this.runningState = RunnableState.STOPPED;
-    	packetsFromGateway = new ConcurrentLinkedQueue<Packet>();
+    	inboundPacketQueue = new ConcurrentLinkedQueue<XBeeInboundPacket>();
     }
     
     public long getId() {
@@ -44,9 +46,13 @@ public class MockXBeeNode implements Runnable {
     	return node.getCapability();
     }
     
-    public void post(Packet pkt) {
-    	packetsFromGateway.add(pkt);
+    public void receive(XBeeInboundPacket pkt) {
+    	inboundPacketQueue.add(pkt);
     }
+    
+    public void transmit(XBeeOutboundPacket pkt) {
+    	network.broadcast(new XBeeInboundPacket(pkt,node.getId(),node.getAddress()));
+    }    
     
     public void turnOn() {
     	
@@ -68,11 +74,17 @@ public class MockXBeeNode implements Runnable {
     	
     	while (runningState != RunnableState.STOPPING) {
     		
-    		
+    		if (inboundPacketQueue.size() > 0) {
+    			System.out.println("Success!");
+    			break;
+    		}
+    			
     		
     	}
 		runningState = RunnableState.STOPPED;
     }
+    
+    
 
     @Override
     public boolean equals(Object other) {

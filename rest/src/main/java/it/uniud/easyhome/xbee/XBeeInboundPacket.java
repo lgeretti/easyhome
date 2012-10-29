@@ -2,17 +2,35 @@ package it.uniud.easyhome.xbee;
 
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.packets.Domains;
+import it.uniud.easyhome.packets.ModuleCoordinates;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-public class XBeeReceivedPacket extends XBeePacket {
+public class XBeeInboundPacket extends XBeePacket {
 
 	private long srcAddr64;
 	private short srcAddr16;
 	private byte receiveOptions = 0x00;
 	
-	public XBeeReceivedPacket() {
+	public XBeeInboundPacket() {
+	}
+	
+	public XBeeInboundPacket(XBeeOutboundPacket pkt, long srcAddr64, short srcAddr16) {
+		
+		this.srcAddr64 = srcAddr64;
+		this.srcAddr16 = srcAddr16;
+		
+		receiveOptions = (pkt.isBroadcast() ? (byte)0x02 : 0x00);
+		
+		srcEndpoint = pkt.getSrcEndpoint();
+		dstEndpoint = pkt.getDstEndpoint();
+		clusterId = pkt.getClusterId();
+		profileId = pkt.getProfileId();
+		frameControl = pkt.getFrameControl();
+		transactionSeqNumber = pkt.getTransactionSeqNumber();
+		command = pkt.getCommand();
+		apsPayload = pkt.getApsPayload();
 	}
 	
 	public long get64BitSrcAddr() {

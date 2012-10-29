@@ -51,11 +51,11 @@ public class NativePacketTest {
             strb.append(Integer.toHexString(0xFF & b).toUpperCase()).append(" ");
         }
         
-        System.out.println("Original bytes: " + strb.toString());
+        //System.out.println("Original bytes: " + strb.toString());
         
         NativePacket pkt = new NativePacket(new ByteArrayInputStream(packetBytes));
         
-        System.out.println("Recovered bytes: " + pkt.printBytes());
+        //System.out.println("Recovered bytes: " + pkt.printBytes());
         
         assertTrue(Arrays.equals(pkt.getBytes(), packetBytes));
     }

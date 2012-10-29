@@ -8,8 +8,10 @@ import it.uniud.easyhome.network.mock.MockXBeeNetwork;
 import it.uniud.easyhome.packets.RawPacket;
 import it.uniud.easyhome.processing.ProcessKind;
 import it.uniud.easyhome.xbee.XBeeConstants;
+import it.uniud.easyhome.xbee.XBeeInboundPacket;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.Socket;
 import java.util.List;
@@ -18,6 +20,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -26,7 +29,6 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
-@Ignore
 public class DeviceAnnounceIT {
     
 	private final static int XBEE_GATEWAY_PORT = 5050;
@@ -35,12 +37,15 @@ public class DeviceAnnounceIT {
 	
 	private static Client client;
 	
+	private static MockXBeeNetwork mn;
+	
 	@BeforeClass
     public static void setup() {
 
         client = Client.create();
+        mn = new MockXBeeNetwork("localhost",XBEE_GATEWAY_PORT);
     }
-		
+	
     @After
     public void clearGateways() {
     	client.resource(TARGET).path("hub").path("gateways").delete();
@@ -77,8 +82,6 @@ public class DeviceAnnounceIT {
 		
 		ClientResponse processInsertion = insertNodeRegistrationProcess();
 		assertEquals(ClientResponse.Status.CREATED,processInsertion.getClientResponseStatus());
-		
-		MockXBeeNetwork mn = new MockXBeeNetwork("localhost",XBEE_GATEWAY_PORT);
         
         RawPacket.Builder rpBuilder = new RawPacket.Builder();
         
@@ -138,9 +141,12 @@ public class DeviceAnnounceIT {
         // Checksum
         rpBuilder.append(0xFF - (sum & 0xFF));
         
+        XBeeInboundPacket xbeePkt = new XBeeInboundPacket();
+        ByteArrayInputStream bais = new ByteArrayInputStream(rpBuilder.build().getBytes());
+        xbeePkt.read(bais);
+        
         mn.turnOn();
-        mn.post(rpBuilder.build());
-        mn.turnOff();
+        mn.broadcast(xbeePkt);
         
         // Robustly check that we persist the node within a reasonably high time, since 
         // the process persists it asynchronously
@@ -157,6 +163,8 @@ public class DeviceAnnounceIT {
 	    		break;
         }
     	assertTrue(sleepTime*counter < maximumSleepTime);
-    }
+    	
+    	mn.turnOff();
+	}
     
 }

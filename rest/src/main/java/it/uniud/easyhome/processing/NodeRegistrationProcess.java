@@ -3,7 +3,7 @@ package it.uniud.easyhome.processing;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.packets.NativePacket;
-import it.uniud.easyhome.packets.specific.NodeAnnouncePacket;
+import it.uniud.easyhome.packets.natives.NodeAnnouncePacket;
 
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;

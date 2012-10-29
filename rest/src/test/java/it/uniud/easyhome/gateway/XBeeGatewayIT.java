@@ -25,9 +25,9 @@ public class XBeeGatewayIT {
    
 	private static final String TARGET = "http://localhost:8080/easyhome/rest/hub/gateways";
 	
-	private final static int SRC_GATEWAY_PORT = 5000;
+	private final static int SRC_GATEWAY_PORT = 5050;
 	private final static ProtocolType SRC_GATEWAY_PROTOCOL = ProtocolType.XBEE;
-	private final static int DST_GATEWAY_PORT = 6000;
+	private final static int DST_GATEWAY_PORT = 6060;
 	private final static ProtocolType DST_GATEWAY_PROTOCOL = ProtocolType.XBEE;
 	
 	private static Client client;

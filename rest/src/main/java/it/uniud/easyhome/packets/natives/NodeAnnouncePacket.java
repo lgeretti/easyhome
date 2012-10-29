@@ -1,4 +1,4 @@
-package it.uniud.easyhome.packets.specific;
+package it.uniud.easyhome.packets.natives;
 
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.packets.Contexts;

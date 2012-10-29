@@ -8,8 +8,8 @@ import it.uniud.easyhome.packets.ModuleCoordinates;
 import it.uniud.easyhome.packets.NativePacket;
 import it.uniud.easyhome.packets.Operation;
 import it.uniud.easyhome.xbee.XBeeConstants;
-import it.uniud.easyhome.xbee.XBeeReceivedPacket;
-import it.uniud.easyhome.xbee.XBeeTransmittedPacket;
+import it.uniud.easyhome.xbee.XBeeInboundPacket;
+import it.uniud.easyhome.xbee.XBeeOutboundPacket;
 
 import java.io.*;
 
@@ -19,7 +19,7 @@ public class XBeeGateway extends Gateway {
     	super(id,ProtocolType.XBEE,port);
     }
     
-    private NativePacket convertFrom(XBeeReceivedPacket xpkt) throws RoutingEntryMissingException {
+    private NativePacket convertFrom(XBeeInboundPacket xpkt) throws RoutingEntryMissingException {
         
         ModuleCoordinates srcCoords = new ModuleCoordinates(
         		id,xpkt.get64BitSrcAddr(),xpkt.get16BitSrcAddr(),xpkt.getSrcEndpoint());
@@ -66,7 +66,7 @@ public class XBeeGateway extends Gateway {
     	
     	NativePacket result = null;
     	
-    	XBeeReceivedPacket xbeePkt = new XBeeReceivedPacket();
+    	XBeeInboundPacket xbeePkt = new XBeeInboundPacket();
     	
     	if (is.available() == 0)
     		throw new NoBytesAvailableException();
@@ -92,7 +92,7 @@ public class XBeeGateway extends Gateway {
     @Override
     final protected void write(NativePacket pkt, OutputStream os) throws IOException {
     	
-		XBeeTransmittedPacket xbeePkt = new XBeeTransmittedPacket(pkt);
+		XBeeOutboundPacket xbeePkt = new XBeeOutboundPacket(pkt);
 		xbeePkt.write(os);
     }
   

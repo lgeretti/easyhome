@@ -6,6 +6,8 @@ import it.uniud.easyhome.exceptions.NoBytesAvailableException;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.packets.Packet;
 import it.uniud.easyhome.xbee.XBeeConstants;
+import it.uniud.easyhome.xbee.XBeeInboundPacket;
+import it.uniud.easyhome.xbee.XBeeOutboundPacket;
 
 import java.io.*;
 import java.net.Socket;
@@ -22,7 +24,7 @@ public class MockXBeeNetwork implements Runnable {
 
 	private RunnableState runningState;
 	
-	private Queue<Packet> packetsToGateway;
+	private Queue<XBeeInboundPacket> packetsToGateway;
 	
 	private List<MockXBeeNode> nodes;
 	
@@ -31,15 +33,22 @@ public class MockXBeeNetwork implements Runnable {
 	
 	public MockXBeeNetwork(String gwHost, int gwPort) {
 		runningState = RunnableState.STOPPED;
-		packetsToGateway = new ConcurrentLinkedQueue<Packet>();
+		packetsToGateway = new ConcurrentLinkedQueue<XBeeInboundPacket>();
 		nodes = new ArrayList<MockXBeeNode>();
 		
 		this.gwHost = gwHost;
 		this.gwPort = gwPort;
 	}
 	
-	public void post(Packet pkt) {
+	public void broadcast(XBeeInboundPacket pkt) {
 		packetsToGateway.add(pkt);
+	}
+	
+	public void inject(XBeeOutboundPacket pkt) {
+		for (MockXBeeNode node : nodes) {
+			if (pkt.isBroadcast() || pkt.get64BitDstAddr() == node.getId())
+				node.receive(new XBeeInboundPacket(pkt,0x0,(short)0x0));
+		}
 	}
 	
 	public void register(Node node) {
@@ -58,23 +67,35 @@ public class MockXBeeNetwork implements Runnable {
 		try {
 			
 			skt = new Socket(gwHost, gwPort);
-			
 			OutputStream os = new BufferedOutputStream(skt.getOutputStream());
-			
+			InputStream is = new BufferedInputStream(skt.getInputStream());
+				
 			while (runningState != RunnableState.STOPPING) {
 				
-				Packet pkt = packetsToGateway.poll();
+				Packet pktToGateway = packetsToGateway.poll();
 				
-				if (pkt != null) {
-					os.write(pkt.getBytes());
+				if (pktToGateway != null) {
+					os.write(pktToGateway.getBytes());
 					os.flush();
+				}
+				
+				if (is.available() > 0) {
+					XBeeOutboundPacket pktFromGateway = new XBeeOutboundPacket();
+					
+					try {
+						pktFromGateway.read(is);
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+					
+					inject(pktFromGateway);
 				}
 			}
 			os.close();
 			
 		} catch (IOException ex) {
+			ex.printStackTrace();
 		} finally {
-			
 			try {
 				
 				if (skt != null)

@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class XBeeTransmittedPacket extends XBeePacket {
+public class XBeeOutboundPacket extends XBeePacket {
 	
 	private long dstAddr64;
 	private short dstAddr16;
@@ -18,10 +18,10 @@ public class XBeeTransmittedPacket extends XBeePacket {
 	private byte broadcastRadius = 0x00;
 	private byte transmitOptions = 0x00;
 	
-	public XBeeTransmittedPacket() {
+	public XBeeOutboundPacket() {
 	}
 	
-	public XBeeTransmittedPacket(NativePacket ehp) {
+	public XBeeOutboundPacket(NativePacket ehp) {
 		
 		dstAddr64 = ehp.getDstCoords().getNuid();
 		dstAddr16 = ehp.getDstCoords().getAddress();
@@ -68,6 +68,10 @@ public class XBeeTransmittedPacket extends XBeePacket {
 	}
 	public void setTransmitOptions(byte transmitOptions) {
 		this.transmitOptions = transmitOptions;
+	}
+	
+	public boolean isBroadcast() {
+		return (dstAddr64 == 0x0000FFFFL);
 	}
 	
 	@Override
