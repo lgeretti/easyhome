@@ -30,7 +30,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
-public class DeviceAnnounceIT {
+public class NodeRegistrationIT {
     
 	private final static int XBEE_GATEWAY_PORT = 5050;
 	
@@ -65,10 +65,10 @@ public class DeviceAnnounceIT {
     	return response;
     }
     
-    private ClientResponse insertNodeRegistrationProcess() {
+    private ClientResponse insertProcess(ProcessKind kind) {
         
     	MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-    	formData.add("kind", ProcessKind.NodeRegistration.toString());
+    	formData.add("kind", kind.toString());
     	ClientResponse response = client.resource(TARGET).path("processes")
     							  .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
     	
@@ -84,8 +84,10 @@ public class DeviceAnnounceIT {
         String[] segments = locationPath.split("/");
         int gid = Integer.parseInt(segments[segments.length-1]);
 		
-		ClientResponse processInsertion = insertNodeRegistrationProcess();
-		assertEquals(ClientResponse.Status.CREATED,processInsertion.getClientResponseStatus());
+		ClientResponse nodeAnnceRegProcessInsertion = insertProcess(ProcessKind.NODE_ANNCE_REGISTRATION);
+		assertEquals(ClientResponse.Status.CREATED,nodeAnnceRegProcessInsertion.getClientResponseStatus());
+		ClientResponse nodeDescrAcqProcessInsertion = insertProcess(ProcessKind.NODE_DESCR_ACQUIREMENT);
+		assertEquals(ClientResponse.Status.CREATED,nodeDescrAcqProcessInsertion.getClientResponseStatus());
 		
         Node.Builder nodeBuilder = new Node.Builder(0xA1L)
         							 .setAddress((short)0x1111)
@@ -98,16 +100,16 @@ public class DeviceAnnounceIT {
         // Robustly check that we persist the node within a reasonably high time, since 
         // the process persists it asynchronously
         int counter = 0;
-        long sleepTime = 500;
+        long sleepTime = 1000;
         long maximumSleepTime = 6000;
         while (sleepTime*counter < maximumSleepTime) {
-        	Thread.sleep(sleepTime);
         	counter++;
 	    	ClientResponse getNodesResponse = client.resource(TARGET).path("network")
 						.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	    	List<Node> nodes = JsonUtils.getListFrom(getNodesResponse, Node.class);
 	    	if (nodes.size() > 0)
 	    		break;
+	    	Thread.sleep(sleepTime);
         }
     	assertTrue(sleepTime*counter < maximumSleepTime);
     	

@@ -15,6 +15,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
+@Ignore
 public class ProcessResourceIT {
     
 	private static final String TARGET = "http://localhost:8080/easyhome/rest/processes";
@@ -36,7 +37,7 @@ public class ProcessResourceIT {
     @Test
     public void testInsertion() throws JSONException {
         
-        ClientResponse insertionResponse = insertProcess(ProcessKind.NodeRegistration);
+        ClientResponse insertionResponse = insertProcess(ProcessKind.NODE_ANNCE_REGISTRATION);
     	
         assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
         
@@ -47,7 +48,7 @@ public class ProcessResourceIT {
     @Test
     public void testDelete() {
         
-    	insertProcess(ProcessKind.NodeRegistration);
+    	insertProcess(ProcessKind.NODE_ANNCE_REGISTRATION);
     	
     	ClientResponse firstDeletion =  client.resource(TARGET).delete(ClientResponse.class);
     	
@@ -55,7 +56,7 @@ public class ProcessResourceIT {
     	
     	noProcesses();
     	
-    	ClientResponse secondInsertion = insertProcess(ProcessKind.NodeRegistration);
+    	ClientResponse secondInsertion = insertProcess(ProcessKind.NODE_ANNCE_REGISTRATION);
         String locationPath = secondInsertion.getLocation().getPath();
         String[] segments = locationPath.split("/");
         String pid = segments[segments.length-1];

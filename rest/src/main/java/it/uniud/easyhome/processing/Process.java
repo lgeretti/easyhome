@@ -7,6 +7,7 @@ import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
+import javax.jms.Session;
 import javax.jms.Topic;
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -21,18 +22,8 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 @XmlRootElement
 public class Process implements Runnable {
     
-    public enum Session { STATEFUL, STATELESS };
-    
-    public enum Interaction { ASYNC, SYNC };
-    
     @XmlElement(name="pid")
     private int pid;
-    
-    @XmlElement(name="session")
-    private Session session;
-    
-    @XmlElement(name="interaction")
-    private Interaction interaction;
     
     private volatile boolean stopped = false;
     
@@ -44,24 +35,14 @@ public class Process implements Runnable {
     @SuppressWarnings("unused")
     private Process() {}
     
-    protected Process(int pid, Session session, Interaction interaction, URI restTarget) {
+    protected Process(int pid, URI restTarget) {
         this.pid = pid;
-        this.session = session;
-        this.interaction = interaction;
         this.restClient = Client.create(new DefaultClientConfig());
         this.restResource = restClient.resource(restTarget);
     }
     
     public final int getPid() {
         return pid;
-    }
-    
-    public final Session getSession() {
-        return session;
-    }
-    
-    public final Interaction getInteraction() {
-        return interaction;
     }
 	
     public ProcessKind getKind() {
@@ -80,7 +61,8 @@ public class Process implements Runnable {
 		// Empty implementation to be overridden
 	}
 	
-	protected void process(MessageConsumer consumer, MessageProducer producer) throws JMSException {
+	protected void process(MessageConsumer inboundPacketsConsumer, MessageProducer outboundPacketsProducer,
+						   Context context, javax.jms.Session session) throws JMSException, NamingException {
 		// Empty implementation to be overridden
 	}
 	
@@ -97,21 +79,21 @@ public class Process implements Runnable {
 	   		Context jndiContext = new InitialContext();
 	        ConnectionFactory connectionFactory = (ConnectionFactory) jndiContext.lookup("jms/easyhome/ConnectionFactory");
 	        
-	        Topic inboundTopic = (Topic) jndiContext.lookup("jms/easyhome/InboundPacketsTopic");
-	        Topic outboundTopic = (Topic) jndiContext.lookup("jms/easyhome/OutboundPacketsTopic");
+	        Topic inboundPacketsTopic = (Topic) jndiContext.lookup("jms/easyhome/InboundPacketsTopic");
+	        Topic outboundPacketsTopic = (Topic) jndiContext.lookup("jms/easyhome/OutboundPacketsTopic");
 	        
 	        jmsConnection = connectionFactory.createConnection();
-	        javax.jms.Session jmsSession = jmsConnection.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
+	        Session jmsSession = jmsConnection.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
 	        
-	        MessageConsumer consumer = jmsSession.createConsumer(inboundTopic);  
-	        MessageProducer producer = jmsSession.createProducer(outboundTopic);
+	        MessageConsumer inboundPacketsConsumer = jmsSession.createConsumer(inboundPacketsTopic);  
+	        MessageProducer outboundPacketsProducer = jmsSession.createProducer(outboundPacketsTopic);
 	    	
 	        jmsConnection.start();
 	        
-	        println("Processing started");
+	        println(getKind().toString() + " processing started");
 	        
 	    	while (!isStopped()) 
-	    		process(consumer,producer);
+	    		process(inboundPacketsConsumer,outboundPacketsProducer,jndiContext,jmsSession);
 	    	
     	} catch (NamingException ex) {
     		ex.printStackTrace();

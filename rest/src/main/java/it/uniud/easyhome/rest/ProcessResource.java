@@ -1,8 +1,7 @@
 package it.uniud.easyhome.rest;
 
-import it.uniud.easyhome.processing.NodeRegistrationProcess;
+import it.uniud.easyhome.processing.*;
 import it.uniud.easyhome.processing.Process;
-import it.uniud.easyhome.processing.ProcessKind;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,21 +33,13 @@ public class ProcessResource {
     	return String.valueOf(processes.size());
     }
     
-    // curl -X POST http://localhost:8080/easyhome/rest/processes -H "Content-Type: application/x-www-form-urlencoded" --data-binary "kind=nodeRegistration"
+    // curl -X POST http://localhost:8080/easyhome/rest/processes -H "Content-Type: application/x-www-form-urlencoded" --data-binary "kind=NODE_ANNCE_REGISTRATION"
     @POST
     public Response postProcess(@FormParam("kind") ProcessKind kind) {
         
     	int pid = ++pidCounter;
     	
-    	Process process = null;
-    	
-    	switch (kind) {
-	    	case NodeRegistration:
-	    		process = new NodeRegistrationProcess(pid,uriInfo);
-	    		break;
-	    	default:
-	    		return Response.status(Status.BAD_REQUEST).build();
-    	}
+    	Process process = kind.newProcess(pid, uriInfo);
     	
         processes.add(process);
         

@@ -71,7 +71,7 @@ public class Node {
         		throw new NodeConstructionException();
         	
         	if (node.name == null)
-        		node.name = "";
+        		node.name = Long.toHexString(node.id);
         	
             return node;
         }
