@@ -2,7 +2,7 @@ package it.uniud.easyhome.gateway;
 
 import static org.junit.Assert.*;
 import it.uniud.easyhome.gateway.ProtocolType;
-import it.uniud.easyhome.xbee.XBeeConstants;
+import it.uniud.easyhome.packets.xbee.XBeeConstants;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

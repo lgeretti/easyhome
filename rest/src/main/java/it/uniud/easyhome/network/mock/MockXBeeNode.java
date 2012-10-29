@@ -6,8 +6,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import it.uniud.easyhome.common.RunnableState;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.packets.Packet;
-import it.uniud.easyhome.xbee.XBeeInboundPacket;
-import it.uniud.easyhome.xbee.XBeeOutboundPacket;
+import it.uniud.easyhome.packets.xbee.DeviceAnnounceOutpkt;
+import it.uniud.easyhome.packets.xbee.XBeeInboundPacket;
+import it.uniud.easyhome.packets.xbee.XBeeOutboundPacket;
 
 public class MockXBeeNode implements Runnable {
 
@@ -18,6 +19,8 @@ public class MockXBeeNode implements Runnable {
     private Queue<XBeeInboundPacket> inboundPacketQueue;
     
     private volatile RunnableState runningState;
+    
+    private byte seqNumber = 0;
     
     MockXBeeNode(Node node, MockXBeeNetwork network) {
     	this.node = node;
@@ -69,22 +72,17 @@ public class MockXBeeNode implements Runnable {
     	runningState = RunnableState.STOPPING;
     }
     
+    public byte nextSeqNumber() {
+    	return ++seqNumber;
+    }
+    
     @Override
     public void run() {
     	
-    	while (runningState != RunnableState.STOPPING) {
-    		
-    		if (inboundPacketQueue.size() > 0) {
-    			System.out.println("Success!");
-    			break;
-    		}
-    			
-    		
-    	}
+    	transmit(new DeviceAnnounceOutpkt(this));
+
 		runningState = RunnableState.STOPPED;
     }
-    
-    
 
     @Override
     public boolean equals(Object other) {

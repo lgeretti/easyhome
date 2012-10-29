@@ -67,8 +67,11 @@ public class Node {
         
         public Node build() {
             
-        	if ((node.gatewayId == 0) || (node.address == 0) || (node.capability == 0) || (node.name == null))
+        	if ((node.gatewayId == 0) || (node.address == 0) || (node.capability == 0))
         		throw new NodeConstructionException();
+        	
+        	if (node.name == null)
+        		node.name = "";
         	
             return node;
         }

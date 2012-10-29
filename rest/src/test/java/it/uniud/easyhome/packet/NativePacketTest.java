@@ -7,7 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
-import it.uniud.easyhome.packets.NativePacket;
+import it.uniud.easyhome.packets.natives.NativePacket;
 
 import org.junit.*;
 

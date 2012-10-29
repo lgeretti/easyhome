@@ -1,8 +1,8 @@
-package it.uniud.easyhome.xbee;
+package it.uniud.easyhome.packets.xbee;
 
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.packets.Domains;
-import it.uniud.easyhome.packets.NativePacket;
+import it.uniud.easyhome.packets.natives.NativePacket;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -12,11 +12,11 @@ import java.io.OutputStream;
 
 public class XBeeOutboundPacket extends XBeePacket {
 	
-	private long dstAddr64;
-	private short dstAddr16;
-	private byte frameId = 0x00;
-	private byte broadcastRadius = 0x00;
-	private byte transmitOptions = 0x00;
+	protected long dstAddr64;
+	protected short dstAddr16;
+	protected byte frameId = 0x00;
+	protected byte broadcastRadius = 0x00;
+	protected byte transmitOptions = 0x00;
 	
 	public XBeeOutboundPacket() {
 	}

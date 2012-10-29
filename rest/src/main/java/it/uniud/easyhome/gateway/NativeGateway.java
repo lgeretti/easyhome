@@ -1,7 +1,7 @@
 package it.uniud.easyhome.gateway;
 
 import it.uniud.easyhome.exceptions.IncompletePacketException;
-import it.uniud.easyhome.packets.NativePacket;
+import it.uniud.easyhome.packets.natives.NativePacket;
 
 import java.io.*;
 

@@ -5,11 +5,11 @@ import it.uniud.easyhome.exceptions.IncompletePacketException;
 import it.uniud.easyhome.exceptions.NoBytesAvailableException;
 import it.uniud.easyhome.exceptions.RoutingEntryMissingException;
 import it.uniud.easyhome.packets.ModuleCoordinates;
-import it.uniud.easyhome.packets.NativePacket;
 import it.uniud.easyhome.packets.Operation;
-import it.uniud.easyhome.xbee.XBeeConstants;
-import it.uniud.easyhome.xbee.XBeeInboundPacket;
-import it.uniud.easyhome.xbee.XBeeOutboundPacket;
+import it.uniud.easyhome.packets.natives.NativePacket;
+import it.uniud.easyhome.packets.xbee.XBeeConstants;
+import it.uniud.easyhome.packets.xbee.XBeeInboundPacket;
+import it.uniud.easyhome.packets.xbee.XBeeOutboundPacket;
 
 import java.io.*;
 

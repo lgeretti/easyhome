@@ -1,4 +1,4 @@
-package it.uniud.easyhome.xbee;
+package it.uniud.easyhome.packets.xbee;
 
 import it.uniud.easyhome.exceptions.ChecksumException;
 import it.uniud.easyhome.exceptions.IncompletePacketException;

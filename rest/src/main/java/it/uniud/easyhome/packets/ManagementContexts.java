@@ -1,12 +1,13 @@
 package it.uniud.easyhome.packets;
 
-public enum Contexts {
+public enum ManagementContexts {
 
+	NODE_DESC_REQ((short)0x02),
 	NODE_ANNOUNCE((short)0x13);
 	
 	private short code;
 	
-	private Contexts(short code) {
+	private ManagementContexts(short code) {
 		this.code = code;
 	}
 	

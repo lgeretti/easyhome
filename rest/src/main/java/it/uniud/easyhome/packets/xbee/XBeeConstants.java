@@ -1,4 +1,4 @@
-package it.uniud.easyhome.xbee;
+package it.uniud.easyhome.packets.xbee;
 
 public interface XBeeConstants {
 

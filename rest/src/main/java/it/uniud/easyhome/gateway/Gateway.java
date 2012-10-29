@@ -4,7 +4,7 @@ import it.uniud.easyhome.exceptions.IncompletePacketException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.exceptions.NoBytesAvailableException;
 import it.uniud.easyhome.packets.ModuleCoordinates;
-import it.uniud.easyhome.packets.NativePacket;
+import it.uniud.easyhome.packets.natives.NativePacket;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

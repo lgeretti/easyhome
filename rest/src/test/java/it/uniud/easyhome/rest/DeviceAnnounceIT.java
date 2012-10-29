@@ -5,10 +5,11 @@ import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.gateway.ProtocolType;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.mock.MockXBeeNetwork;
+import it.uniud.easyhome.network.mock.MockXBeeNode;
 import it.uniud.easyhome.packets.RawPacket;
+import it.uniud.easyhome.packets.xbee.XBeeConstants;
+import it.uniud.easyhome.packets.xbee.XBeeInboundPacket;
 import it.uniud.easyhome.processing.ProcessKind;
-import it.uniud.easyhome.xbee.XBeeConstants;
-import it.uniud.easyhome.xbee.XBeeInboundPacket;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -79,80 +80,26 @@ public class DeviceAnnounceIT {
 		
 		ClientResponse gatewayInsertion = insertGateway(XBEE_GATEWAY_PORT, ProtocolType.XBEE);
 		assertEquals(ClientResponse.Status.CREATED,gatewayInsertion.getClientResponseStatus());
+        String locationPath = gatewayInsertion.getLocation().getPath();
+        String[] segments = locationPath.split("/");
+        int gid = Integer.parseInt(segments[segments.length-1]);
 		
 		ClientResponse processInsertion = insertNodeRegistrationProcess();
 		assertEquals(ClientResponse.Status.CREATED,processInsertion.getClientResponseStatus());
+		
+        Node.Builder nodeBuilder = new Node.Builder(0xA1L)
+        							 .setAddress((short)0x1111)
+        							 .setGatewayId((byte)gid)
+        							 .setCapability((byte)0x7A);
         
-        RawPacket.Builder rpBuilder = new RawPacket.Builder();
-        
-        int sum = 0;
-        // Delimiter
-        rpBuilder.append(XBeeConstants.START_DELIMITER);
-        // Length (31)
-        rpBuilder.append(0x00).append(0x1F);
-        // Frame type
-        rpBuilder.append(XBeeConstants.EXPLICIT_RX_INDICATOR_FRAME_TYPE);
-        sum += XBeeConstants.EXPLICIT_RX_INDICATOR_FRAME_TYPE;
-        // Source 64 bit address (arbitrary)
-        rpBuilder.append(new byte[7]).append(0x77);
-        sum += 0x77;
-        // Source 16 bit address (arbitrary)
-        rpBuilder.append(new byte[]{(byte)0x7D,(byte)0xB3});
-        sum += 0x7D;
-        sum += 0xB3;
-        // Source endpoint
-        rpBuilder.append(0x01);
-        sum += 0x01;
-        // Destination endpoint
-        rpBuilder.append(0x01);
-        sum += 0x01;
-        // Cluster Id (DeviceAnnce)
-        rpBuilder.append(new byte[]{0x00,0x13});
-        sum += 0x13;
-        // Profile Id (EasyHome ZDP)
-        rpBuilder.append(new byte[]{(byte)0xEA,0x50});
-        sum += 0xEA;
-        sum += 0x50;
-        // Receive options (0x02: packet was a broadcast; 0x00 otherwise)
-        rpBuilder.append(0x02);
-        sum += 0x02;
-        // Frame control
-        rpBuilder.append(0x00);
-        sum += 0x00;
-        // Transaction sequence number (arbitrary)
-        rpBuilder.append(0x71);
-        sum += 0x71;
-        // Device announce data
-        // NWK addr
-        rpBuilder.append(0x23);
-        sum += 0x23;
-        rpBuilder.append(0x34);
-        sum += 0x34;
-        // IEEE addr
-        for (int i=0;i<7;i++) {
-        	rpBuilder.append(0x00);
-	        sum += 0x00;        
-        }
-        rpBuilder.append(0x55);
-        sum += 0x55;
-        // Capability (random)
-        rpBuilder.append(0x7A);
-        sum += 0x7A;
-        // Checksum
-        rpBuilder.append(0xFF - (sum & 0xFF));
-        
-        XBeeInboundPacket xbeePkt = new XBeeInboundPacket();
-        ByteArrayInputStream bais = new ByteArrayInputStream(rpBuilder.build().getBytes());
-        xbeePkt.read(bais);
-        
+        mn.register(nodeBuilder.build());
         mn.turnOn();
-        mn.broadcast(xbeePkt);
         
         // Robustly check that we persist the node within a reasonably high time, since 
         // the process persists it asynchronously
         int counter = 0;
         long sleepTime = 500;
-        long maximumSleepTime = 5000;
+        long maximumSleepTime = 6000;
         while (sleepTime*counter < maximumSleepTime) {
         	Thread.sleep(sleepTime);
         	counter++;

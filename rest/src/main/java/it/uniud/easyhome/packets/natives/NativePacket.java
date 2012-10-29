@@ -1,6 +1,9 @@
-package it.uniud.easyhome.packets;
+package it.uniud.easyhome.packets.natives;
 
 import it.uniud.easyhome.exceptions.InvalidDelimiterException;
+import it.uniud.easyhome.packets.ModuleCoordinates;
+import it.uniud.easyhome.packets.Operation;
+import it.uniud.easyhome.packets.Packet;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
