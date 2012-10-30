@@ -100,8 +100,8 @@ public class NodeRegistrationIT {
         // Robustly check that we persist the node within a reasonably high time, since 
         // the process persists it asynchronously
         int counter = 0;
-        long sleepTime = 1000;
-        long maximumSleepTime = 6000;
+        long sleepTime = 500;
+        long maximumSleepTime = 2000;
         while (sleepTime*counter < maximumSleepTime) {
         	counter++;
 	    	ClientResponse getNodesResponse = client.resource(TARGET).path("network")

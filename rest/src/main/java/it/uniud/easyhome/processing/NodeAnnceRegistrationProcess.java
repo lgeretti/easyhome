@@ -1,5 +1,7 @@
 package it.uniud.easyhome.processing;
 
+import java.util.List;
+
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.Node;
@@ -23,31 +25,22 @@ import com.sun.jersey.api.client.ClientResponse.Status;
 
 public class NodeAnnceRegistrationProcess extends Process {
 	
-	private static long RECEPTION_WAIT_TIME_MS = 1000;	
+	private MessageProducer networkEventsProducer = null;
 	
-    public NodeAnnceRegistrationProcess(int pid, UriInfo uriInfo) {
-        super(pid, UriBuilder.fromUri(uriInfo.getBaseUri()).build(new Object[0]));
-    }
-    
-    @Override
-    public ProcessKind getKind() {
-    	return ProcessKind.NODE_ANNCE_REGISTRATION;
-    }
-    
-    @Override
-    public void start() {
-        Thread thr = new Thread(this);
-        thr.start();
-    }
-    
-    @Override
-	protected void process(MessageConsumer inboundPacketsConsumer, MessageProducer outboundPacketsProducer,
-			   			   Context context, Session session) throws JMSException, NamingException {
+    public NodeAnnceRegistrationProcess(int pid, UriInfo uriInfo, ProcessKind kind) throws NamingException, JMSException {
+        super(pid, UriBuilder.fromUri(uriInfo.getBaseUri()).build(new Object[0]),kind);
     	
-        Topic networkEventsTopic = (Topic) context.lookup("jms/easyhome/NetworkEventsTopic");
-        MessageProducer networkEventsProducer = session.createProducer(networkEventsTopic);
+        Topic networkEventsTopic = (Topic) jndiContext.lookup("jms/easyhome/NetworkEventsTopic");
+        networkEventsProducer = jmsSession.createProducer(networkEventsTopic);
+        registerProducer(networkEventsProducer);
+    }
+    
+    @Override
+	protected void process() throws JMSException, NamingException {
+    	
+    	MessageConsumer inboundPacketsConsumer = getInboundPacketsConsumer();
 
-    	ObjectMessage msg = (ObjectMessage) inboundPacketsConsumer.receive(RECEPTION_WAIT_TIME_MS);
+    	ObjectMessage msg = (ObjectMessage) inboundPacketsConsumer.receive();
     	if (msg != null) {
         	NativePacket pkt = (NativePacket) msg.getObject();
         	println("Packet received from " + pkt.getSrcCoords());
@@ -73,7 +66,7 @@ public class NodeAnnceRegistrationProcess extends Process {
                 	
                 	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_ADDED, gatewayId, nuid);
                     try {
-                        ObjectMessage eventMessage = session.createObjectMessage(event);
+                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
                         networkEventsProducer.send(eventMessage);
                         println("Node announcement registered and event dispatched");
                     } catch (Exception e) {
@@ -88,8 +81,6 @@ public class NodeAnnceRegistrationProcess extends Process {
         		return;
         	}
     	}
-    	
-    	networkEventsProducer.close();
     }
     
 }

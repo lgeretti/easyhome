@@ -23,38 +23,24 @@ import com.sun.jersey.api.client.ClientResponse.Status;
 
 public class NodeDescrAcquirementProcess extends Process {
 	
-	private static long RECEPTION_WAIT_TIME_MS = 1000;	
+	private MessageConsumer networkEventsConsumer = null;
 	
-    public NodeDescrAcquirementProcess(int pid, UriInfo uriInfo) {
-        super(pid, UriBuilder.fromUri(uriInfo.getBaseUri()).build(new Object[0]));
+    public NodeDescrAcquirementProcess(int pid, UriInfo uriInfo,ProcessKind kind) throws NamingException, JMSException {
+        super(pid, UriBuilder.fromUri(uriInfo.getBaseUri()).build(new Object[0]),kind);
+        Topic networkEventsTopic = (Topic) jndiContext.lookup("jms/easyhome/NetworkEventsTopic");
+        networkEventsConsumer = jmsSession.createConsumer(networkEventsTopic);
+        registerConsumer(networkEventsConsumer);
     }
     
     @Override
-    public ProcessKind getKind() {
-    	return ProcessKind.NODE_DESCR_ACQUIREMENT;
-    }
-    
-    @Override
-    public void start() {
-        Thread thr = new Thread(this);
-        thr.start();
-    }
-    
-    @Override
-	protected void process(MessageConsumer inboundPacketsConsumer, MessageProducer outboundPacketsProducer,
-			   			   Context context, Session session) throws JMSException, NamingException {
-    	
-        Topic networkEventsTopic = (Topic) context.lookup("jms/easyhome/NetworkEventsTopic");
-        MessageConsumer networkEventsConsumer = session.createConsumer(networkEventsTopic);
+	protected void process() throws JMSException, NamingException {
 
-    	ObjectMessage msg = (ObjectMessage) networkEventsConsumer.receive(RECEPTION_WAIT_TIME_MS);
+    	ObjectMessage msg = (ObjectMessage) networkEventsConsumer.receive();
     	if (msg != null) {
     		NetworkEvent event = (NetworkEvent) msg.getObject();
     		if (event.getKind() == NetworkEvent.EventKind.NODE_ADDED)
     			println("New node event received for gid " + event.getGid() + " and node id " + event.getNuid());
        	}
-    	
-    	networkEventsConsumer.close();
     }
     
 }

@@ -6,6 +6,8 @@ import it.uniud.easyhome.processing.Process;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.jms.JMSException;
+import javax.naming.NamingException;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.*;
@@ -21,12 +23,6 @@ public class ProcessResource {
     private static int pidCounter = 0;
     
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<Process> getProcesses() {
-        return processes;
-    }
-    
-    @GET
     @Path("size")
     @Produces(MediaType.TEXT_PLAIN)
     public String getNumProcesses() {
@@ -35,7 +31,7 @@ public class ProcessResource {
     
     // curl -X POST http://localhost:8080/easyhome/rest/processes -H "Content-Type: application/x-www-form-urlencoded" --data-binary "kind=NODE_ANNCE_REGISTRATION"
     @POST
-    public Response postProcess(@FormParam("kind") ProcessKind kind) {
+    public Response postProcess(@FormParam("kind") ProcessKind kind) throws NamingException, JMSException {
         
     	int pid = ++pidCounter;
     	

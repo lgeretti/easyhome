@@ -1,6 +1,8 @@
 package it.uniud.easyhome.processing;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -19,26 +21,64 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 
-@XmlRootElement
-public class Process implements Runnable {
+public abstract class Process implements Runnable {
     
-    @XmlElement(name="pid")
     private int pid;
+    private final ProcessKind kind;
     
     private volatile boolean stopped = false;
     
-    // REST client
     private Client restClient;
     
     protected WebResource restResource;
     
-    @SuppressWarnings("unused")
-    private Process() {}
+    private List<MessageConsumer> consumers;
+    private List<MessageProducer> producers;
     
-    protected Process(int pid, URI restTarget) {
+	private Connection jmsConnection = null;
+	protected Context jndiContext = null;
+	protected Session jmsSession = null;
+    
+    protected Process(int pid, URI restTarget, ProcessKind kind) throws NamingException, JMSException {
         this.pid = pid;
+        this.kind = kind;
         this.restClient = Client.create(new DefaultClientConfig());
         this.restResource = restClient.resource(restTarget);
+        
+    	consumers = new ArrayList<MessageConsumer>();
+    	producers = new ArrayList<MessageProducer>();
+    	
+   		jndiContext = new InitialContext();
+        ConnectionFactory connectionFactory = (ConnectionFactory) jndiContext.lookup("jms/easyhome/ConnectionFactory");
+        
+        Topic inboundPacketsTopic = (Topic) jndiContext.lookup("jms/easyhome/InboundPacketsTopic");
+        Topic outboundPacketsTopic = (Topic) jndiContext.lookup("jms/easyhome/OutboundPacketsTopic");
+        
+        jmsConnection = connectionFactory.createConnection();
+        jmsSession = jmsConnection.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
+
+        consumers.add(jmsSession.createConsumer(inboundPacketsTopic));  
+        producers.add(jmsSession.createProducer(outboundPacketsTopic));
+        
+        jmsConnection.start();
+    }
+    
+    protected abstract void process() throws JMSException, NamingException;
+    
+    protected MessageConsumer getInboundPacketsConsumer() {
+    	return consumers.get(0);
+    }
+    
+    protected MessageProducer getOutboundPacketsProducer() {
+    	return producers.get(0);
+    }
+    
+    protected void registerConsumer(MessageConsumer consumer) {
+    	consumers.add(consumer);
+    }
+
+    protected void registerProducer(MessageProducer producer) {
+    	producers.add(producer);
     }
     
     public final int getPid() {
@@ -46,68 +86,67 @@ public class Process implements Runnable {
     }
 	
     public ProcessKind getKind() {
-    	return null;
+    	return kind;
     }
     
 	protected boolean isStopped() {
 		return stopped;
 	}
+
+    public void start() {
+        Thread thr = new Thread(this);
+        thr.start();
+    }
 	
 	public void stop() {
 		stopped = true;
-	}
-	
-	public void start() {
-		// Empty implementation to be overridden
-	}
-	
-	protected void process(MessageConsumer inboundPacketsConsumer, MessageProducer outboundPacketsProducer,
-						   Context context, javax.jms.Session session) throws JMSException, NamingException {
-		// Empty implementation to be overridden
+		closeConsumersProducers();
 	}
 	
 	protected void println(String msg) {
     	System.out.println("Pr #" + pid + ": " + msg);
     }
+	
+	private void closeConsumersProducers() {
+		
+		for (MessageConsumer consumer : consumers) {
+			try {
+				consumer.close();
+			} catch (JMSException ex) {
+				// If we fail closing, then it is already closed
+			}
+		}
+			
+		for (MessageProducer producer : producers) {
+			try {
+				producer.close();
+			} catch (JMSException ex) {
+				// If we fail closing, then it is already closed
+			}
+		}
+		consumers.clear();
+		producers.clear();
+	}
 
 	@Override
-    public void run() {
-    	
-    	Connection jmsConnection = null;
-    	Session jmsSession = null;
-    	MessageConsumer inboundPacketsConsumer = null;
-    	MessageProducer outboundPacketsProducer = null;
+    public final void run() {
     	
     	try {
-	   		Context jndiContext = new InitialContext();
-	        ConnectionFactory connectionFactory = (ConnectionFactory) jndiContext.lookup("jms/easyhome/ConnectionFactory");
-	        
-	        Topic inboundPacketsTopic = (Topic) jndiContext.lookup("jms/easyhome/InboundPacketsTopic");
-	        Topic outboundPacketsTopic = (Topic) jndiContext.lookup("jms/easyhome/OutboundPacketsTopic");
-	        
-	        jmsConnection = connectionFactory.createConnection();
-	        jmsSession = jmsConnection.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
-
-	        inboundPacketsConsumer = jmsSession.createConsumer(inboundPacketsTopic);  
-	        outboundPacketsProducer = jmsSession.createProducer(outboundPacketsTopic);
-	    	
-	        jmsConnection.start();
 	        
 	        println(getKind().toString() + " processing started");
 	        
 	    	while (!isStopped()) 
-	    		process(inboundPacketsConsumer,outboundPacketsProducer,jndiContext,jmsSession);
+	    		process();
 	    	
     	} catch (NamingException ex) {
     		ex.printStackTrace();
     	} catch (JMSException ex) {
-    		ex.printStackTrace();
+    		// Here we also consider the case of termination via consumer closing
     	} finally {
     		try {
     		
 	    		if (jmsConnection != null) {
-	    			inboundPacketsConsumer.close();
-	    			outboundPacketsProducer.close();
+	    			closeConsumersProducers();
 	    			jmsSession.close();
 	    			jmsConnection.close();
 	    		}
