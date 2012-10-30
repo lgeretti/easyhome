@@ -74,6 +74,9 @@ public class Process implements Runnable {
     public void run() {
     	
     	Connection jmsConnection = null;
+    	Session jmsSession = null;
+    	MessageConsumer inboundPacketsConsumer = null;
+    	MessageProducer outboundPacketsProducer = null;
     	
     	try {
 	   		Context jndiContext = new InitialContext();
@@ -83,10 +86,10 @@ public class Process implements Runnable {
 	        Topic outboundPacketsTopic = (Topic) jndiContext.lookup("jms/easyhome/OutboundPacketsTopic");
 	        
 	        jmsConnection = connectionFactory.createConnection();
-	        Session jmsSession = jmsConnection.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
-	        
-	        MessageConsumer inboundPacketsConsumer = jmsSession.createConsumer(inboundPacketsTopic);  
-	        MessageProducer outboundPacketsProducer = jmsSession.createProducer(outboundPacketsTopic);
+	        jmsSession = jmsConnection.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
+
+	        inboundPacketsConsumer = jmsSession.createConsumer(inboundPacketsTopic);  
+	        outboundPacketsProducer = jmsSession.createProducer(outboundPacketsTopic);
 	    	
 	        jmsConnection.start();
 	        
@@ -101,8 +104,13 @@ public class Process implements Runnable {
     		ex.printStackTrace();
     	} finally {
     		try {
-	    		if (jmsConnection != null)
+    		
+	    		if (jmsConnection != null) {
+	    			inboundPacketsConsumer.close();
+	    			outboundPacketsProducer.close();
+	    			jmsSession.close();
 	    			jmsConnection.close();
+	    		}
     		} catch (JMSException ex) {
     			// Can't do better than this, hence we ignore the error
     		} finally {

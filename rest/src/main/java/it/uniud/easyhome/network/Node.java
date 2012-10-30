@@ -23,6 +23,8 @@ public class Node {
     private short address;    
     @Column(nullable = false)
     private byte capability;
+    @Column(nullable = false)
+    private NodeLogicalType logicalType;
     
     private Node() {}
 
@@ -35,6 +37,9 @@ public class Node {
                 throw new IllegalArgumentException();            
             node = new Node();
             node.id = id;
+            
+            node.name = Long.toHexString(id);
+            node.logicalType = NodeLogicalType.UNDEFINED;
         }
         
         public Builder setName(String name) {
@@ -65,13 +70,15 @@ public class Node {
             return this;        		
         }
         
+        public Builder setLogicalType(NodeLogicalType logicalType) {
+        	node.logicalType = logicalType;
+        	return this;
+        }
+        
         public Node build() {
             
         	if ((node.gatewayId == 0) || (node.address == 0) || (node.capability == 0))
         		throw new NodeConstructionException();
-        	
-        	if (node.name == null)
-        		node.name = Long.toHexString(node.id);
         	
             return node;
         }
@@ -96,6 +103,10 @@ public class Node {
     public byte getCapability() {
     	return this.capability;
     }
+    
+    public NodeLogicalType getLogicalType() {
+    	return this.logicalType;
+    }
 
     @Override
     public boolean equals(Object other) {
@@ -109,6 +120,7 @@ public class Node {
         if (!(this.gatewayId == otherNode.gatewayId)) return false;
         if (!(this.address == otherNode.address)) return false;
         if (!(this.capability == otherNode.capability)) return false;
+        if (!(this.logicalType == otherNode.logicalType)) return false;
         
         return true;
     }
@@ -123,7 +135,7 @@ public class Node {
         result = prime * result + gatewayId;
         result = prime * result + address;
         result = prime * result + capability;
-        
+        result = prime * result + logicalType.hashCode();
         return (int)result;
     }
 }

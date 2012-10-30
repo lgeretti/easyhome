@@ -53,6 +53,8 @@ public class NodeDescrAcquirementProcess extends Process {
     		if (event.getKind() == NetworkEvent.EventKind.NODE_ADDED)
     			println("New node event received for gid " + event.getGid() + " and node id " + event.getNuid());
        	}
+    	
+    	networkEventsConsumer.close();
     }
     
 }

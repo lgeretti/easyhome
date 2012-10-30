@@ -88,6 +88,8 @@ public class NodeAnnceRegistrationProcess extends Process {
         		return;
         	}
     	}
+    	
+    	networkEventsProducer.close();
     }
     
 }
