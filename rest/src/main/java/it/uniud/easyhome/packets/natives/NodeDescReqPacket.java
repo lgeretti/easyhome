@@ -20,16 +20,16 @@ public class NodeDescReqPacket extends NativePacket {
 			throw new InvalidPacketTypeException();
 		if (op.getDomain() != Domains.MANAGEMENT.getCode())
 			throw new InvalidPacketTypeException();
-		if (op.getContext() != ManagementContexts.NODE_ANNOUNCE.getCode())
+		if (op.getContext() != ManagementContexts.NODE_DESC_REQ.getCode())
 			throw new InvalidPacketTypeException();
 		if (op.getData().length != APS_PAYLOAD_LENGTH)
 			throw new InvalidPacketTypeException();
 	}
 	
 	public NodeDescReqPacket(Node destinationNode, byte seqNumber) {
-		this(new ModuleCoordinates((byte)1,0L,(short)0,(byte)1),
-			 new ModuleCoordinates(destinationNode.getGatewayId(),destinationNode.getId(),destinationNode.getAddress(),(byte)1),				
-			 new Operation(seqNumber,Domains.EASYHOME_MANAGEMENT.getCode(),ManagementContexts.NODE_DESC_REQ.getCode(),
+		this(new ModuleCoordinates((byte)1,0L,(short)0,(byte)0),
+			 new ModuleCoordinates(destinationNode.getGatewayId(),destinationNode.getId(),destinationNode.getAddress(),(byte)0),				
+			 new Operation(seqNumber,Domains.MANAGEMENT.getCode(),ManagementContexts.NODE_DESC_REQ.getCode(),
 					       (byte)0x0/*Context invariant*/,(byte)0x0/*Irrelevant*/,
 					       new byte[]{(byte)((destinationNode.getAddress() >>> 8) & 0xFF), (byte)(destinationNode.getAddress() & 0xFF)}));
 	}
@@ -40,6 +40,6 @@ public class NodeDescReqPacket extends NativePacket {
 	
 	public short getAddrOfInterest() {
 		byte[] data = getOperation().getData();
-		return (short) ((((short)data[0]) << 8) + data[1]); 
+		return (short) ((((short)(data[0] & 0xFF)) << 8) + data[1]); 
 	}
 }

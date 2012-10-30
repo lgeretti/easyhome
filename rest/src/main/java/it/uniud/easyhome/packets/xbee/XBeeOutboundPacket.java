@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 public class XBeeOutboundPacket extends XBeePacket {
 	
@@ -71,7 +72,7 @@ public class XBeeOutboundPacket extends XBeePacket {
 	}
 	
 	public boolean isBroadcast() {
-		return (dstAddr64 == 0x0000FFFFL);
+		return (dstAddr64 == 0xFFFFL);
 	}
 	
 	@Override
@@ -109,8 +110,7 @@ public class XBeeOutboundPacket extends XBeePacket {
 			os.write(val);
 			sum += val;
 		}		
-		// Source endpoint;
-		
+		// Source endpoint
 		byte srcEndpointToWrite = (srcEndpoint == 0 ? 1 : srcEndpoint);
 		os.write(srcEndpointToWrite);
 		sum += srcEndpointToWrite;
@@ -147,6 +147,7 @@ public class XBeeOutboundPacket extends XBeePacket {
 			os.write(command);
 			sum += command;
 		}
+		
 		// Aps payload
 		for (byte b: apsPayload) {
 			os.write(b);
@@ -164,15 +165,14 @@ public class XBeeOutboundPacket extends XBeePacket {
         byte frameType = (byte)is.read();
         if (frameType != XBeeConstants.EXPLICIT_ADDRESSING_COMMAND_FRAME_TYPE) 
         	throw new InvalidPacketTypeException();
+        
+        frameId = (byte)is.read();
 		
-		dstAddr64 = (((long)is.read()) << 56) + 
-			       (((long)is.read()) << 48) + 
-			       (((long)is.read()) << 40) + 
-			       (((long)is.read()) << 32) +
-			       (((long)is.read()) << 24) + 
-			       (((long)is.read()) << 16) + 
-			       (((long)is.read()) << 8) + 
-			       (long)is.read();
+		long result = 0;
+		for (int i=56; i>=0; i-=8)
+			result += ((long)is.read())<<i;
+		dstAddr64 = result;
+        
 	    dstAddr16 = (short)((is.read() << 8) + is.read());
 	    
 	    byte readSrcEndpoint = (byte)is.read(); 
@@ -196,10 +196,10 @@ public class XBeeOutboundPacket extends XBeePacket {
 		int apsPayloadLength = 0;
 		
 		if (Domains.isManagement(profileId)) {
-			apsPayloadLength = packetLength - 20;
+			apsPayloadLength = packetLength - 22;
 			command = 0x00;
 		} else {
-			apsPayloadLength = packetLength - 21;
+			apsPayloadLength = packetLength - 23;
 			command = (byte)is.read();
 		}
 		

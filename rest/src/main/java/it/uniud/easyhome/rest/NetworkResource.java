@@ -57,7 +57,7 @@ public final class NetworkResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateOrInsertNode(Node node) {
-        
+    	
         boolean existed = resEjb.insertOrUpdateNode(node);
         
         if (!existed)

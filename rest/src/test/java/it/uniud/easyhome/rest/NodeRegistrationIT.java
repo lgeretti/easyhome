@@ -90,11 +90,12 @@ public class NodeRegistrationIT {
 		assertEquals(ClientResponse.Status.CREATED,nodeDescrAcqProcessInsertion.getClientResponseStatus());
 		
         Node.Builder nodeBuilder = new Node.Builder(0xA1L)
-        							 .setAddress((short)0x1111)
+        							 .setAddress((short)0x543F)
         							 .setGatewayId((byte)gid)
         							 .setCapability((byte)0x7A);
+        Node node = nodeBuilder.build();
         
-        mn.register(nodeBuilder.build());
+        mn.register(node);
         mn.turnOn();
         
         // Robustly check that we persist the node within a reasonably high time, since 
@@ -111,7 +112,10 @@ public class NodeRegistrationIT {
 	    		break;
 	    	Thread.sleep(sleepTime);
         }
+        
     	assertTrue(sleepTime*counter < maximumSleepTime);
+    	
+    	
     	
     	mn.turnOff();
 	}

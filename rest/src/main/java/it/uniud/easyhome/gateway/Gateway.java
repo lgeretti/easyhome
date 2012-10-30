@@ -60,23 +60,23 @@ public class Gateway implements Runnable {
     	this.port = port;
     }
     
-    public byte getId() {
+    public final byte getId() {
         return id;
     }
     
-    public ProtocolType getProtocolType() {
+    public final ProtocolType getProtocolType() {
         return protocolType;
     }
     
-    public int getPort() {
+    public final int getPort() {
         return port;
     }
     
-    public Map<ModuleCoordinates,Integer> getRoutingTable() {
+    public final Map<ModuleCoordinates,Integer> getRoutingTable() {
         return routingTable;
     }
     
-    public int addRoutingEntry(ModuleCoordinates coords) {
+    public final int addRoutingEntry(ModuleCoordinates coords) {
         
         println("Putting routing entry (endpoint " + (mappedEndpointCounter+1) + ") for " + coords);
     	
@@ -85,11 +85,11 @@ public class Gateway implements Runnable {
         return mappedEndpointCounter;
     }
     
-    public void removeRoutingEntry(ModuleCoordinates coords) {
+    public final void removeRoutingEntry(ModuleCoordinates coords) {
         routingTable.remove(coords);
     }
     
-    public void removeRoutingEntriesForGateway(int gid) {
+    public final void removeRoutingEntriesForGateway(int gid) {
         
         Iterator<Map.Entry<ModuleCoordinates,Integer>> it = routingTable.entrySet().iterator();
         while (it.hasNext())
@@ -97,11 +97,11 @@ public class Gateway implements Runnable {
                 it.remove();
     }
     
-    public Integer getEndpointFor(ModuleCoordinates coords) {
+    public final Integer getEndpointFor(ModuleCoordinates coords) {
         return routingTable.get(coords);
     }
     
-    protected ModuleCoordinates getCoordinatesFor(int endpoint) {
+    protected final ModuleCoordinates getCoordinatesFor(int endpoint) {
         ModuleCoordinates coords = null;
 
         for (Entry<ModuleCoordinates,Integer> pair : routingTable.entrySet()) 
@@ -117,7 +117,7 @@ public class Gateway implements Runnable {
     	// To be overridden
     }
     
-    public void close() {
+    public final void close() {
         try {
         	disconnect();
             server.close();
@@ -127,16 +127,16 @@ public class Gateway implements Runnable {
     }
     
     /** Drop any existing connection */
-    public void disconnect() {
+    public final void disconnect() {
     	disconnected = true;
     }
     
-    protected void println(String msg) {
+    protected final void println(String msg) {
     	System.out.println("Gw #" + id + ": " + msg);
     }
 
     @Override
-    public void run() {
+    public final void run() {
         
         try {
           server = new ServerSocket(port, MAX_CONNECTIONS);
@@ -210,7 +210,7 @@ public class Gateway implements Runnable {
     /**
      * Dispatches the packet to the processes and the gateways
      */
-    private void dispatchPacket(NativePacket pkt, Session jmsSession, MessageProducer inboundProducer, MessageProducer outboundProducer) {
+    private final void dispatchPacket(NativePacket pkt, Session jmsSession, MessageProducer inboundProducer, MessageProducer outboundProducer) {
   
         try {
             ObjectMessage inboundMessage = jmsSession.createObjectMessage(pkt);
@@ -227,7 +227,7 @@ public class Gateway implements Runnable {
         }
     }
     
-    private void handleInboundPacketFrom(InputStream is, ByteArrayOutputStream buffer, Session jmsSession,
+    private final void handleInboundPacketFrom(InputStream is, ByteArrayOutputStream buffer, Session jmsSession,
     		MessageProducer inboundProducer, MessageProducer outboundProducer) throws IOException {
     	
         try {
@@ -255,7 +255,7 @@ public class Gateway implements Runnable {
     	// To be overridden
     }
     
-    private void handleOutboundPacketsTo(OutputStream os, MessageConsumer consumer) {
+    private final void handleOutboundPacketsTo(OutputStream os, MessageConsumer consumer) {
     	
         try {
             while (true) {

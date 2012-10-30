@@ -87,7 +87,7 @@ public class ModuleCoordinates implements Serializable {
     		.append(gid)
     		.append("; N: ")
     		.append(nuid)
-    		.append("; A:")
+    		.append("; A: ")
     		.append(address)
     		.append("; E: ")
     		.append(endpoint)

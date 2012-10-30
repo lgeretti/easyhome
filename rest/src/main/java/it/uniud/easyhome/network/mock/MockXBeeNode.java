@@ -80,7 +80,14 @@ public class MockXBeeNode implements Runnable {
     public void run() {
     	
     	transmit(new DeviceAnnounceOutpkt(this));
+    	
+    	while(runningState != RunnableState.STOPPING) {
 
+        	XBeeInboundPacket pkt = inboundPacketQueue.poll();
+        	if (pkt != null)
+        		System.out.println("Packet received: " + pkt.printBytes());
+    	}
+    	
 		runningState = RunnableState.STOPPED;
     }
 

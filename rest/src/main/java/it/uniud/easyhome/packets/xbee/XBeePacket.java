@@ -138,6 +138,18 @@ public abstract class XBeePacket implements Packet {
         if (i == 100)
         	throw new IncompletePacketException();
 	}
+	
+    public String printBytes() {
+        
+        StringBuilder strb = new StringBuilder();
+        for (byte b: getBytes()) {
+            if ((0xFF & b) < 0x10)
+                strb.append("0");
+            strb.append(Integer.toHexString(0xFF & b).toUpperCase()).append(" ");
+        }
+        
+        return strb.toString();
+    }
 
 	protected abstract void handlePacketPayload(ByteArrayInputStream is, int packetLength);
 }
