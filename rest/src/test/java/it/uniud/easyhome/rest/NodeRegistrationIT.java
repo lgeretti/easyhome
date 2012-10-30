@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.gateway.ProtocolType;
 import it.uniud.easyhome.network.Node;
+import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.network.mock.MockXBeeNetwork;
 import it.uniud.easyhome.network.mock.MockXBeeNode;
 import it.uniud.easyhome.packets.RawPacket;
@@ -92,7 +93,8 @@ public class NodeRegistrationIT {
         Node.Builder nodeBuilder = new Node.Builder(0xA1L)
         							 .setAddress((short)0x543F)
         							 .setGatewayId((byte)gid)
-        							 .setCapability((byte)0x7A);
+        							 .setCapability((byte)0x7A)
+        							 .setLogicalType(NodeLogicalType.ROUTER);
         Node node = nodeBuilder.build();
         
         mn.register(node);

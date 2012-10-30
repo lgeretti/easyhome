@@ -53,7 +53,7 @@ public class MockXBeeNetwork implements Runnable {
 		}
 	}
 	
-	public void register(Node node) {
+	public void register(Node node) throws InvalidMockNodeException {
 		nodes.add(new MockXBeeNode(node,this));
 	}
 	

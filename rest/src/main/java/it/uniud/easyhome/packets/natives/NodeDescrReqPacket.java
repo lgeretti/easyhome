@@ -7,12 +7,12 @@ import it.uniud.easyhome.packets.Domains;
 import it.uniud.easyhome.packets.ModuleCoordinates;
 import it.uniud.easyhome.packets.Operation;
 
-public class NodeDescReqPacket extends NativePacket {
+public class NodeDescrReqPacket extends NativePacket {
 
 	private static final long serialVersionUID = 3241227466990620831L;
 	private static final int APS_PAYLOAD_LENGTH = 2;
 	
-	public NodeDescReqPacket(ModuleCoordinates srcCoords, ModuleCoordinates dstCoords, Operation op) {
+	public NodeDescrReqPacket(ModuleCoordinates srcCoords, ModuleCoordinates dstCoords, Operation op) {
 		
 		super(srcCoords,dstCoords,op);
 		
@@ -26,7 +26,7 @@ public class NodeDescReqPacket extends NativePacket {
 			throw new InvalidPacketTypeException();
 	}
 	
-	public NodeDescReqPacket(Node destinationNode, byte seqNumber) {
+	public NodeDescrReqPacket(Node destinationNode, byte seqNumber) {
 		this(new ModuleCoordinates((byte)1,0L,(short)0,(byte)0),
 			 new ModuleCoordinates(destinationNode.getGatewayId(),destinationNode.getId(),destinationNode.getAddress(),(byte)0),				
 			 new Operation(seqNumber,Domains.MANAGEMENT.getCode(),ManagementContexts.NODE_DESC_REQ.getCode(),
@@ -34,7 +34,7 @@ public class NodeDescReqPacket extends NativePacket {
 					       new byte[]{(byte)((destinationNode.getAddress() >>> 8) & 0xFF), (byte)(destinationNode.getAddress() & 0xFF)}));
 	}
 	
-	public NodeDescReqPacket(NativePacket pkt) {
+	public NodeDescrReqPacket(NativePacket pkt) {
 		this(pkt.getSrcCoords(),pkt.getDstCoords(),pkt.getOperation());
 	}
 	

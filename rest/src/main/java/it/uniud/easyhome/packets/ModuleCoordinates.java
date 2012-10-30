@@ -12,16 +12,16 @@ public class ModuleCoordinates implements Serializable {
 
     private static final long serialVersionUID = -5009839141486612459L;
 
-    public static final int OCTETS = 13;
+    public static final int OCTETS = 12;
     
-    // Gateway (and consequently subnetwork) identifier (>=0, =0 for broadcast, =1 for the native TCP/IP subnetwork)
+    // Gateway (and consequently subnetwork) identifier (0 for broadcast, 1 for the native TCP/IP subnetwork)
     private byte gid;
     // Node unique id (global address, like a IEEE MAC address, fixed for a node) (0x0 for the gateway, 
-    // 0x0000FFFF for a broadcast, 0xFFFFFFFF for unknown)
+    // 0x000000000000FFFF for a broadcast)
     private long nuid;
-    // Address within the network (>=0, 0xFFFE if broadcast or unknown)
+    // Address within the network (0x0000 for the gateway, 0xFFFE if broadcast or unknown)
     private short address;
-    // Endpoint of the interested module (>=0, =0 addresses the configuration endpoint)
+    // Endpoint of the interested module (0 addresses the management endpoint)
     private byte endpoint;
     
     public byte getGatewayId() {
@@ -59,7 +59,7 @@ public class ModuleCoordinates implements Serializable {
 			   (((long)is.read()) << 8) + 
 			   (long)is.read();
         address = (short)((is.read()<<8)+is.read());
-        endpoint = (byte)((is.read()<<8)+is.read());
+        endpoint = (byte)is.read();
     }
     
     public void write(OutputStream os) throws IOException {
@@ -76,7 +76,6 @@ public class ModuleCoordinates implements Serializable {
         
         os.write((address >>> 8) & 0xFF);
         os.write(address & 0xFF);
-        os.write((endpoint >>> 8) & 0xFF);
         os.write(endpoint & 0xFF);
     }
     

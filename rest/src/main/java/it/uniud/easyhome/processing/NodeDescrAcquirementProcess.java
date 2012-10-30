@@ -3,7 +3,7 @@ package it.uniud.easyhome.processing;
 import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.Node;
-import it.uniud.easyhome.packets.natives.NodeDescReqPacket;
+import it.uniud.easyhome.packets.natives.NodeDescrReqPacket;
 
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
@@ -42,7 +42,7 @@ public class NodeDescrAcquirementProcess extends Process {
   						  .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         	        
     	        	Node node = JsonUtils.getFrom(getResponse, Node.class);
-    	        	NodeDescReqPacket packet = new NodeDescReqPacket(node,++sequenceNumber);
+    	        	NodeDescrReqPacket packet = new NodeDescrReqPacket(node,++sequenceNumber);
     	            ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
     	            getOutboundPacketsProducer().send(outboundMessage);    
     	            println("Node descriptor request dispatched");

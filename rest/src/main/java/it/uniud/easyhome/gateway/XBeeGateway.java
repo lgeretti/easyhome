@@ -30,10 +30,10 @@ public class XBeeGateway extends Gateway {
         ModuleCoordinates dstCoords = null;
         
         // If a broadcast, we use the broadcast format for the destination coordinates, but only
-        // if the destination port are actually the administration ports
+        // if the destination port is actually an administration port
         if (receiveOptions == 0x02) {
         	if (dstEndpoint == 0x00 || dstEndpoint == 0x01) {        		
-	        	dstCoords = new ModuleCoordinates((byte)0,(short)0xFFFF,(short)0xFFFE,(byte)0);
+	        	dstCoords = new ModuleCoordinates((byte)0,0xFFFFL,(short)0xFFFE,(byte)0);
 	        	println("Setting destination as broadcast");
         	} else {
         		throw new IllegalBroadcastPortException();
