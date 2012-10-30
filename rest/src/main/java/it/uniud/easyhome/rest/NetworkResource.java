@@ -5,35 +5,33 @@ import it.uniud.easyhome.network.Node;
 
 import java.util.List;
 
-import javax.ejb.EJB;
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
-import javax.persistence.*;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.ws.rs.core.*;
 import javax.ws.rs.*;
 
 /** Handles the access to the network of nodes */
-@RequestScoped
 @Path("/network")
 public final class NetworkResource {
-    
-    @Inject
-    private static NetworkResourceEJB resEjb;
+
+    private NetworkResourceEJB resEjb;
+
+    public NetworkResource() throws NamingException {
+    	resEjb = (NetworkResourceEJB) new
+                InitialContext().lookup("java:global/easyhome/NetworkResourceEJB");
+    }
     
     @Context
     private UriInfo uriInfo;
     
     @GET
-    @Path("check")
+    @Path("checkInjection")
     @Produces(MediaType.TEXT_PLAIN)
-    public String check() {
+    public String number() {
     	if (resEjb == null)
-    		return "Failure";
-    	return "Success";
-    }
+    		return "EJB not injected";
+    	else return resEjb.getStatusMessage();
+    }    
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)

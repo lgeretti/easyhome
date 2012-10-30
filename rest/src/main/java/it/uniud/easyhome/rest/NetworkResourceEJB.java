@@ -4,7 +4,6 @@ import it.uniud.easyhome.network.Node;
 
 import java.util.List;
 
-import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -15,11 +14,17 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 @Stateless
-@LocalBean
-public class NetworkResourceEJB implements NetworkResourceEJBRemote {
+public class NetworkResourceEJB {
 
 	@PersistenceContext(unitName = "EasyHome-JTA")
 	private EntityManager em;
+	
+	private int val = 0;
+	
+	public String getStatusMessage() {
+		
+		return "Counter: " + String.valueOf(++val) + "; EntityManager: " + (em == null ? "null" : (em.isOpen()? "open" : "closed"));
+	}
 	
 	public List<Node> getNodes() {
 		
