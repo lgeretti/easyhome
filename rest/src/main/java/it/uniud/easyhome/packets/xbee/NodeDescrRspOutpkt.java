@@ -12,7 +12,7 @@ public final class NodeDescrRspOutpkt extends XBeeOutboundPacket {
 	public NodeDescrRspOutpkt(MockXBeeNode node) throws InvalidMockNodeException {
 		
 		dstAddr64 = 0x0L;
-		dstAddr16 = (short)0x0000;
+		dstAddr16 = (short)0x0;
 		profileId = Domains.EASYHOME_MANAGEMENT.getCode();
 		clusterId = ManagementContexts.NODE_DESC_RSP.getCode();
 		srcEndpoint = 0x01;

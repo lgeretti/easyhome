@@ -6,13 +6,13 @@ import it.uniud.easyhome.packets.Domains;
 import it.uniud.easyhome.packets.ModuleCoordinates;
 import it.uniud.easyhome.packets.Operation;
 
-public class NodeAnnouncePacket extends NativePacket {
+public class NodeAnncePacket extends NativePacket {
 
 	private static final long serialVersionUID = -5541681898302354205L;
 
 	private static final int APS_PAYLOAD_LENGTH = 11;
 	
-	public NodeAnnouncePacket(ModuleCoordinates srcCoords, ModuleCoordinates dstCoords, Operation op) {
+	public NodeAnncePacket(ModuleCoordinates srcCoords, ModuleCoordinates dstCoords, Operation op) {
 		
 		super(srcCoords,dstCoords,op);
 		
@@ -26,7 +26,7 @@ public class NodeAnnouncePacket extends NativePacket {
 			throw new InvalidPacketTypeException();
 	}
 	
-	public NodeAnnouncePacket(NativePacket pkt) {
+	public NodeAnncePacket(NativePacket pkt) {
 		this(pkt.getSrcCoords(),pkt.getDstCoords(),pkt.getOperation());
 	}
 	
@@ -45,5 +45,17 @@ public class NodeAnnouncePacket extends NativePacket {
 	
 	public byte getAnnouncedCapability() {
 		return getOperation().getData()[APS_PAYLOAD_LENGTH-1];
+	}
+	
+	public static boolean validates(NativePacket pkt) {
+		
+		Operation op = pkt.getOperation();
+		
+		if (op.getDomain() != Domains.MANAGEMENT.getCode())
+			return false;
+		if (op.getContext() != ManagementContexts.NODE_ANNOUNCE.getCode())
+			return false;
+		
+		return true;
 	}
 }

@@ -27,6 +27,10 @@ public class Node {
     private NodeLogicalType logicalType;
     
     private Node() {}
+    
+    public void setLogicalType(NodeLogicalType logicalType) {
+    	this.logicalType = logicalType;
+    }
 
     public static class Builder implements ConcreteClassBuilder<Node> {
         

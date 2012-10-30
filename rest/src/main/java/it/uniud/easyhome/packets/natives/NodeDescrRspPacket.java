@@ -1,5 +1,6 @@
 package it.uniud.easyhome.packets.natives;
 
+import it.uniud.easyhome.common.ByteUtils;
 import it.uniud.easyhome.exceptions.InvalidNodeDescException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.NodeLogicalType;
@@ -33,7 +34,7 @@ public class NodeDescrRspPacket extends NativePacket {
 	}
 	
 	public NodeLogicalType getLogicalType() throws InvalidNodeDescException {
-		int raw = (this.getOperation().getData()[0] >>> 5) & 0xFF;
+		int raw = (this.getOperation().getData()[3] >>> 5) & 0xFF;
 		
 		NodeLogicalType result = null;
 		
@@ -52,5 +53,21 @@ public class NodeDescrRspPacket extends NativePacket {
 		}
 		
 		return result;
+	}
+	
+	public short getAddrOfInterest() {
+		return ByteUtils.getShort(getOperation().getData(),1);
+	}
+	
+	public static boolean validates(NativePacket pkt) {
+		
+		Operation op = pkt.getOperation();
+		
+		if (op.getDomain() != Domains.MANAGEMENT.getCode())
+			return false;
+		if (op.getContext() != ManagementContexts.NODE_DESC_RSP.getCode())
+			return false;
+		
+		return true;
 	}
 }

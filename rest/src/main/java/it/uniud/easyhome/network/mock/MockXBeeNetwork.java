@@ -47,7 +47,6 @@ public class MockXBeeNetwork implements Runnable {
 	public void inject(XBeeOutboundPacket pkt) {
 		for (MockXBeeNode node : nodes) {
 			if (pkt.isBroadcast() || pkt.get64BitDstAddr() == node.getId()) {
-				System.out.println("Dispatched packet to node " + Long.toHexString(node.getId()));
 				node.receive(new XBeeInboundPacket(pkt,0x0,(short)0x0));
 			}
 		}

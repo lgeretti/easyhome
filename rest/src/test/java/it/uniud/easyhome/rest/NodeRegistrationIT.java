@@ -6,23 +6,14 @@ import it.uniud.easyhome.gateway.ProtocolType;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.network.mock.MockXBeeNetwork;
-import it.uniud.easyhome.network.mock.MockXBeeNode;
-import it.uniud.easyhome.packets.RawPacket;
-import it.uniud.easyhome.packets.xbee.XBeeConstants;
-import it.uniud.easyhome.packets.xbee.XBeeInboundPacket;
 import it.uniud.easyhome.processing.ProcessKind;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.net.Socket;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -102,24 +93,25 @@ public class NodeRegistrationIT {
         mn.register(node);
         mn.turnOn();
         
-        // Robustly check that we persist the node within a reasonably high time, since 
+        // Robustly check that we persist within a reasonably high time, since 
         // the process persists it asynchronously
         int counter = 0;
         long sleepTime = 500;
-        long maximumSleepTime = 2000;
+        long maximumSleepTime = 5000;
         while (sleepTime*counter < maximumSleepTime) {
         	counter++;
 	    	ClientResponse getNodesResponse = client.resource(TARGET).path("network")
 						.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	    	List<Node> nodes = JsonUtils.getListFrom(getNodesResponse, Node.class);
-	    	if (nodes.size() > 0)
-	    		break;
+	    	if (nodes.size() > 0) {
+	    		if (nodes.get(0).getLogicalType() == NodeLogicalType.ROUTER)
+	    			break;
+	    	}
+	    		
 	    	Thread.sleep(sleepTime);
         }
         
     	assertTrue(sleepTime*counter < maximumSleepTime);
-    	
-    	
     	
     	mn.turnOff();
 	}

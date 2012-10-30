@@ -6,7 +6,7 @@ import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.packets.natives.NativePacket;
-import it.uniud.easyhome.packets.natives.NodeAnnouncePacket;
+import it.uniud.easyhome.packets.natives.NodeAnncePacket;
 
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
@@ -43,42 +43,45 @@ public class NodeAnnceRegistrationProcess extends Process {
     	ObjectMessage msg = (ObjectMessage) inboundPacketsConsumer.receive();
     	if (msg != null) {
         	NativePacket pkt = (NativePacket) msg.getObject();
-        	println("Packet received from " + pkt.getSrcCoords());
         	
-        	try {
-        		NodeAnnouncePacket announce = new NodeAnnouncePacket(pkt);
-        		
-        		long nuid = announce.getAnnouncedNuid();
-        		byte gatewayId = announce.getSrcCoords().getGatewayId();
-        		short address = announce.getAnnouncedAddress();
-        		byte capability = announce.getAnnouncedCapability();
-        		
-                Node.Builder nodeBuilder = new Node.Builder(nuid);
-                Node node = nodeBuilder.setGatewayId(gatewayId)
-                					   .setAddress(address)
-                					   .setCapability(capability)
-                					   .build();
-                
-                ClientResponse response = restResource.path("network")
-                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
-                
-                if (response.getClientResponseStatus() == Status.CREATED) {
-                	
-                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_ADDED, gatewayId, nuid);
-                    try {
-                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
-                        networkEventsProducer.send(eventMessage);
-                        println("Node announcement registered and event dispatched");
-                    } catch (Exception e) {
-                    	println("Message could not be dispatched to inbound packets topic");
-                    }
-                	
-                } else if (response.getClientResponseStatus() != Status.OK)
-                	println("Node announcement registration failed");
-                
-        	} catch (InvalidPacketTypeException ex) {
-        		ex.printStackTrace();
-        		return;
+        	if (NodeAnncePacket.validates(pkt)) {
+	        	println("NodeAnncePacket received from " + pkt.getSrcCoords());
+	        	
+	        	try {
+	        		NodeAnncePacket announce = new NodeAnncePacket(pkt);
+	        		
+	        		long nuid = announce.getAnnouncedNuid();
+	        		byte gatewayId = announce.getSrcCoords().getGatewayId();
+	        		short address = announce.getAnnouncedAddress();
+	        		byte capability = announce.getAnnouncedCapability();
+	        		
+	                Node.Builder nodeBuilder = new Node.Builder(nuid);
+	                Node node = nodeBuilder.setGatewayId(gatewayId)
+	                					   .setAddress(address)
+	                					   .setCapability(capability)
+	                					   .build();
+	                
+	                ClientResponse response = restResource.path("network")
+	                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
+	                
+	                if (response.getClientResponseStatus() == Status.CREATED) {
+	                	
+	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_ADDED, gatewayId, nuid);
+	                    try {
+	                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
+	                        networkEventsProducer.send(eventMessage);
+	                        println("Node announcement registered and event dispatched");
+	                    } catch (Exception e) {
+	                    	println("Message could not be dispatched to inbound packets topic");
+	                    }
+	                	
+	                } else if (response.getClientResponseStatus() != Status.OK)
+	                	println("Node announcement registration failed");
+	                
+	        	} catch (InvalidPacketTypeException ex) {
+	        		ex.printStackTrace();
+	        		return;
+	        	}
         	}
     	}
     }
