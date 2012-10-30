@@ -13,13 +13,22 @@ public enum ProcessKind {
 			return new NodeAnnceRegistrationProcess(pid,uriInfo,this);
 		}
 	}, 
-	// Requests the node descriptor as soon as a node is added, then updates the node information
-	NODE_DESCR_ACQUIREMENT { 
+	// Requests the node descriptor as soon as a node is added
+	NODE_DESCR_REQUEST { 
 		@Override
 		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {
-			return new NodeDescrAcquirementProcess(pid,uriInfo,this);
+			return new NodeDescrRequestProcess(pid,uriInfo,this);
+		}
+	}, 
+	// Updates the node as soon as a descriptor is received
+	NODE_DESCR_REGISTRATION { 
+		@Override
+		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {
+			return new NodeDescrRegistrationProcess(pid,uriInfo,this);
 		}
 	};
+	
+	
 	
 	public abstract Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException;
 }

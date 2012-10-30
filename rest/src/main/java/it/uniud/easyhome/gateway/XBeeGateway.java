@@ -12,6 +12,7 @@ import it.uniud.easyhome.packets.xbee.XBeeInboundPacket;
 import it.uniud.easyhome.packets.xbee.XBeeOutboundPacket;
 
 import java.io.*;
+import java.util.Map;
 
 public class XBeeGateway extends Gateway {
     
@@ -40,7 +41,13 @@ public class XBeeGateway extends Gateway {
         	}
         } else {
 	        
-	        dstCoords = getCoordinatesFor(dstEndpoint);
+        	// If this is the implicit EasyHome controller endpoint
+        	if (dstEndpoint == 0x02) {
+        		dstCoords = new ModuleCoordinates((byte)1,0x0L,(short)0x0,(byte)0);
+        		println("Setting destination as domotic controller");
+        	} else {
+        		dstCoords = getCoordinatesFor(dstEndpoint);
+        	}
 	        
 	        if (dstCoords == null) {
 		        println("Could not find coordinates for mapped endpoint " + dstEndpoint);
@@ -92,8 +99,13 @@ public class XBeeGateway extends Gateway {
     @Override
     final protected void write(NativePacket pkt, OutputStream os) throws IOException {
     	
+    	// NOTE: we do not need to remap back the endpoint of the source, since the gateway will become the source
+    	// We instead need to rewrite the endpoints in the APS payload, where present, thus depending on the packet type
 		XBeeOutboundPacket xbeePkt = new XBeeOutboundPacket(pkt);
-		xbeePkt.write(os);
+		// We remap the endpoint of the destination, since the native network uses 0 for all cases
+		if (xbeePkt.getDstEndpoint() == 0)
+			xbeePkt.setDstEndpoint((byte)0x01);
+		xbeePkt.write(os);		
     }
   
 }

@@ -16,7 +16,7 @@ public final class NodeDescrRspOutpkt extends XBeeOutboundPacket {
 		profileId = Domains.EASYHOME_MANAGEMENT.getCode();
 		clusterId = ManagementContexts.NODE_DESC_RSP.getCode();
 		srcEndpoint = 0x01;
-		dstEndpoint = 0x01;
+		dstEndpoint = 0x02; // This is the endpoint that addresses the management port for the domotic controller
 		frameControl = 0x0;
 		apsPayload = new byte[APS_PAYLOAD_SIZE];
 		

@@ -16,13 +16,13 @@ import javax.ws.rs.core.UriInfo;
 
 import com.sun.jersey.api.client.ClientResponse;
 
-public class NodeDescrAcquirementProcess extends Process {
+public class NodeDescrRequestProcess extends Process {
 	
 	private byte sequenceNumber = 0;
 	
 	private MessageConsumer networkEventsConsumer = null;
 	
-    public NodeDescrAcquirementProcess(int pid, UriInfo uriInfo,ProcessKind kind) throws NamingException, JMSException {
+    public NodeDescrRequestProcess(int pid, UriInfo uriInfo,ProcessKind kind) throws NamingException, JMSException {
         super(pid, UriBuilder.fromUri(uriInfo.getBaseUri()).build(new Object[0]),kind);
         Topic networkEventsTopic = (Topic) jndiContext.lookup("jms/easyhome/NetworkEventsTopic");
         networkEventsConsumer = jmsSession.createConsumer(networkEventsTopic);

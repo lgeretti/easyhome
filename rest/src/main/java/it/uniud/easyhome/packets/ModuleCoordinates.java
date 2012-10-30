@@ -16,7 +16,7 @@ public class ModuleCoordinates implements Serializable {
     
     // Gateway (and consequently subnetwork) identifier (0 for broadcast, 1 for the native TCP/IP subnetwork)
     private byte gid;
-    // Node unique id (global address, like a IEEE MAC address, fixed for a node) (0x0 for the gateway, 
+    // Node unique id (global address, like a IEEE MAC address, fixed for a node) (0x0 for a gateway node if gid!=1, or the domotic controller if gid==1, 
     // 0x000000000000FFFF for a broadcast)
     private long nuid;
     // Address within the network (0x0000 for the gateway, 0xFFFE if broadcast or unknown)

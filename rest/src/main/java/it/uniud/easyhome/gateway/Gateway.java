@@ -45,7 +45,8 @@ public class Gateway implements Runnable {
     
     private final Map<ModuleCoordinates,Integer> routingTable = new HashMap<ModuleCoordinates,Integer>();
     
-    private int mappedEndpointCounter = 1;
+    // We start from 3 in order to leave the two management ports and the domotic controller port free
+    private int mappedEndpointCounter = 3;
     
     protected ServerSocket server = null;
     
@@ -78,11 +79,13 @@ public class Gateway implements Runnable {
     
     public final int addRoutingEntry(ModuleCoordinates coords) {
         
-        println("Putting routing entry (endpoint " + (mappedEndpointCounter+1) + ") for " + coords);
+    	int mappedEndpoint = mappedEndpointCounter++;
     	
-        routingTable.put(coords, ++mappedEndpointCounter);
+        println("Putting routing entry (endpoint " + (mappedEndpoint) + ") for " + coords);
+    	
+        routingTable.put(coords, mappedEndpoint);
         
-        return mappedEndpointCounter;
+        return mappedEndpoint;
     }
     
     public final void removeRoutingEntry(ModuleCoordinates coords) {
