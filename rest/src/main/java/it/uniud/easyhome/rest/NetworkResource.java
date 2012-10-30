@@ -5,6 +5,9 @@ import it.uniud.easyhome.network.Node;
 
 import java.util.List;
 
+import javax.ejb.EJB;
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 import javax.persistence.*;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -13,33 +16,30 @@ import javax.ws.rs.core.*;
 import javax.ws.rs.*;
 
 /** Handles the access to the network of nodes */
+@RequestScoped
 @Path("/network")
 public final class NetworkResource {
     
-    private static final String PERSISTENCE_CONTEXT = "EasyHome";
-    
-    private EntityManagerFactory emf = Persistence.createEntityManagerFactory(PERSISTENCE_CONTEXT);
+    @Inject
+    private static NetworkResourceEJB resEjb;
     
     @Context
     private UriInfo uriInfo;
     
     @GET
+    @Path("check")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String check() {
+    	if (resEjb == null)
+    		return "Failure";
+    	return "Success";
+    }
+    
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<Node> getNodes() {
         
-    	EntityManager em = emf.createEntityManager();
-    	
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<Node> criteria = builder.createQuery(Node.class);
-        Root<Node> root = criteria.from(Node.class);
-        criteria.select(root);
-        
-        TypedQuery<Node> query = em.createQuery(criteria);
-        List<Node> nodes = query.getResultList();
-        
-        em.close();
-        
-        return nodes;
+        return resEjb.getNodes();
         
     }
     
@@ -48,11 +48,7 @@ public final class NetworkResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Node getNode(@PathParam("nodeid") long nodeId) {
         
-    	EntityManager em = emf.createEntityManager();
-    	
-        Node node = em.find(Node.class, nodeId);
-
-        em.close();
+        Node node = resEjb.findNodeById(nodeId);
         
         if (node == null) 
             throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -64,22 +60,7 @@ public final class NetworkResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateOrInsertNode(Node node) {
         
-    	EntityManager em = emf.createEntityManager();
-    	
-        EntityTransaction tx = em.getTransaction();
-        tx.begin();
-        Node persistedNode = em.find(Node.class, node.getId());
-        boolean existed = (persistedNode != null);
-        
-        if (!existed) {
-            em.persist(node);
-        } else {
-            em.merge(node);
-        }
-            
-        tx.commit();
-        
-        em.close();
+        boolean existed = resEjb.insertOrUpdateNode(node);
         
         if (!existed)
             return Response.created(
@@ -95,22 +76,11 @@ public final class NetworkResource {
     @Path("{nodeid}")
     public Response deleteNode(@PathParam("nodeid") long nodeId) {
         
-    	EntityManager em = emf.createEntityManager();
-    	
-        EntityTransaction tx = em.getTransaction();
+        boolean existed = resEjb.removeNodeById(nodeId);
         
-        Node existing = em.find(Node.class, nodeId);
-        
-        if (existing == null) {
-        	em.close();
+        if (existed) {
         	throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
-        
-        tx.begin();
-        em.remove(existing);
-        tx.commit();    
-        
-        em.close();
         
         return Response.ok().build();
     }    
@@ -121,18 +91,7 @@ public final class NetworkResource {
     @DELETE
     public Response clear() {
         
-    	EntityManager em = emf.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
-
-        Query query = em.createQuery("DELETE FROM Node");
-                
-        tx.begin();
-        query.executeUpdate();
-        tx.commit();  
-        
-        em.clear();
-        
-        em.close();
+    	resEjb.removeAllNodes();
         
         return Response.ok().build();
     }
