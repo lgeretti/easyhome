@@ -32,7 +32,7 @@ public class NodeDescrRequestProcess extends Process {
     @Override
 	protected void process() throws JMSException, NamingException {
 
-    	ObjectMessage msg = (ObjectMessage) networkEventsConsumer.receive();
+    	ObjectMessage msg = (ObjectMessage) networkEventsConsumer.receive(MESSAGE_WAIT_TIME_MS);
     	if (msg != null) {
     		NetworkEvent event = (NetworkEvent) msg.getObject();
     		if (event.getKind() == NetworkEvent.EventKind.NODE_ADDED) {

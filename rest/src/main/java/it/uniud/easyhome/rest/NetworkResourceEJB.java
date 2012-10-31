@@ -19,13 +19,6 @@ public class NetworkResourceEJB {
 	@PersistenceContext(unitName = "EasyHome-JTA")
 	private EntityManager em;
 	
-	private int val = 0;
-	
-	public String getStatusMessage() {
-		
-		return "Counter: " + String.valueOf(++val) + "; EntityManager: " + (em == null ? "null" : (em.isOpen()? "open" : "closed"));
-	}
-	
 	public List<Node> getNodes() {
 		
         CriteriaBuilder builder = em.getCriteriaBuilder();

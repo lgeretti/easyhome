@@ -25,15 +25,6 @@ public final class NetworkResource {
     private UriInfo uriInfo;
     
     @GET
-    @Path("checkInjection")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String number() {
-    	if (resEjb == null)
-    		return "EJB not injected";
-    	else return resEjb.getStatusMessage();
-    }    
-    
-    @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<Node> getNodes() {
         

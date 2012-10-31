@@ -2,6 +2,7 @@ package it.uniud.easyhome.rest;
 
 import static org.junit.Assert.*;
 
+import it.uniud.easyhome.processing.Process;
 import it.uniud.easyhome.processing.ProcessKind;
 
 import javax.ws.rs.core.MediaType;
@@ -70,7 +71,7 @@ public class ProcessResourceIT {
     }
 
     @After
-    public void removeProcesses() {
+    public void removeProcesses() throws InterruptedException {
         client.resource(TARGET).delete();
     }
    

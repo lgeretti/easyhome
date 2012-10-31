@@ -42,6 +42,8 @@ public class Gateway implements Runnable {
 	// Default behavior requires only one connection; the native gateway is an exception, 
 	// reachable by any node in the native subnetwork
 	protected int MAX_CONNECTIONS = 1;
+	
+	public final static int MESSAGE_WAIT_TIME_MS = 500;
     
     private final Map<ModuleCoordinates,Integer> routingTable = new HashMap<ModuleCoordinates,Integer>();
     
@@ -262,7 +264,7 @@ public class Gateway implements Runnable {
     	
         try {
             while (true) {
-            	ObjectMessage msg = (ObjectMessage) consumer.receiveNoWait();
+            	ObjectMessage msg = (ObjectMessage) consumer.receive(MESSAGE_WAIT_TIME_MS);
                 if (msg == null) {
                 	break;
                 }

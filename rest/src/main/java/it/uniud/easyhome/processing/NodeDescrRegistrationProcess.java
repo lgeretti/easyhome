@@ -39,7 +39,7 @@ public class NodeDescrRegistrationProcess extends Process {
     	
     	MessageConsumer inboundPacketsConsumer = getInboundPacketsConsumer();
 
-    	ObjectMessage msg = (ObjectMessage) inboundPacketsConsumer.receive();
+    	ObjectMessage msg = (ObjectMessage) inboundPacketsConsumer.receive(MESSAGE_WAIT_TIME_MS);
     	if (msg != null) {
         	NativePacket pkt = (NativePacket) msg.getObject();
         	

@@ -6,6 +6,7 @@ import it.uniud.easyhome.gateway.ProtocolType;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.network.mock.MockXBeeNetwork;
+import it.uniud.easyhome.processing.Process;
 import it.uniud.easyhome.processing.ProcessKind;
 
 import java.util.List;
@@ -40,7 +41,7 @@ public class NodeRegistrationIT {
     }
 	
     @After
-    public void clearGateways() {
+    public void clear() throws InterruptedException {
     	client.resource(TARGET).path("hub").path("gateways").delete();
     	client.resource(TARGET).path("processes").delete();
     	client.resource(TARGET).path("network").delete();

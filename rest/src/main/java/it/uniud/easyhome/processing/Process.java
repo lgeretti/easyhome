@@ -22,7 +22,9 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 public abstract class Process implements Runnable {
-    
+	
+	public final static int MESSAGE_WAIT_TIME_MS = 500;
+	
     private int pid;
     private final ProcessKind kind;
     
@@ -94,39 +96,19 @@ public abstract class Process implements Runnable {
 	}
 
     public void start() {
-        Thread thr = new Thread(this);
-        thr.start();
+    	if (!stopped) {
+	        Thread thr = new Thread(this);
+	        thr.start();
+    	}
     }
 	
 	public void stop() {
 		stopped = true;
-		closeConsumersProducers();
 	}
 	
 	protected void println(String msg) {
     	System.out.println("Pr #" + pid + ": " + msg);
     }
-	
-	private void closeConsumersProducers() {
-		
-		for (MessageConsumer consumer : consumers) {
-			try {
-				consumer.close();
-			} catch (JMSException ex) {
-				// If we fail closing, then it is already closed
-			}
-		}
-			
-		for (MessageProducer producer : producers) {
-			try {
-				producer.close();
-			} catch (JMSException ex) {
-				// If we fail closing, then it is already closed
-			}
-		}
-		consumers.clear();
-		producers.clear();
-	}
 
 	@Override
     public final void run() {
@@ -146,14 +128,10 @@ public abstract class Process implements Runnable {
     		try {
     		
 	    		if (jmsConnection != null) {
-	    			closeConsumersProducers();
-	    			jmsSession.close();
 	    			jmsConnection.close();
 	    		}
     		} catch (JMSException ex) {
     			// Can't do better than this, hence we ignore the error
-    		} finally {
-    			println("JMS connection stopped");
     		}
     		
     		restClient.destroy();

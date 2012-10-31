@@ -100,7 +100,7 @@ public class HubContext {
     
     public void disconnectAllGateways() {
         for (Gateway gw : gateways)
-            gw.disconnect();    	    	
+            gw.disconnect();
     }
     
     public void removeGateway(int gid) {
