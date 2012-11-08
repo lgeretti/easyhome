@@ -1,5 +1,7 @@
 package it.uniud.easyhome.processing;
 
+import it.uniud.easyhome.common.RunnableState;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,12 +25,12 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 public abstract class Process implements Runnable {
 	
-	public final static int MESSAGE_WAIT_TIME_MS = 500;
+	public final static int MESSAGE_WAIT_TIME_MS = 250;
 	
     private int pid;
     private final ProcessKind kind;
     
-    private volatile boolean stopped = false;
+    private volatile RunnableState runState = RunnableState.STOPPED;
     
     private Client restClient;
     
@@ -92,18 +94,19 @@ public abstract class Process implements Runnable {
     }
     
 	protected boolean isStopped() {
-		return stopped;
+		return runState == RunnableState.STOPPED;
 	}
 
     public void start() {
-    	if (!stopped) {
+    	if (runState == RunnableState.STOPPED) {
+    		runState = RunnableState.STARTING;
 	        Thread thr = new Thread(this);
 	        thr.start();
     	}
     }
 	
 	public void stop() {
-		stopped = true;
+		runState = RunnableState.STOPPING;
 	}
 	
 	protected void println(String msg) {
@@ -114,10 +117,11 @@ public abstract class Process implements Runnable {
     public final void run() {
     	
     	try {
-	        
+    		
+    		runState = RunnableState.STARTED;
 	        println(getKind().toString() + " processing started");
 	        
-	    	while (!isStopped()) 
+	    	while (runState != RunnableState.STOPPING) 
 	    		process();
 	    	
     	} catch (NamingException ex) {
@@ -137,6 +141,7 @@ public abstract class Process implements Runnable {
     		restClient.destroy();
     	}
     	
+    	runState = RunnableState.STOPPED;
     	println("Processing stopped");
     }
 }

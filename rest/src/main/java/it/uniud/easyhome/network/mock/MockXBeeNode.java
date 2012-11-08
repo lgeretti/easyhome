@@ -19,9 +19,9 @@ public class MockXBeeNode implements Runnable {
     
     private MockXBeeNetwork network;
     
-    private Queue<XBeeInboundPacket> inboundPacketQueue;
+    private Queue<XBeeInboundPacket> inboundPacketQueue = new ConcurrentLinkedQueue<XBeeInboundPacket>();
     
-    private volatile RunnableState runningState;
+    private volatile RunnableState runningState = RunnableState.STOPPED;
     
     private byte seqNumber = 0;
     
@@ -30,8 +30,6 @@ public class MockXBeeNode implements Runnable {
     		throw new InvalidMockNodeException();
     	this.node = node;
     	this.network = network;
-    	this.runningState = RunnableState.STOPPED;
-    	inboundPacketQueue = new ConcurrentLinkedQueue<XBeeInboundPacket>();
     }
     
     public long getId() {
@@ -69,9 +67,9 @@ public class MockXBeeNode implements Runnable {
     public void turnOn() {
     	
     	if (runningState == RunnableState.STOPPED) {
+    		runningState = RunnableState.STARTING;
     		Thread thr = new Thread(this);
     		thr.start();
-    		runningState = RunnableState.RUNNING;
     	} else {
     		throw new IllegalStateException();
     	}
@@ -88,6 +86,7 @@ public class MockXBeeNode implements Runnable {
     @Override
     public void run() {
     	
+    	runningState = RunnableState.STARTED;
     	transmit(new DeviceAnnounceOutpkt(this));
     	
     	while(runningState != RunnableState.STOPPING) {

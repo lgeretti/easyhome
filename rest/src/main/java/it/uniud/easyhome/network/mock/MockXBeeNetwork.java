@@ -22,20 +22,17 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class MockXBeeNetwork implements Runnable {
 
-	private RunnableState runningState;
+	private RunnableState runningState = RunnableState.STOPPED;
 	
-	private Queue<XBeeInboundPacket> packetsToGateway;
+	private Queue<XBeeInboundPacket> packetsToGateway = new ConcurrentLinkedQueue<XBeeInboundPacket>();
 	
-	private List<MockXBeeNode> nodes;
+	private List<MockXBeeNode> nodes = new ArrayList<MockXBeeNode>();
 	
 	private String gwHost;
 	private int gwPort;
 	
 	public MockXBeeNetwork(String gwHost, int gwPort) {
-		runningState = RunnableState.STOPPED;
-		packetsToGateway = new ConcurrentLinkedQueue<XBeeInboundPacket>();
-		nodes = new ArrayList<MockXBeeNode>();
-		
+
 		this.gwHost = gwHost;
 		this.gwPort = gwPort;
 	}
@@ -109,11 +106,12 @@ public class MockXBeeNetwork implements Runnable {
 	
 	public void turnOn() {
     	if (runningState == RunnableState.STOPPED) {
+    		runningState = RunnableState.STARTING;
     		Thread thr = new Thread(this);
     		thr.start();
     		for (MockXBeeNode node : nodes)
     			node.turnOn();
-    		runningState = RunnableState.RUNNING;
+    		runningState = RunnableState.STARTED;
     	} else {
     		throw new IllegalStateException();
     	}

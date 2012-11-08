@@ -43,7 +43,7 @@ public class Gateway implements Runnable {
 	// reachable by any node in the native subnetwork
 	protected int MAX_CONNECTIONS = 1;
 	
-	public final static int MESSAGE_WAIT_TIME_MS = 500;
+	public final static int MESSAGE_WAIT_TIME_MS = 250;
     
     private final Map<ModuleCoordinates,Integer> routingTable = new HashMap<ModuleCoordinates,Integer>();
     
@@ -173,8 +173,6 @@ public class Gateway implements Runnable {
                 MessageProducer outboundProducer = jmsSession.createProducer(outboundTopic);
                 
                 jmsConnection.start();
-
-                println("JMS connection started");
                 
                 ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                 
@@ -196,17 +194,16 @@ public class Gateway implements Runnable {
               }
               
         	  try {
-        		  jmsConnection.close();
-        	  } catch (JMSException jmsEx) {
+        		  if (jmsConnection != null)
+        			  jmsConnection.close();
+        	  } catch (JMSException ex) {
         		// Whatever the case, the connection is not available anymore  
-        	  } finally {
-        		  println("JMS connection closed");
         	  }
             }
           }
         } catch (Exception ex) {
             if (ex instanceof SocketException)
-            	println("Gateway cannot accept connections anymore");
+            	println("Gateway is closed");
             else
             	println("Gateway could not be opened");
         }
