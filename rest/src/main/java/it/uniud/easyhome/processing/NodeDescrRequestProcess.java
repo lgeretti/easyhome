@@ -1,5 +1,6 @@
 package it.uniud.easyhome.processing;
 
+import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.Node;
@@ -24,18 +25,17 @@ public class NodeDescrRequestProcess extends Process {
 	
     public NodeDescrRequestProcess(int pid, UriInfo uriInfo,ProcessKind kind) throws NamingException, JMSException {
         super(pid, UriBuilder.fromUri(uriInfo.getBaseUri()).build(new Object[0]),kind);
-        Topic networkEventsTopic = (Topic) jndiContext.lookup("jms/easyhome/NetworkEventsTopic");
-        networkEventsConsumer = jmsSession.createConsumer(networkEventsTopic);
-        registerConsumer(networkEventsConsumer);
+        Topic networkEventsTopic = (Topic) jndiContext.lookup(JMSConstants.NETWORK_EVENTS_TOPIC);
+        networkEventsConsumer = registerConsumerFor(networkEventsTopic);
     }
     
     @Override
 	protected void process() throws JMSException, NamingException {
 
-    	ObjectMessage msg = (ObjectMessage) networkEventsConsumer.receive(MESSAGE_WAIT_TIME_MS);
+    	ObjectMessage msg = (ObjectMessage) networkEventsConsumer.receive();
     	if (msg != null) {
     		NetworkEvent event = (NetworkEvent) msg.getObject();
-    		if (event.getKind() == NetworkEvent.EventKind.NODE_ADDED) {
+    		if (event != null && event.getKind() == NetworkEvent.EventKind.NODE_ADDED) {
 
     	        try {
         	        ClientResponse getResponse = restResource.path("network").path(String.valueOf(event.getNuid()))

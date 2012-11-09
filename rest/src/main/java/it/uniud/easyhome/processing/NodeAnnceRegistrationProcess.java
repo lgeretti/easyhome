@@ -1,7 +1,6 @@
 package it.uniud.easyhome.processing;
 
-import java.util.List;
-
+import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.Node;
@@ -12,9 +11,7 @@ import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
-import javax.jms.Session;
 import javax.jms.Topic;
-import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
@@ -30,9 +27,8 @@ public class NodeAnnceRegistrationProcess extends Process {
     public NodeAnnceRegistrationProcess(int pid, UriInfo uriInfo, ProcessKind kind) throws NamingException, JMSException {
         super(pid, UriBuilder.fromUri(uriInfo.getBaseUri()).build(new Object[0]),kind);
     	
-        Topic networkEventsTopic = (Topic) jndiContext.lookup("jms/easyhome/NetworkEventsTopic");
-        networkEventsProducer = jmsSession.createProducer(networkEventsTopic);
-        registerProducer(networkEventsProducer);
+        Topic networkEventsTopic = (Topic) jndiContext.lookup(JMSConstants.NETWORK_EVENTS_TOPIC);
+        networkEventsProducer = registerProducerFor(networkEventsTopic);
     }
     
     @Override
@@ -40,7 +36,7 @@ public class NodeAnnceRegistrationProcess extends Process {
     	
     	MessageConsumer inboundPacketsConsumer = getInboundPacketsConsumer();
 
-    	ObjectMessage msg = (ObjectMessage) inboundPacketsConsumer.receive(MESSAGE_WAIT_TIME_MS);
+    	ObjectMessage msg = (ObjectMessage) inboundPacketsConsumer.receive();
     	if (msg != null) {
         	NativePacket pkt = (NativePacket) msg.getObject();
         	
@@ -83,6 +79,8 @@ public class NodeAnnceRegistrationProcess extends Process {
 	        		return;
 	        	}
         	}
+    	} else {
+    		println("Null message received");
     	}
     }
     

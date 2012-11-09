@@ -49,6 +49,9 @@ public class NodeAnncePacket extends NativePacket {
 	
 	public static boolean validates(NativePacket pkt) {
 		
+		if (pkt == null)
+			return false;
+		
 		Operation op = pkt.getOperation();
 		
 		if (op.getDomain() != Domains.MANAGEMENT.getCode())

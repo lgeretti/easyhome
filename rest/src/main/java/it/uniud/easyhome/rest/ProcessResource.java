@@ -48,12 +48,11 @@ public class ProcessResource {
 
     @DELETE
     @Path("{pid}")
-    public Response deleteProcess(@PathParam("pid") int pid) throws InterruptedException {
+    public Response deleteProcess(@PathParam("pid") int pid) {
         
         for (int i=0; i<processes.size(); i++) {
             if (processes.get(i).getPid() == pid) {
             	processes.get(i).stop();
-            	Thread.sleep(Process.MESSAGE_WAIT_TIME_MS);
                 processes.remove(i);
                 return Response.ok().build();
             }
@@ -63,12 +62,11 @@ public class ProcessResource {
     }
     
     @DELETE
-    public Response clearAll() throws InterruptedException {
+    public Response clearAll() {
         
     	for (Process pr : processes) {
     		pr.stop();
     	}
-    	Thread.sleep(Process.MESSAGE_WAIT_TIME_MS);
     	processes.clear();
         
         return Response.ok().build();

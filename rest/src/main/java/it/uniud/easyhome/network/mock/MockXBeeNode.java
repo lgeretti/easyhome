@@ -90,6 +90,7 @@ public class MockXBeeNode implements Runnable {
     	transmit(new DeviceAnnounceOutpkt(this));
     	
     	while(runningState != RunnableState.STOPPING) {
+    		
         	while(runningState != RunnableState.STOPPING) { 
         		XBeeInboundPacket pkt = inboundPacketQueue.poll();
         		if (pkt != null && pkt.getClusterId() == ManagementContexts.NODE_DESC_REQ.getCode()) { 
@@ -98,7 +99,6 @@ public class MockXBeeNode implements Runnable {
         				try {
 							transmit(new NodeDescrRspOutpkt(this));
 						} catch (InvalidMockNodeException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 							runningState = RunnableState.STOPPING;
 						}
