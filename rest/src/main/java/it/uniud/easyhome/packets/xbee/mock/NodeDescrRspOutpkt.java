@@ -1,9 +1,10 @@
-package it.uniud.easyhome.packets.xbee;
+package it.uniud.easyhome.packets.xbee.mock;
 
 import it.uniud.easyhome.network.mock.InvalidMockNodeException;
 import it.uniud.easyhome.network.mock.MockXBeeNode;
 import it.uniud.easyhome.packets.Domains;
 import it.uniud.easyhome.packets.ManagementContexts;
+import it.uniud.easyhome.packets.xbee.XBeeOutboundPacket;
 
 public final class NodeDescrRspOutpkt extends XBeeOutboundPacket {
 
@@ -28,13 +29,13 @@ public final class NodeDescrRspOutpkt extends XBeeOutboundPacket {
 		
 		switch (node.getLogicalType()) {
 			case END_DEVICE:
-				apsPayload[3] = (byte)0x00;
+				apsPayload[3] = (byte)0x2;
 				break;
 			case ROUTER:
-				apsPayload[3] = (byte)0x20;
+				apsPayload[3] = (byte)0x1;
 				break;				
 			case COORDINATOR:
-				apsPayload[3] = (byte)0x40;
+				apsPayload[3] = (byte)0x0;
 				break;	
 			case UNDEFINED:
 				throw new InvalidMockNodeException();

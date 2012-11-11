@@ -8,10 +8,10 @@ import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.packets.ManagementContexts;
 import it.uniud.easyhome.packets.Packet;
-import it.uniud.easyhome.packets.xbee.DeviceAnnounceOutpkt;
-import it.uniud.easyhome.packets.xbee.NodeDescrRspOutpkt;
 import it.uniud.easyhome.packets.xbee.XBeeInboundPacket;
 import it.uniud.easyhome.packets.xbee.XBeeOutboundPacket;
+import it.uniud.easyhome.packets.xbee.mock.DeviceAnnounceOutpkt;
+import it.uniud.easyhome.packets.xbee.mock.NodeDescrRspOutpkt;
 
 public class MockXBeeNode implements Runnable {
 

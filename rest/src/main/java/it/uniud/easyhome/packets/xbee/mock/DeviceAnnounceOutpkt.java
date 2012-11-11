@@ -1,6 +1,7 @@
-package it.uniud.easyhome.packets.xbee;
+package it.uniud.easyhome.packets.xbee.mock;
 
 import it.uniud.easyhome.network.mock.MockXBeeNode;
+import it.uniud.easyhome.packets.xbee.XBeeOutboundPacket;
 
 public final class DeviceAnnounceOutpkt extends XBeeOutboundPacket {
 

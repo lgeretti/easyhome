@@ -34,7 +34,7 @@ public class NodeDescrRspPacket extends NativePacket {
 	}
 	
 	public NodeLogicalType getLogicalType() throws InvalidNodeDescException {
-		int raw = (this.getOperation().getData()[3] >>> 5) & 0xFF;
+		int raw = this.getOperation().getData()[3] & 0x3; // (the first two bits)
 		
 		NodeLogicalType result = null;
 		

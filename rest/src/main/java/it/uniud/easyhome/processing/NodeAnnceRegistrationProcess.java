@@ -79,8 +79,6 @@ public class NodeAnnceRegistrationProcess extends Process {
 	        		return;
 	        	}
         	}
-    	} else {
-    		println("Null message received");
     	}
     }
     

@@ -27,6 +27,42 @@ import javax.naming.InitialContext;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ * A gateway to access a subnetwork.
+ * 
+ * Regarding endpoints and addresses:
+ * 
+ * Since from the global address includes the subnetwork address, and given that a node in a subnetwork knows nothing about both its
+ * subnetwork address and the other subnetworks, we need to translate coordinates.
+ * Source coordinates are always unicast, meaning that source information is always related to the sender of the message. Nevertheless,
+ * in multi-hop networks the source of the message may not be the actual final sender that is able to reach the destination. For this
+ * reason, it is not possible in general to reply to a message unless the source is already known or it is included in the payload.
+ * Native packets explicitly includes source information and therefore do not need translation.
+ * XBee packets, instead, for example, will lose the source information as soon as the packet is sent. The only information retained in
+ * such cases is the endpoint: this means that we need to remap endpoints of nodes outside a subnetwork to appear as extra endpoints of
+ * the gateway node. More on that in the following.
+ * 
+ * There exist three classes of messages that can be sent by a subnetwork node: Non-management unicast messages, Management unicast messages and Management 
+ * broadcast messages. Non-management broadcast messages are not allowed, since they must refer to a specific endpoint, which does not in general map 
+ * to the same device of different nodes. Management unicast messages address one node in the subnetwork, where in particular the gateway node passes the messages
+ * through to the coordinator; consequently, the gateway node is transparent to the subnetwork and can be queried by the coordinator only. 
+ * Management unicast messages to other nodes outside the subnetwork are not possible, since the destination coordinates
+ * minus the endpoint are insufficient to identify an external node. Management broadcast messages are allowed since they can be intercepted by any node.  
+ * 
+ * Native packets can in fact support Management unicast to the whole network, but only when the packet originates from a node in the native network, 
+ * and therefore the support is removed because they do not allow a response in general.
+ * 
+ * While endpoint 0 is standard for the native network, the actual endpoint used by a subnetwork can vary. In particular for the XBee case, it is the 
+ * case that some packets must be supported on an endpoint different from 0. Hence in general the translation of the destination endpoint for a packet
+ * that is injected in a subnetwork may depend on the actual node and the specific Management context, and not simply on the subnetwork type. 
+ * Such translation is performed by the coordinator and the resulting packet is issued to the gateway device.
+ * 
+ * To expose external Non-management endpoints to the interior of a subnetwork, a dynamical map must be created. Gateway devices do not know of 
+ * such a map, which is handled by the coordinator that receives the untampered packet from the subnetwork. 
+ * 
+ * @author Luca Geretti
+ */
+
 @XmlRootElement
 public class Gateway implements Runnable {
     
