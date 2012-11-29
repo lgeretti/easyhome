@@ -11,8 +11,8 @@ public final class DeviceAnnounceOutpkt extends XBeeOutboundPacket {
 		dstAddr16 = (short)0xFFFE;
 		profileId = (short)0xEA50;
 		clusterId = (short)0x0013;
-		srcEndpoint = 0x01;
-		dstEndpoint = 0x01;
+		srcEndpoint = 0x00;
+		dstEndpoint = 0x00;
 		frameControl = 0x0;
 		apsPayload = new byte[11];
 		

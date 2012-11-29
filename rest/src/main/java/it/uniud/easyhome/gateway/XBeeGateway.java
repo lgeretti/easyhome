@@ -42,7 +42,7 @@ public class XBeeGateway extends Gateway {
         } else {
 	        
         	// If this is the implicit EasyHome controller endpoint
-        	if (dstEndpoint == 0x02) {
+        	if (dstEndpoint == 0x00 || dstEndpoint == 0x01) {
         		dstCoords = new ModuleCoordinates((byte)1,0x0L,(short)0x0,(byte)0);
         		println("Setting destination as domotic controller");
         	} else {

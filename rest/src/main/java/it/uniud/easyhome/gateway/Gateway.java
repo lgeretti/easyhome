@@ -45,7 +45,8 @@ import javax.xml.bind.annotation.XmlRootElement;
  * There exist three classes of messages that can be sent by a subnetwork node: Non-management unicast messages, Management unicast messages and Management 
  * broadcast messages. Non-management broadcast messages are not allowed, since they must refer to a specific endpoint, which does not in general map 
  * to the same device of different nodes. Management unicast messages address one node in the subnetwork, where in particular the gateway node passes the messages
- * through to the coordinator; consequently, the gateway node is transparent to the subnetwork and can be queried by the coordinator only. 
+ * through to the coordinator; consequently, the gateway node is transparent to Management response messages from the subnetwork; it still can receive requests,
+ * but those should be issued by the coordinator only. 
  * Management unicast messages to other nodes outside the subnetwork are not possible, since the destination coordinates
  * minus the endpoint are insufficient to identify an external node. Management broadcast messages are allowed since they can be intercepted by any node.  
  * 
@@ -83,8 +84,8 @@ public class Gateway implements Runnable {
     
     private final Map<ModuleCoordinates,Integer> routingTable = new HashMap<ModuleCoordinates,Integer>();
     
-    // We start from 3 in order to leave the two management ports and the domotic controller port free
-    private int mappedEndpointCounter = 3;
+    // We start from 2 in order to leave the two management ports free
+    private int mappedEndpointCounter = 2;
     
     protected ServerSocket server = null;
     

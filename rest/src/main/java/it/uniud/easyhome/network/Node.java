@@ -1,19 +1,24 @@
 package it.uniud.easyhome.network;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 import it.uniud.easyhome.common.ConcreteClassBuilder;
 import it.uniud.easyhome.exceptions.NodeConstructionException;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.xml.bind.annotation.*;
 
 @Entity
+@Table(name = "Node")
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Node {
+public class Node implements Serializable {
 
-    @Id
+	private static final long serialVersionUID = -239673332667054641L;
+	
+	@Id
     private long id;
     @Column(nullable = false, length = 200)
     private String name;
@@ -25,11 +30,24 @@ public class Node {
     private byte capability;
     @Column(nullable = false)
     private NodeLogicalType logicalType;
+    @Column(nullable = false)
+    private NodeLiveness liveness;
+    @OneToMany
+    @JoinTable(name="Neighbors")
+    private List<Node> neighbors = new ArrayList<Node>();
     
     private Node() {}
     
     public void setLogicalType(NodeLogicalType logicalType) {
     	this.logicalType = logicalType;
+    }
+    
+    public void setLiveness(NodeLiveness liveness) {
+    	this.liveness = liveness;
+    }
+    
+    public void addNeighbor(Node node) {
+    	neighbors.add(node);
     }
 
     public static class Builder implements ConcreteClassBuilder<Node> {
@@ -44,6 +62,7 @@ public class Node {
             
             node.name = Long.toHexString(id);
             node.logicalType = NodeLogicalType.UNDEFINED;
+            node.liveness = NodeLiveness.OK;
         }
         
         public Builder setName(String name) {
@@ -79,6 +98,11 @@ public class Node {
         	return this;
         }
         
+        public Builder setLiveness(NodeLiveness liveness) {
+        	node.liveness = liveness;
+        	return this;
+        }
+        
         public Node build() {
             
         	if ((node.gatewayId == 0) || (node.address == 0) || (node.capability == 0))
@@ -111,6 +135,14 @@ public class Node {
     public NodeLogicalType getLogicalType() {
     	return this.logicalType;
     }
+    
+    public NodeLiveness getLiveness() {
+    	return this.liveness;
+    }
+    
+    public List<Node> getNeighbors() {
+    	return this.neighbors;
+    }
 
     @Override
     public boolean equals(Object other) {
@@ -125,6 +157,7 @@ public class Node {
         if (!(this.address == otherNode.address)) return false;
         if (!(this.capability == otherNode.capability)) return false;
         if (!(this.logicalType == otherNode.logicalType)) return false;
+        if (!(this.liveness == otherNode.liveness)) return false;
         
         return true;
     }
@@ -140,6 +173,7 @@ public class Node {
         result = prime * result + address;
         result = prime * result + capability;
         result = prime * result + logicalType.hashCode();
+        result = prime * result + liveness.hashCode();
         return (int)result;
     }
 }

@@ -90,24 +90,27 @@ public class MockXBeeNode implements Runnable {
     	transmit(new DeviceAnnounceOutpkt(this));
     	
     	while(runningState != RunnableState.STOPPING) {
-    		
-        	while(runningState != RunnableState.STOPPING) { 
-        		XBeeInboundPacket pkt = inboundPacketQueue.poll();
-        		if (pkt != null && pkt.getClusterId() == ManagementContexts.NODE_DESC_REQ.getCode()) { 
-        			short nwkAddress = (short) ((((short)(pkt.getApsPayload()[0] & 0xFF)) << 8) + (pkt.getApsPayload()[1] & 0xFF));
-        			if (nwkAddress == node.getAddress()) {
-        				try {
-							transmit(new NodeDescrRspOutpkt(this));
-						} catch (InvalidMockNodeException e) {
-							e.printStackTrace();
-							runningState = RunnableState.STOPPING;
-						}
-        			}
-        		}
-        	}
+    		XBeeInboundPacket pkt = inboundPacketQueue.poll();
+    		if (pkt != null)
+    			loopRoutine(pkt);
     	}
     	
 		runningState = RunnableState.STOPPED;
+    }
+    
+    private void loopRoutine(XBeeInboundPacket pkt) {
+    	
+		if (pkt.getClusterId() == ManagementContexts.NODE_DESC_REQ.getCode()) {
+			short nwkAddress = (short) ((((short)(pkt.getApsPayload()[0] & 0xFF)) << 8) + (pkt.getApsPayload()[1] & 0xFF));
+			if (nwkAddress == node.getAddress()) {
+				try {
+					transmit(new NodeDescrRspOutpkt(this));
+				} catch (InvalidMockNodeException e) {
+					e.printStackTrace();
+					runningState = RunnableState.STOPPING;
+				}
+			}
+		}        				
     }
 
     @Override

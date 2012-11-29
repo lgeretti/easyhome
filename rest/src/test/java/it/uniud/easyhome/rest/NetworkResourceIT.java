@@ -42,27 +42,63 @@ public class NetworkResourceIT {
 	@Test
 	public void testInsert() throws JSONException {
 		
-        Node.Builder nb = new Node.Builder(10L);
+        Node.Builder nb1 = new Node.Builder(10L);
         
-        nb.setName("test");
-        nb.setGatewayId((byte)2);
-        nb.setAddress((short)15);
-        nb.setCapability((byte)14);
-        
-        Node node = nb.build();
+        nb1.setName("test");
+        nb1.setGatewayId((byte)2);
+        nb1.setAddress((short)15);
+        nb1.setCapability((byte)14);
+
+        Node node1 = nb1.build();
        
-        ClientResponse insertionResponse = postNode(node.getId(),node.getName(),node.getGatewayId(),node.getAddress(),node.getCapability());
+        ClientResponse insertionResponse = client.resource(TARGET).type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node1);
         assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
 
         Node recoveredNode = client.resource(TARGET).path("10").accept(MediaType.APPLICATION_JSON).get(Node.class);
         
-        assertEquals(node,recoveredNode);
+        assertEquals(node1,recoveredNode);
      
         ClientResponse getResponse = client.resource(TARGET).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         List<Node> nodeList = JsonUtils.getListFrom(getResponse,Node.class);
         assertEquals(1,nodeList.size());
-        assertEquals(node,nodeList.get(0));
+        assertEquals(node1,nodeList.get(0));
+    }
+	
+	@Test
+	public void testInsertTwoNodes() throws JSONException {
+		
+        Node.Builder nb1 = new Node.Builder(10L);
         
+        nb1.setName("test");
+        nb1.setGatewayId((byte)2);
+        nb1.setAddress((short)15);
+        nb1.setCapability((byte)14);
+        
+        Node node1 = nb1.build();
+        
+        Node.Builder nb2 = new Node.Builder(11L);
+        
+        nb2.setName("test2");
+        nb2.setGatewayId((byte)2);
+        nb2.setAddress((short)24);
+        nb2.setCapability((byte)14);
+        
+        Node node2 = nb2.build();
+        node1.addNeighbor(node2);
+       
+        ClientResponse secondInsertionResponse = client.resource(TARGET).type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node2);
+        assertEquals(ClientResponse.Status.CREATED,secondInsertionResponse.getClientResponseStatus());
+        ClientResponse firstInsertionResponse = client.resource(TARGET).type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node1);
+        assertEquals(ClientResponse.Status.CREATED,firstInsertionResponse.getClientResponseStatus());
+
+        Node recoveredNode = client.resource(TARGET).path("10").accept(MediaType.APPLICATION_JSON).get(Node.class);
+        
+        assertEquals(node1,recoveredNode);
+        assertEquals(1,recoveredNode.getNeighbors().size());
+        
+        ClientResponse getResponse = client.resource(TARGET).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        List<Node> nodeList = JsonUtils.getListFrom(getResponse,Node.class);
+        assertEquals(2,nodeList.size());
     }
 	
 	@Test

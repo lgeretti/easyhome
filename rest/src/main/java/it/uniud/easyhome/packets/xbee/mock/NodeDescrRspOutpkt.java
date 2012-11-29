@@ -16,8 +16,8 @@ public final class NodeDescrRspOutpkt extends XBeeOutboundPacket {
 		dstAddr16 = (short)0x0;
 		profileId = Domains.EASYHOME_MANAGEMENT.getCode();
 		clusterId = ManagementContexts.NODE_DESC_RSP.getCode();
-		srcEndpoint = 0x01;
-		dstEndpoint = 0x02; // This is the endpoint that addresses the management port for the domotic controller
+		srcEndpoint = 0x00;
+		dstEndpoint = 0x00;
 		frameControl = 0x0;
 		apsPayload = new byte[APS_PAYLOAD_SIZE];
 		
@@ -33,7 +33,7 @@ public final class NodeDescrRspOutpkt extends XBeeOutboundPacket {
 				break;
 			case ROUTER:
 				apsPayload[3] = (byte)0x1;
-				break;				
+				break;					
 			case COORDINATOR:
 				apsPayload[3] = (byte)0x0;
 				break;	
