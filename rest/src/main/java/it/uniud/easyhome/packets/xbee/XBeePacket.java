@@ -81,7 +81,7 @@ public abstract class XBeePacket implements Packet {
 	}
 	
 	@Override
-	public void read(InputStream is) throws IOException, InvalidDelimiterException, 
+	public int read(InputStream is) throws IOException, InvalidDelimiterException, 
 											InvalidPacketTypeException, ChecksumException {
 
     	int octet = is.read();
@@ -114,6 +114,8 @@ public abstract class XBeePacket implements Packet {
         	throw new ChecksumException();
         
         handlePacketPayload(new ByteArrayInputStream(packetPayload), length);
+        
+        return 4+length;
 	}
 	
 	@Override

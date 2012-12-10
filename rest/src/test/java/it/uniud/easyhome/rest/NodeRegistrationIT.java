@@ -68,6 +68,7 @@ public class NodeRegistrationIT {
     	return response;
     }    
 
+    @Ignore
 	@Test
     public void testDeviceRegistration() throws Exception {
 		
@@ -115,6 +116,74 @@ public class NodeRegistrationIT {
     	assertTrue(sleepTime*counter < maximumSleepTime);
     	
     	mn.turnOff();
+    	mn.unregisterAll();
+	}
+	
+	@Test
+    public void testNeighborRegistration() throws Exception {
+		
+		ClientResponse gatewayInsertion = insertGateway(XBEE_GATEWAY_PORT, ProtocolType.XBEE);
+		assertEquals(ClientResponse.Status.CREATED,gatewayInsertion.getClientResponseStatus());
+        String locationPath = gatewayInsertion.getLocation().getPath();
+        String[] segments = locationPath.split("/");
+        int gid = Integer.parseInt(segments[segments.length-1]);
+		
+		ClientResponse nodeAnnceRegProcessInsertion = insertProcess(ProcessKind.NODE_ANNCE_REGISTRATION);
+		assertEquals(ClientResponse.Status.CREATED,nodeAnnceRegProcessInsertion.getClientResponseStatus());
+		
+		ClientResponse nodeDescrAcqProcessInsertion = insertProcess(ProcessKind.NODE_DESCR_REQUEST);
+		assertEquals(ClientResponse.Status.CREATED,nodeDescrAcqProcessInsertion.getClientResponseStatus());		
+		ClientResponse nodeDescrRegProcessInsertion = insertProcess(ProcessKind.NODE_DESCR_REGISTRATION);
+		assertEquals(ClientResponse.Status.CREATED,nodeDescrRegProcessInsertion.getClientResponseStatus());		
+		/*ClientResponse nodeNeighAcqProcessInsertion = insertProcess(ProcessKind.NODE_NEIGH_REQUEST);
+		assertEquals(ClientResponse.Status.CREATED,nodeNeighAcqProcessInsertion.getClientResponseStatus());
+		ClientResponse nodeNeighRegProcessInsertion = insertProcess(ProcessKind.NODE_NEIGH_REGISTRATION);
+		assertEquals(ClientResponse.Status.CREATED,nodeNeighRegProcessInsertion.getClientResponseStatus());		
+		*/
+        Node node1 = new Node.Builder(0xA1L)
+        							 .setAddress((short)0x543F)
+        							 .setGatewayId((byte)gid)
+        							 .setCapability((byte)0x7A)
+        							 .setLogicalType(NodeLogicalType.ROUTER).build();
+        
+        Node node2 = new Node.Builder(0xA2L)
+		 .setAddress((short)0x544F)
+		 .setGatewayId((byte)gid)
+		 .setCapability((byte)0x7A)
+		 .setLogicalType(NodeLogicalType.ROUTER).build();
+        
+        node1.addNeighbor(node2);
+        
+        mn.register(node1);
+        mn.register(node2);
+        mn.turnOn();
+        
+        // Robustly check that we persist within a reasonably high time, since 
+        // the process persists it asynchronously
+        int counter = 0;
+        long sleepTime = 500;
+        long maximumSleepTime = 5000;
+        while (sleepTime*counter < maximumSleepTime) {
+        	counter++;
+	    	ClientResponse getNodesResponse = client.resource(TARGET).path("network")
+						.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	    	List<Node> nodes = JsonUtils.getListFrom(getNodesResponse, Node.class);
+	    	
+	    	
+	    	if (nodes.size() == 2) {
+	    		Node recoveredNode1 = client.resource(TARGET).path("network").path(Long.toString(node1.getId())).accept(MediaType.APPLICATION_JSON).get(Node.class);
+	    		
+	    		if (recoveredNode1.getNeighborIds().size() == 1 && recoveredNode1.getLogicalType() == NodeLogicalType.ROUTER)
+		    		break;
+	    	}
+	    	
+	    	Thread.sleep(sleepTime);
+        }
+        
+    	assertTrue(sleepTime*counter < maximumSleepTime);
+    	
+    	mn.turnOff();
+    	mn.unregisterAll();
 	}
     
 }

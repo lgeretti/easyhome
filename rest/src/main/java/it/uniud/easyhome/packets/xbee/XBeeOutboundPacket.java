@@ -161,7 +161,7 @@ public class XBeeOutboundPacket extends XBeePacket {
 
 	@Override
 	protected void handlePacketPayload(ByteArrayInputStream is, int packetLength) {
-
+		
         byte frameType = (byte)is.read();
         if (frameType != XBeeConstants.EXPLICIT_ADDRESSING_COMMAND_FRAME_TYPE) 
         	throw new InvalidPacketTypeException();
@@ -184,7 +184,7 @@ public class XBeeOutboundPacket extends XBeePacket {
 		
 		short readProfile = (short)((is.read() << 8) + is.read());
 		profileId = (Domains.isManagement(readProfile) ? 0 : readProfile);
-		 
+		
 		broadcastRadius = (byte)is.read();
 		
 		transmitOptions = (byte)is.read();

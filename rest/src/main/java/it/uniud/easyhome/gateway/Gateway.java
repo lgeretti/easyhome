@@ -8,7 +8,6 @@ import it.uniud.easyhome.packets.natives.NativePacket;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -179,7 +178,7 @@ public class Gateway implements Runnable {
 
     @Override
     public final void run() {
-        
+    	
         try {
           server = new ServerSocket(port, MAX_CONNECTIONS);
           println("Gateway opened on port " + server.getLocalPort());
@@ -273,7 +272,6 @@ public class Gateway implements Runnable {
         	
         	NativePacket nativePkt = readFrom(is,buffer);
         	dispatchPacket(nativePkt,jmsSession,inboundProducer,outboundProducer);
-        	buffer.reset(); // Only if we successfully dispatched, then we can discard whatever we accumulated
         } catch (NoBytesAvailableException ex) {
         	// Just move on
         } catch (IncompletePacketException ex) {

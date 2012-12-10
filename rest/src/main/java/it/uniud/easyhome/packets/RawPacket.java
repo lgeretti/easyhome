@@ -50,12 +50,14 @@ public class RawPacket implements Packet {
 	}
 	
 	@Override
-	public void read(InputStream is) throws IOException {
+	public int read(InputStream is) throws IOException {
 		int numBytes = is.available();
 		
 		bytes = new byte[numBytes];
 		
 		is.read(bytes, 0, bytes.length-1);
+		
+		return numBytes;
 	}
 	
 	@Override

@@ -39,4 +39,17 @@ public class ByteUtils {
 		}
 		return result;
 	}
+	
+	public static String printBytes(byte[] bytes) {
+		
+		StringBuilder strb = new StringBuilder();
+		
+		for (byte b : bytes) {
+            if ((0xFF & b) < 0x10)
+                strb.append("0");
+            strb.append(Integer.toHexString(0xFF & b).toUpperCase()).append(" ");
+		}
+		
+		return strb.toString();
+	}
 }

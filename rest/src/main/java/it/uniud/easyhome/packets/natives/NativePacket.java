@@ -65,7 +65,7 @@ public class NativePacket implements Serializable, Packet {
     }
     
     @Override
-    public void read(InputStream is) throws IOException {
+    public int read(InputStream is) throws IOException {
     	
         byte delimiter = (byte)is.read();
         
@@ -78,6 +78,8 @@ public class NativePacket implements Serializable, Packet {
         srcCoords = new ModuleCoordinates(is);
         dstCoords = new ModuleCoordinates(is);
         operation = new Operation(is,length-2*ModuleCoordinates.OCTETS-Operation.FIXED_OCTETS);
+        
+        return 3+length;
     }
     
     @Override

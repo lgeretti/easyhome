@@ -39,7 +39,7 @@ public class NodeAnnceRegistrationProcess extends Process {
     	ObjectMessage msg = (ObjectMessage) inboundPacketsConsumer.receive();
     	if (msg != null) {
         	NativePacket pkt = (NativePacket) msg.getObject();
-        	
+        	//println("Possible NodeAnncePacket received from " + pkt.getSrcCoords());
         	if (NodeAnncePacket.validates(pkt)) {
 	        	println("NodeAnncePacket received from " + pkt.getSrcCoords());
 	        	

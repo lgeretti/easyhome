@@ -43,18 +43,19 @@ public class NodeNeighRequestProcess extends Process {
 	    	if (nodes.size() == 0) {
 	    		println("No nodes are currently available");
 	    	} else {
-		    	nodeIdx = (nodes.size() <= nodeIdx ? 0 : nodeIdx++);
+	    		println("There are " + nodes.size() + " nodes available");
+		    	nodeIdx = (nodeIdx < nodes.size()  ? nodeIdx++ : 0);
 		
 		    	NodeNeighReqPacket packet = new NodeNeighReqPacket(nodes.get(nodeIdx),++sequenceNumber);
 		 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
 		    	getOutboundPacketsProducer().send(outboundMessage);    
-		    	println("Node neighbor request dispatched to node id " + nodes.get(nodeIdx).getId());
+		    	println("Node neighbours request dispatched to node id " + nodes.get(nodeIdx).getId() + " (idx " + nodeIdx + ")");
 	    	}	
-				Thread.sleep(NEIGH_REQUEST_PERIOD_MS);
+			Thread.sleep(NEIGH_REQUEST_PERIOD_MS);
 	    	
         } catch (Exception e) {
         	e.printStackTrace();
-        	println("Node neighbor request could not be dispatched");
+        	println("Node neighbours request could not be dispatched");
         }
     }
     

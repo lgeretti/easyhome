@@ -2,27 +2,18 @@ package it.uniud.easyhome.processing;
 
 import java.util.List;
 
-import it.uniud.easyhome.common.JMSConstants;
-import it.uniud.easyhome.common.JsonUtils;
-import it.uniud.easyhome.exceptions.InvalidNodeDescException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
-import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.packets.natives.NativePacket;
-import it.uniud.easyhome.packets.natives.NodeDescrReqPacket;
-import it.uniud.easyhome.packets.natives.NodeDescrRspPacket;
 import it.uniud.easyhome.packets.natives.NodeNeighRspPacket;
 
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.ObjectMessage;
-import javax.jms.Topic;
 import javax.naming.NamingException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-
-import org.codehaus.jettison.json.JSONException;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;

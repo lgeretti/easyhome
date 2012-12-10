@@ -1,5 +1,6 @@
 package it.uniud.easyhome.gateway;
 
+import it.uniud.easyhome.common.ByteUtils;
 import it.uniud.easyhome.exceptions.IllegalBroadcastPortException;
 import it.uniud.easyhome.exceptions.IncompletePacketException;
 import it.uniud.easyhome.exceptions.NoBytesAvailableException;
@@ -75,14 +76,9 @@ public class XBeeGateway extends Gateway {
     	
     	XBeeInboundPacket xbeePkt = new XBeeInboundPacket();
     	
-    	if (is.available() == 0)
+    	if (is.available() == 0 && buffer.size() == 0)
     		throw new NoBytesAvailableException();
     	
-    	int readByte = is.read();
-    	if (buffer.size() == 0 && ((byte)readByte) != XBeeConstants.START_DELIMITER)
-    		throw new IncompletePacketException();
-    	
-    	buffer.write(readByte);
     	if (is.available() > 0) {
     		byte[] readBytes = new byte[is.available()];
     		is.read(readBytes);
@@ -90,8 +86,15 @@ public class XBeeGateway extends Gateway {
     		buffer.write(readBytes);
     	}
     	
-    	xbeePkt.read(new ByteArrayInputStream(buffer.toByteArray()));
+    	byte[] originalBuffer = buffer.toByteArray();
+    	
+    	int readBytes = xbeePkt.read(new ByteArrayInputStream(originalBuffer));
+    	
     	result = convertFrom(xbeePkt);
+
+    	buffer.reset();
+    	if (readBytes < originalBuffer.length)
+    		buffer.write(originalBuffer, readBytes, originalBuffer.length-readBytes);
     	
     	return result;
     }

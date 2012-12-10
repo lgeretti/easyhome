@@ -48,10 +48,10 @@ public final class NodeLQIRspOutpkt extends XBeeOutboundPacket {
 			
 			// Extended PAN address (plainly using 16 bit network address)
 			byte[] nwkAddr = ByteUtils.getBytes(neighbor.getAddress());
-			for (int i=0;i<6;i++)
-				apsPayload[idx++] = (byte)0;
 			apsPayload[idx++] = nwkAddr[1];
 			apsPayload[idx++] = nwkAddr[0];
+			for (int i=0;i<6;i++)
+				apsPayload[idx++] = (byte)0;
 			// MAC address
 			byte[] macAddr = ByteUtils.getBytes(neighbor.getId());
 			for (int i=0;i<8;i++)

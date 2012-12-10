@@ -1,5 +1,6 @@
 package it.uniud.easyhome.network.mock;
 
+import it.uniud.easyhome.common.ByteUtils;
 import it.uniud.easyhome.common.RunnableState;
 import it.uniud.easyhome.exceptions.IncompletePacketException;
 import it.uniud.easyhome.exceptions.NoBytesAvailableException;
@@ -73,6 +74,9 @@ public class MockXBeeNetwork implements Runnable {
 				Packet pktToGateway = packetsToGateway.poll();
 				
 				if (pktToGateway != null) {
+					
+					System.out.println("Packet polled: " + ByteUtils.printBytes(pktToGateway.getBytes()));
+					
 					os.write(pktToGateway.getBytes());
 					os.flush();
 				}
@@ -121,5 +125,9 @@ public class MockXBeeNetwork implements Runnable {
 		runningState = RunnableState.STOPPING;
 		for (MockXBeeNode node : nodes)
 			node.turnOff();
+	}
+	
+	public void unregisterAll() {
+		nodes.clear();
 	}
 }

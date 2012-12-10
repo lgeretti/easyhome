@@ -26,6 +26,8 @@ public class MockXBeeNode implements Runnable {
     
     private volatile RunnableState runningState = RunnableState.STOPPED;
     
+    private static long LOOP_WAIT_TIME_MS = 500;
+    
     private byte seqNumber = 0;
     
     MockXBeeNode(Node node, MockXBeeNetwork network) throws InvalidMockNodeException {
@@ -89,12 +91,11 @@ public class MockXBeeNode implements Runnable {
     	inboundPacketQueue.add(pkt);
     }
     
-    public void transmit(XBeeOutboundPacket pkt) {
+    public synchronized void transmit(XBeeOutboundPacket pkt) {
     	network.broadcast(new XBeeInboundPacket(pkt,node.getId(),node.getAddress()));
     }    
     
     public void turnOn() {
-    	
     	if (runningState == RunnableState.STOPPED) {
     		runningState = RunnableState.STARTING;
     		Thread thr = new Thread(this);
@@ -118,10 +119,16 @@ public class MockXBeeNode implements Runnable {
     	runningState = RunnableState.STARTED;
     	transmit(new DeviceAnnounceOutpkt(this));
     	
-    	while(runningState != RunnableState.STOPPING) {
-    		XBeeInboundPacket pkt = inboundPacketQueue.poll();
-    		if (pkt != null)
-    			loopRoutine(pkt);
+    	try {
+	    	while(runningState != RunnableState.STOPPING) {
+	    		System.out.println("Node " + this.getId() + " waiting...");
+	    		XBeeInboundPacket pkt = inboundPacketQueue.poll();
+	    		if (pkt != null)
+	    			loopRoutine(pkt);
+	    		Thread.sleep(LOOP_WAIT_TIME_MS);
+	    	}
+    	} catch (InterruptedException ex) {
+    		
     	}
     	
 		runningState = RunnableState.STOPPED;

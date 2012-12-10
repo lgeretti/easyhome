@@ -20,7 +20,7 @@ public class NodeNeighReqPacket extends NativePacket {
 			throw new InvalidPacketTypeException();
 		if (op.getDomain() != Domains.MANAGEMENT.getCode())
 			throw new InvalidPacketTypeException();
-		if (op.getContext() != ManagementContexts.NODE_DESC_REQ.getCode())
+		if (op.getContext() != ManagementContexts.NODE_NEIGH_REQ.getCode())
 			throw new InvalidPacketTypeException();
 		if (op.getData().length != APS_PAYLOAD_LENGTH)
 			throw new InvalidPacketTypeException();

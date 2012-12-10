@@ -30,6 +30,12 @@ public enum ProcessKind {
 	NODE_NEIGH_REQUEST {
 		@Override
 		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {
+			return new NodeNeighRequestProcess(pid,uriInfo,this);
+		}
+	},
+	NODE_NEIGH_REGISTRATION {
+		@Override
+		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {
 			return new NodeNeighRegistrationProcess(pid,uriInfo,this);
 		}
 	};

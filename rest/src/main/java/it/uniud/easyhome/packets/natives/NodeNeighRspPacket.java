@@ -29,6 +29,8 @@ public class NodeNeighRspPacket extends NativePacket {
 			throw new InvalidPacketTypeException();
 		if (op.getData()[3] != (op.getData().length-4)/22)
 			throw new InvalidPacketLengthException();
+		
+		System.out.println("NodeNeighRspPacket Op bytes: " + ByteUtils.printBytes(op.getData()));
 	}
 	
 	public NodeNeighRspPacket(NativePacket pkt) {
@@ -43,8 +45,11 @@ public class NodeNeighRspPacket extends NativePacket {
 		
 		int numNeighbors = opData[3];
 		
-		for (int i=0;i<numNeighbors;i++) {
-			result.add(new Long(opData[12+i*22]));
+		for (int n=0;n<numNeighbors;n++) {
+			long val = 0;
+			for (int i=0, j=0; i<=56; i+=8, j++)
+				val += ((long)(opData[12+j+n*22] & 0xFF))<<i;
+			result.add(val);
 		}
 		
 		return result;
