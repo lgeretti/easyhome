@@ -2,6 +2,7 @@ package it.uniud.easyhome.rest;
 
 
 import it.uniud.easyhome.network.Node;
+import it.uniud.easyhome.network.NodeLogicalType;
 
 import java.util.List;
 
@@ -30,6 +31,47 @@ public final class NetworkResource {
         
         return resEjb.getNodes();
         
+    }
+    
+    @POST
+    @Path("neighbors")
+    public Response testNeighbors() throws InterruptedException {
+    	
+        Node node1 = new Node.Builder(0xA1L)
+		 .setAddress((short)0x543F)
+		 .setGatewayId((byte)1)
+		 .setCapability((byte)0x7A)
+		 .setLogicalType(NodeLogicalType.ROUTER).build();
+        Node node2 = new Node.Builder(0xA2L)
+		 .setAddress((short)0x543F)
+		 .setGatewayId((byte)1)
+		 .setCapability((byte)0x7A)
+		 .setLogicalType(NodeLogicalType.ROUTER).build();        
+        Node node3 = new Node.Builder(0xA3L)
+		 .setAddress((short)0x543F)
+		 .setGatewayId((byte)1)
+		 .setCapability((byte)0x7A)
+		 .setLogicalType(NodeLogicalType.ROUTER).build();
+        Node node4 = new Node.Builder(0xA4L)
+		 .setAddress((short)0x543F)
+		 .setGatewayId((byte)1)
+		 .setCapability((byte)0x7A)
+		 .setLogicalType(NodeLogicalType.ROUTER).build();
+        
+        node1.addNeighbor(node2);
+        node1.addNeighbor(node3);
+        node2.addNeighbor(node4);
+        
+        resEjb.insertOrUpdateNode(node4);
+        resEjb.insertOrUpdateNode(node3);
+        resEjb.insertOrUpdateNode(node2);
+        resEjb.insertOrUpdateNode(node1);
+        
+        Thread.sleep(10000);
+        
+        resEjb.removeAllNodes();
+        
+    	return Response.ok().build();
     }
     
     @GET

@@ -32,8 +32,8 @@ public class Node implements Serializable {
     private NodeLogicalType logicalType;
     @Column(nullable = false)
     private NodeLiveness liveness;
-    @OneToMany
-    @JoinTable(name="NeighborIds")
+    @ElementCollection
+    @CollectionTable(name = "NeighborIds")
     private List<Long> neighborIds = new ArrayList<Long>();
     
     private Node() {}
