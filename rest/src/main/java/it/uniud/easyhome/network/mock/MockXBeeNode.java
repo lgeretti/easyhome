@@ -1,5 +1,7 @@
 package it.uniud.easyhome.network.mock;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -12,6 +14,7 @@ import it.uniud.easyhome.packets.xbee.XBeeInboundPacket;
 import it.uniud.easyhome.packets.xbee.XBeeOutboundPacket;
 import it.uniud.easyhome.packets.xbee.mock.DeviceAnnounceOutpkt;
 import it.uniud.easyhome.packets.xbee.mock.NodeDescrRspOutpkt;
+import it.uniud.easyhome.packets.xbee.mock.NodeLQIRspOutpkt;
 
 public class MockXBeeNode implements Runnable {
 
@@ -54,6 +57,32 @@ public class MockXBeeNode implements Runnable {
     
     public NodeLogicalType getLogicalType() {
     	return node.getLogicalType();
+    }
+    
+    public List<MockXBeeNode> getNeighbors() throws MockXBeeNodeNotFoundException {
+    	
+    	List<MockXBeeNode> neighbors = new ArrayList<MockXBeeNode>();
+    	
+    	for (Long neighborId : node.getNeighborIds()) {
+    		
+    		MockXBeeNode recoveredNode = getMockXBeeNode(neighborId);
+    		
+    		if (recoveredNode == null)
+    			throw new MockXBeeNodeNotFoundException();
+    		
+    		neighbors.add(recoveredNode);
+    	}
+    	
+    	return neighbors;
+    }
+    
+    private MockXBeeNode getMockXBeeNode(long id) {
+    	
+    	for (MockXBeeNode node : network.getNodes()) {
+    		if (node.getId() == id)
+    			return node;
+    	}
+    	return null;
     }
     
     public void receive(XBeeInboundPacket pkt) {
@@ -110,7 +139,15 @@ public class MockXBeeNode implements Runnable {
 					runningState = RunnableState.STOPPING;
 				}
 			}
-		}        				
+		}      
+		else if (pkt.getClusterId() == ManagementContexts.NODE_NEIGH_REQ.getCode()) {
+			try {
+				transmit(new NodeLQIRspOutpkt(this));
+			} catch (InvalidMockNodeException | MockXBeeNodeNotFoundException e) {
+				e.printStackTrace();
+				runningState = RunnableState.STOPPING;
+			}
+		}
     }
 
     @Override

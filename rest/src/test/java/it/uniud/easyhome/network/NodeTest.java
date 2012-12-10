@@ -47,7 +47,7 @@ public class NodeTest {
         
         assertEquals(10L, node1.getId());
         assertEquals("test", node1.getName());
-        assertEquals(node1.getNeighbors().size(),1);
+        assertEquals(node1.getNeighborIds().size(),1);
     }
     
 }

@@ -33,8 +33,8 @@ public class Node implements Serializable {
     @Column(nullable = false)
     private NodeLiveness liveness;
     @OneToMany
-    @JoinTable(name="Neighbors")
-    private List<Node> neighbors = new ArrayList<Node>();
+    @JoinTable(name="NeighborIds")
+    private List<Long> neighborIds = new ArrayList<Long>();
     
     private Node() {}
     
@@ -47,8 +47,12 @@ public class Node implements Serializable {
     }
     
     public void addNeighbor(Node node) {
-    	neighbors.add(node);
+    	neighborIds.add(node.getId());
     }
+    
+	public void setNeighbors(List<Long> neighborIds) {
+		this.neighborIds = neighborIds;
+	}
 
     public static class Builder implements ConcreteClassBuilder<Node> {
         
@@ -140,8 +144,8 @@ public class Node implements Serializable {
     	return this.liveness;
     }
     
-    public List<Node> getNeighbors() {
-    	return this.neighbors;
+    public List<Long> getNeighborIds() {
+    	return this.neighborIds;
     }
 
     @Override

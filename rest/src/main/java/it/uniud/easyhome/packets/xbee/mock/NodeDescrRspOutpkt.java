@@ -29,13 +29,9 @@ public final class NodeDescrRspOutpkt extends XBeeOutboundPacket {
 		
 		switch (node.getLogicalType()) {
 			case END_DEVICE:
-				apsPayload[3] = (byte)0x2;
-				break;
-			case ROUTER:
-				apsPayload[3] = (byte)0x1;
-				break;					
+			case ROUTER:			
 			case COORDINATOR:
-				apsPayload[3] = (byte)0x0;
+				apsPayload[3] = node.getLogicalType().getCode();
 				break;	
 			case UNDEFINED:
 				throw new InvalidMockNodeException();

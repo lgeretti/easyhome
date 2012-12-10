@@ -94,7 +94,7 @@ public class NetworkResourceIT {
         Node recoveredNode = client.resource(TARGET).path("10").accept(MediaType.APPLICATION_JSON).get(Node.class);
         
         assertEquals(node1,recoveredNode);
-        assertEquals(1,recoveredNode.getNeighbors().size());
+        assertEquals(1,recoveredNode.getNeighborIds().size());
         
         ClientResponse getResponse = client.resource(TARGET).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         List<Node> nodeList = JsonUtils.getListFrom(getResponse,Node.class);
