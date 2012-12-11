@@ -29,8 +29,6 @@ public class NodeNeighRspPacket extends NativePacket {
 			throw new InvalidPacketTypeException();
 		if (op.getData()[3] != (op.getData().length-4)/22)
 			throw new InvalidPacketLengthException();
-		
-		System.out.println("NodeNeighRspPacket Op bytes: " + ByteUtils.printBytes(op.getData()));
 	}
 	
 	public NodeNeighRspPacket(NativePacket pkt) {

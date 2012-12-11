@@ -1,17 +1,12 @@
 package it.uniud.easyhome.common;
 
-import it.uniud.easyhome.network.Node;
-
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.sun.jersey.api.client.ClientResponse;
 
 public class JsonUtils {

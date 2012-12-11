@@ -74,9 +74,6 @@ public class MockXBeeNetwork implements Runnable {
 				Packet pktToGateway = packetsToGateway.poll();
 				
 				if (pktToGateway != null) {
-					
-					System.out.println("Packet polled: " + ByteUtils.printBytes(pktToGateway.getBytes()));
-					
 					os.write(pktToGateway.getBytes());
 					os.flush();
 				}

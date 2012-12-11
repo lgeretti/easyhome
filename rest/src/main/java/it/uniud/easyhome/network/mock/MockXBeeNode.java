@@ -121,7 +121,6 @@ public class MockXBeeNode implements Runnable {
     	
     	try {
 	    	while(runningState != RunnableState.STOPPING) {
-	    		System.out.println("Node " + this.getId() + " waiting...");
 	    		XBeeInboundPacket pkt = inboundPacketQueue.poll();
 	    		if (pkt != null)
 	    			loopRoutine(pkt);

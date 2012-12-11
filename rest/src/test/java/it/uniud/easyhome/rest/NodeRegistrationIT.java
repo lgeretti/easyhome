@@ -68,7 +68,6 @@ public class NodeRegistrationIT {
     	return response;
     }    
 
-    @Ignore
 	@Test
     public void testDeviceRegistration() throws Exception {
 		

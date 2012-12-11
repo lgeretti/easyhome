@@ -37,26 +37,21 @@ public class NodeNeighRegistrationProcess extends Process {
 	        	println("NodeNeighRspPacket received from " + pkt.getSrcCoords());
 	        	
 	        	try {
-	        		NodeNeighRspPacket neigh = new NodeNeighRspPacket(pkt);
+	        		NodeNeighRspPacket neighPkt = new NodeNeighRspPacket(pkt);
 	        		
-	        		List<Long> neighborIds = neigh.getNeighborIds();
-	        		
-	        		for (Long id: neighborIds) {
+	        		List<Long> neighborIds = neighPkt.getNeighborIds();
 	        			
-		        		Node neighbor = restResource.path("network/"+id)
-		                		.accept(MediaType.APPLICATION_JSON).get(Node.class);
-		        		neighbor.setNeighbors(neighborIds);
+	        		Node node = restResource.path("network/"+pkt.getSrcCoords().getNuid())
+	                		.accept(MediaType.APPLICATION_JSON).get(Node.class);
+	        		node.setNeighbors(neighborIds);
 
-    	                ClientResponse updateResponse = restResource.path("network")
-    	                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,neighbor);
-    	                
-    	                if (updateResponse.getClientResponseStatus() == Status.OK) {
-    	                	println("Node updated with neighbors information");
-    	                } else
-    	                	println("Node neighbors information update failed");
-    	                
-    	                break;
-	        		}
+	                ClientResponse updateResponse = restResource.path("network")
+	                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
+	                
+	                if (updateResponse.getClientResponseStatus() == Status.OK)
+	                	println("Node " + pkt.getSrcCoords().getNuid() + " updated with neighbors information");
+	                else
+	                	println("Node neighbors information update failed");
 	        		
 	        	} catch (InvalidPacketTypeException e) {
 	        		e.printStackTrace();
