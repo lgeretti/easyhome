@@ -135,11 +135,11 @@ public class NodeRegistrationIT {
 		assertEquals(ClientResponse.Status.CREATED,nodeDescrAcqProcessInsertion.getClientResponseStatus());		
 		ClientResponse nodeDescrRegProcessInsertion = insertProcess(ProcessKind.NODE_DESCR_REGISTRATION);
 		assertEquals(ClientResponse.Status.CREATED,nodeDescrRegProcessInsertion.getClientResponseStatus());		
-		/*ClientResponse nodeNeighAcqProcessInsertion = insertProcess(ProcessKind.NODE_NEIGH_REQUEST);
+		ClientResponse nodeNeighAcqProcessInsertion = insertProcess(ProcessKind.NODE_NEIGH_REQUEST);
 		assertEquals(ClientResponse.Status.CREATED,nodeNeighAcqProcessInsertion.getClientResponseStatus());
 		ClientResponse nodeNeighRegProcessInsertion = insertProcess(ProcessKind.NODE_NEIGH_REGISTRATION);
 		assertEquals(ClientResponse.Status.CREATED,nodeNeighRegProcessInsertion.getClientResponseStatus());		
-		*/
+		
         Node node1 = new Node.Builder(0xA1L)
         							 .setAddress((short)0x543F)
         							 .setGatewayId((byte)gid)
@@ -168,7 +168,6 @@ public class NodeRegistrationIT {
 	    	ClientResponse getNodesResponse = client.resource(TARGET).path("network")
 						.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	    	List<Node> nodes = JsonUtils.getListFrom(getNodesResponse, Node.class);
-	    	
 	    	
 	    	if (nodes.size() == 2) {
 	    		Node recoveredNode1 = client.resource(TARGET).path("network").path(Long.toString(node1.getId())).accept(MediaType.APPLICATION_JSON).get(Node.class);

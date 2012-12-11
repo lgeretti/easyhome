@@ -11,6 +11,11 @@ import javax.naming.NamingException;
 import javax.ws.rs.core.*;
 import javax.ws.rs.*;
 
+import org.junit.BeforeClass;
+
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+
 /** Handles the access to the network of nodes */
 @Path("/network")
 public final class NetworkResource {
@@ -31,47 +36,6 @@ public final class NetworkResource {
         
         return resEjb.getNodes();
         
-    }
-    
-    @POST
-    @Path("neighbors")
-    public Response testNeighbors() throws InterruptedException {
-    	
-        Node node1 = new Node.Builder(0xA1L)
-		 .setAddress((short)0x543F)
-		 .setGatewayId((byte)1)
-		 .setCapability((byte)0x7A)
-		 .setLogicalType(NodeLogicalType.ROUTER).build();
-        Node node2 = new Node.Builder(0xA2L)
-		 .setAddress((short)0x543F)
-		 .setGatewayId((byte)1)
-		 .setCapability((byte)0x7A)
-		 .setLogicalType(NodeLogicalType.ROUTER).build();        
-        Node node3 = new Node.Builder(0xA3L)
-		 .setAddress((short)0x543F)
-		 .setGatewayId((byte)1)
-		 .setCapability((byte)0x7A)
-		 .setLogicalType(NodeLogicalType.ROUTER).build();
-        Node node4 = new Node.Builder(0xA4L)
-		 .setAddress((short)0x543F)
-		 .setGatewayId((byte)1)
-		 .setCapability((byte)0x7A)
-		 .setLogicalType(NodeLogicalType.ROUTER).build();
-        
-        node1.addNeighbor(node2);
-        node1.addNeighbor(node3);
-        node2.addNeighbor(node4);
-        
-        resEjb.insertOrUpdateNode(node4);
-        resEjb.insertOrUpdateNode(node3);
-        resEjb.insertOrUpdateNode(node2);
-        resEjb.insertOrUpdateNode(node1);
-        
-        Thread.sleep(10000);
-        
-        resEjb.removeAllNodes();
-        
-    	return Response.ok().build();
     }
     
     @GET

@@ -6,6 +6,7 @@ import java.util.List;
 
 import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.network.Node;
+import it.uniud.easyhome.network.NodeLogicalType;
 
 import javax.ws.rs.core.MediaType;
 
@@ -18,7 +19,6 @@ import org.junit.Test;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 
-@Ignore
 public class NetworkResourceIT {
 	
 	private static final String TARGET = "http://localhost:8080/easyhome/rest/network";
@@ -29,7 +29,7 @@ public class NetworkResourceIT {
     public static void setup() {
         client = Client.create();
     }
-	
+
 	@Test
 	public void testNoNodes() throws JSONException {
 		
@@ -92,15 +92,60 @@ public class NetworkResourceIT {
         ClientResponse firstInsertionResponse = client.resource(TARGET).type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node1);
         assertEquals(ClientResponse.Status.CREATED,firstInsertionResponse.getClientResponseStatus());
 
-        Node recoveredNode = client.resource(TARGET).path("10").accept(MediaType.APPLICATION_JSON).get(Node.class);
-        
-        assertEquals(node1,recoveredNode);
+        Node recoveredNode = client.resource(TARGET).path(Long.toString(node1.getId())).accept(MediaType.APPLICATION_JSON).get(Node.class);
         assertEquals(1,recoveredNode.getNeighborIds().size());
         
-        ClientResponse getResponse = client.resource(TARGET).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-        List<Node> nodeList = JsonUtils.getListFrom(getResponse,Node.class);
-        assertEquals(2,nodeList.size());
+		ClientResponse getResponse = client.resource(TARGET).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+		List<Node> nodeList = JsonUtils.getListFrom(getResponse,Node.class);
+		
+		assertEquals(2,nodeList.size());
     }
+	
+	@Test
+	public void testInsertMultipleNodes() throws JSONException {
+		
+        Node node1 = new Node.Builder(0xA1L)
+		 .setAddress((short)0x543F)
+		 .setGatewayId((byte)1)
+		 .setCapability((byte)0x7A)
+		 .setLogicalType(NodeLogicalType.ROUTER).build();
+        Node node2 = new Node.Builder(0xA2L)
+		 .setAddress((short)0x543F)
+		 .setGatewayId((byte)1)
+		 .setCapability((byte)0x7A)
+		 .setLogicalType(NodeLogicalType.ROUTER).build();        
+        Node node3 = new Node.Builder(0xA3L)
+		 .setAddress((short)0x543F)
+		 .setGatewayId((byte)1)
+		 .setCapability((byte)0x7A)
+		 .setLogicalType(NodeLogicalType.ROUTER).build();
+        
+        node1.addNeighbor(node2);
+        node1.addNeighbor(node3);
+        node2.addNeighbor(node3);
+        
+        ClientResponse insertionResponse;
+        insertionResponse = client.resource(TARGET).type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node1);
+        assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
+        insertionResponse = client.resource(TARGET).type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node2);
+        assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
+        insertionResponse = client.resource(TARGET).type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node3);
+        assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
+        
+    	Node recoveredNode;      
+    	
+        recoveredNode = client.resource(TARGET).path(Long.toString(node1.getId())).accept(MediaType.APPLICATION_JSON).get(Node.class);
+        assertEquals(2,recoveredNode.getNeighborIds().size());
+        recoveredNode = client.resource(TARGET).path(Long.toString(node2.getId())).accept(MediaType.APPLICATION_JSON).get(Node.class);
+        assertEquals(1,recoveredNode.getNeighborIds().size());
+        recoveredNode = client.resource(TARGET).path(Long.toString(node3.getId())).accept(MediaType.APPLICATION_JSON).get(Node.class);
+        assertEquals(0,recoveredNode.getNeighborIds().size());
+        
+		ClientResponse getResponse = client.resource(TARGET).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+		List<Node> nodeList = JsonUtils.getListFrom(getResponse,Node.class);
+		
+		assertEquals(3,nodeList.size());
+	}
 	
 	@Test
 	public void testUpdate() throws JSONException {
@@ -130,18 +175,6 @@ public class NetworkResourceIT {
 		List<Node> nodeList = JsonUtils.getListFrom(getResponse,Node.class);
 		
 		assertEquals(1,nodeList.size());
-	}
-	
-	@Test
-	public void multipleNodes() throws JSONException {
-		
-		postNode(1L,"test",(byte)2,(short)3333,(byte)14);
-		postNode(2L,"test",(byte)2,(short)3333,(byte)14);
-		
-		ClientResponse response = client.resource(TARGET).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-        List<Node> nodeList = JsonUtils.getListFrom(response,Node.class);
-		
-		assertEquals(2,nodeList.size());
 	}
 	
 	@After

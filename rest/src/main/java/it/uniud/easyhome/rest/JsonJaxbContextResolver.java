@@ -6,28 +6,30 @@ import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.api.json.JSONJAXBContext;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 @Provider
 public final class JsonJaxbContextResolver implements ContextResolver<JAXBContext> {
 
-    private final JAXBContext context;
-    private final Set<Class<?>> types;
-    private final Class<?>[] cTypes = { };
+    private JAXBContext context;
+    private Class<?>[] types;
 
-    public JsonJaxbContextResolver() throws Exception {
-        this.types = new HashSet<Class<?>>(Arrays.asList(cTypes));
-        this.context = new JSONJAXBContext(JSONConfiguration.natural().rootUnwrapping(false).build(),cTypes);
+    public JsonJaxbContextResolver() throws JAXBException {
+        types = new Class[] {
+            Node.class, 
+        };
+        context = new JSONJAXBContext(JSONConfiguration.natural().build(), types);
     }
 
     @Override
     public JAXBContext getContext(Class<?> objectType) {
-        return (types.contains(objectType)) ? context : null;
+        for (Class<?> type : types) {
+            if (type==objectType)
+                return context;
+        }
+        return null;
     }
 }
