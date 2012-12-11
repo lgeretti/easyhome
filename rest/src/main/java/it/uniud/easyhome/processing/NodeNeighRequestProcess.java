@@ -44,7 +44,7 @@ public class NodeNeighRequestProcess extends Process {
 	    		println("No nodes are currently available");
 	    	} else {
 	    		println("There are " + nodes.size() + " nodes available");
-		    	nodeIdx = (nodeIdx < nodes.size()  ? nodeIdx++ : 0);
+		    	nodeIdx = ((nodeIdx+1) >= nodes.size()  ? 0 : nodeIdx+1);
 		
 		    	NodeNeighReqPacket packet = new NodeNeighReqPacket(nodes.get(nodeIdx),++sequenceNumber);
 		 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
