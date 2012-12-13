@@ -29,7 +29,9 @@ public class JsonUtils {
 	
 	public static <T> T getFrom(ClientResponse response, Class<T> cls) throws JSONException {
 
-		T result = new Gson().fromJson(response.getEntity(String.class), cls);
+		String responseString = response.getEntity(String.class);
+		
+		T result = new Gson().fromJson(responseString, cls);
 		
 		return result;
 	}

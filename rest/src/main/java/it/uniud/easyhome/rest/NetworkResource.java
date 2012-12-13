@@ -52,6 +52,22 @@ public final class NetworkResource {
     }
     
     @POST
+    @Path("{nodeid}")
+    public Response setNodeName(@PathParam("nodeid") long nodeId, @FormParam("location") String location) {
+    	
+        Node node = resEjb.findNodeById(nodeId);
+        
+        if (node == null) 
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        
+        node.setLocation(location);
+        
+        resEjb.updateManaged(node);
+    	
+    	return Response.ok().build();
+    }
+    
+    @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateOrInsertNode(Node node) {
     	

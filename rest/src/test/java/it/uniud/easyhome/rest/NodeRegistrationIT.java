@@ -67,59 +67,9 @@ public class NodeRegistrationIT {
     	
     	return response;
     }    
-
-	@Test
-    public void testDeviceRegistration() throws Exception {
-		
-		ClientResponse gatewayInsertion = insertGateway(XBEE_GATEWAY_PORT, ProtocolType.XBEE);
-		assertEquals(ClientResponse.Status.CREATED,gatewayInsertion.getClientResponseStatus());
-        String locationPath = gatewayInsertion.getLocation().getPath();
-        String[] segments = locationPath.split("/");
-        int gid = Integer.parseInt(segments[segments.length-1]);
-		
-		ClientResponse nodeAnnceRegProcessInsertion = insertProcess(ProcessKind.NODE_ANNCE_REGISTRATION);
-		assertEquals(ClientResponse.Status.CREATED,nodeAnnceRegProcessInsertion.getClientResponseStatus());
-		ClientResponse nodeDescrAcqProcessInsertion = insertProcess(ProcessKind.NODE_DESCR_REQUEST);
-		assertEquals(ClientResponse.Status.CREATED,nodeDescrAcqProcessInsertion.getClientResponseStatus());		
-		ClientResponse nodeDescrRegProcessInsertion = insertProcess(ProcessKind.NODE_DESCR_REGISTRATION);
-		assertEquals(ClientResponse.Status.CREATED,nodeDescrRegProcessInsertion.getClientResponseStatus());
-		
-        Node.Builder nodeBuilder = new Node.Builder(0xA1L)
-        							 .setAddress((short)0x543F)
-        							 .setGatewayId((byte)gid)
-        							 .setCapability((byte)0x7A)
-        							 .setLogicalType(NodeLogicalType.ROUTER);
-        Node node = nodeBuilder.build();
-        
-        mn.register(node);
-        mn.turnOn();
-        
-        // Robustly check that we persist within a reasonably high time, since 
-        // the process persists it asynchronously
-        int counter = 0;
-        long sleepTime = 500;
-        long maximumSleepTime = 5000;
-        while (sleepTime*counter < maximumSleepTime) {
-        	counter++;
-	    	ClientResponse getNodesResponse = client.resource(TARGET).path("network")
-						.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-	    	List<Node> nodes = JsonUtils.getListFrom(getNodesResponse, Node.class);
-	    	if (nodes.size() > 0) {
-	    		if (nodes.get(0).getLogicalType() == NodeLogicalType.ROUTER)
-	    			break;
-	    	}
-	    		
-	    	Thread.sleep(sleepTime);
-        }
-        
-    	assertTrue(sleepTime*counter < maximumSleepTime);
-    	
-    	mn.turnOff();
-    	mn.unregisterAll();
-	}
 	
 	@Test
-    public void testNeighborRegistration() throws Exception {
+    public void testRegistration() throws Exception {
 		
 		ClientResponse gatewayInsertion = insertGateway(XBEE_GATEWAY_PORT, ProtocolType.XBEE);
 		assertEquals(ClientResponse.Status.CREATED,gatewayInsertion.getClientResponseStatus());
@@ -161,7 +111,7 @@ public class NodeRegistrationIT {
         // the process persists it asynchronously
         int counter = 0;
         long sleepTime = 500;
-        long maximumSleepTime = 5000;
+        long maximumSleepTime = 6000;
         while (sleepTime*counter < maximumSleepTime) {
         	counter++;
 	    	ClientResponse getNodesResponse = client.resource(TARGET).path("network")

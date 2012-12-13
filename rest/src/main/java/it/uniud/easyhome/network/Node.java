@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.uniud.easyhome.common.ConcreteClassBuilder;
+import it.uniud.easyhome.exceptions.InvalidNodeTypeException;
 import it.uniud.easyhome.exceptions.NodeConstructionException;
 
 import javax.persistence.*;
@@ -30,6 +31,8 @@ public class Node implements Serializable {
     private byte capability;
     @Column(nullable = false)
     private NodeLogicalType logicalType;
+    @Column
+    private String location;
     @Column(nullable = false)
     private NodeLiveness liveness;
     @ElementCollection
@@ -52,6 +55,13 @@ public class Node implements Serializable {
     
 	public void setNeighbors(List<Long> neighborIds) {
 		this.neighborIds = neighborIds;
+	}
+	
+	public void setLocation(String location) throws InvalidNodeTypeException {
+		if (this.logicalType == NodeLogicalType.END_DEVICE)
+			throw new InvalidNodeTypeException();
+		
+		this.location = location;
 	}
 
     public static class Builder implements ConcreteClassBuilder<Node> {
@@ -139,6 +149,13 @@ public class Node implements Serializable {
     public NodeLogicalType getLogicalType() {
     	return this.logicalType;
     }
+    
+	public String getLocation() throws InvalidNodeTypeException {
+		if (this.logicalType == NodeLogicalType.END_DEVICE)
+			throw new InvalidNodeTypeException();
+		
+		return this.location;
+	}
     
     public NodeLiveness getLiveness() {
     	return this.liveness;

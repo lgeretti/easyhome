@@ -9,6 +9,7 @@ import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.codehaus.jettison.json.JSONException;
 import org.junit.After;
@@ -18,6 +19,7 @@ import org.junit.Test;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class NetworkResourceIT {
 	
@@ -161,20 +163,38 @@ public class NetworkResourceIT {
        
         postNode(node.getId(),node.getName(),node.getGatewayId(),node.getAddress(),node.getCapability());
 		
-		ClientResponse updateResponse = postNode(node.getId(),node.getName(),node.getGatewayId(),(short)(node.getAddress()+1),node.getCapability());
-        assertEquals(ClientResponse.Status.OK,updateResponse.getClientResponseStatus());
+		ClientResponse genericUpdateResponse = postNode(node.getId(),node.getName(),node.getGatewayId(),(short)(node.getAddress()+1),node.getCapability());
+        assertEquals(ClientResponse.Status.OK,genericUpdateResponse.getClientResponseStatus());
         
-        ClientResponse getUpdatedNodeResponse = client.resource(TARGET).path(String.valueOf(node.getId()))
+        ClientResponse genericUpdateNodeResponse = client.resource(TARGET).path(String.valueOf(node.getId()))
         											  .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         
-        Node updatedNode = JsonUtils.getFrom(getUpdatedNodeResponse, Node.class);
+        Node updatedNode = JsonUtils.getFrom(genericUpdateNodeResponse, Node.class);
         
         assertFalse(node.equals(updatedNode));
         
-		ClientResponse getResponse = client.resource(TARGET).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-		List<Node> nodeList = JsonUtils.getListFrom(getResponse,Node.class);
-		
-		assertEquals(1,nodeList.size());
+        updatedNode.setLocation("Bedroom");
+        
+        ClientResponse locationUpdateResponse = client.resource(TARGET).type(MediaType.APPLICATION_JSON).post(ClientResponse.class,updatedNode);
+        assertEquals(ClientResponse.Status.OK,locationUpdateResponse.getClientResponseStatus());
+        
+        ClientResponse locationUpdateNodeResponse = client.resource(TARGET).path(String.valueOf(node.getId()))
+				  .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        Node locationUpdatedNode = JsonUtils.getFrom(locationUpdateNodeResponse, Node.class);
+        assertEquals(updatedNode.getLocation(),locationUpdatedNode.getLocation());
+        
+        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+        formData.add("location","Kitchen");
+        
+        ClientResponse restUpdateResponse = client.resource(TARGET)
+                                            		.path(String.valueOf(node.getId()))
+                                            		.post(ClientResponse.class,formData);
+        assertEquals(ClientResponse.Status.OK,restUpdateResponse.getClientResponseStatus());
+        
+        ClientResponse restUpdateNodeResponse = client.resource(TARGET).path(String.valueOf(node.getId()))
+				  .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        Node restUpdateNode = JsonUtils.getFrom(restUpdateNodeResponse, Node.class);
+        assertEquals("Kitchen",restUpdateNode.getLocation());
 	}
 	
 	@After

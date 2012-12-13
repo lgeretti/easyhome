@@ -55,6 +55,15 @@ public class NetworkResourceEJB {
 	}
 	
 	/**
+	 * Updates a node guaranteed to be managed by the entity manager.
+	 * 
+	 * @param node The managed node that will be updated
+	 */
+	public void updateManaged(Node node) {
+		em.merge(node);
+	}
+	
+	/**
 	 * Removes a node.
 	 * 
 	 * @param nodeId The node identifier

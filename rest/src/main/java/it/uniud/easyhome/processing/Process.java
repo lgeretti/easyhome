@@ -171,6 +171,6 @@ public abstract class Process implements Runnable {
     	}
     	
     	runState = RunnableState.STOPPED;
-    	println("Processing stopped");
+    	println(getKind().toString() + " stopped");
     }
 }

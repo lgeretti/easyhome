@@ -56,7 +56,7 @@ public final class NodeLQIRspOutpkt extends XBeeOutboundPacket {
 			byte[] macAddr = ByteUtils.getBytes(neighbor.getId());
 			for (int i=0;i<8;i++)
 				apsPayload[idx++] = macAddr[7-i];
-			// Nwk address
+			// NWK address
 			apsPayload[idx++] = nwkAddr[1];
 			apsPayload[idx++] = nwkAddr[0];
 			// Device type, RxOnWhenIdle (0x1), Relationship (0x3), reserved bit (0x0) -> 0b001101XX -> 52 | 0xXX
