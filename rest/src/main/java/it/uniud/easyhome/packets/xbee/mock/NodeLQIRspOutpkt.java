@@ -7,8 +7,8 @@ import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.network.mock.InvalidMockNodeException;
 import it.uniud.easyhome.network.mock.MockXBeeNode;
 import it.uniud.easyhome.network.mock.MockXBeeNodeNotFoundException;
-import it.uniud.easyhome.packets.Domains;
-import it.uniud.easyhome.packets.ManagementContexts;
+import it.uniud.easyhome.packets.Domain;
+import it.uniud.easyhome.packets.ManagementContext;
 import it.uniud.easyhome.packets.xbee.XBeeOutboundPacket;
 
 public final class NodeLQIRspOutpkt extends XBeeOutboundPacket {
@@ -27,8 +27,8 @@ public final class NodeLQIRspOutpkt extends XBeeOutboundPacket {
 		
 		dstAddr64 = 0x0L;
 		dstAddr16 = (short)0x0;
-		profileId = Domains.EASYHOME_MANAGEMENT.getCode();
-		clusterId = ManagementContexts.NODE_NEIGH_RSP.getCode();
+		profileId = Domain.EASYHOME_MANAGEMENT.getCode();
+		clusterId = ManagementContext.NODE_NEIGH_RSP.getCode();
 		srcEndpoint = 0x00;
 		dstEndpoint = 0x00;
 		frameControl = 0x0;

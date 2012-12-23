@@ -1,18 +1,19 @@
 package it.uniud.easyhome.packets.natives;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.packets.ManagementContext;
 import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.packets.ModuleCoordinates;
 import it.uniud.easyhome.packets.Operation;
 
-public class NodeAnncePacket extends NativePacket {
-
-	private static final long serialVersionUID = -5541681898302354205L;
-
-	private static final int APS_PAYLOAD_LENGTH = 11;
+public class ActiveEndpointsRspPacket extends NativePacket {
 	
-	public NodeAnncePacket(ModuleCoordinates srcCoords, ModuleCoordinates dstCoords, Operation op) {
+	private static final long serialVersionUID = 3008289461892332406L;
+
+	public ActiveEndpointsRspPacket(ModuleCoordinates srcCoords, ModuleCoordinates dstCoords, Operation op) {
 		
 		super(srcCoords,dstCoords,op);
 		
@@ -20,31 +21,29 @@ public class NodeAnncePacket extends NativePacket {
 			throw new InvalidPacketTypeException();
 		if (op.getDomain() != Domain.MANAGEMENT.getCode())
 			throw new InvalidPacketTypeException();
-		if (op.getContext() != ManagementContext.NODE_ANNOUNCE.getCode())
+		if (op.getContext() != ManagementContext.ACTIVE_EP_RSP.getCode())
 			throw new InvalidPacketTypeException();
-		if (op.getData().length != APS_PAYLOAD_LENGTH)
+		byte[] opData = op.getData();
+		if (opData[3] != opData.length-4)
 			throw new InvalidPacketTypeException();
 	}
 	
-	public NodeAnncePacket(NativePacket pkt) {
+	public ActiveEndpointsRspPacket(NativePacket pkt) {
 		this(pkt.getSrcCoords(),pkt.getDstCoords(),pkt.getOperation());
 	}
 	
-	public short getAnnouncedAddress() {
-		byte[] data = getOperation().getData();
-		return (short) ((((short)(data[0] & 0xFF)) << 8) + data[1]); 
-	}
-	
-	public long getAnnouncedNuid() {
-		byte[] data = getOperation().getData();
-		long result = 0;
-		for (int i=56,j=2; i>=0; i-=8,j+=1)
-			result += ((long)(data[j] & 0xFF))<<i;
+	public List<Short> getActiveEndpoints() {
+		
+		List<Short> result = new ArrayList<Short>();
+		
+		byte[] opData = this.getOperation().getData();
+		
+		int numEndpoints = opData[3];
+		
+		for (int i=4; i<numEndpoints;i++) 
+			result.add(new Short(opData[i]));
+		
 		return result;
-	}
-	
-	public byte getAnnouncedCapability() {
-		return getOperation().getData()[APS_PAYLOAD_LENGTH-1];
 	}
 	
 	public static boolean validates(NativePacket pkt) {
@@ -56,9 +55,11 @@ public class NodeAnncePacket extends NativePacket {
 		
 		if (op.getDomain() != Domain.MANAGEMENT.getCode())
 			return false;
-		if (op.getContext() != ManagementContext.NODE_ANNOUNCE.getCode())
+		if (op.getContext() != ManagementContext.ACTIVE_EP_RSP.getCode())
 			return false;
 		
 		return true;
 	}
+	
+	
 }

@@ -4,7 +4,7 @@ import it.uniud.easyhome.exceptions.ChecksumException;
 import it.uniud.easyhome.exceptions.IncompletePacketException;
 import it.uniud.easyhome.exceptions.InvalidDelimiterException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
-import it.uniud.easyhome.packets.Domains;
+import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.packets.Packet;
 
 import java.io.ByteArrayInputStream;

@@ -10,6 +10,7 @@ import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.packets.natives.NativePacket;
 import it.uniud.easyhome.packets.natives.NodeAnncePacket;
 import it.uniud.easyhome.packets.natives.NodeDescrRspPacket;
+import it.uniud.easyhome.packets.natives.SimpleDescrRspPacket;
 
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
@@ -28,9 +29,9 @@ import org.codehaus.jettison.json.JSONException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
 
-public class NodeDescrRegistrationProcess extends Process {
+public class SimpleDescrRegistrationProcess extends Process {
 	
-    public NodeDescrRegistrationProcess(int pid, UriInfo uriInfo, ProcessKind kind) throws NamingException, JMSException {
+    public SimpleDescrRegistrationProcess(int pid, UriInfo uriInfo, ProcessKind kind) throws NamingException, JMSException {
         super(pid, UriBuilder.fromUri(uriInfo.getBaseUri()).build(new Object[0]),kind);
     }
     
@@ -43,14 +44,12 @@ public class NodeDescrRegistrationProcess extends Process {
     	if (msg != null) {
         	NativePacket pkt = (NativePacket) msg.getObject();
         	
-        	if (NodeDescrRspPacket.validates(pkt)) {
-	        	println("NodeDescrRspPacket received from " + pkt.getSrcCoords());
-	        	
+        	if (SimpleDescrRspPacket.validates(pkt)) {
+	        	println("SimpleDescrRspPacket received from " + pkt.getSrcCoords());
+	        	/*
 	        	try {
-	        		NodeDescrRspPacket descr = new NodeDescrRspPacket(pkt);
+	        		SimpleDescrRspPacket descr = new SimpleDescrRspPacket(pkt);
 	        		
-	        		byte gid = descr.getSrcCoords().getGatewayId();
-	        		short address = descr.getAddrOfInterest();
 	        		
 	        		ClientResponse nodesListResponse = restResource.path("network")
 	                		.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
@@ -58,16 +57,16 @@ public class NodeDescrRegistrationProcess extends Process {
 	        		
 	        		for (Node node: nodes) {
 	        			if (node.getGatewayId() == gid && node.getAddress() == address) {
-	        				node.setLogicalType(descr.getLogicalType());
-	        				node.setManufacturer(descr.getManufacturerCode());
 
+	        				// TODO: implement the update of the endpoints
+	        				
 	    	                ClientResponse updateResponse = restResource.path("network")
 	    	                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
 	    	                
 	    	                if (updateResponse.getClientResponseStatus() == Status.OK) {
-	    	                	println("Node updated with logical type information");
+	    	                	println("Node updated with endpoints list");
 	    	                } else
-	    	                	println("Node logical type information update failed");
+	    	                	println("Node endpoints list information update failed");
 	    	                
 	    	                break;
 	        			}
@@ -76,11 +75,10 @@ public class NodeDescrRegistrationProcess extends Process {
 
 	        	} catch (InvalidPacketTypeException e) {
 	        		e.printStackTrace();
-	        	} catch (InvalidNodeDescException e) {
-					e.printStackTrace();
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
+				*/
         	}
     	}
     }

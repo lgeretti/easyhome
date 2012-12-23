@@ -1,18 +1,20 @@
 package it.uniud.easyhome.packets.natives;
 
+import it.uniud.easyhome.common.ByteUtils;
+import it.uniud.easyhome.exceptions.InvalidNodeDescException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
+import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.packets.ManagementContext;
 import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.packets.ModuleCoordinates;
 import it.uniud.easyhome.packets.Operation;
 
-public class NodeAnncePacket extends NativePacket {
+public class SimpleDescrRspPacket extends NativePacket {
 
-	private static final long serialVersionUID = -5541681898302354205L;
-
-	private static final int APS_PAYLOAD_LENGTH = 11;
+	private static final long serialVersionUID = 1266890985693018451L;
+	private static final int APS_PAYLOAD_LENGTH = 16;
 	
-	public NodeAnncePacket(ModuleCoordinates srcCoords, ModuleCoordinates dstCoords, Operation op) {
+	public SimpleDescrRspPacket(ModuleCoordinates srcCoords, ModuleCoordinates dstCoords, Operation op) {
 		
 		super(srcCoords,dstCoords,op);
 		
@@ -20,31 +22,14 @@ public class NodeAnncePacket extends NativePacket {
 			throw new InvalidPacketTypeException();
 		if (op.getDomain() != Domain.MANAGEMENT.getCode())
 			throw new InvalidPacketTypeException();
-		if (op.getContext() != ManagementContext.NODE_ANNOUNCE.getCode())
+		if (op.getContext() != ManagementContext.SIMPLE_DESC_RSP.getCode())
 			throw new InvalidPacketTypeException();
 		if (op.getData().length != APS_PAYLOAD_LENGTH)
 			throw new InvalidPacketTypeException();
 	}
 	
-	public NodeAnncePacket(NativePacket pkt) {
+	public SimpleDescrRspPacket(NativePacket pkt) {
 		this(pkt.getSrcCoords(),pkt.getDstCoords(),pkt.getOperation());
-	}
-	
-	public short getAnnouncedAddress() {
-		byte[] data = getOperation().getData();
-		return (short) ((((short)(data[0] & 0xFF)) << 8) + data[1]); 
-	}
-	
-	public long getAnnouncedNuid() {
-		byte[] data = getOperation().getData();
-		long result = 0;
-		for (int i=56,j=2; i>=0; i-=8,j+=1)
-			result += ((long)(data[j] & 0xFF))<<i;
-		return result;
-	}
-	
-	public byte getAnnouncedCapability() {
-		return getOperation().getData()[APS_PAYLOAD_LENGTH-1];
 	}
 	
 	public static boolean validates(NativePacket pkt) {
@@ -56,7 +41,7 @@ public class NodeAnncePacket extends NativePacket {
 		
 		if (op.getDomain() != Domain.MANAGEMENT.getCode())
 			return false;
-		if (op.getContext() != ManagementContext.NODE_ANNOUNCE.getCode())
+		if (op.getContext() != ManagementContext.NODE_DESC_RSP.getCode())
 			return false;
 		
 		return true;

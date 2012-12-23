@@ -1,7 +1,7 @@
 package it.uniud.easyhome.packets.xbee;
 
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
-import it.uniud.easyhome.packets.Domains;
+import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.packets.ModuleCoordinates;
 
 import java.io.ByteArrayInputStream;
@@ -62,7 +62,7 @@ public class XBeeInboundPacket extends XBeePacket {
 		baos.write(XBeeConstants.START_DELIMITER);
 		
 		// If not using the management profile, the command byte is not present
-		int length = 20 + getApsPayload().length + (Domains.isManagement(getProfileId()) ? 0 : 1);
+		int length = 20 + getApsPayload().length + (Domain.isManagement(getProfileId()) ? 0 : 1);
 		
 		// High and low lengths
 		baos.write((length >>> 8) & 0xFF);
@@ -101,7 +101,7 @@ public class XBeeInboundPacket extends XBeePacket {
 			sum += val;
 		}			
 		// Profile ID
-		short profileIdToWrite = (profileId == 0 ? Domains.EASYHOME_MANAGEMENT.getCode() : profileId);
+		short profileIdToWrite = (profileId == 0 ? Domain.EASYHOME_MANAGEMENT.getCode() : profileId);
 		for (int j=8; j>=0; j-=8) {
 			byte val = (byte)((profileIdToWrite >>> j) & 0xFF);
 			baos.write(val);
@@ -116,7 +116,7 @@ public class XBeeInboundPacket extends XBeePacket {
 		// Transaction sequence number
 		baos.write(transactionSeqNumber);
 		sum += transactionSeqNumber;
-		if (!Domains.isManagement(profileId)) {
+		if (!Domain.isManagement(profileId)) {
 			baos.write(command);
 			sum += command;
 		}
@@ -156,7 +156,7 @@ public class XBeeInboundPacket extends XBeePacket {
 		clusterId = (short)((is.read() << 8) + is.read());
 		
 		short readProfile = (short)((is.read() << 8) + is.read());
-		profileId = (Domains.isManagement(readProfile) ? 0 : readProfile);
+		profileId = (Domain.isManagement(readProfile) ? 0 : readProfile);
 		 
 		receiveOptions = (byte)is.read();
 		 
@@ -166,7 +166,7 @@ public class XBeeInboundPacket extends XBeePacket {
 		 
 		int apsPayloadLength = 0;
 		
-		if (Domains.isManagement(profileId)) {
+		if (Domain.isManagement(profileId)) {
 			apsPayloadLength = packetLength - 20;
 			command = 0x00;
 		} else {

@@ -7,12 +7,12 @@ import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.packets.ModuleCoordinates;
 import it.uniud.easyhome.packets.Operation;
 
-public class NodeDescrReqPacket extends NativePacket {
+public class SimpleDescrReqPacket extends NativePacket {
 
-	private static final long serialVersionUID = 3241227466990620831L;
+	private static final long serialVersionUID = 8448404581483865375L;
 	private static final int APS_PAYLOAD_LENGTH = 2;
 	
-	public NodeDescrReqPacket(ModuleCoordinates srcCoords, ModuleCoordinates dstCoords, Operation op) {
+	public SimpleDescrReqPacket(ModuleCoordinates srcCoords, ModuleCoordinates dstCoords, Operation op) {
 		
 		super(srcCoords,dstCoords,op);
 		
@@ -20,13 +20,13 @@ public class NodeDescrReqPacket extends NativePacket {
 			throw new InvalidPacketTypeException();
 		if (op.getDomain() != Domain.MANAGEMENT.getCode())
 			throw new InvalidPacketTypeException();
-		if (op.getContext() != ManagementContext.NODE_DESC_REQ.getCode())
+		if (op.getContext() != ManagementContext.SIMPLE_DESC_REQ.getCode())
 			throw new InvalidPacketTypeException();
 		if (op.getData().length != APS_PAYLOAD_LENGTH)
 			throw new InvalidPacketTypeException();
 	}
 	
-	public NodeDescrReqPacket(Node destinationNode, byte seqNumber) {
+	public SimpleDescrReqPacket(Node destinationNode, byte seqNumber) {
 		this(new ModuleCoordinates((byte)1,0L,(short)0,(byte)0),
 			 new ModuleCoordinates(destinationNode.getGatewayId(),destinationNode.getId(),destinationNode.getAddress(),(byte)0),				
 			 new Operation(seqNumber,Domain.MANAGEMENT.getCode(),ManagementContext.NODE_DESC_REQ.getCode(),
@@ -34,12 +34,7 @@ public class NodeDescrReqPacket extends NativePacket {
 					       new byte[]{(byte)((destinationNode.getAddress() >>> 8) & 0xFF), (byte)(destinationNode.getAddress() & 0xFF)}));
 	}
 	
-	public NodeDescrReqPacket(NativePacket pkt) {
+	public SimpleDescrReqPacket(NativePacket pkt) {
 		this(pkt.getSrcCoords(),pkt.getDstCoords(),pkt.getOperation());
-	}
-	
-	public short getAddrOfInterest() {
-		byte[] data = getOperation().getData();
-		return (short) ((((short)(data[0] & 0xFF)) << 8) + data[1]); 
 	}
 }

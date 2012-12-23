@@ -2,8 +2,8 @@ package it.uniud.easyhome.packets.xbee.mock;
 
 import it.uniud.easyhome.network.mock.InvalidMockNodeException;
 import it.uniud.easyhome.network.mock.MockXBeeNode;
-import it.uniud.easyhome.packets.Domains;
-import it.uniud.easyhome.packets.ManagementContexts;
+import it.uniud.easyhome.packets.Domain;
+import it.uniud.easyhome.packets.ManagementContext;
 import it.uniud.easyhome.packets.xbee.XBeeOutboundPacket;
 
 public final class NodeDescrRspOutpkt extends XBeeOutboundPacket {
@@ -14,8 +14,8 @@ public final class NodeDescrRspOutpkt extends XBeeOutboundPacket {
 		
 		dstAddr64 = 0x0L;
 		dstAddr16 = (short)0x0;
-		profileId = Domains.EASYHOME_MANAGEMENT.getCode();
-		clusterId = ManagementContexts.NODE_DESC_RSP.getCode();
+		profileId = Domain.EASYHOME_MANAGEMENT.getCode();
+		clusterId = ManagementContext.NODE_DESC_RSP.getCode();
 		srcEndpoint = 0x00;
 		dstEndpoint = 0x00;
 		frameControl = 0x0;
@@ -36,6 +36,10 @@ public final class NodeDescrRspOutpkt extends XBeeOutboundPacket {
 			case UNDEFINED:
 				throw new InvalidMockNodeException();
 		}
+		
+		short manufacturerCode = node.getManufacturer().getCode();
+		apsPayload[6] = (byte)((manufacturerCode >>> 8) & 0xFF);
+		apsPayload[7] = (byte)(manufacturerCode & 0xFF);
 		
 		// We ignore the other bytes for now
 	}

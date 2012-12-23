@@ -3,9 +3,10 @@ package it.uniud.easyhome.packets.natives;
 import it.uniud.easyhome.common.ByteUtils;
 import it.uniud.easyhome.exceptions.InvalidNodeDescException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
+import it.uniud.easyhome.network.Manufacturer;
 import it.uniud.easyhome.network.NodeLogicalType;
-import it.uniud.easyhome.packets.ManagementContexts;
-import it.uniud.easyhome.packets.Domains;
+import it.uniud.easyhome.packets.ManagementContext;
+import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.packets.ModuleCoordinates;
 import it.uniud.easyhome.packets.Operation;
 
@@ -21,9 +22,9 @@ public class NodeDescrRspPacket extends NativePacket {
 		
 		if (srcCoords.getEndpoint() != 0 || dstCoords.getEndpoint() != 0)
 			throw new InvalidPacketTypeException();
-		if (op.getDomain() != Domains.MANAGEMENT.getCode())
+		if (op.getDomain() != Domain.MANAGEMENT.getCode())
 			throw new InvalidPacketTypeException();
-		if (op.getContext() != ManagementContexts.NODE_DESC_RSP.getCode())
+		if (op.getContext() != ManagementContext.NODE_DESC_RSP.getCode())
 			throw new InvalidPacketTypeException();
 		if (op.getData().length != APS_PAYLOAD_LENGTH)
 			throw new InvalidPacketTypeException();
@@ -55,6 +56,13 @@ public class NodeDescrRspPacket extends NativePacket {
 		return result;
 	}
 	
+	public Manufacturer getManufacturerCode() {
+		
+		short raw = ByteUtils.getShort(getOperation().getData(),6);
+		
+		return Manufacturer.getFromShort(raw);
+	}
+	
 	public short getAddrOfInterest() {
 		return ByteUtils.getShort(getOperation().getData(),1);
 	}
@@ -66,9 +74,9 @@ public class NodeDescrRspPacket extends NativePacket {
 		
 		Operation op = pkt.getOperation();
 		
-		if (op.getDomain() != Domains.MANAGEMENT.getCode())
+		if (op.getDomain() != Domain.MANAGEMENT.getCode())
 			return false;
-		if (op.getContext() != ManagementContexts.NODE_DESC_RSP.getCode())
+		if (op.getContext() != ManagementContext.NODE_DESC_RSP.getCode())
 			return false;
 		
 		return true;

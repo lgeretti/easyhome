@@ -31,13 +31,19 @@ public class Node implements Serializable {
     private byte capability;
     @Column(nullable = false)
     private NodeLogicalType logicalType;
-    @Column
-    private String location;
     @Column(nullable = false)
     private NodeLiveness liveness;
+    @Column
+    private String location;    
+    @Column
+    private Manufacturer manufacturer;
     @ElementCollection
     @CollectionTable(name = "NeighborIds")
     private List<Long> neighborIds = new ArrayList<Long>();
+    
+    @ElementCollection
+    @CollectionTable(name = "Endpoints")
+    private List<Short> endpoints = new ArrayList<Short>();
     
     private Node() {}
     
@@ -49,12 +55,24 @@ public class Node implements Serializable {
     	this.liveness = liveness;
     }
     
+    public void setManufacturer(Manufacturer manufacturer) {
+    	this.manufacturer = manufacturer;
+    }
+    
     public void addNeighbor(Node node) {
     	neighborIds.add(node.getId());
     }
     
 	public void setNeighbors(List<Long> neighborIds) {
 		this.neighborIds = neighborIds;
+	}
+	
+	public void addEndpoint(short ep) {
+		endpoints.add(ep);
+	}
+    
+	public void setEndpoints(List<Short> endpoints) {
+		this.endpoints = endpoints;
 	}
 	
 	public void setLocation(String location) throws InvalidNodeTypeException {
@@ -76,6 +94,7 @@ public class Node implements Serializable {
             
             node.name = Long.toHexString(id);
             node.logicalType = NodeLogicalType.UNDEFINED;
+            node.manufacturer = Manufacturer.UNDEFINED;
             node.liveness = NodeLiveness.OK;
         }
         
@@ -117,6 +136,11 @@ public class Node implements Serializable {
         	return this;
         }
         
+        public Builder setManufacturer(Manufacturer manufacturer) {
+        	node.manufacturer = manufacturer;
+        	return this;
+        }
+        
         public Node build() {
             
         	if ((node.gatewayId == 0) || (node.address == 0) || (node.capability == 0))
@@ -146,6 +170,10 @@ public class Node implements Serializable {
     	return this.capability;
     }
     
+    public Manufacturer getManufacturer() {
+    	return this.manufacturer;
+    }
+    
     public NodeLogicalType getLogicalType() {
     	return this.logicalType;
     }
@@ -164,6 +192,10 @@ public class Node implements Serializable {
     public List<Long> getNeighborIds() {
     	return this.neighborIds;
     }
+    
+    public List<Short> getEndpoints() {
+    	return this.endpoints;
+    }    
 
     @Override
     public boolean equals(Object other) {
@@ -174,11 +206,12 @@ public class Node implements Serializable {
         
         if (this.id != otherNode.id) return false;
         if (!this.name.equals(otherNode.name)) return false;
-        if (!(this.gatewayId == otherNode.gatewayId)) return false;
-        if (!(this.address == otherNode.address)) return false;
-        if (!(this.capability == otherNode.capability)) return false;
-        if (!(this.logicalType == otherNode.logicalType)) return false;
-        if (!(this.liveness == otherNode.liveness)) return false;
+        if (this.gatewayId != otherNode.gatewayId) return false;
+        if (this.address != otherNode.address) return false;
+        if (this.capability != otherNode.capability) return false;
+        if (this.logicalType != otherNode.logicalType) return false;
+        if (this.liveness != otherNode.liveness) return false;
+        if (this.manufacturer != otherNode.manufacturer) return false;
         
         return true;
     }
@@ -195,6 +228,7 @@ public class Node implements Serializable {
         result = prime * result + capability;
         result = prime * result + logicalType.hashCode();
         result = prime * result + liveness.hashCode();
+        result = prime * result + manufacturer.hashCode();
         return (int)result;
     }
 }

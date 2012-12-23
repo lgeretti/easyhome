@@ -3,6 +3,7 @@ package it.uniud.easyhome.rest;
 import static org.junit.Assert.*;
 import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.gateway.ProtocolType;
+import it.uniud.easyhome.network.Manufacturer;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.network.mock.MockXBeeNetwork;
@@ -93,13 +94,15 @@ public class NodeRegistrationIT {
         							 .setAddress((short)0x543F)
         							 .setGatewayId((byte)gid)
         							 .setCapability((byte)0x7A)
-        							 .setLogicalType(NodeLogicalType.ROUTER).build();
+        							 .setLogicalType(NodeLogicalType.ROUTER)
+        							 .setManufacturer(Manufacturer.DIGI).build();
         
         Node node2 = new Node.Builder(0xA2L)
 		 .setAddress((short)0x544F)
 		 .setGatewayId((byte)gid)
 		 .setCapability((byte)0x7A)
-		 .setLogicalType(NodeLogicalType.ROUTER).build();
+		 .setLogicalType(NodeLogicalType.ROUTER)
+		 .setManufacturer(Manufacturer.DIGI).build();
         
         node1.addNeighbor(node2);
         

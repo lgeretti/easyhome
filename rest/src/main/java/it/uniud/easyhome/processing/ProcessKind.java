@@ -38,6 +38,18 @@ public enum ProcessKind {
 		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {
 			return new NodeNeighRegistrationProcess(pid,uriInfo,this);
 		}
+	},
+	SIMPLE_DESCR_REQUEST {
+		@Override
+		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {
+			return new SimpleDescrRequestProcess(pid,uriInfo,this);
+		}
+	},
+	SIMPLE_DESCR_REGISTRATION {
+		@Override
+		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {
+			return new SimpleDescrRegistrationProcess(pid,uriInfo,this);
+		}
 	};
 	
 	public abstract Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException;

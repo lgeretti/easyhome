@@ -1,7 +1,7 @@
 package it.uniud.easyhome.packets.xbee;
 
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
-import it.uniud.easyhome.packets.Domains;
+import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.packets.natives.NativePacket;
 
 import java.io.ByteArrayInputStream;
@@ -83,7 +83,7 @@ public class XBeeOutboundPacket extends XBeePacket {
 		os.write(XBeeConstants.START_DELIMITER);
 		
 		// If not using the management profile, the command byte is not present
-		int length = 22 + apsPayload.length + (Domains.isManagement(profileId) ? 0 : 1);
+		int length = 22 + apsPayload.length + (Domain.isManagement(profileId) ? 0 : 1);
 		
 		// High and low lengths
 		os.write((length >>> 8) & 0xFF);
@@ -125,7 +125,7 @@ public class XBeeOutboundPacket extends XBeePacket {
 			sum += val;
 		}			
 		// Profile ID
-		short profileIdToWrite = (profileId == 0 ? Domains.EASYHOME_MANAGEMENT.getCode() : profileId);
+		short profileIdToWrite = (profileId == 0 ? Domain.EASYHOME_MANAGEMENT.getCode() : profileId);
 		for (int j=8; j>=0; j-=8) {
 			byte val = (byte)((profileIdToWrite >>> j) & 0xFF);
 			os.write(val);
@@ -143,7 +143,7 @@ public class XBeeOutboundPacket extends XBeePacket {
 		// Transaction sequence number
 		os.write(transactionSeqNumber);
 		sum += transactionSeqNumber;
-		if (!Domains.isManagement(profileId)) {
+		if (!Domain.isManagement(profileId)) {
 			os.write(command);
 			sum += command;
 		}
@@ -183,7 +183,7 @@ public class XBeeOutboundPacket extends XBeePacket {
 		clusterId = (short)((is.read() << 8) + is.read());
 		
 		short readProfile = (short)((is.read() << 8) + is.read());
-		profileId = (Domains.isManagement(readProfile) ? 0 : readProfile);
+		profileId = (Domain.isManagement(readProfile) ? 0 : readProfile);
 		
 		broadcastRadius = (byte)is.read();
 		
@@ -195,7 +195,7 @@ public class XBeeOutboundPacket extends XBeePacket {
 		 
 		int apsPayloadLength = 0;
 		
-		if (Domains.isManagement(profileId)) {
+		if (Domain.isManagement(profileId)) {
 			apsPayloadLength = packetLength - 22;
 			command = 0x00;
 		} else {

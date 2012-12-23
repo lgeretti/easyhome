@@ -98,7 +98,7 @@ public class Operation implements Serializable {
     		.append("; Cx: ")
     		.append(context);
     	
-    	if (Domains.isManagement(domain))
+    	if (Domain.isManagement(domain))
     		strb.append("; Cm: ").append(command);
     	
     	strb.append("}");

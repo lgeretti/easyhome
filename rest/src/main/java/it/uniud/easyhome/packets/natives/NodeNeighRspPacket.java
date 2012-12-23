@@ -8,8 +8,8 @@ import it.uniud.easyhome.exceptions.InvalidNodeDescException;
 import it.uniud.easyhome.exceptions.InvalidPacketLengthException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.NodeLogicalType;
-import it.uniud.easyhome.packets.ManagementContexts;
-import it.uniud.easyhome.packets.Domains;
+import it.uniud.easyhome.packets.ManagementContext;
+import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.packets.ModuleCoordinates;
 import it.uniud.easyhome.packets.Operation;
 
@@ -23,9 +23,9 @@ public class NodeNeighRspPacket extends NativePacket {
 		
 		if (srcCoords.getEndpoint() != 0 || dstCoords.getEndpoint() != 0)
 			throw new InvalidPacketTypeException();
-		if (op.getDomain() != Domains.MANAGEMENT.getCode())
+		if (op.getDomain() != Domain.MANAGEMENT.getCode())
 			throw new InvalidPacketTypeException();
-		if (op.getContext() != ManagementContexts.NODE_NEIGH_RSP.getCode())
+		if (op.getContext() != ManagementContext.NODE_NEIGH_RSP.getCode())
 			throw new InvalidPacketTypeException();
 		if (op.getData()[3] != (op.getData().length-4)/22)
 			throw new InvalidPacketLengthException();
@@ -60,9 +60,9 @@ public class NodeNeighRspPacket extends NativePacket {
 		
 		Operation op = pkt.getOperation();
 		
-		if (op.getDomain() != Domains.MANAGEMENT.getCode())
+		if (op.getDomain() != Domain.MANAGEMENT.getCode())
 			return false;
-		if (op.getContext() != ManagementContexts.NODE_NEIGH_RSP.getCode())
+		if (op.getContext() != ManagementContext.NODE_NEIGH_RSP.getCode())
 			return false;
 		
 		return true;

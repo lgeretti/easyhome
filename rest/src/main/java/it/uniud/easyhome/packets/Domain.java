@@ -1,6 +1,6 @@
 package it.uniud.easyhome.packets;
 
-public enum Domains {
+public enum Domain {
 
 	MANAGEMENT((short)0),
 	HOME_AUTOMATION((short)260),
@@ -9,7 +9,7 @@ public enum Domains {
 	
 	private short code;
 	
-	private Domains(short code) {
+	private Domain(short code) {
 		this.code = code;
 	}
 	
@@ -18,6 +18,6 @@ public enum Domains {
 	}
 	
 	public static boolean isManagement(short domainId) {
-		return (domainId == Domains.MANAGEMENT.getCode() || domainId == Domains.EASYHOME_MANAGEMENT.getCode());
+		return (domainId == Domain.MANAGEMENT.getCode() || domainId == Domain.EASYHOME_MANAGEMENT.getCode());
 	}
 }
