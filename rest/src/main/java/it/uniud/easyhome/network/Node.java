@@ -2,9 +2,12 @@ package it.uniud.easyhome.network;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import it.uniud.easyhome.common.ConcreteClassBuilder;
+import it.uniud.easyhome.devices.Device;
 import it.uniud.easyhome.exceptions.InvalidNodeTypeException;
 import it.uniud.easyhome.exceptions.NodeConstructionException;
 
@@ -44,6 +47,10 @@ public class Node implements Serializable {
     @ElementCollection
     @CollectionTable(name = "Endpoints")
     private List<Short> endpoints = new ArrayList<Short>();
+    
+    @ElementCollection
+    @CollectionTable(name = "Devices")
+    private Map<Short,Device> devices = new HashMap<Short,Device>();
     
     private Node() {}
     
