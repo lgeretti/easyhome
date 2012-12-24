@@ -3,8 +3,9 @@ package it.uniud.easyhome.packets.natives;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.uniud.easyhome.common.ByteUtils;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
-import it.uniud.easyhome.packets.ManagementContext;
+import it.uniud.easyhome.packets.Context;
 import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.packets.ModuleCoordinates;
 import it.uniud.easyhome.packets.Operation;
@@ -21,7 +22,7 @@ public class ActiveEndpointsRspPacket extends NativePacket {
 			throw new InvalidPacketTypeException();
 		if (op.getDomain() != Domain.MANAGEMENT.getCode())
 			throw new InvalidPacketTypeException();
-		if (op.getContext() != ManagementContext.ACTIVE_EP_RSP.getCode())
+		if (op.getContext() != Context.ACTIVE_EP_RSP.getCode())
 			throw new InvalidPacketTypeException();
 		byte[] opData = op.getData();
 		if (opData[3] != opData.length-4)
@@ -40,7 +41,7 @@ public class ActiveEndpointsRspPacket extends NativePacket {
 		
 		int numEndpoints = opData[3];
 		
-		for (int i=4; i<numEndpoints;i++) 
+		for (int i=0; i<numEndpoints;i++) 
 			result.add(new Short(opData[i]));
 		
 		return result;
@@ -55,7 +56,7 @@ public class ActiveEndpointsRspPacket extends NativePacket {
 		
 		if (op.getDomain() != Domain.MANAGEMENT.getCode())
 			return false;
-		if (op.getContext() != ManagementContext.ACTIVE_EP_RSP.getCode())
+		if (op.getContext() != Context.ACTIVE_EP_RSP.getCode())
 			return false;
 		
 		return true;

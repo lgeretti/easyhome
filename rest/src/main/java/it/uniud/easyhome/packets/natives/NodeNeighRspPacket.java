@@ -8,7 +8,7 @@ import it.uniud.easyhome.exceptions.InvalidNodeDescException;
 import it.uniud.easyhome.exceptions.InvalidPacketLengthException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.NodeLogicalType;
-import it.uniud.easyhome.packets.ManagementContext;
+import it.uniud.easyhome.packets.Context;
 import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.packets.ModuleCoordinates;
 import it.uniud.easyhome.packets.Operation;
@@ -25,7 +25,7 @@ public class NodeNeighRspPacket extends NativePacket {
 			throw new InvalidPacketTypeException();
 		if (op.getDomain() != Domain.MANAGEMENT.getCode())
 			throw new InvalidPacketTypeException();
-		if (op.getContext() != ManagementContext.NODE_NEIGH_RSP.getCode())
+		if (op.getContext() != Context.NODE_NEIGH_RSP.getCode())
 			throw new InvalidPacketTypeException();
 		if (op.getData()[3] != (op.getData().length-4)/22)
 			throw new InvalidPacketLengthException();
@@ -62,7 +62,7 @@ public class NodeNeighRspPacket extends NativePacket {
 		
 		if (op.getDomain() != Domain.MANAGEMENT.getCode())
 			return false;
-		if (op.getContext() != ManagementContext.NODE_NEIGH_RSP.getCode())
+		if (op.getContext() != Context.NODE_NEIGH_RSP.getCode())
 			return false;
 		
 		return true;

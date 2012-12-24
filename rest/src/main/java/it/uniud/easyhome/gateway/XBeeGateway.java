@@ -9,8 +9,8 @@ import it.uniud.easyhome.packets.ModuleCoordinates;
 import it.uniud.easyhome.packets.Operation;
 import it.uniud.easyhome.packets.natives.NativePacket;
 import it.uniud.easyhome.packets.xbee.XBeeConstants;
-import it.uniud.easyhome.packets.xbee.XBeeInboundPacket;
-import it.uniud.easyhome.packets.xbee.XBeeOutboundPacket;
+import it.uniud.easyhome.packets.xbee.XBeePacketToNode;
+import it.uniud.easyhome.packets.xbee.XBeePacketFromNode;
 
 import java.io.*;
 import java.util.Map;
@@ -21,7 +21,7 @@ public class XBeeGateway extends Gateway {
     	super(id,ProtocolType.XBEE,port);
     }
     
-    private NativePacket convertFrom(XBeeInboundPacket xpkt) throws RoutingEntryMissingException {
+    private NativePacket convertFrom(XBeePacketToNode xpkt) throws RoutingEntryMissingException {
         
         ModuleCoordinates srcCoords = new ModuleCoordinates(
         		id,xpkt.get64BitSrcAddr(),xpkt.get16BitSrcAddr(),xpkt.getSrcEndpoint());
@@ -74,7 +74,7 @@ public class XBeeGateway extends Gateway {
     	
     	NativePacket result = null;
     	
-    	XBeeInboundPacket xbeePkt = new XBeeInboundPacket();
+    	XBeePacketToNode xbeePkt = new XBeePacketToNode();
     	
     	if (is.available() == 0 && buffer.size() == 0)
     		throw new NoBytesAvailableException();
@@ -104,7 +104,7 @@ public class XBeeGateway extends Gateway {
     	
     	// NOTE: we do not need to remap back the endpoint of the source, since the gateway will become the source
     	// We instead need to rewrite the endpoints in the APS payload, where present, thus depending on the packet type
-		XBeeOutboundPacket xbeePkt = new XBeeOutboundPacket(pkt);
+		XBeePacketFromNode xbeePkt = new XBeePacketFromNode(pkt);
 		// We remap the endpoint of the destination, since the native network uses 0 for all cases
 		// FIXME: depends on the actual node manufacturer
 		if (xbeePkt.getDstEndpoint() == 0)

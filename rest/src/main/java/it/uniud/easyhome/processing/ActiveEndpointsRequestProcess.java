@@ -45,6 +45,7 @@ public class ActiveEndpointsRequestProcess extends Process {
         	        
     	        	Node node = JsonUtils.getFrom(getResponse, Node.class);
     	        	ActiveEndpointsReqPacket packet = new ActiveEndpointsReqPacket(node,++sequenceNumber);
+
     	            ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
     	            getOutboundPacketsProducer().send(outboundMessage);    
     	            println("Active endpoints request dispatched");

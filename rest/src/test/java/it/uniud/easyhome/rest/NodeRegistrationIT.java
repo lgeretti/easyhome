@@ -7,6 +7,7 @@ import it.uniud.easyhome.network.Manufacturer;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.network.mock.MockXBeeNetwork;
+import it.uniud.easyhome.network.mock.MockXBeeNode;
 import it.uniud.easyhome.processing.Process;
 import it.uniud.easyhome.processing.ProcessKind;
 
@@ -84,7 +85,11 @@ public class NodeRegistrationIT {
 		ClientResponse nodeDescrAcqProcessInsertion = insertProcess(ProcessKind.NODE_DESCR_REQUEST);
 		assertEquals(ClientResponse.Status.CREATED,nodeDescrAcqProcessInsertion.getClientResponseStatus());		
 		ClientResponse nodeDescrRegProcessInsertion = insertProcess(ProcessKind.NODE_DESCR_REGISTRATION);
-		assertEquals(ClientResponse.Status.CREATED,nodeDescrRegProcessInsertion.getClientResponseStatus());		
+		assertEquals(ClientResponse.Status.CREATED,nodeDescrRegProcessInsertion.getClientResponseStatus());	
+		ClientResponse activeEpAcqProcessInsertion = insertProcess(ProcessKind.ACTIVE_ENDPOINTS_REQUEST);
+		assertEquals(ClientResponse.Status.CREATED,activeEpAcqProcessInsertion.getClientResponseStatus());		
+		ClientResponse activeEpRegProcessInsertion = insertProcess(ProcessKind.ACTIVE_ENDPOINTS_REGISTRATION);
+		assertEquals(ClientResponse.Status.CREATED,activeEpRegProcessInsertion.getClientResponseStatus());			
 		ClientResponse nodeNeighAcqProcessInsertion = insertProcess(ProcessKind.NODE_NEIGH_REQUEST);
 		assertEquals(ClientResponse.Status.CREATED,nodeNeighAcqProcessInsertion.getClientResponseStatus());
 		ClientResponse nodeNeighRegProcessInsertion = insertProcess(ProcessKind.NODE_NEIGH_REGISTRATION);
@@ -105,6 +110,8 @@ public class NodeRegistrationIT {
 		 .setManufacturer(Manufacturer.DIGI).build();
         
         node1.addNeighbor(node2);
+        node1.addEndpoint((short)18);
+        node1.addEndpoint((short)3);
         
         mn.register(node1);
         mn.register(node2);
@@ -123,8 +130,8 @@ public class NodeRegistrationIT {
 	    	
 	    	if (nodes.size() == 2) {
 	    		Node recoveredNode1 = client.resource(TARGET).path("network").path(Long.toString(node1.getId())).accept(MediaType.APPLICATION_JSON).get(Node.class);
-	    		
-	    		if (recoveredNode1.getNeighborIds().size() == 1 && recoveredNode1.getLogicalType() == NodeLogicalType.ROUTER)
+	    		if (recoveredNode1.getNeighborIds().size() == 1 &&
+	    			recoveredNode1.getEndpoints().size() == 2)
 		    		break;
 	    	}
 	    	

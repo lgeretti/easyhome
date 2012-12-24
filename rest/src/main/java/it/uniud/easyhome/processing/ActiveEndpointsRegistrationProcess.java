@@ -50,7 +50,7 @@ public class ActiveEndpointsRegistrationProcess extends Process {
 	                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
 	                
 	                if (updateResponse.getClientResponseStatus() == Status.OK)
-	                	println("Node " + pkt.getSrcCoords().getNuid() + " updated with endpoints information");
+	                	println("Node " + pkt.getSrcCoords().getNuid() + " updated with endpoints information (#" + activeEps.size() + ")");
 	                else
 	                	println("Node endpoints information update failed");
 	        		

@@ -1,22 +1,21 @@
 package it.uniud.easyhome.packets.xbee;
 
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
-import it.uniud.easyhome.packets.Domain;
-import it.uniud.easyhome.packets.ModuleCoordinates;
+import it.uniud.easyhome.packets.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-public class XBeeInboundPacket extends XBeePacket {
+public class XBeePacketToNode extends XBeePacket {
 
 	private long srcAddr64;
 	private short srcAddr16;
 	private byte receiveOptions = 0x00;
 	
-	public XBeeInboundPacket() {
+	public XBeePacketToNode() {
 	}
 	
-	public XBeeInboundPacket(XBeeOutboundPacket pkt, long srcAddr64, short srcAddr16) {
+	public XBeePacketToNode(XBeePacketFromNode pkt, long srcAddr64, short srcAddr16) {
 		
 		this.srcAddr64 = srcAddr64;
 		this.srcAddr16 = srcAddr16;
@@ -101,9 +100,8 @@ public class XBeeInboundPacket extends XBeePacket {
 			sum += val;
 		}			
 		// Profile ID
-		short profileIdToWrite = (profileId == 0 ? Domain.EASYHOME_MANAGEMENT.getCode() : profileId);
 		for (int j=8; j>=0; j-=8) {
-			byte val = (byte)((profileIdToWrite >>> j) & 0xFF);
+			byte val = (byte)((profileId >>> j) & 0xFF);
 			baos.write(val);
 			sum += val;
 		}			
@@ -155,9 +153,8 @@ public class XBeeInboundPacket extends XBeePacket {
 		         
 		clusterId = (short)((is.read() << 8) + is.read());
 		
-		short readProfile = (short)((is.read() << 8) + is.read());
-		profileId = (Domain.isManagement(readProfile) ? 0 : readProfile);
-		 
+		profileId = (short)((is.read() << 8) + is.read());
+		
 		receiveOptions = (byte)is.read();
 		 
 		frameControl = (byte)is.read();

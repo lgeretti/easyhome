@@ -2,13 +2,10 @@ package it.uniud.easyhome.network.mock;
 
 import it.uniud.easyhome.common.ByteUtils;
 import it.uniud.easyhome.common.RunnableState;
-import it.uniud.easyhome.exceptions.IncompletePacketException;
-import it.uniud.easyhome.exceptions.NoBytesAvailableException;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.packets.Packet;
-import it.uniud.easyhome.packets.xbee.XBeeConstants;
-import it.uniud.easyhome.packets.xbee.XBeeInboundPacket;
-import it.uniud.easyhome.packets.xbee.XBeeOutboundPacket;
+import it.uniud.easyhome.packets.xbee.XBeePacketToNode;
+import it.uniud.easyhome.packets.xbee.XBeePacketFromNode;
 
 import java.io.*;
 import java.net.Socket;
@@ -25,7 +22,7 @@ public class MockXBeeNetwork implements Runnable {
 
 	private RunnableState runningState = RunnableState.STOPPED;
 	
-	private Queue<XBeeInboundPacket> packetsToGateway = new ConcurrentLinkedQueue<XBeeInboundPacket>();
+	private Queue<XBeePacketToNode> packetsToGateway = new ConcurrentLinkedQueue<XBeePacketToNode>();
 	
 	private List<MockXBeeNode> nodes = new ArrayList<MockXBeeNode>();
 	
@@ -38,14 +35,14 @@ public class MockXBeeNetwork implements Runnable {
 		this.gwPort = gwPort;
 	}
 	
-	public void broadcast(XBeeInboundPacket pkt) {
+	public void broadcast(XBeePacketToNode pkt) {
 		packetsToGateway.add(pkt);
 	}
 	
-	public void inject(XBeeOutboundPacket pkt) {
+	public void inject(XBeePacketFromNode pkt) {
 		for (MockXBeeNode node : nodes) {
 			if (pkt.isBroadcast() || pkt.get64BitDstAddr() == node.getId()) {
-				node.receive(new XBeeInboundPacket(pkt,0x0,(short)0x0));
+				node.receive(new XBeePacketToNode(pkt,0x0,(short)0x0));
 			}
 		}
 	}
@@ -79,7 +76,7 @@ public class MockXBeeNetwork implements Runnable {
 				}
 				
 				if (is.available() > 0) {
-					XBeeOutboundPacket pktFromGateway = new XBeeOutboundPacket();
+					XBeePacketFromNode pktFromGateway = new XBeePacketFromNode();
 					
 					try {
 						pktFromGateway.read(is);

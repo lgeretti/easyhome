@@ -8,10 +8,10 @@ import it.uniud.easyhome.network.mock.InvalidMockNodeException;
 import it.uniud.easyhome.network.mock.MockXBeeNode;
 import it.uniud.easyhome.network.mock.MockXBeeNodeNotFoundException;
 import it.uniud.easyhome.packets.Domain;
-import it.uniud.easyhome.packets.ManagementContext;
-import it.uniud.easyhome.packets.xbee.XBeeOutboundPacket;
+import it.uniud.easyhome.packets.Context;
+import it.uniud.easyhome.packets.xbee.XBeePacketFromNode;
 
-public final class ActiveEpRspOutpkt extends XBeeOutboundPacket {
+public final class ActiveEpRspOutpkt extends XBeePacketFromNode {
 
 	private static int APS_PAYLOAD_SIZE_FIXED = 4;
 	
@@ -23,8 +23,8 @@ public final class ActiveEpRspOutpkt extends XBeeOutboundPacket {
 		
 		dstAddr64 = 0x0L;
 		dstAddr16 = (short)0x0;
-		profileId = Domain.EASYHOME_MANAGEMENT.getCode();
-		clusterId = ManagementContext.NODE_NEIGH_RSP.getCode();
+		profileId = Domain.MANAGEMENT.getCode();
+		clusterId = Context.ACTIVE_EP_RSP.getCode();
 		srcEndpoint = 0x00;
 		dstEndpoint = 0x00;
 		frameControl = 0x0;

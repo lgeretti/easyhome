@@ -1,6 +1,6 @@
 package it.uniud.easyhome.packets;
 
-public enum ManagementContext {
+public enum Context {
 
 	NODE_DESC_REQ((short)0x2),
 	NODE_DESC_RSP((short)0x8002),
@@ -14,7 +14,7 @@ public enum ManagementContext {
 	
 	private short code;
 	
-	private ManagementContext(short code) {
+	private Context(short code) {
 		this.code = code;
 	}
 	

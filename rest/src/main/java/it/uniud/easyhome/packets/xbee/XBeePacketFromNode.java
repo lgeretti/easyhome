@@ -11,7 +11,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 
-public class XBeeOutboundPacket extends XBeePacket {
+public class XBeePacketFromNode extends XBeePacket {
 	
 	protected long dstAddr64;
 	protected short dstAddr16;
@@ -19,10 +19,10 @@ public class XBeeOutboundPacket extends XBeePacket {
 	protected byte broadcastRadius = 0x00;
 	protected byte transmitOptions = 0x00;
 	
-	public XBeeOutboundPacket() {
+	public XBeePacketFromNode() {
 	}
 	
-	public XBeeOutboundPacket(NativePacket ehp) {
+	public XBeePacketFromNode(NativePacket ehp) {
 		
 		dstAddr64 = ehp.getDstCoords().getNuid();
 		dstAddr16 = ehp.getDstCoords().getAddress();
@@ -125,9 +125,8 @@ public class XBeeOutboundPacket extends XBeePacket {
 			sum += val;
 		}			
 		// Profile ID
-		short profileIdToWrite = (profileId == 0 ? Domain.EASYHOME_MANAGEMENT.getCode() : profileId);
 		for (int j=8; j>=0; j-=8) {
-			byte val = (byte)((profileIdToWrite >>> j) & 0xFF);
+			byte val = (byte)((profileId >>> j) & 0xFF);
 			os.write(val);
 			sum += val;
 		}			
@@ -182,8 +181,7 @@ public class XBeeOutboundPacket extends XBeePacket {
 		         
 		clusterId = (short)((is.read() << 8) + is.read());
 		
-		short readProfile = (short)((is.read() << 8) + is.read());
-		profileId = (Domain.isManagement(readProfile) ? 0 : readProfile);
+		profileId = (short)((is.read() << 8) + is.read());
 		
 		broadcastRadius = (byte)is.read();
 		
