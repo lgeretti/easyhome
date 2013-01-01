@@ -1,5 +1,12 @@
 package it.uniud.easyhome.rest;
 
+import java.lang.reflect.Array;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import it.uniud.easyhome.devices.DeviceIdentifier;
+import it.uniud.easyhome.devices.DevicesWrapper;
 import it.uniud.easyhome.gateway.Gateway;
 import it.uniud.easyhome.network.Node;
 
@@ -20,8 +27,11 @@ public final class JsonJaxbContextResolver implements ContextResolver<JAXBContex
 
     public JsonJaxbContextResolver() throws JAXBException {
         types = new Class[] {
+        	HashMap.class,
             Node.class, 
             Gateway.class,
+            DeviceIdentifier.class,
+            DevicesWrapper.class,
         };
         context = new JSONJAXBContext(JSONConfiguration.natural().build(), types);
     }

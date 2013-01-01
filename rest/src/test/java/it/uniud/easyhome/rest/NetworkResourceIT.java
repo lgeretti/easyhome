@@ -2,14 +2,21 @@ package it.uniud.easyhome.rest;
 
 import static org.junit.Assert.*;
 
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import it.uniud.easyhome.common.JsonUtils;
+import it.uniud.easyhome.devices.HomeAutomationDevice;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 
 import org.codehaus.jettison.json.JSONException;
 import org.junit.After;
@@ -17,11 +24,17 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
-@Ignore
 public class NetworkResourceIT {
 	
 	private static final String TARGET = "http://localhost:8080/easyhome/rest/network";
@@ -32,6 +45,39 @@ public class NetworkResourceIT {
     public static void setup() {
         client = Client.create();
     }
+	
+    @Test
+    public void putDevicesForNode() throws JSONException {
+    	
+        Node.Builder nb1 = new Node.Builder(10L);
+        nb1.setName("test");
+        nb1.setGatewayId((byte)2);
+        nb1.setAddress((short)15);
+        nb1.setCapability((byte)14);        
+        Node node1 = nb1.build();
+        
+        node1.setEndpoints(Arrays.asList((short)2,(short)7,(short)3,(short)5));
+        node1.addDevice((short)5, HomeAutomationDevice.ONOFF_SWITCH);
+        node1.addDevice((short)3, HomeAutomationDevice.DIMMABLE_LIGHT);
+        
+        Map<Short,HomeAutomationDevice> originalDevices = node1.getDevices();
+    	assertEquals(4,originalDevices.size());
+    	assertEquals(HomeAutomationDevice.ONOFF_SWITCH,originalDevices.get((short)5));
+    	assertEquals(HomeAutomationDevice.DIMMABLE_LIGHT,originalDevices.get((short)3));
+    	assertEquals(HomeAutomationDevice.UNKNOWN,originalDevices.get((short)2));
+    	assertEquals(HomeAutomationDevice.UNKNOWN,originalDevices.get((short)7));
+        
+        ClientResponse insertionResponse = client.resource(TARGET).type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node1);
+        assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
+
+        ClientResponse retrievalResponse = client.resource(TARGET).path("10").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+    	Node retrievedNode = JsonUtils.getFrom(retrievalResponse,Node.class);
+    	Map<Short,HomeAutomationDevice> retrievedDevices = retrievedNode.getDevices();
+    	assertEquals(4,retrievedDevices.size());
+    	assertEquals(HomeAutomationDevice.ONOFF_SWITCH,retrievedDevices.get((short)5));
+    	assertEquals(HomeAutomationDevice.DIMMABLE_LIGHT,retrievedDevices.get((short)3));
+    	assertEquals(HomeAutomationDevice.UNKNOWN,retrievedDevices.get((short)2));
+    	assertEquals(HomeAutomationDevice.UNKNOWN,retrievedDevices.get((short)7));    }
 
 	@Test
 	public void testNoNodes() throws JSONException {

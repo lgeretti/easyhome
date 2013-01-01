@@ -1,8 +1,8 @@
 package it.uniud.easyhome.packets.natives;
 
+import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.Node;
-import it.uniud.easyhome.packets.Context;
 import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.packets.ModuleCoordinates;
 import it.uniud.easyhome.packets.Operation;
@@ -20,7 +20,7 @@ public class ActiveEndpointsReqPacket extends NativePacket {
 			throw new InvalidPacketTypeException();
 		if (op.getDomain() != Domain.EASYHOME_MANAGEMENT.getCode())
 			throw new InvalidPacketTypeException();
-		if (op.getContext() != Context.ACTIVE_EP_REQ.getCode())
+		if (op.getContext() != ManagementContext.ACTIVE_EP_REQ.getCode())
 			throw new InvalidPacketTypeException();
 		if (op.getData().length != APS_PAYLOAD_LENGTH)
 			throw new InvalidPacketTypeException();
@@ -29,7 +29,7 @@ public class ActiveEndpointsReqPacket extends NativePacket {
 	public ActiveEndpointsReqPacket(Node destinationNode, byte seqNumber) {
 		this(new ModuleCoordinates((byte)1,0L,(short)0,(byte)0),
 			 new ModuleCoordinates(destinationNode.getGatewayId(),destinationNode.getId(),destinationNode.getAddress(),(byte)0),				
-			 new Operation(seqNumber,Domain.EASYHOME_MANAGEMENT.getCode(),Context.ACTIVE_EP_REQ.getCode(),
+			 new Operation(seqNumber,Domain.EASYHOME_MANAGEMENT.getCode(),ManagementContext.ACTIVE_EP_REQ.getCode(),
 					       (byte)0x0/*Context invariant*/,(byte)0x0/*Irrelevant*/,
 					       new byte[]{(byte)((destinationNode.getAddress() >>> 8) & 0xFF), (byte)(destinationNode.getAddress() & 0xFF)}));
 	}

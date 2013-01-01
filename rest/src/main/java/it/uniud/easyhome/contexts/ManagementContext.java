@@ -1,6 +1,8 @@
-package it.uniud.easyhome.packets;
+package it.uniud.easyhome.contexts;
 
-public enum Context {
+import it.uniud.easyhome.packets.Domain;
+
+public enum ManagementContext implements Context {
 
 	NODE_DESC_REQ((short)0x2),
 	NODE_DESC_RSP((short)0x8002),
@@ -14,11 +16,17 @@ public enum Context {
 	
 	private short code;
 	
-	private Context(short code) {
+	private ManagementContext(short code) {
 		this.code = code;
 	}
 	
+	@Override
 	public short getCode() {
 		return code;
+	}
+
+	@Override
+	public Domain getDomain() {
+		return Domain.MANAGEMENT;
 	}
 }

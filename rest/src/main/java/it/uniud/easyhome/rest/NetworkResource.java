@@ -1,9 +1,12 @@
 package it.uniud.easyhome.rest;
 
 
+import it.uniud.easyhome.common.JsonUtils;
+import it.uniud.easyhome.devices.HomeAutomationDevice;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.naming.InitialContext;
@@ -11,7 +14,9 @@ import javax.naming.NamingException;
 import javax.ws.rs.core.*;
 import javax.ws.rs.*;
 
+import org.codehaus.jettison.json.JSONException;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;

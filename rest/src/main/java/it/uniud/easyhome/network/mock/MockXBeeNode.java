@@ -6,11 +6,11 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import it.uniud.easyhome.common.RunnableState;
+import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.network.Manufacturer;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.packets.Domain;
-import it.uniud.easyhome.packets.Context;
 import it.uniud.easyhome.packets.Packet;
 import it.uniud.easyhome.packets.xbee.XBeePacketToNode;
 import it.uniud.easyhome.packets.xbee.XBeePacketFromNode;
@@ -149,7 +149,7 @@ public class MockXBeeNode implements Runnable {
     private void loopRoutine(XBeePacketToNode pkt) {
 
     	if (pkt.getProfileId() == Domain.MANAGEMENT.getCode()) {
-			if (pkt.getClusterId() == Context.NODE_DESC_REQ.getCode()) {
+			if (pkt.getClusterId() == ManagementContext.NODE_DESC_REQ.getCode()) {
 				short nwkAddress = (short) ((((short)(pkt.getApsPayload()[0] & 0xFF)) << 8) + (pkt.getApsPayload()[1] & 0xFF));
 				if (nwkAddress == node.getAddress()) {
 					try {
@@ -160,7 +160,7 @@ public class MockXBeeNode implements Runnable {
 					}
 				}
 			}      
-			else if (pkt.getClusterId() == Context.NODE_NEIGH_REQ.getCode()) {
+			else if (pkt.getClusterId() == ManagementContext.NODE_NEIGH_REQ.getCode()) {
 				try {
 					transmit(new NodeLQIRspOutpkt(this));
 				} catch (InvalidMockNodeException | MockXBeeNodeNotFoundException e) {
@@ -170,7 +170,7 @@ public class MockXBeeNode implements Runnable {
 			}
     	}
     	else if (pkt.getProfileId() == Domain.EASYHOME_MANAGEMENT.getCode()) {
-			if (pkt.getClusterId() == Context.ACTIVE_EP_REQ.getCode()) {
+			if (pkt.getClusterId() == ManagementContext.ACTIVE_EP_REQ.getCode()) {
 				try {
 					transmit(new ActiveEpRspOutpkt(this));
 				} catch (InvalidMockNodeException | MockXBeeNodeNotFoundException e) {

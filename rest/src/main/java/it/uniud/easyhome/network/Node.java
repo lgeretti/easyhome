@@ -8,6 +8,10 @@ import java.util.Map;
 
 import it.uniud.easyhome.common.ConcreteClassBuilder;
 import it.uniud.easyhome.devices.Device;
+import it.uniud.easyhome.devices.DeviceIdentifier;
+import it.uniud.easyhome.devices.DevicesWrapper;
+import it.uniud.easyhome.devices.HomeAutomationDevice;
+import it.uniud.easyhome.exceptions.EndpointNotFoundException;
 import it.uniud.easyhome.exceptions.InvalidNodeTypeException;
 import it.uniud.easyhome.exceptions.NodeConstructionException;
 
@@ -48,9 +52,9 @@ public class Node implements Serializable {
     @CollectionTable(name = "Endpoints")
     private List<Short> endpoints = new ArrayList<Short>();
     
-    @ElementCollection
+	@ElementCollection
     @CollectionTable(name = "Devices")
-    private Map<Short,Device> devices = new HashMap<Short,Device>();
+    private List<HomeAutomationDevice> devices = new ArrayList<HomeAutomationDevice>();
     
     private Node() {}
     
@@ -73,13 +77,27 @@ public class Node implements Serializable {
 	public void setNeighbors(List<Long> neighborIds) {
 		this.neighborIds = neighborIds;
 	}
-	
-	public void addEndpoint(short ep) {
-		endpoints.add(ep);
-	}
     
 	public void setEndpoints(List<Short> endpoints) {
 		this.endpoints = endpoints;
+		this.devices = new ArrayList<HomeAutomationDevice>(endpoints.size());
+		for (int i=0;i<endpoints.size();i++)
+			this.devices.add(HomeAutomationDevice.UNKNOWN);
+	}
+	
+	public void addDevice(short endpoint, HomeAutomationDevice device) {
+		short epIndex = -1;
+		for (short i=0; i<endpoints.size(); i++) {
+			if (endpoints.get(i) == endpoint) {
+				epIndex = i;
+				break;
+			}
+		}
+		
+		if (epIndex == -1)
+			throw new EndpointNotFoundException();
+			
+		devices.set(epIndex, device);
 	}
 	
 	public void setLocation(String location) throws InvalidNodeTypeException {
@@ -203,6 +221,15 @@ public class Node implements Serializable {
     public List<Short> getEndpoints() {
     	return this.endpoints;
     }    
+    
+    public Map<Short,HomeAutomationDevice> getDevices() {
+    	Map<Short,HomeAutomationDevice> result = new HashMap<Short,HomeAutomationDevice>(endpoints.size());
+    	
+    	for (short i=0; i<endpoints.size(); i++)
+    		result.put(endpoints.get(i), devices.get(i));
+    	
+    	return result;
+    }
 
     @Override
     public boolean equals(Object other) {

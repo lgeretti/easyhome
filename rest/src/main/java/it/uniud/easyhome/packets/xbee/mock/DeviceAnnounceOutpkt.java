@@ -1,8 +1,8 @@
 package it.uniud.easyhome.packets.xbee.mock;
 
+import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.network.mock.MockXBeeNode;
 import it.uniud.easyhome.packets.Domain;
-import it.uniud.easyhome.packets.Context;
 import it.uniud.easyhome.packets.xbee.XBeePacketFromNode;
 
 public final class DeviceAnnounceOutpkt extends XBeePacketFromNode {
@@ -12,7 +12,7 @@ public final class DeviceAnnounceOutpkt extends XBeePacketFromNode {
 		dstAddr64 = 0x0000FFFFL;
 		dstAddr16 = (short)0xFFFE;
 		profileId = Domain.MANAGEMENT.getCode();
-		clusterId = Context.NODE_ANNOUNCE.getCode();
+		clusterId = ManagementContext.NODE_ANNOUNCE.getCode();
 		srcEndpoint = 0x00;
 		dstEndpoint = 0x00;
 		frameControl = 0x0;

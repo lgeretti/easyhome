@@ -1,7 +1,7 @@
 package it.uniud.easyhome.packets.natives;
 
+import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
-import it.uniud.easyhome.packets.Context;
 import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.packets.ModuleCoordinates;
 import it.uniud.easyhome.packets.Operation;
@@ -20,7 +20,7 @@ public class NodeAnncePacket extends NativePacket {
 			throw new InvalidPacketTypeException();
 		if (op.getDomain() != Domain.MANAGEMENT.getCode())
 			throw new InvalidPacketTypeException();
-		if (op.getContext() != Context.NODE_ANNOUNCE.getCode())
+		if (op.getContext() != ManagementContext.NODE_ANNOUNCE.getCode())
 			throw new InvalidPacketTypeException();
 		if (op.getData().length != APS_PAYLOAD_LENGTH)
 			throw new InvalidPacketTypeException();
@@ -56,7 +56,7 @@ public class NodeAnncePacket extends NativePacket {
 		
 		if (op.getDomain() != Domain.MANAGEMENT.getCode())
 			return false;
-		if (op.getContext() != Context.NODE_ANNOUNCE.getCode())
+		if (op.getContext() != ManagementContext.NODE_ANNOUNCE.getCode())
 			return false;
 		
 		return true;

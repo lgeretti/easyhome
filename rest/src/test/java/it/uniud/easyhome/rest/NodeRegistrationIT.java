@@ -2,6 +2,7 @@ package it.uniud.easyhome.rest;
 
 import static org.junit.Assert.*;
 import it.uniud.easyhome.common.JsonUtils;
+import it.uniud.easyhome.devices.HomeAutomationDevice;
 import it.uniud.easyhome.gateway.ProtocolType;
 import it.uniud.easyhome.network.Manufacturer;
 import it.uniud.easyhome.network.Node;
@@ -11,11 +12,17 @@ import it.uniud.easyhome.network.mock.MockXBeeNode;
 import it.uniud.easyhome.processing.Process;
 import it.uniud.easyhome.processing.ProcessKind;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 
+import org.codehaus.jettison.json.JSONException;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -25,6 +32,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
+@Ignore
 public class NodeRegistrationIT {
     
 	private final static int XBEE_GATEWAY_PORT = 5050;
@@ -110,8 +118,8 @@ public class NodeRegistrationIT {
 		 .setManufacturer(Manufacturer.DIGI).build();
         
         node1.addNeighbor(node2);
-        node1.addEndpoint((short)18);
-        node1.addEndpoint((short)3);
+        node1.setEndpoints(Arrays.asList((short)18,(short)3));
+        node1.addDevice((short)18, HomeAutomationDevice.ONOFF_OUTPUT);
         
         mn.register(node1);
         mn.register(node2);

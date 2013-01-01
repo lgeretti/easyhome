@@ -1,10 +1,10 @@
 package it.uniud.easyhome.packets.natives;
 
 import it.uniud.easyhome.common.ByteUtils;
+import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.exceptions.InvalidNodeDescException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.NodeLogicalType;
-import it.uniud.easyhome.packets.Context;
 import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.packets.ModuleCoordinates;
 import it.uniud.easyhome.packets.Operation;
@@ -22,7 +22,7 @@ public class SimpleDescrRspPacket extends NativePacket {
 			throw new InvalidPacketTypeException();
 		if (op.getDomain() != Domain.MANAGEMENT.getCode())
 			throw new InvalidPacketTypeException();
-		if (op.getContext() != Context.SIMPLE_DESC_RSP.getCode())
+		if (op.getContext() != ManagementContext.SIMPLE_DESC_RSP.getCode())
 			throw new InvalidPacketTypeException();
 		if (op.getData().length != APS_PAYLOAD_LENGTH)
 			throw new InvalidPacketTypeException();
@@ -41,7 +41,7 @@ public class SimpleDescrRspPacket extends NativePacket {
 		
 		if (op.getDomain() != Domain.MANAGEMENT.getCode())
 			return false;
-		if (op.getContext() != Context.NODE_DESC_RSP.getCode())
+		if (op.getContext() != ManagementContext.NODE_DESC_RSP.getCode())
 			return false;
 		
 		return true;
