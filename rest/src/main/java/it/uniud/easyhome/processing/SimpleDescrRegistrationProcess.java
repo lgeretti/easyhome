@@ -1,8 +1,11 @@
 package it.uniud.easyhome.processing;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import it.uniud.easyhome.common.JsonUtils;
+import it.uniud.easyhome.devices.HomeAutomationDevice;
 import it.uniud.easyhome.exceptions.InvalidNodeDescException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.NetworkEvent;
@@ -46,10 +49,16 @@ public class SimpleDescrRegistrationProcess extends Process {
         	
         	if (SimpleDescrRspPacket.validates(pkt)) {
 	        	println("SimpleDescrRspPacket received from " + pkt.getSrcCoords());
-	        	/*
+	        	
 	        	try {
 	        		SimpleDescrRspPacket descr = new SimpleDescrRspPacket(pkt);
 	        		
+	        		byte gid = descr.getSrcCoords().getGatewayId();
+	        		short address = descr.getAddrOfInterest();
+	        		
+	        		byte endpoint = descr.getEndpoint();
+	        		
+	        		HomeAutomationDevice device = descr.getDevice();
 	        		
 	        		ClientResponse nodesListResponse = restResource.path("network")
 	                		.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
@@ -57,16 +66,16 @@ public class SimpleDescrRegistrationProcess extends Process {
 	        		
 	        		for (Node node: nodes) {
 	        			if (node.getGatewayId() == gid && node.getAddress() == address) {
-
-	        				// TODO: implement the update of the endpoints
+	        	    		
+	        				node.addDevice(endpoint, device);
 	        				
 	    	                ClientResponse updateResponse = restResource.path("network")
 	    	                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
 	    	                
 	    	                if (updateResponse.getClientResponseStatus() == Status.OK) {
-	    	                	println("Node updated with endpoints list");
+	    	                	println("Node updated with device information for endpoint " + endpoint);
 	    	                } else
-	    	                	println("Node endpoints list information update failed");
+	    	                	println("Node device information update failed for endpoint " + endpoint);
 	    	                
 	    	                break;
 	        			}
@@ -78,7 +87,6 @@ public class SimpleDescrRegistrationProcess extends Process {
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
-				*/
         	}
     	}
     }

@@ -1,11 +1,13 @@
 package it.uniud.easyhome.packets.natives;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import it.uniud.easyhome.common.ByteUtils;
 import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
+import it.uniud.easyhome.exceptions.InvalidPayloadLengthException;
 import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.packets.ModuleCoordinates;
 import it.uniud.easyhome.packets.Operation;
@@ -26,7 +28,7 @@ public class ActiveEndpointsRspPacket extends NativePacket {
 			throw new InvalidPacketTypeException();
 		byte[] opData = op.getData();
 		if (opData[3] != opData.length-4)
-			throw new InvalidPacketTypeException();
+			throw new InvalidPayloadLengthException();
 	}
 	
 	public ActiveEndpointsRspPacket(NativePacket pkt) {
@@ -42,7 +44,7 @@ public class ActiveEndpointsRspPacket extends NativePacket {
 		int numEndpoints = opData[3];
 		
 		for (int i=0; i<numEndpoints;i++) 
-			result.add(new Short(opData[i]));
+			result.add(new Short(opData[4+i]));
 		
 		return result;
 	}

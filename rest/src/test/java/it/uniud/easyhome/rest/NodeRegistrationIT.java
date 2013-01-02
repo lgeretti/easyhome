@@ -101,7 +101,11 @@ public class NodeRegistrationIT {
 		ClientResponse nodeNeighAcqProcessInsertion = insertProcess(ProcessKind.NODE_NEIGH_REQUEST);
 		assertEquals(ClientResponse.Status.CREATED,nodeNeighAcqProcessInsertion.getClientResponseStatus());
 		ClientResponse nodeNeighRegProcessInsertion = insertProcess(ProcessKind.NODE_NEIGH_REGISTRATION);
-		assertEquals(ClientResponse.Status.CREATED,nodeNeighRegProcessInsertion.getClientResponseStatus());		
+		assertEquals(ClientResponse.Status.CREATED,nodeNeighRegProcessInsertion.getClientResponseStatus());	
+		ClientResponse nodeSimpleDescrAcqProcessInsertion = insertProcess(ProcessKind.SIMPLE_DESCR_REQUEST);
+		assertEquals(ClientResponse.Status.CREATED,nodeSimpleDescrAcqProcessInsertion.getClientResponseStatus());
+		ClientResponse nodeSimpleDescrRegProcessInsertion = insertProcess(ProcessKind.SIMPLE_DESCR_REGISTRATION);
+		assertEquals(ClientResponse.Status.CREATED,nodeSimpleDescrRegProcessInsertion.getClientResponseStatus());
 		
         Node node1 = new Node.Builder(0xA1L)
         							 .setAddress((short)0x543F)
@@ -119,7 +123,8 @@ public class NodeRegistrationIT {
         
         node1.addNeighbor(node2);
         node1.setEndpoints(Arrays.asList((short)18,(short)3));
-        node1.addDevice((short)18, HomeAutomationDevice.ONOFF_OUTPUT);
+        node1.addDevice((short)18, HomeAutomationDevice.DIMMABLE_LIGHT);
+        node1.addDevice((short)3, HomeAutomationDevice.SIMPLE_SENSOR);
         
         mn.register(node1);
         mn.register(node2);
@@ -129,7 +134,7 @@ public class NodeRegistrationIT {
         // the process persists it asynchronously
         int counter = 0;
         long sleepTime = 500;
-        long maximumSleepTime = 6000;
+        long maximumSleepTime = 8000;
         while (sleepTime*counter < maximumSleepTime) {
         	counter++;
 	    	ClientResponse getNodesResponse = client.resource(TARGET).path("network")
@@ -138,8 +143,14 @@ public class NodeRegistrationIT {
 	    	
 	    	if (nodes.size() == 2) {
 	    		Node recoveredNode1 = client.resource(TARGET).path("network").path(Long.toString(node1.getId())).accept(MediaType.APPLICATION_JSON).get(Node.class);
+	    		Map<Short,HomeAutomationDevice> devices = recoveredNode1.getMappedDevices();
+	    		System.out.println("Devices endpoints: " + Arrays.toString(devices.keySet().toArray()));
+	    		System.out.println("Devices types: " + Arrays.toString(devices.values().toArray()));
 	    		if (recoveredNode1.getNeighborIds().size() == 1 &&
-	    			recoveredNode1.getEndpoints().size() == 2)
+	    			devices.size() == 2 &&
+	    			devices.get(18) == HomeAutomationDevice.DIMMABLE_LIGHT &&
+	    			devices.get(3) == HomeAutomationDevice.SIMPLE_SENSOR
+	    			)
 		    		break;
 	    	}
 	    	

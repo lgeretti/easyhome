@@ -12,7 +12,7 @@ public class NetworkEvent implements Serializable {
 
 	private static final long serialVersionUID = -926685643567817992L;
 
-	public static enum EventKind { NODE_ADDED, NODE_REMOVED}; 
+	public static enum EventKind { NODE_ADDED, NODE_REMOVED, NODE_ENDPOINTS_ACQUIRED}; 
 	
 	private EventKind kind;
 	private byte gid;

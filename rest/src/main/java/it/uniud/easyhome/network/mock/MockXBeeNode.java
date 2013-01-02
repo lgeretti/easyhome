@@ -2,11 +2,13 @@ package it.uniud.easyhome.network.mock;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import it.uniud.easyhome.common.RunnableState;
 import it.uniud.easyhome.contexts.ManagementContext;
+import it.uniud.easyhome.devices.HomeAutomationDevice;
 import it.uniud.easyhome.network.Manufacturer;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
@@ -18,6 +20,7 @@ import it.uniud.easyhome.packets.xbee.mock.ActiveEpRspOutpkt;
 import it.uniud.easyhome.packets.xbee.mock.DeviceAnnounceOutpkt;
 import it.uniud.easyhome.packets.xbee.mock.NodeDescrRspOutpkt;
 import it.uniud.easyhome.packets.xbee.mock.NodeLQIRspOutpkt;
+import it.uniud.easyhome.packets.xbee.mock.SimpleDescRspOutpkt;
 
 public class MockXBeeNode implements Runnable {
 
@@ -89,6 +92,10 @@ public class MockXBeeNode implements Runnable {
     
     public List<Short> getEndpoints() {
     	return node.getEndpoints();
+    }
+    
+    public Map<Short,HomeAutomationDevice> getDevices() {
+    	return node.getMappedDevices();
     }
     
     private MockXBeeNode getMockXBeeNode(long id) {
@@ -168,17 +175,24 @@ public class MockXBeeNode implements Runnable {
 					runningState = RunnableState.STOPPING;
 				}
 			}
-    	}
-    	else if (pkt.getProfileId() == Domain.EASYHOME_MANAGEMENT.getCode()) {
-			if (pkt.getClusterId() == ManagementContext.ACTIVE_EP_REQ.getCode()) {
+			else if (pkt.getClusterId() == ManagementContext.ACTIVE_EP_REQ.getCode()) {
 				try {
 					transmit(new ActiveEpRspOutpkt(this));
 				} catch (InvalidMockNodeException | MockXBeeNodeNotFoundException e) {
 					e.printStackTrace();
 					runningState = RunnableState.STOPPING;
 				}
+			} 
+			else if (pkt.getClusterId() == ManagementContext.SIMPLE_DESC_REQ.getCode()) {
+				try {
+					byte endpoint = pkt.getApsPayload()[2];
+					transmit(new SimpleDescRspOutpkt(this,endpoint));
+				} catch (InvalidMockNodeException | MockXBeeNodeNotFoundException e) {
+					e.printStackTrace();
+					runningState = RunnableState.STOPPING;
+				}
 			}
-    	}
+    	}	
     }
 
     @Override

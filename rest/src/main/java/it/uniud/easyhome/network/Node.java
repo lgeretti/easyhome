@@ -50,10 +50,12 @@ public class Node implements Serializable {
     
     @ElementCollection
     @CollectionTable(name = "Endpoints")
+    @OrderColumn
     private List<Short> endpoints = new ArrayList<Short>();
     
 	@ElementCollection
     @CollectionTable(name = "Devices")
+	@OrderColumn
     private List<HomeAutomationDevice> devices = new ArrayList<HomeAutomationDevice>();
     
     private Node() {}
@@ -85,7 +87,7 @@ public class Node implements Serializable {
 			this.devices.add(HomeAutomationDevice.UNKNOWN);
 	}
 	
-	public void addDevice(short endpoint, HomeAutomationDevice device) {
+	public synchronized void addDevice(short endpoint, HomeAutomationDevice device) {
 		short epIndex = -1;
 		for (short i=0; i<endpoints.size(); i++) {
 			if (endpoints.get(i) == endpoint) {
@@ -222,7 +224,11 @@ public class Node implements Serializable {
     	return this.endpoints;
     }    
     
-    public Map<Short,HomeAutomationDevice> getDevices() {
+    public List<HomeAutomationDevice> getDevices() {
+    	return this.devices;
+    }
+    
+    public Map<Short,HomeAutomationDevice> getMappedDevices() {
     	Map<Short,HomeAutomationDevice> result = new HashMap<Short,HomeAutomationDevice>(endpoints.size());
     	
     	for (short i=0; i<endpoints.size(); i++)

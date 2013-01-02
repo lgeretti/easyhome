@@ -60,7 +60,7 @@ public class NetworkResourceIT {
         node1.addDevice((short)5, HomeAutomationDevice.ONOFF_SWITCH);
         node1.addDevice((short)3, HomeAutomationDevice.DIMMABLE_LIGHT);
         
-        Map<Short,HomeAutomationDevice> originalDevices = node1.getDevices();
+        Map<Short,HomeAutomationDevice> originalDevices = node1.getMappedDevices();
     	assertEquals(4,originalDevices.size());
     	assertEquals(HomeAutomationDevice.ONOFF_SWITCH,originalDevices.get((short)5));
     	assertEquals(HomeAutomationDevice.DIMMABLE_LIGHT,originalDevices.get((short)3));
@@ -72,12 +72,30 @@ public class NetworkResourceIT {
 
         ClientResponse retrievalResponse = client.resource(TARGET).path("10").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
     	Node retrievedNode = JsonUtils.getFrom(retrievalResponse,Node.class);
-    	Map<Short,HomeAutomationDevice> retrievedDevices = retrievedNode.getDevices();
+    	Map<Short,HomeAutomationDevice> retrievedDevices = retrievedNode.getMappedDevices();
     	assertEquals(4,retrievedDevices.size());
     	assertEquals(HomeAutomationDevice.ONOFF_SWITCH,retrievedDevices.get((short)5));
     	assertEquals(HomeAutomationDevice.DIMMABLE_LIGHT,retrievedDevices.get((short)3));
     	assertEquals(HomeAutomationDevice.UNKNOWN,retrievedDevices.get((short)2));
-    	assertEquals(HomeAutomationDevice.UNKNOWN,retrievedDevices.get((short)7));    }
+    	assertEquals(HomeAutomationDevice.UNKNOWN,retrievedDevices.get((short)7));    
+    	
+    	node1.addDevice((short)7, HomeAutomationDevice.LEVEL_CONTROL_SWITCH);
+    	ClientResponse updateResponse = client.resource(TARGET).type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node1);
+        assertEquals(ClientResponse.Status.OK,updateResponse.getClientResponseStatus());
+        
+        ClientResponse retrievalResponse2 = client.resource(TARGET).path("10").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+    	Node retrievedNode2 = JsonUtils.getFrom(retrievalResponse2,Node.class);
+
+    	Map<Short,HomeAutomationDevice> retrievedDevices2 = retrievedNode2.getMappedDevices();
+
+		System.out.println("Devices endpoints: " + Arrays.toString(retrievedDevices2.keySet().toArray()));
+		System.out.println("Devices types: " + Arrays.toString(retrievedDevices2.values().toArray()));
+    	assertEquals(4,retrievedDevices2.size());
+    	assertEquals(HomeAutomationDevice.ONOFF_SWITCH,retrievedDevices.get((short)5));
+    	assertEquals(HomeAutomationDevice.DIMMABLE_LIGHT,retrievedDevices.get((short)3));
+    	assertEquals(HomeAutomationDevice.UNKNOWN,retrievedDevices.get((short)2));
+    	assertEquals(HomeAutomationDevice.LEVEL_CONTROL_SWITCH,retrievedDevices.get((short)7));            
+    }
 
 	@Test
 	public void testNoNodes() throws JSONException {

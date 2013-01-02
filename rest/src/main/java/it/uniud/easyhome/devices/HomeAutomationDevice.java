@@ -95,20 +95,30 @@ public enum HomeAutomationDevice implements Device {
 	public Domain getDomain() {
 		return Domain.HOME_AUTOMATION;
 	}
-
+	
 	@Override
 	public short getCode() {
-		return code;
+		return this.code;
 	}
-
+	
 	@Override
-	public List<HomeAutomationContext> getClientContexts() {
-		return Collections.unmodifiableList(clientContexts);
+	public List<? extends Context> getClientContexts() {
+		return clientContexts;
 	}
-
+	
 	@Override
-	public List<HomeAutomationContext> getServerContexts() {
-		return Collections.unmodifiableList(serverContexts);
+	public List<? extends Context> getServerContexts() {
+		return serverContexts;
+	}	
+	
+	public static HomeAutomationDevice fromCode(short code) {
+		
+		HomeAutomationDevice result = UNKNOWN;
+		for (HomeAutomationDevice dev: HomeAutomationDevice.values()) {
+			if (dev.getCode() == code)
+				result = dev;
+		}
+		
+		return result;
 	}
-
 }

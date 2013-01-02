@@ -10,7 +10,7 @@ import it.uniud.easyhome.packets.Operation;
 public class SimpleDescrReqPacket extends NativePacket {
 
 	private static final long serialVersionUID = 8448404581483865375L;
-	private static final int APS_PAYLOAD_LENGTH = 2;
+	private static final int APS_PAYLOAD_LENGTH = 3;
 	
 	public SimpleDescrReqPacket(ModuleCoordinates srcCoords, ModuleCoordinates dstCoords, Operation op) {
 		
@@ -26,12 +26,15 @@ public class SimpleDescrReqPacket extends NativePacket {
 			throw new InvalidPacketTypeException();
 	}
 	
-	public SimpleDescrReqPacket(Node destinationNode, byte seqNumber) {
+	public SimpleDescrReqPacket(Node destinationNode, int endpointIndex, byte seqNumber) {
 		this(new ModuleCoordinates((byte)1,0L,(short)0,(byte)0),
 			 new ModuleCoordinates(destinationNode.getGatewayId(),destinationNode.getId(),destinationNode.getAddress(),(byte)0),				
-			 new Operation(seqNumber,Domain.MANAGEMENT.getCode(),ManagementContext.NODE_DESC_REQ.getCode(),
+			 new Operation(seqNumber,Domain.MANAGEMENT.getCode(),ManagementContext.SIMPLE_DESC_REQ.getCode(),
 					       (byte)0x0/*Context invariant*/,(byte)0x0/*Irrelevant*/,
-					       new byte[]{(byte)((destinationNode.getAddress() >>> 8) & 0xFF), (byte)(destinationNode.getAddress() & 0xFF)}));
+					       new byte[]{
+				 				(byte)((destinationNode.getAddress() >>> 8) & 0xFF), 
+				 				(byte)(destinationNode.getAddress() & 0xFF), 
+				 				(byte)(destinationNode.getEndpoints().get(endpointIndex) & 0xFF)}));
 	}
 	
 	public SimpleDescrReqPacket(NativePacket pkt) {
