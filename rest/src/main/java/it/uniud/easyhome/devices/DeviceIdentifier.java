@@ -2,20 +2,21 @@ package it.uniud.easyhome.devices;
 
 import java.io.Serializable;
 
+import javax.persistence.Embeddable;
+
 import it.uniud.easyhome.packets.Domain;
 
+@Embeddable
 public class DeviceIdentifier implements Serializable {
 	
 	private static final long serialVersionUID = 2882522345532470176L;
 	
 	private short endpoint;
-	private short domain;
-	private short deviceCode;
+	private HomeAutomationDevice device;
 	
-	public DeviceIdentifier(short endpoint, short domain, short deviceCode) {
+	public DeviceIdentifier(short endpoint, HomeAutomationDevice device) {
 		this.endpoint = endpoint;
-		this.domain = domain;
-		this.deviceCode = deviceCode;
+		this.device = device;
 	}
 	
 	private DeviceIdentifier() { }
@@ -24,16 +25,20 @@ public class DeviceIdentifier implements Serializable {
 		return endpoint;
 	}
 	
-	public short getDomain() {
-		return domain;
+	public void setEndpoint(short endpoint) {
+		this.endpoint = endpoint;
 	}
 	
-	public short getDeviceCode() {
-		return deviceCode;
+	public HomeAutomationDevice getDevice() {
+		return device;
+	}
+	
+	public void setDevice(HomeAutomationDevice device) {
+		this.device = device;
 	}
 	
 	@Override
 	public String toString() {
-		return "(endpoint: " + endpoint + "; domain: " + domain + "; device code: 0x" + Integer.toHexString(deviceCode) + ")";
+		return "(endpoint: " + endpoint + "; device: " + device + ")";
 	}
 }

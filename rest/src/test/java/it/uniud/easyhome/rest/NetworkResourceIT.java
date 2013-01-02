@@ -87,14 +87,12 @@ public class NetworkResourceIT {
     	Node retrievedNode2 = JsonUtils.getFrom(retrievalResponse2,Node.class);
 
     	Map<Short,HomeAutomationDevice> retrievedDevices2 = retrievedNode2.getMappedDevices();
-
-		System.out.println("Devices endpoints: " + Arrays.toString(retrievedDevices2.keySet().toArray()));
-		System.out.println("Devices types: " + Arrays.toString(retrievedDevices2.values().toArray()));
+    	
     	assertEquals(4,retrievedDevices2.size());
-    	assertEquals(HomeAutomationDevice.ONOFF_SWITCH,retrievedDevices.get((short)5));
-    	assertEquals(HomeAutomationDevice.DIMMABLE_LIGHT,retrievedDevices.get((short)3));
-    	assertEquals(HomeAutomationDevice.UNKNOWN,retrievedDevices.get((short)2));
-    	assertEquals(HomeAutomationDevice.LEVEL_CONTROL_SWITCH,retrievedDevices.get((short)7));            
+    	assertEquals(HomeAutomationDevice.ONOFF_SWITCH,retrievedDevices2.get((short)5));
+    	assertEquals(HomeAutomationDevice.DIMMABLE_LIGHT,retrievedDevices2.get((short)3));
+    	assertEquals(HomeAutomationDevice.UNKNOWN,retrievedDevices2.get((short)2));
+    	assertEquals(HomeAutomationDevice.LEVEL_CONTROL_SWITCH,retrievedDevices2.get((short)7));            
     }
 
 	@Test
@@ -130,6 +128,26 @@ public class NetworkResourceIT {
         List<Node> nodeList = JsonUtils.getListFrom(getResponse,Node.class);
         assertEquals(1,nodeList.size());
         assertEquals(node1,nodeList.get(0));
+    }
+	
+	@Test
+	public void testDelete() throws JSONException {
+		
+        Node.Builder nb1 = new Node.Builder(10L);
+        
+        nb1.setName("test");
+        nb1.setGatewayId((byte)2);
+        nb1.setAddress((short)15);
+        nb1.setCapability((byte)14);
+
+        Node node1 = nb1.build();
+       
+        ClientResponse insertionResponse = client.resource(TARGET).type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node1);
+        assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
+
+        ClientResponse deletionResponse = client.resource(TARGET).path("15").delete(ClientResponse.class);
+        
+        assertEquals(ClientResponse.Status.OK,deletionResponse.getClientResponseStatus());
     }
 	
 	@Test

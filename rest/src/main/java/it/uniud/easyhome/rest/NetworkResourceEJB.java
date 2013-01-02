@@ -82,8 +82,10 @@ public class NetworkResourceEJB {
 	}
 	
 	public void removeAllNodes() {
-		
-        Query query = em.createQuery("DELETE FROM Node");
-        query.executeUpdate();
+        
+        List<Node> nodes = getNodes();
+        
+        for (Node node: nodes)
+        	em.remove(node);
 	}
 }

@@ -32,7 +32,6 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
-@Ignore
 public class NodeRegistrationIT {
     
 	private final static int XBEE_GATEWAY_PORT = 5050;
@@ -144,12 +143,10 @@ public class NodeRegistrationIT {
 	    	if (nodes.size() == 2) {
 	    		Node recoveredNode1 = client.resource(TARGET).path("network").path(Long.toString(node1.getId())).accept(MediaType.APPLICATION_JSON).get(Node.class);
 	    		Map<Short,HomeAutomationDevice> devices = recoveredNode1.getMappedDevices();
-	    		System.out.println("Devices endpoints: " + Arrays.toString(devices.keySet().toArray()));
-	    		System.out.println("Devices types: " + Arrays.toString(devices.values().toArray()));
 	    		if (recoveredNode1.getNeighborIds().size() == 1 &&
 	    			devices.size() == 2 &&
-	    			devices.get(18) == HomeAutomationDevice.DIMMABLE_LIGHT &&
-	    			devices.get(3) == HomeAutomationDevice.SIMPLE_SENSOR
+	    			devices.get((short)18) == HomeAutomationDevice.DIMMABLE_LIGHT &&
+	    			devices.get((short)3) == HomeAutomationDevice.SIMPLE_SENSOR
 	    			)
 		    		break;
 	    	}

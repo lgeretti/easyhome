@@ -44,20 +44,16 @@ public class Node implements Serializable {
     private String location;    
     @Column
     private Manufacturer manufacturer;
+    
     @ElementCollection
     @CollectionTable(name = "NeighborIds")
     private List<Long> neighborIds = new ArrayList<Long>();
     
+    @Embedded
     @ElementCollection
-    @CollectionTable(name = "Endpoints")
-    @OrderColumn
-    private List<Short> endpoints = new ArrayList<Short>();
-    
-	@ElementCollection
     @CollectionTable(name = "Devices")
-	@OrderColumn
-    private List<HomeAutomationDevice> devices = new ArrayList<HomeAutomationDevice>();
-    
+    private List<DeviceIdentifier> devices = new ArrayList<DeviceIdentifier>();
+
     private Node() {}
     
     public void setLogicalType(NodeLogicalType logicalType) {
@@ -81,16 +77,15 @@ public class Node implements Serializable {
 	}
     
 	public void setEndpoints(List<Short> endpoints) {
-		this.endpoints = endpoints;
-		this.devices = new ArrayList<HomeAutomationDevice>(endpoints.size());
-		for (int i=0;i<endpoints.size();i++)
-			this.devices.add(HomeAutomationDevice.UNKNOWN);
+		for (Short ep : endpoints) {
+			this.devices.add(new DeviceIdentifier(ep,HomeAutomationDevice.UNKNOWN));
+		}
 	}
 	
 	public synchronized void addDevice(short endpoint, HomeAutomationDevice device) {
 		short epIndex = -1;
-		for (short i=0; i<endpoints.size(); i++) {
-			if (endpoints.get(i) == endpoint) {
+		for (short i=0; i<devices.size(); i++) {
+			if (devices.get(i).getEndpoint() == endpoint) {
 				epIndex = i;
 				break;
 			}
@@ -99,7 +94,7 @@ public class Node implements Serializable {
 		if (epIndex == -1)
 			throw new EndpointNotFoundException();
 			
-		devices.set(epIndex, device);
+		devices.get(epIndex).setDevice(device);
 	}
 	
 	public void setLocation(String location) throws InvalidNodeTypeException {
@@ -221,19 +216,21 @@ public class Node implements Serializable {
     }
     
     public List<Short> getEndpoints() {
-    	return this.endpoints;
+    	List<Short> endpoints = new ArrayList<Short>();
+    	
+    	for (DeviceIdentifier devId: devices) {
+    		endpoints.add(devId.getEndpoint());
+    	}
+    	
+    	return endpoints;
     }    
     
-    public List<HomeAutomationDevice> getDevices() {
-    	return this.devices;
-    }
-    
     public Map<Short,HomeAutomationDevice> getMappedDevices() {
-    	Map<Short,HomeAutomationDevice> result = new HashMap<Short,HomeAutomationDevice>(endpoints.size());
-    	
-    	for (short i=0; i<endpoints.size(); i++)
-    		result.put(endpoints.get(i), devices.get(i));
-    	
+    	Map<Short,HomeAutomationDevice> result = new HashMap<Short,HomeAutomationDevice>(devices.size());
+
+    	for (DeviceIdentifier devId: devices) {
+    		result.put(devId.getEndpoint(), devId.getDevice());
+    	}    	
     	return result;
     }
 
