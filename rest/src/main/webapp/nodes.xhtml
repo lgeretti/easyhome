@@ -11,7 +11,9 @@
 </h:head>
 <h:body>
     <h:form>
+    	<i>Stopped: </i><h:outputText value="#{pushController.stopped}"/>
         <h:commandButton value="Add" action="#{nodesController.doAdd}"/>
+        <h:commandButton value="Stop" action="#{nodesController.doStop}"/>
         <h:commandButton value="Clear" action="#{nodesController.doClear}"/>
     </h:form>
     <hr/>
