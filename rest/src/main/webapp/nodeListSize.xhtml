@@ -1,0 +1,20 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core">
+<h:head>
+    <title>Counter</title>
+    <script type="text/javascript" src="script/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="script/jquery.icepush.js"></script>
+</h:head>
+<h:body>
+    <h:form>
+        <i>NodeList size: </i><h:outputText value="#{nodeListController.size}"/>
+        <br/>
+        <h:commandButton value="Add" action="#{nodeListController.doAdd}"/>
+        <h:commandButton value="Clear" action="#{nodeListController.doClear}"/>
+    </h:form>
+    <hr/>
+</h:body>
+</html>

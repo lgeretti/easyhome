@@ -13,7 +13,8 @@
     </parent>
     
     <properties>
-        <ice.version>3.0.1</ice.version>
+        <ice.version>3.1.0</ice.version>
+        <icepush.version>3.0.1</icepush.version>
     </properties>
     
     <repositories>
@@ -38,7 +39,7 @@
         <dependency>
             <groupId>org.icepush</groupId>
             <artifactId>icepush</artifactId>
-            <version>${ice.version}</version>
+            <version>${icepush.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.faces</groupId>
