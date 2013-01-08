@@ -13,13 +13,13 @@ import javax.faces.bean.ManagedBean;
 @ApplicationScoped
 public class NodeList {
 	
-	//@EJB
-	//private NetworkResourceEJB networkEjb;
+	@EJB
+	private NetworkResourceEJB networkEjb;
     
 	private int size;
 	
 	public int getSize() {
-		return size;//networkEjb.getNodes().size();
+		return networkEjb.getNodes().size();
 	}
 	
 	public void addNode() {
