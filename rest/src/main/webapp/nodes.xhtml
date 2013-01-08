@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ace="http://www.icefaces.org/icefaces/components">
+<h:head>
+    <title>Counter</title>
+    <script type="text/javascript" src="script/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="script/jquery.icepush.js"></script>
+</h:head>
+<h:body>
+    <h:form>
+        <h:commandButton value="Add" action="#{nodesController.doAdd}"/>
+        <h:commandButton value="Clear" action="#{nodesController.doClear}"/>
+    </h:form>
+    <hr/>
+	 <h:form id="form">
+	  <ace:dataTable id="nodeTable"
+	              value="#{nodesController.nodes}"
+	              var="node"
+	              paginator="true"
+	              paginatorPosition="bottom"
+	              rows="10">
+	    <ace:column id="ID" headerText="ID" sortBy="#{node.id}"
+	                filterBy="#{node.id}" filterMatchMode="contains">
+	        <h:outputText id="nodeId" value="#{node.hexId}"/>
+	    </ace:column>
+	  </ace:dataTable>
+	 </h:form> 
+    
+    
+</h:body>
+</html>

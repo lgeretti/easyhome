@@ -1,9 +1,10 @@
 package it.uniud.easyhome.jsf;
 
+import java.util.List;
 import java.util.Random;
 
+import it.uniud.easyhome.network.NetworkEJB;
 import it.uniud.easyhome.network.Node;
-import it.uniud.easyhome.rest.NetworkResourceEJB;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -15,14 +16,14 @@ import org.icefaces.application.PushRenderer;
 
 @ManagedBean
 @ViewScoped 
-public class NodeListController {
+public class NodesController {
     
     private static final String PUSH_GROUP = "nodes";
     
     private Random rnd;
     
 	@EJB
-	private NetworkResourceEJB networkEjb;
+	private NetworkEJB networkEjb;
 
     //@ManagedProperty(value="#{nodes}")
     //private NodeList nodes = new NodeList();
@@ -31,6 +32,10 @@ public class NodeListController {
     public void init() {
     	rnd = new Random();
         PushRenderer.addCurrentView(PUSH_GROUP);
+    }
+    
+    public List<Node> getNodes() {
+    	return networkEjb.getNodes();
     }
     
     public void doAdd() {        

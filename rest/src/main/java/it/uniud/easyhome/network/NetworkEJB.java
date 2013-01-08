@@ -1,6 +1,5 @@
-package it.uniud.easyhome.rest;
+package it.uniud.easyhome.network;
 
-import it.uniud.easyhome.network.Node;
 
 import java.util.List;
 
@@ -14,7 +13,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 @Stateless
-public class NetworkResourceEJB {
+public class NetworkEJB {
 
 	@PersistenceContext(unitName = "EasyHome-JTA")
 	private EntityManager em;

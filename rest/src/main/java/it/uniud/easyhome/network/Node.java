@@ -176,6 +176,10 @@ public class Node implements Serializable {
         return this.id;
     }
     
+    public String getHexId() {
+    	return "0x" + Long.toHexString(id);
+    }
+    
     public String getName() {
         return this.name;
     }

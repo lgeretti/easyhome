@@ -3,6 +3,7 @@ package it.uniud.easyhome.rest;
 
 import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.devices.HomeAutomationDevice;
+import it.uniud.easyhome.network.NetworkEJB;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
 
@@ -25,10 +26,10 @@ import com.sun.jersey.api.client.ClientResponse;
 @Path("/network")
 public final class NetworkResource {
 
-    private NetworkResourceEJB resEjb;
+    private NetworkEJB resEjb;
 
     public NetworkResource() throws NamingException {
-    	resEjb = (NetworkResourceEJB) new
+    	resEjb = (NetworkEJB) new
                 InitialContext().lookup("java:global/easyhome/NetworkResourceEJB");
     }
     
