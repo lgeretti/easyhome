@@ -32,8 +32,8 @@ public class SimpleDescrReqPacket extends NativePacket {
 			 new Operation(seqNumber,Domain.MANAGEMENT.getCode(),ManagementContext.SIMPLE_DESC_REQ.getCode(),
 					       (byte)0x0/*Context invariant*/,(byte)0x0/*Irrelevant*/,
 					       new byte[]{
-				 				(byte)((destinationNode.getAddress() >>> 8) & 0xFF), 
-				 				(byte)(destinationNode.getAddress() & 0xFF), 
+				 				(byte)(destinationNode.getAddress() & 0xFF),
+				 				(byte)((destinationNode.getAddress() >>> 8) & 0xFF), 				 				 
 				 				(byte)(destinationNode.getEndpoints().get(endpointIndex) & 0xFF)}));
 	}
 	

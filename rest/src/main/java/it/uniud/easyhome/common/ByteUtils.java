@@ -49,6 +49,7 @@ public class ByteUtils {
                 strb.append("0");
             strb.append(Integer.toHexString(0xFF & b).toUpperCase()).append(" ");
 		}
+		strb.deleteCharAt(strb.length()-1);
 		
 		return strb.toString();
 	}

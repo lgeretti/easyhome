@@ -34,13 +34,13 @@ public class NodeAnncePacket extends NativePacket {
 	
 	public short getAnnouncedAddress() {
 		byte[] data = getOperation().getData();
-		return (short) ((((short)(data[0] & 0xFF)) << 8) + data[1]); 
+		return (short) ((((short)(data[1] & 0xFF)) << 8) + data[0]); 
 	}
 	
 	public long getAnnouncedNuid() {
 		byte[] data = getOperation().getData();
 		long result = 0;
-		for (int i=56,j=2; i>=0; i-=8,j+=1)
+		for (int i=56,j=9; i>=0; i-=8,j-=1)
 			result += ((long)(data[j] & 0xFF))<<i;
 		return result;
 	}

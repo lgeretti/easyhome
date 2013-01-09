@@ -114,9 +114,10 @@ public class XBeeGateway extends Gateway {
     	// We instead need to rewrite the endpoints in the APS payload, where present, thus depending on the packet type
 		XBeePacketFromNode xbeePkt = new XBeePacketFromNode(pkt);
 		// We remap the endpoint of the destination, since the native network uses 0 for all cases
-		// FIXME: depends on the actual node manufacturer
-		if (xbeePkt.getDstEndpoint() == 0)
-			xbeePkt.setDstEndpoint((byte)0x01);
+		// FIXME: depends on the actual node manufacturer and the fact that this is a management command like
+		// endpoint list, simple descriptors and bind/unbind commands
+		//if (xbeePkt.getDstEndpoint() == 0)
+		//	xbeePkt.setDstEndpoint((byte)0x01);
 		xbeePkt.write(os);		
     }
   

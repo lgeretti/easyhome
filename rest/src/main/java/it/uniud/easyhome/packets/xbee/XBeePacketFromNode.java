@@ -110,11 +110,11 @@ public class XBeePacketFromNode extends XBeePacket {
 			sum += val;
 		}		
 		// Source endpoint
-		byte srcEndpointToWrite = (srcEndpoint == 0 ? 1 : srcEndpoint);
+		byte srcEndpointToWrite = srcEndpoint;
 		os.write(srcEndpointToWrite);
 		sum += srcEndpointToWrite;
 		// Destination endpoint
-		byte dstEndpointToWrite = (dstEndpoint == 0 ? 1 : dstEndpoint);
+		byte dstEndpointToWrite = dstEndpoint;
 		os.write(dstEndpointToWrite);
 		sum += dstEndpointToWrite;
 		// Cluster ID

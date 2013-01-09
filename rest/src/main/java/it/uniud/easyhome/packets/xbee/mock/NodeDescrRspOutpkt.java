@@ -23,8 +23,8 @@ public final class NodeDescrRspOutpkt extends XBeePacketFromNode {
 		transactionSeqNumber = node.nextSeqNumber();
 		
 		apsPayload[0] = (byte)0; // SUCCESS
-		apsPayload[1] = (byte)((node.getAddress() >>> 8) & 0xFF);
-		apsPayload[2] = (byte)(node.getAddress() & 0xFF);
+		apsPayload[1] = (byte)(node.getAddress() & 0xFF);
+		apsPayload[2] = (byte)((node.getAddress() >>> 8) & 0xFF);
 		
 		switch (node.getLogicalType()) {
 			case END_DEVICE:
@@ -37,8 +37,8 @@ public final class NodeDescrRspOutpkt extends XBeePacketFromNode {
 		}
 		
 		short manufacturerCode = node.getManufacturer().getCode();
-		apsPayload[6] = (byte)((manufacturerCode >>> 8) & 0xFF);
-		apsPayload[7] = (byte)(manufacturerCode & 0xFF);
+		apsPayload[6] = (byte)(manufacturerCode & 0xFF);
+		apsPayload[7] = (byte)((manufacturerCode >>> 8) & 0xFF);
 		
 		// We ignore the other bytes for now
 	}

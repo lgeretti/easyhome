@@ -19,10 +19,10 @@ public final class DeviceAnnounceOutpkt extends XBeePacketFromNode {
 		
 		transactionSeqNumber = node.nextSeqNumber();
 		
-		apsPayload[0] = (byte)((node.getAddress() >>> 8) & 0xFF);
-		apsPayload[1] = (byte)(node.getAddress() & 0xFF);
+		apsPayload[0] = (byte)(node.getAddress() & 0xFF);
+		apsPayload[1] = (byte)((node.getAddress() >>> 8) & 0xFF);
 		
-		for (int i=2,j=56; j>=0; i++,j-=8)
+		for (int i=2,j=0; j<=56; i++,j+=8)
 			apsPayload[i] = (byte)((node.getId() >>> j) & 0xFF);
 		
 		apsPayload[10] = node.getCapability();

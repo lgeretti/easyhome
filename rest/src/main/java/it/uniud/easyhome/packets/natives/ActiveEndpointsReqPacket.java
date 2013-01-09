@@ -31,7 +31,7 @@ public class ActiveEndpointsReqPacket extends NativePacket {
 			 new ModuleCoordinates(destinationNode.getGatewayId(),destinationNode.getId(),destinationNode.getAddress(),(byte)0),				
 			 new Operation(seqNumber,Domain.MANAGEMENT.getCode(),ManagementContext.ACTIVE_EP_REQ.getCode(),
 					       (byte)0x0/*Context invariant*/,(byte)0x0/*Irrelevant*/,
-					       new byte[]{(byte)((destinationNode.getAddress() >>> 8) & 0xFF), (byte)(destinationNode.getAddress() & 0xFF)}));
+					       new byte[]{(byte)(destinationNode.getAddress() & 0xFF),(byte)((destinationNode.getAddress() >>> 8) & 0xFF)}));
 	}
 	
 	public ActiveEndpointsReqPacket(NativePacket pkt) {
