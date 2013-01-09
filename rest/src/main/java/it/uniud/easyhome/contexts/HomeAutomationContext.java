@@ -2,6 +2,7 @@ package it.uniud.easyhome.contexts;
 
 import java.util.List;
 
+import it.uniud.easyhome.exceptions.InvalidContextException;
 import it.uniud.easyhome.packets.Domain;
 
 public enum HomeAutomationContext implements Context {
@@ -35,5 +36,19 @@ public enum HomeAutomationContext implements Context {
 	@Override
 	public Domain getDomain() {
 		return Domain.HOME_AUTOMATION;
+	}
+	
+	public static HomeAutomationContext fromCode(short code) {
+		
+		HomeAutomationContext result = null;
+		for (HomeAutomationContext cxt: HomeAutomationContext.values()) {
+			if (cxt.getCode() == code)
+				result = cxt;
+		}
+		
+		if (result == null)
+			throw new InvalidContextException();
+		
+		return result;
 	}
 }

@@ -78,9 +78,9 @@ public class NodeDescrRegistrationProcess extends Process {
 	    	                        networkEventsProducer.send(eventMessage);
 	    	                    } catch (JMSException ex) { }
 	    	                    
-	    	                	println("Node updated with logical type information");
+	    	                	println("Node updated with logical type information " + descr.getLogicalType() + " and manufacturer " + descr.getManufacturerCode());
 	    	                } else
-	    	                	println("Node logical type information update failed");
+	    	                	println("Node logical type information and manufacturer update failed");
 	    	                
 	    	                break;
 	        			}

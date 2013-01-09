@@ -68,7 +68,7 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                    try {
 	                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
 	                        networkEventsProducer.send(eventMessage);
-	                        println("Node " + ByteUtils.printBytes(ByteUtils.getBytes(nuid)) + " at " + ByteUtils.printBytes(ByteUtils.getBytes(address)) +
+	                        println("Node " + ByteUtils.printBytes(nuid) + " at " + ByteUtils.printBytes(address) +
 	                        		" announcement registered and event dispatched");
 	                    } catch (Exception e) {
 	                    	println("Message could not be dispatched to inbound packets topic");
@@ -80,8 +80,8 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                    try {
 	                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
 	                        networkEventsProducer.send(eventMessage);
-	                        println("Node " + ByteUtils.printBytes(ByteUtils.getBytes(nuid)) + 
-	                        		" announcement re-registered (" + ByteUtils.printBytes(ByteUtils.getBytes(address)) + ") and event dispatched");
+	                        println("Node " + ByteUtils.printBytes(nuid) + 
+	                        		" announcement re-registered (" + ByteUtils.printBytes(address) + ") and event dispatched");
 	                    } catch (Exception e) {
 	                    	println("Message could not be dispatched to inbound packets topic");
 	                    }

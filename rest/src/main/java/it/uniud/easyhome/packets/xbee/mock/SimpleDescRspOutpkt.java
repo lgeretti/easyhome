@@ -7,6 +7,7 @@ import java.util.Map;
 import com.sun.xml.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 import it.uniud.easyhome.common.ByteUtils;
+import it.uniud.easyhome.common.Endianness;
 import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.devices.HomeAutomationDevice;
 import it.uniud.easyhome.network.NodeLogicalType;
@@ -40,20 +41,22 @@ public final class SimpleDescRspOutpkt extends XBeePacketFromNode {
 		transactionSeqNumber = node.nextSeqNumber();
 		
 		apsPayload[0] = 0; // SUCCESS
-		byte[] nwkAddr = ByteUtils.getBytes(node.getAddress());
-		apsPayload[1] = nwkAddr[1];
-		apsPayload[2] = nwkAddr[0];
+		byte[] nwkAddr = ByteUtils.getBytes(node.getAddress(), Endianness.LITTLE_ENDIAN);
+		apsPayload[1] = nwkAddr[0];
+		apsPayload[2] = nwkAddr[1];
 		
 		apsPayload[3] = 12;
 		
 		// Endpoint
 		apsPayload[4] = endpoint;
 		// Profile
-		apsPayload[5] = (byte)(Domain.HOME_AUTOMATION.getCode() & 0xFF);
-		apsPayload[6] = (byte)((Domain.HOME_AUTOMATION.getCode() >>> 8) & 0xFF);
+		byte[] profileBytes = ByteUtils.getBytes(Domain.HOME_AUTOMATION.getCode(), Endianness.LITTLE_ENDIAN);
+		apsPayload[5] = profileBytes[0];
+		apsPayload[6] = profileBytes[1];
 		// Device
-		apsPayload[7] = (byte)(dev.getCode() & 0xFF);
-		apsPayload[8] = (byte)((dev.getCode() >>> 8) & 0xFF);
+		byte[] deviceBytes = ByteUtils.getBytes(dev.getCode(), Endianness.LITTLE_ENDIAN);
+		apsPayload[7] = deviceBytes[0];
+		apsPayload[8] = deviceBytes[1];
 		// The rest is ignored (implicitly setting to zero the input/output cluster counts)
 	}
 	

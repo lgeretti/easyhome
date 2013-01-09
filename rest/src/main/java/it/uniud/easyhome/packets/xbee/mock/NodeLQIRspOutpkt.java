@@ -3,6 +3,7 @@ package it.uniud.easyhome.packets.xbee.mock;
 import java.util.List;
 
 import it.uniud.easyhome.common.ByteUtils;
+import it.uniud.easyhome.common.Endianness;
 import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.network.mock.InvalidMockNodeException;
@@ -46,18 +47,18 @@ public final class NodeLQIRspOutpkt extends XBeePacketFromNode {
 			// Data in little-endian format
 			
 			// Extended PAN address (plainly using 16 bit network address)
-			byte[] nwkAddr = ByteUtils.getBytes(neighbor.getAddress());
-			apsPayload[idx++] = nwkAddr[1];
+			byte[] nwkAddr = ByteUtils.getBytes(neighbor.getAddress(), Endianness.LITTLE_ENDIAN);
 			apsPayload[idx++] = nwkAddr[0];
+			apsPayload[idx++] = nwkAddr[1];
 			for (int i=0;i<6;i++)
 				apsPayload[idx++] = (byte)0;
 			// MAC address
-			byte[] macAddr = ByteUtils.getBytes(neighbor.getId());
+			byte[] macAddr = ByteUtils.getBytes(neighbor.getId(), Endianness.LITTLE_ENDIAN);
 			for (int i=0;i<8;i++)
-				apsPayload[idx++] = macAddr[7-i];
+				apsPayload[idx++] = macAddr[i];
 			// NWK address
-			apsPayload[idx++] = nwkAddr[1];
 			apsPayload[idx++] = nwkAddr[0];
+			apsPayload[idx++] = nwkAddr[1];
 			// Device type, RxOnWhenIdle (0x1), Relationship (0x3), reserved bit (0x0) -> 0b001101XX -> 52 | 0xXX
 			apsPayload[idx++] = (byte) (((byte)52) | neighbor.getLogicalType().getCode());
 			// Permit joining (0x2: unknown) and reserved bits (set to zero)

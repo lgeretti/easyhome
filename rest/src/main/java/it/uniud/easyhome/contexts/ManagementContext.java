@@ -1,5 +1,7 @@
 package it.uniud.easyhome.contexts;
 
+import it.uniud.easyhome.devices.HomeAutomationDevice;
+import it.uniud.easyhome.exceptions.InvalidContextException;
 import it.uniud.easyhome.packets.Domain;
 
 public enum ManagementContext implements Context {
@@ -28,5 +30,19 @@ public enum ManagementContext implements Context {
 	@Override
 	public Domain getDomain() {
 		return Domain.MANAGEMENT;
+	}
+	
+	public static ManagementContext fromCode(short code) {
+		
+		ManagementContext result = null;
+		for (ManagementContext cxt: ManagementContext.values()) {
+			if (cxt.getCode() == code)
+				result = cxt;
+		}
+		
+		if (result == null)
+			throw new InvalidContextException();
+		
+		return result;
 	}
 }

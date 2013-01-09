@@ -3,6 +3,7 @@ package it.uniud.easyhome.packets.xbee.mock;
 import java.util.List;
 
 import it.uniud.easyhome.common.ByteUtils;
+import it.uniud.easyhome.common.Endianness;
 import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.network.mock.InvalidMockNodeException;
@@ -32,9 +33,9 @@ public final class ActiveEpRspOutpkt extends XBeePacketFromNode {
 		transactionSeqNumber = node.nextSeqNumber();
 		
 		apsPayload[0] = 0; // SUCCESS
-		byte[] nwkAddr = ByteUtils.getBytes(node.getAddress());
-		apsPayload[1] = nwkAddr[1];
-		apsPayload[2] = nwkAddr[0];
+		byte[] nwkAddr = ByteUtils.getBytes(node.getAddress(),Endianness.LITTLE_ENDIAN);
+		apsPayload[1] = nwkAddr[0];
+		apsPayload[2] = nwkAddr[1];
 		apsPayload[3] = (byte)(endpoints.size() & 0xFF);
 		
 		int idx = 4;

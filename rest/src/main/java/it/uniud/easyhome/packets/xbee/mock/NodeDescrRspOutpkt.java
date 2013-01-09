@@ -1,5 +1,7 @@
 package it.uniud.easyhome.packets.xbee.mock;
 
+import it.uniud.easyhome.common.ByteUtils;
+import it.uniud.easyhome.common.Endianness;
 import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.network.mock.InvalidMockNodeException;
 import it.uniud.easyhome.network.mock.MockXBeeNode;
@@ -23,8 +25,10 @@ public final class NodeDescrRspOutpkt extends XBeePacketFromNode {
 		transactionSeqNumber = node.nextSeqNumber();
 		
 		apsPayload[0] = (byte)0; // SUCCESS
-		apsPayload[1] = (byte)(node.getAddress() & 0xFF);
-		apsPayload[2] = (byte)((node.getAddress() >>> 8) & 0xFF);
+		
+		byte[] addrBytes = ByteUtils.getBytes(node.getAddress(), Endianness.LITTLE_ENDIAN);
+		apsPayload[1] = addrBytes[0];
+		apsPayload[2] = addrBytes[1];
 		
 		switch (node.getLogicalType()) {
 			case END_DEVICE:
@@ -36,9 +40,9 @@ public final class NodeDescrRspOutpkt extends XBeePacketFromNode {
 				throw new InvalidMockNodeException();
 		}
 		
-		short manufacturerCode = node.getManufacturer().getCode();
-		apsPayload[6] = (byte)(manufacturerCode & 0xFF);
-		apsPayload[7] = (byte)((manufacturerCode >>> 8) & 0xFF);
+		byte[] manufacturerBytes = ByteUtils.getBytes(node.getManufacturer().getCode(), Endianness.LITTLE_ENDIAN);
+		apsPayload[6] = manufacturerBytes[0];
+		apsPayload[7] = manufacturerBytes[1];
 		
 		// We ignore the other bytes for now
 	}

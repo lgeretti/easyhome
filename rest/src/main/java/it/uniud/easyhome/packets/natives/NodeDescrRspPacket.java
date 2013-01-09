@@ -58,13 +58,16 @@ public class NodeDescrRspPacket extends NativePacket {
 	
 	public Manufacturer getManufacturerCode() {
 		
-		short raw = ByteUtils.getShort(getOperation().getData(),6);
+		byte[] data = getOperation().getData();
+		short raw = (short) ((((short)(data[7] & 0xFF)) << 8) + data[6]); 
 		
-		return Manufacturer.getFromShort(raw);
+		return Manufacturer.fromCode(raw);
 	}
 	
 	public short getAddrOfInterest() {
-		return ByteUtils.getShort(getOperation().getData(),1);
+		
+		byte[] data = getOperation().getData();
+		return (short) ((((short)(data[2] & 0xFF)) << 8) + data[1]); 
 	}
 	
 	public static boolean validates(NativePacket pkt) {

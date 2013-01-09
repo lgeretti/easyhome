@@ -1,5 +1,7 @@
 package it.uniud.easyhome.packets.xbee.mock;
 
+import it.uniud.easyhome.common.ByteUtils;
+import it.uniud.easyhome.common.Endianness;
 import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.network.mock.MockXBeeNode;
 import it.uniud.easyhome.packets.Domain;
@@ -19,11 +21,13 @@ public final class DeviceAnnounceOutpkt extends XBeePacketFromNode {
 		
 		transactionSeqNumber = node.nextSeqNumber();
 		
-		apsPayload[0] = (byte)(node.getAddress() & 0xFF);
-		apsPayload[1] = (byte)((node.getAddress() >>> 8) & 0xFF);
+		byte[] addrBytes = ByteUtils.getBytes(node.getAddress(), Endianness.LITTLE_ENDIAN);
+		apsPayload[0] = addrBytes[0];
+		apsPayload[1] = addrBytes[1];
 		
-		for (int i=2,j=0; j<=56; i++,j+=8)
-			apsPayload[i] = (byte)((node.getId() >>> j) & 0xFF);
+		byte[] idBytes = ByteUtils.getBytes(node.getId(), Endianness.LITTLE_ENDIAN);
+		for (int i=2; i<10; i++)
+			apsPayload[i] = idBytes[i];
 		
 		apsPayload[10] = node.getCapability();
 	}

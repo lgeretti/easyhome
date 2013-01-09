@@ -1,5 +1,7 @@
 package it.uniud.easyhome.network;
 
+import it.uniud.easyhome.contexts.ManagementContext;
+import it.uniud.easyhome.exceptions.InvalidContextException;
 import it.uniud.easyhome.exceptions.InvalidManufacturerCodeException;
 
 public enum Manufacturer {
@@ -16,20 +18,18 @@ public enum Manufacturer {
 	public short getCode() {
 		return code;
 	}
-	
-	public static Manufacturer getFromShort(short code) {
+
+	public static Manufacturer fromCode(short code) {
 		
 		Manufacturer result = null;
-		
-		switch (code) {
-			case 0x0013:
-				result = DIGI;
-				break;
-			default:
-				throw new InvalidManufacturerCodeException();
+		for (Manufacturer cxt: Manufacturer.values()) {
+			if (cxt.getCode() == code)
+				result = cxt;
 		}
 		
+		if (result == null)
+			throw new InvalidManufacturerCodeException();
+		
 		return result;
-	}
-	
+	}	
 }

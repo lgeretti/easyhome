@@ -87,9 +87,9 @@ public class ModuleCoordinates implements Serializable {
     	strb.append("{G: ")
     		.append(gid)
     		.append("; N: ")
-    		.append(ByteUtils.printBytes(ByteUtils.getBytes(nuid)))
+    		.append(ByteUtils.printBytes(nuid))
     		.append("; A: ")
-    		.append(ByteUtils.printBytes(ByteUtils.getBytes(address)))
+    		.append(ByteUtils.printBytes(address))
     		.append("; E: ")
     		.append(endpoint)
     		.append("}");
