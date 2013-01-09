@@ -30,7 +30,7 @@ public final class NetworkResource {
 
     public NetworkResource() throws NamingException {
     	resEjb = (NetworkEJB) new
-                InitialContext().lookup("java:global/easyhome/NetworkResourceEJB");
+                InitialContext().lookup("java:global/easyhome/NetworkEJB");
     }
     
     @Context

@@ -15,7 +15,6 @@ public final class DeviceAnnounceOutpkt extends XBeePacketFromNode {
 		clusterId = ManagementContext.NODE_ANNOUNCE.getCode();
 		srcEndpoint = 0x00;
 		dstEndpoint = 0x00;
-		frameControl = 0x0;
 		apsPayload = new byte[11];
 		
 		transactionSeqNumber = node.nextSeqNumber();

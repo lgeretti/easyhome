@@ -27,7 +27,6 @@ public final class ActiveEpRspOutpkt extends XBeePacketFromNode {
 		clusterId = ManagementContext.ACTIVE_EP_RSP.getCode();
 		srcEndpoint = 0x00;
 		dstEndpoint = 0x00;
-		frameControl = 0x0;
 		apsPayload = new byte[APS_PAYLOAD_SIZE];
 		
 		transactionSeqNumber = node.nextSeqNumber();

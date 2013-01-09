@@ -31,7 +31,6 @@ public final class NodeLQIRspOutpkt extends XBeePacketFromNode {
 		clusterId = ManagementContext.NODE_NEIGH_RSP.getCode();
 		srcEndpoint = 0x00;
 		dstEndpoint = 0x00;
-		frameControl = 0x0;
 		apsPayload = new byte[APS_PAYLOAD_SIZE];
 		
 		transactionSeqNumber = node.nextSeqNumber();

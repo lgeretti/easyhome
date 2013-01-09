@@ -1,5 +1,7 @@
 package it.uniud.easyhome.packets;
 
+import it.uniud.easyhome.common.ByteUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -85,9 +87,9 @@ public class ModuleCoordinates implements Serializable {
     	strb.append("{G: ")
     		.append(gid)
     		.append("; N: ")
-    		.append(nuid)
+    		.append(ByteUtils.printBytes(ByteUtils.getBytes(nuid)))
     		.append("; A: ")
-    		.append(address)
+    		.append(ByteUtils.printBytes(ByteUtils.getBytes(address)))
     		.append("; E: ")
     		.append(endpoint)
     		.append("}");

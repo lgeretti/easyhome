@@ -19,7 +19,6 @@ public abstract class XBeePacket implements Packet {
 	protected byte dstEndpoint;
 	protected short clusterId;
 	protected short profileId;
-	protected byte frameControl = 0x00;
 	protected byte transactionSeqNumber = 0x00;
 	protected byte command = 0x00;
 	protected byte[] apsPayload = new byte[0];
@@ -50,13 +49,6 @@ public abstract class XBeePacket implements Packet {
 	}
 	public void setProfileId(short profileId) {
 		this.profileId = profileId;
-	}
-	
-	public byte getFrameControl() {
-		return frameControl;
-	}
-	public void setFrameControl(byte frameControl) {
-		this.frameControl = frameControl;
 	}
 	
 	public byte getTransactionSeqNumber() {
@@ -132,7 +124,7 @@ public abstract class XBeePacket implements Packet {
         	if (is.available() > length)
         		break;
         	try {
-				Thread.sleep(10);
+				Thread.sleep(50);
 			} catch (InterruptedException e) {
 				throw new IncompletePacketException();
 			}

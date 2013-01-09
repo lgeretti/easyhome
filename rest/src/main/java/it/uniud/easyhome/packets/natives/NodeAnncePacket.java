@@ -1,7 +1,9 @@
 package it.uniud.easyhome.packets.natives;
 
 import it.uniud.easyhome.contexts.ManagementContext;
+import it.uniud.easyhome.exceptions.InvalidEndpointsException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
+import it.uniud.easyhome.exceptions.InvalidPayloadLengthException;
 import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.packets.ModuleCoordinates;
 import it.uniud.easyhome.packets.Operation;
@@ -17,13 +19,13 @@ public class NodeAnncePacket extends NativePacket {
 		super(srcCoords,dstCoords,op);
 		
 		if (srcCoords.getEndpoint() != 0 || dstCoords.getEndpoint() != 0)
-			throw new InvalidPacketTypeException();
+			throw new InvalidEndpointsException();
 		if (op.getDomain() != Domain.MANAGEMENT.getCode())
 			throw new InvalidPacketTypeException();
 		if (op.getContext() != ManagementContext.NODE_ANNOUNCE.getCode())
 			throw new InvalidPacketTypeException();
 		if (op.getData().length != APS_PAYLOAD_LENGTH)
-			throw new InvalidPacketTypeException();
+			throw new InvalidPayloadLengthException();
 	}
 	
 	public NodeAnncePacket(NativePacket pkt) {

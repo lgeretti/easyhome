@@ -56,8 +56,10 @@ public class XBeeGateway extends Gateway {
 	        }
 	    }
         
+        println("XBee packet APS payload: " + ByteUtils.printBytes(xpkt.getApsPayload()));
+        
         Operation op = new Operation(xpkt.getTransactionSeqNumber(),xpkt.getProfileId(),
-        		xpkt.getClusterId(),xpkt.getFrameControl(),xpkt.getCommand(),xpkt.getApsPayload());
+        		xpkt.getClusterId(),(byte)0x0/*Frame control*/,xpkt.getCommand(),xpkt.getApsPayload());
         
         return new NativePacket(srcCoords,dstCoords,op);
     }
@@ -83,12 +85,18 @@ public class XBeeGateway extends Gateway {
     		byte[] readBytes = new byte[is.available()];
     		is.read(readBytes);
     		
+    		println("Read: " + ByteUtils.printBytes(readBytes));
+    		
     		buffer.write(readBytes);
     	}
+    	
+    	println("Buffer: " + ByteUtils.printBytes(buffer.toByteArray()));
     	
     	byte[] originalBuffer = buffer.toByteArray();
     	
     	int readBytes = xbeePkt.read(new ByteArrayInputStream(originalBuffer));
+    	
+    	println("XBee packet: " + ByteUtils.printBytes(xbeePkt.getBytes()));
     	
     	result = convertFrom(xbeePkt);
 

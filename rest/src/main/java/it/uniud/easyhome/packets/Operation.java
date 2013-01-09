@@ -60,7 +60,7 @@ public class Operation implements Serializable {
     }
     
     public Operation(InputStream is, int dataSize) throws IOException {
-
+    	
     	sequenceNumber = (byte)is.read();
     	
         int highDomain = is.read();

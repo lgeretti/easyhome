@@ -18,7 +18,6 @@ public final class NodeDescrRspOutpkt extends XBeePacketFromNode {
 		clusterId = ManagementContext.NODE_DESC_RSP.getCode();
 		srcEndpoint = 0x00;
 		dstEndpoint = 0x00;
-		frameControl = 0x0;
 		apsPayload = new byte[APS_PAYLOAD_SIZE];
 		
 		transactionSeqNumber = node.nextSeqNumber();

@@ -1,5 +1,6 @@
 package it.uniud.easyhome.processing;
 
+import it.uniud.easyhome.common.ByteUtils;
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.NetworkEvent;
@@ -42,6 +43,8 @@ public class NodeAnnceRegistrationProcess extends Process {
         	if (NodeAnncePacket.validates(pkt)) {
 	        	println("NodeAnncePacket received from " + pkt.getSrcCoords());
 	        	
+	        	println("Packet bytes: " + ByteUtils.printBytes(pkt.getBytes()));
+	        	println("OpData bytes: " + ByteUtils.printBytes(pkt.getOperation().getData()));
 	        	try {
 	        		NodeAnncePacket announce = new NodeAnncePacket(pkt);
 	        		
@@ -70,8 +73,20 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                    	println("Message could not be dispatched to inbound packets topic");
 	                    }
 	                	
-	                } else if (response.getClientResponseStatus() != Status.OK)
+	                } else if (response.getClientResponseStatus() == Status.OK) {
+	                	
+	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_ADDED, gatewayId, nuid);
+	                    try {
+	                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
+	                        networkEventsProducer.send(eventMessage);
+	                        println("Node announcement re-registered and event dispatched");
+	                    } catch (Exception e) {
+	                    	println("Message could not be dispatched to inbound packets topic");
+	                    }
+	                	
+	                } else
 	                	println("Node announcement registration failed");
+	                
 	                
 	        	} catch (InvalidPacketTypeException ex) {
 	        		ex.printStackTrace();

@@ -30,7 +30,6 @@ public class XBeePacketFromNode extends XBeePacket {
 		dstEndpoint = ehp.getDstCoords().getEndpoint();
 		clusterId = ehp.getOperation().getContext();
 		profileId = ehp.getOperation().getDomain();
-		frameControl = ehp.getOperation().getFlags();
 		transactionSeqNumber = ehp.getOperation().getSequenceNumber();
 		command = ehp.getOperation().getFlags();
 		apsPayload = ehp.getOperation().getData();
@@ -83,7 +82,7 @@ public class XBeePacketFromNode extends XBeePacket {
 		os.write(XBeeConstants.START_DELIMITER);
 		
 		// If not using the management profile, the command byte is not present
-		int length = 22 + apsPayload.length + (Domain.isManagement(profileId) ? 0 : 1);
+		int length = 21 + apsPayload.length + (Domain.isManagement(profileId) ? 0 : 1);
 		
 		// High and low lengths
 		os.write((length >>> 8) & 0xFF);
@@ -136,9 +135,6 @@ public class XBeePacketFromNode extends XBeePacket {
 		// Transmit options
 		os.write(transmitOptions);
 		sum += transmitOptions;
-		// Frame control
-		os.write(frameControl);
-		sum += frameControl;
 		// Transaction sequence number
 		os.write(transactionSeqNumber);
 		sum += transactionSeqNumber;
@@ -187,17 +183,15 @@ public class XBeePacketFromNode extends XBeePacket {
 		
 		transmitOptions = (byte)is.read();
 		 
-		frameControl = (byte)is.read();
-		 
 		transactionSeqNumber = (byte)is.read();
 		 
 		int apsPayloadLength = 0;
 		
 		if (Domain.isManagement(profileId)) {
-			apsPayloadLength = packetLength - 22;
+			apsPayloadLength = packetLength - 21;
 			command = 0x00;
 		} else {
-			apsPayloadLength = packetLength - 23;
+			apsPayloadLength = packetLength - 22;
 			command = (byte)is.read();
 		}
 		

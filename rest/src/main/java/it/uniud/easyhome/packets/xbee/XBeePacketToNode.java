@@ -1,5 +1,6 @@
 package it.uniud.easyhome.packets.xbee;
 
+import it.uniud.easyhome.common.ByteUtils;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.packets.*;
 
@@ -26,7 +27,6 @@ public class XBeePacketToNode extends XBeePacket {
 		dstEndpoint = pkt.getDstEndpoint();
 		clusterId = pkt.getClusterId();
 		profileId = pkt.getProfileId();
-		frameControl = pkt.getFrameControl();
 		transactionSeqNumber = pkt.getTransactionSeqNumber();
 		command = pkt.getCommand();
 		apsPayload = pkt.getApsPayload();
@@ -61,7 +61,7 @@ public class XBeePacketToNode extends XBeePacket {
 		baos.write(XBeeConstants.START_DELIMITER);
 		
 		// If not using the management profile, the command byte is not present
-		int length = 20 + getApsPayload().length + (Domain.isManagement(getProfileId()) ? 0 : 1);
+		int length = 19 + getApsPayload().length + (Domain.isManagement(getProfileId()) ? 0 : 1);
 		
 		// High and low lengths
 		baos.write((length >>> 8) & 0xFF);
@@ -108,9 +108,6 @@ public class XBeePacketToNode extends XBeePacket {
 		// Receive options
 		baos.write(receiveOptions);
 		sum += receiveOptions;
-		// Frame control
-		baos.write(frameControl);
-		sum += frameControl;
 		// Transaction sequence number
 		baos.write(transactionSeqNumber);
 		sum += transactionSeqNumber;
@@ -157,17 +154,15 @@ public class XBeePacketToNode extends XBeePacket {
 		
 		receiveOptions = (byte)is.read();
 		 
-		frameControl = (byte)is.read();
-		 
 		transactionSeqNumber = (byte)is.read();
 		 
 		int apsPayloadLength = 0;
 		
 		if (Domain.isManagement(profileId)) {
-			apsPayloadLength = packetLength - 20;
+			apsPayloadLength = packetLength - 19;
 			command = 0x00;
 		} else {
-			apsPayloadLength = packetLength - 21;
+			apsPayloadLength = packetLength - 20;
 			command = (byte)is.read();
 		}
 		

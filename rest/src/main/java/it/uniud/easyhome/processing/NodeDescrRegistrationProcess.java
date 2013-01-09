@@ -2,6 +2,7 @@ package it.uniud.easyhome.processing;
 
 import java.util.List;
 
+import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.exceptions.InvalidNodeDescException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
@@ -30,8 +31,13 @@ import com.sun.jersey.api.client.ClientResponse.Status;
 
 public class NodeDescrRegistrationProcess extends Process {
 	
+	private MessageProducer networkEventsProducer = null;
+	
     public NodeDescrRegistrationProcess(int pid, UriInfo uriInfo, ProcessKind kind) throws NamingException, JMSException {
         super(pid, UriBuilder.fromUri(uriInfo.getBaseUri()).build(new Object[0]),kind);
+        
+        Topic networkEventsTopic = (Topic) jndiContext.lookup(JMSConstants.NETWORK_EVENTS_TOPIC);
+        networkEventsProducer = registerProducerFor(networkEventsTopic);
     }
     
     @Override
@@ -65,6 +71,13 @@ public class NodeDescrRegistrationProcess extends Process {
 	    	                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
 	    	                
 	    	                if (updateResponse.getClientResponseStatus() == Status.OK) {
+	    	                	
+	    	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_DESCR_ACQUIRED, node.getGatewayId(), node.getId());
+	    	                    try {
+	    	                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
+	    	                        networkEventsProducer.send(eventMessage);
+	    	                    } catch (JMSException ex) { }
+	    	                    
 	    	                	println("Node updated with logical type information");
 	    	                } else
 	    	                	println("Node logical type information update failed");

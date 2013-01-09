@@ -1,6 +1,7 @@
 package it.uniud.easyhome.gateway;
 
 import it.uniud.easyhome.exceptions.IncompletePacketException;
+import it.uniud.easyhome.exceptions.InvalidDelimiterException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.exceptions.NoBytesAvailableException;
 import it.uniud.easyhome.packets.ModuleCoordinates;
@@ -275,11 +276,14 @@ public class Gateway implements Runnable {
         } catch (NoBytesAvailableException ex) {
         	// Just move on
         } catch (IncompletePacketException ex) {
-        	// Just move on      
-        } catch (InvalidPacketTypeException ex) {
         	// Just move on
+        } catch (InvalidDelimiterException ex) {
+        	// Prune out the first byte
+        	byte[] bufferBytes = buffer.toByteArray();
+        	buffer.reset();
+        	buffer.write(bufferBytes, 1, bufferBytes.length-1);
         } catch (Exception ex) {
-            ex.printStackTrace();
+        	ex.printStackTrace();
         }
     }
     
