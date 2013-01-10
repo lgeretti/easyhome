@@ -1,13 +1,15 @@
 package it.uniud.easyhome.network;
 
+import it.uniud.easyhome.common.ByteUtils;
 import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.exceptions.InvalidContextException;
 import it.uniud.easyhome.exceptions.InvalidManufacturerCodeException;
 
 public enum Manufacturer {
 
-	DIGI ((short)0x0013), 
-	UNDEFINED ((short)0x0);
+	DIGI ((short)0x101E), 
+	UNDEFINED ((short)0x0), // Not previously defined, like before being collected from the node
+	UNKNOWN ((short)0xFFFF); // Defined but not within this enumeration
 	
 	private short code;
 	
@@ -28,7 +30,7 @@ public enum Manufacturer {
 		}
 		
 		if (result == null)
-			throw new InvalidManufacturerCodeException();
+			result = Manufacturer.UNKNOWN;
 		
 		return result;
 	}	

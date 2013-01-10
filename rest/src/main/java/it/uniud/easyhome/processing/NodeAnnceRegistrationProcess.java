@@ -43,8 +43,6 @@ public class NodeAnnceRegistrationProcess extends Process {
         	if (NodeAnncePacket.validates(pkt)) {
 	        	println("NodeAnncePacket received from " + pkt.getSrcCoords());
 	        	
-	        	println("Packet bytes: " + ByteUtils.printBytes(pkt.getBytes()));
-	        	println("OpData bytes: " + ByteUtils.printBytes(pkt.getOperation().getData()));
 	        	try {
 	        		NodeAnncePacket announce = new NodeAnncePacket(pkt);
 	        		
@@ -68,8 +66,8 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                    try {
 	                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
 	                        networkEventsProducer.send(eventMessage);
-	                        println("Node " + ByteUtils.printBytes(nuid) + " at " + ByteUtils.printBytes(address) +
-	                        		" announcement registered and event dispatched");
+	                        println("Node (" + ByteUtils.printBytes(nuid) + ") at (" + ByteUtils.printBytes(address) +
+	                        		") announcement registered and event dispatched");
 	                    } catch (Exception e) {
 	                    	println("Message could not be dispatched to inbound packets topic");
 	                    }
@@ -80,8 +78,8 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                    try {
 	                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
 	                        networkEventsProducer.send(eventMessage);
-	                        println("Node " + ByteUtils.printBytes(nuid) + 
-	                        		" announcement re-registered (" + ByteUtils.printBytes(address) + ") and event dispatched");
+	                        println("Node (" + ByteUtils.printBytes(nuid) + 
+	                        		") announcement re-registered (" + ByteUtils.printBytes(address) + ") and event dispatched");
 	                    } catch (Exception e) {
 	                    	println("Message could not be dispatched to inbound packets topic");
 	                    }

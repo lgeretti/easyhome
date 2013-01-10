@@ -41,13 +41,13 @@ public class NodeDescrRspPacket extends NativePacket {
 		
 		switch (raw) {
 		case 0:
-			result = NodeLogicalType.END_DEVICE;
+			result = NodeLogicalType.COORDINATOR;
 			break;
 		case 1:
 			result = NodeLogicalType.ROUTER;
 			break;
 		case 2:
-			result = NodeLogicalType.COORDINATOR;
+			result = NodeLogicalType.END_DEVICE;
 			break;
 		default:
 			throw new InvalidNodeDescException();
