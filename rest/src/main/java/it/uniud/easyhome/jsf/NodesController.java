@@ -1,44 +1,29 @@
 package it.uniud.easyhome.jsf;
 
-import java.net.URI;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
 import it.uniud.easyhome.common.JMSConstants;
-import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.network.NetworkEJB;
-import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.Node;
-import it.uniud.easyhome.packets.natives.NodeDescrReqPacket;
-import it.uniud.easyhome.processing.ProcessKind;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
-import javax.faces.bean.ViewScoped;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
 import javax.jms.Session;
 import javax.jms.Topic;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.ws.rs.core.MediaType;
 
 import org.icefaces.application.PortableRenderer;
 import org.icefaces.application.PushRenderer;
-
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 @ManagedBean
 @SessionScoped 
@@ -80,7 +65,7 @@ public class NodesController implements Runnable {
         PushRenderer.render(PUSH_GROUP);
     }
     
-    public void doClear() {        
+    public void doClear() {
         networkEjb.removeAllNodes();
         PushRenderer.render(PUSH_GROUP);
     }
@@ -101,7 +86,7 @@ public class NodesController implements Runnable {
 	        ConnectionFactory connectionFactory = (ConnectionFactory) jndiContext.lookup(JMSConstants.CONNECTION_FACTORY);
 	        
 	        jmsConnection = connectionFactory.createConnection();
-	        jmsSession = jmsConnection.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
+	        jmsSession = jmsConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 	        
 	        jmsConnection.start();
 	        
@@ -124,8 +109,8 @@ public class NodesController implements Runnable {
 		} finally {
 			try {
 				jmsConnection.stop();
-				
-			} catch (JMSException e) { }
+			} catch (JMSException e) {
+			}
 		}
 		
 	}

@@ -3,7 +3,10 @@ package it.uniud.easyhome.rest;
 
 import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.devices.HomeAutomationDevice;
+import it.uniud.easyhome.gateway.ProtocolType;
 import it.uniud.easyhome.network.NetworkEJB;
+import it.uniud.easyhome.network.NetworkJob;
+import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
 
@@ -25,8 +28,10 @@ import com.sun.jersey.api.client.ClientResponse;
 /** Handles the access to the network of nodes */
 @Path("/network")
 public final class NetworkResource {
-
+	
     private NetworkEJB resEjb;
+    
+    private static int jobId = 0;
 
     public NetworkResource() throws NamingException {
     	resEjb = (NetworkEJB) new
@@ -95,12 +100,14 @@ public final class NetworkResource {
         
         boolean existed = resEjb.removeNodeById(nodeId);
         
-        if (existed) {
+        if (!existed) {
         	throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
         
         return Response.ok().build();
     }    
+    
+    
     
     /** Removes all the nodes.
      * 
@@ -112,5 +119,46 @@ public final class NetworkResource {
         
         return Response.ok().build();
     }
+    
+    // curl -X POST http://localhost:8080/easyhome/rest/network/jobs -H "Content-Type: application/x-www-form-urlencoded" --data-binary "type=NODE_DESCR_REQUEST&gid=1&nuid=392342391&address=24&endpoint=7"
+    @POST
+    @Path("/jobs")
+    public Response addJob(@FormParam("type") NetworkJobType type,
+    					   @FormParam("gid") byte gatewayId,
+    					   @FormParam("nuid") long nuid,
+    					   @FormParam("address") short address,
+    					   @DefaultValue("127") @FormParam("endpoint") byte endpoint) {
+    	
+    	resEjb.insertJob(++jobId, type, gatewayId, nuid, address, endpoint);
+    	
+    	return Response.created(
+    					uriInfo.getAbsolutePathBuilder()
+    						   .path("jobs")
+    						   .path(String.valueOf(jobId))
+    						   .build())
+    					.build();
+    }
+    
+    @GET
+    @Path("/jobs")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<NetworkJob> getNumJobs() {
+    	return resEjb.getJobs();
+    }
+    
+    @DELETE
+    @Path("/jobs/{jobid}")
+    public Response deleteJob(@PathParam("jobid") int jobId) {
+        
+        boolean existed = resEjb.removeJobById(jobId);
+        
+        if (!existed) {
+        	throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+        
+        return Response.ok().build();
+    } 
+    
+    
        
 }

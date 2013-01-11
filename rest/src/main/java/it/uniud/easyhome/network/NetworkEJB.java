@@ -1,6 +1,8 @@
 package it.uniud.easyhome.network;
 
 
+import it.uniud.easyhome.gateway.HubContext;
+
 import java.util.List;
 
 import javax.ejb.Stateless;
@@ -86,5 +88,40 @@ public class NetworkEJB {
         
         for (Node node: nodes)
         	em.remove(node);
+	}
+	
+	public void insertJob(int id, NetworkJobType jobType, byte gatewayId, long nuid, short address, byte endpoint) {
+		
+		NetworkJob job = new NetworkJob(id, jobType, gatewayId, nuid, address, endpoint);
+		
+		em.persist(job);
+	}
+	
+	public List<NetworkJob> getJobs() {
+		
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<NetworkJob> criteria = builder.createQuery(NetworkJob.class);
+        Root<NetworkJob> root = criteria.from(NetworkJob.class);
+        criteria.select(root);
+        
+        TypedQuery<NetworkJob> query = em.createQuery(criteria);
+        
+        return query.getResultList();
+	}
+	
+	public NetworkJob findJobById(int jobId) {
+		return em.find(NetworkJob.class, jobId);
+	}
+
+	public boolean removeJobById(int jobId) {
+
+        NetworkJob job = findJobById(jobId);
+        
+        boolean existed = (job != null);
+        
+        if (existed)
+        	em.remove(job);
+        
+        return existed;
 	}
 }
