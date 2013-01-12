@@ -124,6 +124,19 @@ public class NetworkEJB {
 	public NetworkJob findJobById(int jobId) {
 		return em.find(NetworkJob.class, jobId);
 	}
+	
+	public boolean resetJobDate(int jobId) {
+        NetworkJob job = findJobById(jobId);
+        
+        boolean existed = (job != null);
+        
+        job.resetDate();
+        
+        if (existed)
+        	em.merge(job);
+        
+        return existed;		
+	}
 
 	public boolean removeJobById(int jobId) {
 

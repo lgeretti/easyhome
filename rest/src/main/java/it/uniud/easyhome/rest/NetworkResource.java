@@ -132,6 +132,7 @@ public final class NetworkResource {
     	
     	int newJobId;
     	
+    	
     	synchronized(this) {
     		newJobId = ++jobId;
 	    	resEjb.insertJob(newJobId, type, gatewayId, nuid, address, endpoint);
@@ -142,6 +143,19 @@ public final class NetworkResource {
     						   .path(String.valueOf(newJobId))
     						   .build())
     					.build();
+    }
+    
+    @POST
+    @Path("/jobs/{jobId}/reset")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response resetJobDate(@QueryParam("jobId") int jobId) {
+    	
+        boolean existed = resEjb.resetJobDate(jobId);
+        
+        if (!existed) 
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        
+        return Response.ok().build();
     }
     
     @GET

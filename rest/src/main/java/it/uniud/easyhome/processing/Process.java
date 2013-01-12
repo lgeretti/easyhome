@@ -30,6 +30,11 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 public abstract class Process implements Runnable {
 	
+	// The time between jobs checking, when a particular job type is not resolved
+	protected static long JOB_POLLING_TIME_MILLIS = 1000;
+	// The time after the job should be reissued
+	protected static long JOB_TIMEOUT_MILLIS = 5000;
+	
     private int pid;
     private final ProcessKind kind;
     

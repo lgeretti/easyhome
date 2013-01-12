@@ -26,8 +26,8 @@ public final class DeviceAnnounceOutpkt extends XBeePacketFromNode {
 		apsPayload[1] = addrBytes[1];
 		
 		byte[] idBytes = ByteUtils.getBytes(node.getId(), Endianness.LITTLE_ENDIAN);
-		for (int i=2; i<10; i++)
-			apsPayload[i] = idBytes[i];
+		for (int i=0; i<8; i++)
+			apsPayload[i+2] = idBytes[i];
 		
 		apsPayload[10] = node.getCapability();
 	}

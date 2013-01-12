@@ -35,6 +35,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
+@Ignore
 public class NetworkResourceIT {
 	
 	private static final String TARGET = "http://localhost:8080/easyhome/rest/network";
@@ -129,7 +130,7 @@ public class NetworkResourceIT {
         assertEquals(1,nodeList.size());
         assertEquals(node1,nodeList.get(0));
     }
-	
+
 	@Test
 	public void testDelete() throws JSONException {
 		
@@ -145,10 +146,11 @@ public class NetworkResourceIT {
         ClientResponse insertionResponse = client.resource(TARGET).type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node1);
         assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
 
-        ClientResponse deletionResponse = client.resource(TARGET).path("15").delete(ClientResponse.class);
+        ClientResponse deletionResponse = client.resource(TARGET).path("10").delete(ClientResponse.class);
         
         assertEquals(ClientResponse.Status.OK,deletionResponse.getClientResponseStatus());
     }
+	
 	
 	@Test
 	public void testInsertTwoNodes() throws JSONException {

@@ -4,6 +4,7 @@ import it.uniud.easyhome.common.ByteUtils;
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.NetworkEvent;
+import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.packets.natives.NativePacket;
 import it.uniud.easyhome.packets.natives.NodeAnncePacket;
@@ -15,11 +16,13 @@ import javax.jms.ObjectMessage;
 import javax.jms.Topic;
 import javax.naming.NamingException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class NodeAnnceRegistrationProcess extends Process {
 	
@@ -57,10 +60,19 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                					   .setCapability(capability)
 	                					   .build();
 	                
-	                ClientResponse response = restResource.path("network")
+	                ClientResponse nodeInsertionResponse = restResource.path("network")
 	                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
 	                
-	                if (response.getClientResponseStatus() == Status.CREATED) {
+	                MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+	                formData.add("type",NetworkJobType.NODE_DESCR_REQUEST.toString());
+	                formData.add("gid",String.valueOf(gatewayId));
+	                formData.add("nuid",String.valueOf(nuid));
+	                formData.add("address",String.valueOf(address));
+	                
+	                ClientResponse jobInsertionResponse = restResource.path("network").path("jobs")
+	                		.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	                
+	                if (nodeInsertionResponse.getClientResponseStatus() == Status.CREATED && jobInsertionResponse.getClientResponseStatus() == Status.CREATED) {
 	                	
 	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_ADDED, gatewayId, nuid);
 	                    try {
@@ -72,7 +84,7 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                    	println("Message could not be dispatched to inbound packets topic");
 	                    }
 	                	
-	                } else if (response.getClientResponseStatus() == Status.OK) {
+	                } else if (nodeInsertionResponse.getClientResponseStatus() == Status.OK && jobInsertionResponse.getClientResponseStatus() == Status.CREATED) {
 	                	
 	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_ADDED, gatewayId, nuid);
 	                    try {

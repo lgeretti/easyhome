@@ -59,6 +59,10 @@ public class NetworkJob implements Serializable {
 		this.timestamp = new Date(System.currentTimeMillis());
 	}
 	
+	public int getId() {
+		return id;
+	}
+	
 	public NetworkJobType getType() {
 		return type;
 	}
@@ -77,5 +81,13 @@ public class NetworkJob implements Serializable {
 	
 	public byte getEndpoint() {
 		return endpoint;
+	}
+	
+	public Date getDate() {
+		return timestamp;
+	}
+	
+	public void resetDate() {
+		timestamp = new Date(System.currentTimeMillis());
 	}
 }
