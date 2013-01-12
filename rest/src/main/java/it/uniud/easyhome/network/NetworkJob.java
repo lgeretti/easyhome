@@ -1,6 +1,7 @@
 package it.uniud.easyhome.network;
 
 import java.io.Serializable;
+import java.sql.Time;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -25,7 +26,6 @@ public class NetworkJob implements Serializable {
 	@Id
 	private int id;
 	
-	@Enumerated
 	@Column(nullable = false)
 	private NetworkJobType type;
 	
@@ -41,9 +41,8 @@ public class NetworkJob implements Serializable {
 	@Column(nullable = false)
 	private byte endpoint;
 	
-	@Temporal(TemporalType.TIME)
 	@Column(nullable = false)
-	private Date timestamp;
+	private long timestamp;
 	
 	@SuppressWarnings("unused")
 	private NetworkJob() { }
@@ -56,7 +55,7 @@ public class NetworkJob implements Serializable {
 		this.nuid = nuid;
 		this.address = address;
 		this.endpoint = endpoint;
-		this.timestamp = new Date(System.currentTimeMillis());
+		this.timestamp = System.currentTimeMillis();
 	}
 	
 	public int getId() {
@@ -84,10 +83,10 @@ public class NetworkJob implements Serializable {
 	}
 	
 	public Date getDate() {
-		return timestamp;
+		return new Date(timestamp);
 	}
 	
 	public void resetDate() {
-		timestamp = new Date(System.currentTimeMillis());
+		timestamp = System.currentTimeMillis();
 	}
 }

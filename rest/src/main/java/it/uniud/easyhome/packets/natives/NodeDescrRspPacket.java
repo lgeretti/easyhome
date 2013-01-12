@@ -79,7 +79,7 @@ public class NodeDescrRspPacket extends NativePacket {
 		
 		if (op.getDomain() != Domain.MANAGEMENT.getCode())
 			return false;
-		if (op.getContext() != ManagementContext.NODE_DESC_RSP.getCode())
+		if (op.getContext() != ManagementContext.NODE_DESC_RSP.getCode()) 
 			return false;
 		
 		return true;

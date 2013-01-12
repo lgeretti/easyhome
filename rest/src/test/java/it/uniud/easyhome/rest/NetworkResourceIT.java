@@ -11,6 +11,8 @@ import java.util.Map;
 
 import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.devices.HomeAutomationDevice;
+import it.uniud.easyhome.network.NetworkJob;
+import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
 
@@ -107,7 +109,7 @@ public class NetworkResourceIT {
 	}
 	
 	@Test
-	public void testInsert() throws JSONException {
+	public void testInsertNode() throws JSONException {
 		
         Node.Builder nb1 = new Node.Builder(10L);
         
@@ -285,6 +287,7 @@ public class NetworkResourceIT {
 	@After
 	public void removeNodes() {
 		client.resource(TARGET).delete();
+		client.resource(TARGET).path("jobs").delete();
 	}
 	
 	private ClientResponse postNode(long id, String name, byte gatewayId, short address, byte capability) {
@@ -294,5 +297,68 @@ public class NetworkResourceIT {
         
         return client.resource(TARGET).type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
 	}
+	
+	@Test
+	public void testInsertJob() throws JSONException {
 		
+        ClientResponse insertionResponse = postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,-12983219012L,(short)11,(byte)9);
+        
+        assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
+
+        String locationPath = insertionResponse.getLocation().getPath();
+        String[] segments = locationPath.split("/");
+        String jobIdString = segments[segments.length-1];
+        
+        NetworkJob recoveredJob = client.resource(TARGET).path("jobs").path(jobIdString).accept(MediaType.APPLICATION_JSON).get(NetworkJob.class);
+        
+        assertEquals(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,recoveredJob.getType());        
+    }
+	
+	@Test
+	public void testDeleteJobById() throws JSONException {
+		
+        ClientResponse insertionResponse = postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,-12983219012L,(short)11,(byte)9);
+
+        String locationPath = insertionResponse.getLocation().getPath();
+        String[] segments = locationPath.split("/");
+        String jobIdString = segments[segments.length-1];
+		
+        ClientResponse deletionResponse = client.resource(TARGET).path("jobs").path(jobIdString).delete(ClientResponse.class);
+        
+        assertEquals(ClientResponse.Status.OK,deletionResponse.getClientResponseStatus());
+	}
+	
+	
+	@Test
+	public void testDeleteJobByCoords() throws JSONException {
+		
+        postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,-12983219012L,(short)11,(byte)9);
+		
+		MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+        formData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
+        formData.add("gid",String.valueOf((byte)3));
+        formData.add("address",String.valueOf((short)11));
+        
+        ClientResponse deletionResponse = client.resource(TARGET).path("jobs").path("delete").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        
+        assertEquals(ClientResponse.Status.OK,deletionResponse.getClientResponseStatus());
+	}	
+		
+	private ClientResponse postJob(NetworkJobType type, byte gatewayId, long nuid, short address, byte endpoint) {
+		
+		MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+        formData.add("type",type.toString());
+        formData.add("gid",String.valueOf(gatewayId));
+        formData.add("nuid",String.valueOf(nuid));
+        formData.add("address",String.valueOf(address));
+        formData.add("endpoint",String.valueOf(endpoint));
+        
+        return client.resource(TARGET).path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        /*
+        NetworkJob job = new NetworkJob(7,type,gatewayId,nuid,address,endpoint);
+        
+        return client.resource(TARGET).path("jobs").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,job);
+        */
+	}
+	
 }

@@ -109,12 +109,9 @@ public final class NetworkResource {
     }    
     
     
-    
-    /** Removes all the nodes.
-     * 
-     */
+
     @DELETE
-    public Response clear() {
+    public Response deleteNodes() {
         
     	resEjb.removeAllNodes();
         
@@ -195,6 +192,34 @@ public final class NetworkResource {
         return Response.ok().build();
     } 
     
+    @POST
+    @Path("/jobs/delete")
+    public Response deleteJobs(@FormParam("type") NetworkJobType type, 
+    						   @FormParam("gid") byte gatewayId, 
+    						   @FormParam("address") short address, 
+    						   @DefaultValue("127") @FormParam("endpoint") byte endpoint) {
+    	
+    	int numRemoved;
+    	
+    	if (endpoint == 127)
+    		numRemoved = resEjb.removeJobs(type, gatewayId, address);
+    	else
+    		numRemoved = resEjb.removeJobs(type, gatewayId, address,endpoint);
+    	
+    	if (numRemoved == 0)
+    		throw new WebApplicationException(Response.Status.NOT_FOUND);
+    	
+    	return Response.ok().build();
+    }
     
+    @DELETE
+    @Path("/jobs")
+    public Response deleteJobs() {
+        
+    	resEjb.removeAllJobs();
+        
+        return Response.ok().build();
+    }
+
        
 }

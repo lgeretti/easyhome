@@ -21,6 +21,7 @@
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
         <jta-data-source>jdbc/EasyHome</jta-data-source>
         <class>it.uniud.easyhome.network.Node</class>
+        <class>it.uniud.easyhome.network.NetworkJob</class>
         <properties>
             <property name="eclipselink.ddl-generation" value="create-tables"/>
             <property name="eclipselink.logging.level" value="INFO"/>

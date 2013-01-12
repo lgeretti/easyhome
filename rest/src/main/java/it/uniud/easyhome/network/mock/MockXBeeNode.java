@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import it.uniud.easyhome.common.ByteUtils;
+import it.uniud.easyhome.common.Endianness;
 import it.uniud.easyhome.common.RunnableState;
 import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.devices.HomeAutomationDevice;
@@ -157,7 +159,7 @@ public class MockXBeeNode implements Runnable {
 
     	if (pkt.getProfileId() == Domain.MANAGEMENT.getCode()) {
 			if (pkt.getClusterId() == ManagementContext.NODE_DESC_REQ.getCode()) {
-				short nwkAddress = (short) ((((short)(pkt.getApsPayload()[0] & 0xFF)) << 8) + (pkt.getApsPayload()[1] & 0xFF));
+				short nwkAddress = ByteUtils.getShort(pkt.getApsPayload(),0,Endianness.LITTLE_ENDIAN);
 				if (nwkAddress == node.getAddress()) {
 					try {
 						transmit(new NodeDescrRspOutpkt(this));

@@ -7,6 +7,7 @@ import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.exceptions.InvalidNodeDescException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.NetworkEvent;
+import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.packets.natives.NativePacket;
 import it.uniud.easyhome.packets.natives.NodeAnncePacket;
@@ -21,6 +22,7 @@ import javax.jms.Topic;
 import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
@@ -28,6 +30,7 @@ import org.codehaus.jettison.json.JSONException;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class NodeDescrRegistrationProcess extends Process {
 	
@@ -72,6 +75,18 @@ public class NodeDescrRegistrationProcess extends Process {
 	    	                
 	    	                if (updateResponse.getClientResponseStatus() == Status.OK) {
 	    	                	
+	    		                MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+	    		                formData.add("type",NetworkJobType.NODE_DESCR_REQUEST.toString());
+	    		                formData.add("gid",String.valueOf(gid));
+	    		                formData.add("nuid",String.valueOf(node.getId()));
+	    		                formData.add("address",String.valueOf(address));
+	    		                
+	    		                /*
+	    		                println("Deleting NODE_DESCR_REQUEST job for " + gid + ", " + node.getId() + ", " + address);
+	    		                
+	    		                restResource.path("network").path("jobs").path("delete")
+	    		                		.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	    	                	*/
 	    	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_DESCR_ACQUIRED, node.getGatewayId(), node.getId());
 	    	                    try {
 	    	                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
@@ -94,6 +109,8 @@ public class NodeDescrRegistrationProcess extends Process {
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
+        	} else {
+        		println("The packet does not validate");
         	}
     	}
     }

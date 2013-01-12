@@ -5,6 +5,7 @@ import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.devices.HomeAutomationDevice;
 import it.uniud.easyhome.gateway.ProtocolType;
 import it.uniud.easyhome.network.Manufacturer;
+import it.uniud.easyhome.network.NetworkJob;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.network.mock.MockXBeeNetwork;
@@ -105,7 +106,7 @@ public class NodeRegistrationIT {
 		assertEquals(ClientResponse.Status.CREATED,nodeSimpleDescrAcqProcessInsertion.getClientResponseStatus());
 		ClientResponse nodeSimpleDescrRegProcessInsertion = insertProcess(ProcessKind.SIMPLE_DESCR_REGISTRATION);
 		assertEquals(ClientResponse.Status.CREATED,nodeSimpleDescrRegProcessInsertion.getClientResponseStatus());
-		
+
         Node node1 = new Node.Builder(0xA1L)
         							 .setAddress((short)0x543F)
         							 .setGatewayId((byte)gid)
@@ -155,6 +156,12 @@ public class NodeRegistrationIT {
         }
         
     	assertTrue(sleepTime*counter < maximumSleepTime);
+    	
+    	ClientResponse getJobsResponse = client.resource(TARGET).path("network").path("jobs")
+				.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+    	int numJobs = JsonUtils.getListFrom(getJobsResponse, NetworkJob.class).size();
+    	
+    	assertEquals(0,numJobs);
     	
     	mn.turnOff();
     	mn.unregisterAll();

@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.Parameter;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
@@ -137,6 +138,14 @@ public class NetworkEJB {
         
         return existed;		
 	}
+	
+	public void removeAllJobs() {
+        
+        List<NetworkJob> jobs = getJobs();
+        
+        for (NetworkJob job: jobs)
+        	em.remove(job);
+	}
 
 	public boolean removeJobById(int jobId) {
 
@@ -148,5 +157,26 @@ public class NetworkEJB {
         	em.remove(job);
         
         return existed;
+	}
+	
+	public int removeJobs(NetworkJobType type, byte gatewayId, short address, byte endpoint) {
+		
+		String queryString = "DELETE FROM NetworkJob j WHERE j.type = :t AND j.gatewayId = :g AND j.address = :a AND j.endpoint = :e";
+		return em.createQuery(queryString)
+				.setParameter("t", type)
+				.setParameter("g", gatewayId)
+				.setParameter("a",address)
+				.setParameter("e", endpoint)
+				.executeUpdate();
+	}
+	
+	public int removeJobs(NetworkJobType type, byte gatewayId, short address) {
+
+		String queryString = "DELETE FROM NetworkJob j WHERE j.type = :t AND j.gatewayId = :g AND j.address = :a";
+		return em.createQuery(queryString)
+				.setParameter("t", type)
+				.setParameter("g", gatewayId)
+				.setParameter("a",address)
+				.executeUpdate();
 	}
 }
