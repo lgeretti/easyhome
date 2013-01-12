@@ -10,6 +10,7 @@ import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -129,12 +130,16 @@ public final class NetworkResource {
     					   @FormParam("address") short address,
     					   @DefaultValue("127") @FormParam("endpoint") byte endpoint) {
     	
-    	resEjb.insertJob(++jobId, type, gatewayId, nuid, address, endpoint);
+    	int newJobId;
+    	
+    	synchronized(this) {
+    		newJobId = ++jobId;
+	    	resEjb.insertJob(newJobId, type, gatewayId, nuid, address, endpoint);
+    	}
     	
     	return Response.created(
     					uriInfo.getAbsolutePathBuilder()
-    						   .path("jobs")
-    						   .path(String.valueOf(jobId))
+    						   .path(String.valueOf(newJobId))
     						   .build())
     					.build();
     }
@@ -142,8 +147,25 @@ public final class NetworkResource {
     @GET
     @Path("/jobs")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<NetworkJob> getNumJobs() {
+    public List<NetworkJob> getNumJobs(@QueryParam("type") NetworkJobType type) {
+    	
+    	if (type != null)
+    		return resEjb.getJobsByType(type);
+    	
     	return resEjb.getJobs();
+    }
+    
+    @GET
+    @Path("/jobs/{jobid}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public NetworkJob getJob(@PathParam("jobid") int jobId) {
+        
+        NetworkJob job = resEjb.findJobById(jobId);
+        
+        if (job == null) 
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        
+        return job;
     }
     
     @DELETE

@@ -90,9 +90,9 @@ public class NetworkEJB {
         	em.remove(node);
 	}
 	
-	public void insertJob(int id, NetworkJobType jobType, byte gatewayId, long nuid, short address, byte endpoint) {
+	public void insertJob(int id, NetworkJobType type, byte gatewayId, long nuid, short address, byte endpoint) {
 		
-		NetworkJob job = new NetworkJob(id, jobType, gatewayId, nuid, address, endpoint);
+		NetworkJob job = new NetworkJob(id, type, gatewayId, nuid, address, endpoint);
 		
 		em.persist(job);
 	}
@@ -107,6 +107,18 @@ public class NetworkEJB {
         TypedQuery<NetworkJob> query = em.createQuery(criteria);
         
         return query.getResultList();
+	}
+	
+	public List<NetworkJob> getJobsByType(NetworkJobType type) {
+		
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<NetworkJob> criteria = builder.createQuery(NetworkJob.class);
+        Root<NetworkJob> job = criteria.from(NetworkJob.class);
+        criteria.select(job).where(builder.equal(job.get("type"), type));
+        
+        TypedQuery<NetworkJob> query = em.createQuery(criteria);
+        
+        return query.getResultList();		
 	}
 	
 	public NetworkJob findJobById(int jobId) {

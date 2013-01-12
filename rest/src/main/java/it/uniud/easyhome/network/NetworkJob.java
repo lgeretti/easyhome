@@ -1,14 +1,11 @@
 package it.uniud.easyhome.network;
 
 import java.io.Serializable;
-import java.sql.Time;
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -30,7 +27,7 @@ public class NetworkJob implements Serializable {
 	
 	@Enumerated
 	@Column(nullable = false)
-	private NetworkJobType jobType;
+	private NetworkJobType type;
 	
 	@Column(nullable = false)
 	private byte gatewayId;
@@ -48,12 +45,13 @@ public class NetworkJob implements Serializable {
 	@Column(nullable = false)
 	private Date timestamp;
 	
+	@SuppressWarnings("unused")
 	private NetworkJob() { }
 	
-	public NetworkJob(int id, NetworkJobType jobType, byte gatewayId, long nuid, short address, byte endpoint) {
+	public NetworkJob(int id, NetworkJobType type, byte gatewayId, long nuid, short address, byte endpoint) {
 		
 		this.id = id;
-		this.jobType = jobType;
+		this.type = type;
 		this.gatewayId = gatewayId;
 		this.nuid = nuid;
 		this.address = address;
@@ -62,7 +60,7 @@ public class NetworkJob implements Serializable {
 	}
 	
 	public NetworkJobType getType() {
-		return jobType;
+		return type;
 	}
 	
 	public byte getGatewayId() {
