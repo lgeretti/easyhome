@@ -122,21 +122,55 @@ public class NetworkEJB {
         return query.getResultList();		
 	}
 	
+	public List<NetworkJob> getJobsByTypeAndCoordinates(NetworkJobType type, byte gatewayId, short address, byte endpoint) {
+		
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<NetworkJob> criteria = builder.createQuery(NetworkJob.class);
+        Root<NetworkJob> job = criteria.from(NetworkJob.class);
+        criteria.select(job).where(builder.equal(job.get("type"), type));
+        
+        if (gatewayId != 0) {
+        	criteria.where(builder.equal(job.get("gatewayId"), gatewayId))
+        			.where(builder.equal(job.get("address"), address))
+        			.where(builder.equal(job.get("endpoint"), endpoint));
+        }
+        
+        TypedQuery<NetworkJob> query = em.createQuery(criteria);
+        
+        return query.getResultList();		
+	}
+	
 	public NetworkJob findJobById(int jobId) {
 		return em.find(NetworkJob.class, jobId);
 	}
 	
-	public boolean resetJobDate(int jobId) {
+	public boolean resetJobById(int jobId) {
         NetworkJob job = findJobById(jobId);
         
         boolean existed = (job != null);
         
         if (existed) {
-        	job.resetDate();
+        	job.reset();
         	em.merge(job);
         }
         
         return existed;		
+	}
+	
+	/***
+	 * Resets one or more jobs (one if coordinates are defined, possibly many otherwise)
+	 * 
+	 * @return True if at least one job has been found
+	 */
+	public boolean resetJobsByTypeAndCoordinates(NetworkJobType type, byte gatewayId, short address, byte endpoint) {
+		List<NetworkJob> jobs = getJobsByTypeAndCoordinates(type,gatewayId,address,endpoint);
+		
+		for (NetworkJob job : jobs) {
+			job.reset();
+			em.merge(job);
+		}
+		
+		return jobs.size() > 0;
 	}
 	
 	public void removeAllJobs() {

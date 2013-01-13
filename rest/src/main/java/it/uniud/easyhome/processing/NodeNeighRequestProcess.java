@@ -46,13 +46,13 @@ public class NodeNeighRequestProcess extends Process {
 		    	NodeNeighReqPacket packet = new NodeNeighReqPacket(nodes.get(nodeIdx),++sequenceNumber);
 		 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
 		    	getOutboundPacketsProducer().send(outboundMessage);    
-		    	println("Node neighbours request dispatched to node id " + nodes.get(nodeIdx).getId() + " (idx " + nodeIdx + ")");
+		    	println("Node '" + nodes.get(nodeIdx).getName() + "' neighbours request dispatched");
 	    	}	
 			Thread.sleep(NEIGH_REQUEST_PERIOD_MS);
 	    	
         } catch (Exception e) {
         	e.printStackTrace();
-        	println("Node neighbours request could not be dispatched");
+        	println("Node neighbours requests could not be dispatched");
         }
     }
     

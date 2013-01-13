@@ -61,7 +61,7 @@ public class ActiveEndpointsRegistrationProcess extends Process {
 	                
 	                if (updateResponse.getClientResponseStatus() == Status.OK) {
 	                	
-	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_ENDPOINTS_ACQUIRED, node.getGatewayId(), node.getId());
+	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_ENDPOINTS_ACQUIRED, node.getGatewayId(), node.getId(), node.getAddress());
 	                    try {
 	                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
 	                        networkEventsProducer.send(eventMessage);

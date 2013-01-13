@@ -44,6 +44,9 @@ public class NetworkJob implements Serializable {
 	@Column(nullable = false)
 	private long timestamp;
 	
+	@Column(nullable = false)
+	private boolean fresh;
+	
 	@SuppressWarnings("unused")
 	private NetworkJob() { }
 	
@@ -56,6 +59,7 @@ public class NetworkJob implements Serializable {
 		this.address = address;
 		this.endpoint = endpoint;
 		this.timestamp = System.currentTimeMillis();
+		this.fresh = true;
 	}
 	
 	public int getId() {
@@ -86,7 +90,12 @@ public class NetworkJob implements Serializable {
 		return new Date(timestamp);
 	}
 	
-	public void resetDate() {
+	public boolean isFresh() {
+		return fresh;
+	}
+	
+	public void reset() {
 		timestamp = System.currentTimeMillis();
+		fresh = false;
 	}
 }

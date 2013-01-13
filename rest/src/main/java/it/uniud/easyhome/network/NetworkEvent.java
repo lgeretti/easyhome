@@ -17,11 +17,19 @@ public class NetworkEvent implements Serializable {
 	private EventKind kind;
 	private byte gid;
 	private long nuid;
+	private short address;
+	private byte endpoint;
 	
-	public NetworkEvent(EventKind kind, byte gid, long nuid) {
+	public NetworkEvent(EventKind kind, byte gid, long nuid, short address) {
+		this(kind,gid,nuid,address,(byte)127);
+	}
+	
+	public NetworkEvent(EventKind kind, byte gid, long nuid, short address, byte endpoint) {
 		this.kind = kind;
 		this.gid = gid;
 		this.nuid = nuid;
+		this.address = address;
+		this.endpoint = endpoint;
 	}
 	
 	public EventKind getKind() {
@@ -34,5 +42,13 @@ public class NetworkEvent implements Serializable {
 	
 	public long getNuid() {
 		return nuid;
+	}
+
+	public short getAddress() {
+		return address;
+	}
+	
+	public byte endpoint() {
+		return endpoint;
 	}
 }

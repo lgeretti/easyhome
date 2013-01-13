@@ -80,15 +80,15 @@ public class SimpleDescrRegistrationProcess extends Process {
 	    	                
 	    	                if (updateResponse.getClientResponseStatus() == Status.OK) {
 	    	                	
-	    	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.SIMPLE_DESCR_ACQUIRED, node.getGatewayId(), node.getId());
+	    	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.SIMPLE_DESCR_ACQUIRED, node.getGatewayId(), node.getId(), node.getAddress(), endpoint);
 	    	                    try {
 	    	                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
 	    	                        networkEventsProducer.send(eventMessage);
 	    	                    } catch (JMSException ex) { }
 	    	                	
-	    	                	println("Node updated with device information for endpoint " + endpoint);
+	    	                	println("Node '" + node.getName() + "' updated with device information for endpoint " + endpoint);
 	    	                } else
-	    	                	println("Node device information update failed for endpoint " + endpoint);
+	    	                	println("Node '" + node.getName() + "' device information update failed for endpoint " + endpoint);
 	    	                
 	    	                break;
 	        			}

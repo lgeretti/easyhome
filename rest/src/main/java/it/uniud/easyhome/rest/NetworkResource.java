@@ -145,11 +145,9 @@ public final class NetworkResource {
     @POST
     @Path("/jobs/{jobId}/reset")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response resetJobDate(@PathParam("jobId") int jobId) {
+    public Response resetJobById(@PathParam("jobId") int jobId) {
     	
-    	System.out.println("JobId: " + jobId);
-    	
-        boolean existed = resEjb.resetJobDate(jobId);
+        boolean existed = resEjb.resetJobById(jobId);
         
         if (!existed) 
             throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -157,13 +155,32 @@ public final class NetworkResource {
         return Response.ok().build();
     }
     
+    @POST
+    @Path("/jobs/reset")
+    public Response resetJobByTypeAndCoordinates(@FormParam("type") NetworkJobType type,
+			   				 @FormParam("gid") byte gatewayId,
+			   				 @FormParam("address") short address,
+			   				 @DefaultValue("127") @FormParam("endpoint") byte endpoint) {
+    	
+        boolean existed = resEjb.resetJobsByTypeAndCoordinates(type,gatewayId,address,endpoint);
+        
+        if (!existed) 
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        
+        return Response.ok().build();
+    }    
+    
     @GET
     @Path("/jobs")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<NetworkJob> getNumJobs(@QueryParam("type") NetworkJobType type) {
+    public List<NetworkJob> getJobsByTypeAndCoordinates(
+    		   @QueryParam("type") NetworkJobType type, 
+			   @QueryParam("gid") byte gatewayId, 
+			   @QueryParam("address") short address, 
+			   @DefaultValue("127") @QueryParam("endpoint") byte endpoint) {
     	
     	if (type != null)
-    		return resEjb.getJobsByType(type);
+    		return resEjb.getJobsByTypeAndCoordinates(type,gatewayId,address,endpoint);
     	
     	return resEjb.getJobs();
     }
@@ -171,7 +188,7 @@ public final class NetworkResource {
     @GET
     @Path("/jobs/{jobid}")
     @Produces(MediaType.APPLICATION_JSON)
-    public NetworkJob getJob(@PathParam("jobid") int jobId) {
+    public NetworkJob getJobById(@PathParam("jobid") int jobId) {
         
         NetworkJob job = resEjb.findJobById(jobId);
         
@@ -179,7 +196,7 @@ public final class NetworkResource {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         
         return job;
-    }
+    }    
     
     @DELETE
     @Path("/jobs/{jobid}")
@@ -194,34 +211,28 @@ public final class NetworkResource {
         return Response.ok().build();
     } 
     
-    @POST
-    @Path("/jobs/delete")
-    public Response deleteJobs(@FormParam("type") NetworkJobType type, 
-    						   @FormParam("gid") byte gatewayId, 
-    						   @FormParam("address") short address, 
-    						   @DefaultValue("127") @FormParam("endpoint") byte endpoint) {
+    @DELETE
+    @Path("/jobs")
+    public Response deleteJobs(@QueryParam("type") NetworkJobType type, 
+    						   @QueryParam("gid") byte gatewayId, 
+    						   @QueryParam("address") short address, 
+    						   @DefaultValue("127") @QueryParam("endpoint") byte endpoint) {
     	
-    	int numRemoved;
-    	
-    	if (endpoint == 127)
-    		numRemoved = resEjb.removeJobs(type, gatewayId, address);
-    	else
-    		numRemoved = resEjb.removeJobs(type, gatewayId, address,endpoint);
-    	
-    	if (numRemoved == 0)
-    		throw new WebApplicationException(Response.Status.NOT_FOUND);
+    	if (type == null) 
+    		resEjb.removeAllJobs();
+	    else {
+	    	int numRemoved;
+	    	
+	    	if (endpoint == 127)
+	    		numRemoved = resEjb.removeJobs(type, gatewayId, address);
+	    	else
+	    		numRemoved = resEjb.removeJobs(type, gatewayId, address,endpoint);
+	    	
+	    	if (numRemoved == 0)
+	    		throw new WebApplicationException(Response.Status.NOT_FOUND);
+    	}
     	
     	return Response.ok().build();
     }
-    
-    @DELETE
-    @Path("/jobs")
-    public Response deleteJobs() {
-        
-    	resEjb.removeAllJobs();
-        
-        return Response.ok().build();
-    }
-
        
 }

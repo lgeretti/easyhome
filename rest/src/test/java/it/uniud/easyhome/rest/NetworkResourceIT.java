@@ -38,6 +38,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
+@Ignore
 public class NetworkResourceIT {
 	
 	private static final String TARGET = "http://localhost:8080/easyhome/rest/network";
@@ -334,28 +335,27 @@ public class NetworkResourceIT {
 		
         postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,-12983219012L,(short)11,(byte)9);
 		
-		MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        formData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
-        formData.add("gid",String.valueOf((byte)3));
-        formData.add("address",String.valueOf((short)11));
+		MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();
+		queryData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
+		queryData.add("gid",String.valueOf((byte)3));
+		queryData.add("address",String.valueOf((short)11));
         
-        ClientResponse deletionResponse = client.resource(TARGET).path("jobs").path("delete").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        ClientResponse deletionResponse = client.resource(TARGET).path("jobs").queryParams(queryData).delete(ClientResponse.class);
         
         assertEquals(ClientResponse.Status.OK,deletionResponse.getClientResponseStatus());
-	}	
+	}		
 	
 	@Test
-	public void testResetJobDate() throws JSONException {
+	public void testResetJobById() throws JSONException {
 		
         ClientResponse insertionResponse = postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,-12983219012L,(short)11,(byte)9);
-        
-        assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
 
         String locationPath = insertionResponse.getLocation().getPath();
         String[] segments = locationPath.split("/");
         String jobIdString = segments[segments.length-1];
         
         NetworkJob recoveredJob = client.resource(TARGET).path("jobs").path(jobIdString).accept(MediaType.APPLICATION_JSON).get(NetworkJob.class);
+        assertTrue(recoveredJob.isFresh());
         Date oldDate = recoveredJob.getDate();
         
         ClientResponse resetResponse = client.resource(TARGET).path("jobs").path(jobIdString).path("reset").post(ClientResponse.class);
@@ -366,6 +366,42 @@ public class NetworkResourceIT {
         Date newDate = recoveredJob2.getDate();
         
         assertTrue(newDate.after(oldDate));
+        assertFalse(recoveredJob2.isFresh());
+    }
+	
+	@Test
+	public void testResetJobByTypeAndCoordinates() throws JSONException {
+		
+		NetworkJobType type = NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST;
+		byte gatewayId = (byte)3;
+		long nuid = -219329112312L;
+		short address = 11;
+		byte endpoint = (byte)9;
+		
+		ClientResponse insertionResponse = postJob(type,gatewayId,nuid,address,endpoint);
+        String locationPath = insertionResponse.getLocation().getPath();
+        String[] segments = locationPath.split("/");
+        String jobIdString = segments[segments.length-1];
+        
+        NetworkJob recoveredJob = client.resource(TARGET).path("jobs").path(jobIdString).accept(MediaType.APPLICATION_JSON).get(NetworkJob.class);
+        assertTrue(recoveredJob.isFresh());
+        Date oldDate = recoveredJob.getDate();
+
+		MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+        formData.add("type",type.toString());
+        formData.add("gid",String.valueOf(gatewayId));
+        formData.add("nuid",String.valueOf(nuid));
+        formData.add("address",String.valueOf(address));
+        formData.add("endpoint",String.valueOf(endpoint));
+        
+        ClientResponse resetResponse = client.resource(TARGET).path("jobs").path("reset").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        assertEquals(ClientResponse.Status.OK,resetResponse.getClientResponseStatus());
+        
+        NetworkJob recoveredJob2 = client.resource(TARGET).path("jobs").path(jobIdString).accept(MediaType.APPLICATION_JSON).get(NetworkJob.class);
+        Date newDate = recoveredJob2.getDate();
+        
+        assertTrue(newDate.after(oldDate));
+        assertFalse(recoveredJob2.isFresh());
     }
 	
 		

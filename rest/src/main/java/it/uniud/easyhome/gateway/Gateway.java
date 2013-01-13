@@ -220,7 +220,7 @@ public class Gateway implements Runnable {
                 }
             
             } catch (Exception ex) {
-              System.out.println(ex);
+              println("Exception: " + ex.getCause().toString() + ", will try to reconnect");
             } finally {
               try {
             	  if (skt != null) skt.close();

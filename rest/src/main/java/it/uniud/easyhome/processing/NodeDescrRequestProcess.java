@@ -17,12 +17,14 @@ import javax.jms.ObjectMessage;
 import javax.jms.Topic;
 import javax.naming.NamingException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.codehaus.jettison.json.JSONException;
 
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class NodeDescrRequestProcess extends Process {
 	
@@ -50,6 +52,13 @@ public class NodeDescrRequestProcess extends Process {
 	        		NetworkEvent event = (NetworkEvent) msg.getObject();
 	        		if (event != null && event.getKind() == NetworkEvent.EventKind.NODE_ADDED) {
 	
+		                MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+		                formData.add("type",NetworkJobType.NODE_DESCR_REQUEST.toString());
+		                formData.add("gid",String.valueOf(event.getGid()));
+		                formData.add("address",String.valueOf(event.getAddress()));
+		                
+		                restResource.path("network").path("jobs").path("reset").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	        			
             	        ClientResponse getNodeResponse = restResource.path("network").path(String.valueOf(event.getNuid()))
       						  .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
             	        
@@ -57,7 +66,7 @@ public class NodeDescrRequestProcess extends Process {
         	        	NodeDescrReqPacket packet = new NodeDescrReqPacket(node,++sequenceNumber);
         	            ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
         	            getOutboundPacketsProducer().send(outboundMessage);    
-        	            println("Node descriptor request dispatched");
+        	            println("Node '" + node.getName() + "' descriptor request dispatched");
 	        		}
 	           	}    		
 	    	} else {
@@ -67,10 +76,9 @@ public class NodeDescrRequestProcess extends Process {
 	    		for (NetworkJob job : jobs) {
 	    			
 	    			Date jobDate = job.getDate();
-	    			if (jobDate.before(fiveSecBeforeNow)) {
+	    			if (jobDate.before(fiveSecBeforeNow) || job.isFresh()) {
 	    				
-	    				restResource.path("network").path("jobs").path(String.valueOf(job.getId())).path("reset")
-	    					.type(MediaType.APPLICATION_JSON).post();
+	    				restResource.path("network").path("jobs").path(String.valueOf(job.getId())).path("reset").type(MediaType.APPLICATION_JSON).post(ClientResponse.class);
 	    				
 	    				ClientResponse getNodeResponse = restResource.path("network").path(String.valueOf(job.getNuid()))
 	      						  .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
@@ -79,7 +87,8 @@ public class NodeDescrRequestProcess extends Process {
         	        	NodeDescrReqPacket packet = new NodeDescrReqPacket(node,++sequenceNumber);
         	            ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
         	            getOutboundPacketsProducer().send(outboundMessage);    
-        	            println("Node descriptor request re-dispatched and job timer reset");
+        	            
+        	            println("Node '" + node.getName() + "' descriptor request " + (job.isFresh() ? "" : "re-") + "dispatched");
 	    			}
 	    		}
 	    		

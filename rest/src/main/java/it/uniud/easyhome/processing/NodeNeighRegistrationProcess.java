@@ -49,9 +49,9 @@ public class NodeNeighRegistrationProcess extends Process {
 	                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
 	                
 	                if (updateResponse.getClientResponseStatus() == Status.OK)
-	                	println("Node " + pkt.getSrcCoords().getNuid() + " updated with neighbors information");
+	                	println("Node '" + node.getName() + "' updated with neighbors information");
 	                else
-	                	println("Node neighbors information update failed");
+	                	println("Node '" + node.getName() + "' neighbors information update failed");
 	        		
 	        	} catch (InvalidPacketTypeException e) {
 	        		e.printStackTrace();

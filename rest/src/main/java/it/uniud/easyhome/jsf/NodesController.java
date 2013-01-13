@@ -108,7 +108,8 @@ public class NodesController implements Runnable {
 			e.printStackTrace();
 		} finally {
 			try {
-				jmsConnection.stop();
+				if (jmsConnection != null)
+					jmsConnection.stop();
 			} catch (JMSException e) {
 			}
 		}

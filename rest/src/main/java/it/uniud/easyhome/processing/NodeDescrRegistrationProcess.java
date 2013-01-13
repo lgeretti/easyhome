@@ -75,27 +75,25 @@ public class NodeDescrRegistrationProcess extends Process {
 	    	                
 	    	                if (updateResponse.getClientResponseStatus() == Status.OK) {
 	    	                	
-	    		                MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-	    		                formData.add("type",NetworkJobType.NODE_DESCR_REQUEST.toString());
-	    		                formData.add("gid",String.valueOf(gid));
-	    		                formData.add("nuid",String.valueOf(node.getId()));
-	    		                formData.add("address",String.valueOf(address));
+	    		                MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();
+	    		                queryData.add("type",NetworkJobType.NODE_DESCR_REQUEST.toString());
+	    		                queryData.add("gid",String.valueOf(gid));
+	    		                queryData.add("nuid",String.valueOf(node.getId()));
+	    		                queryData.add("address",String.valueOf(address));
 	    		                
-	    		                /*
 	    		                println("Deleting NODE_DESCR_REQUEST job for " + gid + ", " + node.getId() + ", " + address);
 	    		                
-	    		                restResource.path("network").path("jobs").path("delete")
-	    		                		.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	    	                	*/
-	    	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_DESCR_ACQUIRED, node.getGatewayId(), node.getId());
+	    		                restResource.path("network").path("jobs").queryParams(queryData).delete(ClientResponse.class);
+	    	                	
+	    	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_DESCR_ACQUIRED, node.getGatewayId(), node.getId(), node.getAddress());
 	    	                    try {
 	    	                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
 	    	                        networkEventsProducer.send(eventMessage);
 	    	                    } catch (JMSException ex) { }
 	    	                    
-	    	                	println("Node updated with logical type information " + descr.getLogicalType() + " and manufacturer " + descr.getManufacturerCode());
+	    	                	println("Node '" + node.getName() + "' updated with logical type information " + descr.getLogicalType() + " and manufacturer " + descr.getManufacturerCode());
 	    	                } else
-	    	                	println("Node logical type information and manufacturer update failed");
+	    	                	println("Node '" + node.getName() + "' logical type information and manufacturer update failed");
 	    	                
 	    	                break;
 	        			}

@@ -74,30 +74,28 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                
 	                if (nodeInsertionResponse.getClientResponseStatus() == Status.CREATED && jobInsertionResponse.getClientResponseStatus() == Status.CREATED) {
 	                	
-	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_ADDED, gatewayId, nuid);
+	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_ADDED, gatewayId, nuid, address);
 	                    try {
 	                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
 	                        networkEventsProducer.send(eventMessage);
-	                        println("Node (" + ByteUtils.printBytes(nuid) + ") at (" + ByteUtils.printBytes(address) +
-	                        		") announcement registered and event dispatched");
+	                        println("Node '" + node.getName() + "' announcement registered and event dispatched");
 	                    } catch (Exception e) {
 	                    	println("Message could not be dispatched to inbound packets topic");
 	                    }
 	                	
 	                } else if (nodeInsertionResponse.getClientResponseStatus() == Status.OK && jobInsertionResponse.getClientResponseStatus() == Status.CREATED) {
 	                	
-	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_ADDED, gatewayId, nuid);
+	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_ADDED, gatewayId, nuid, address);
 	                    try {
 	                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
 	                        networkEventsProducer.send(eventMessage);
-	                        println("Node (" + ByteUtils.printBytes(nuid) + 
-	                        		") announcement re-registered (" + ByteUtils.printBytes(address) + ") and event dispatched");
+	                        println("Node '" + node.getName() + "' announcement re-registered and event dispatched");
 	                    } catch (Exception e) {
 	                    	println("Message could not be dispatched to inbound packets topic");
 	                    }
 	                	
 	                } else
-	                	println("Node announcement registration failed");
+	                	println("Node '" + node.getName() + "' announcement registration failed");
 	                
 	                
 	        	} catch (InvalidPacketTypeException ex) {
