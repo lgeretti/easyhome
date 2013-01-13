@@ -109,8 +109,6 @@ public class NodeDescrRegistrationProcess extends Process {
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
-        	} else {
-        		println("The packet does not validate");
         	}
     	}
     }

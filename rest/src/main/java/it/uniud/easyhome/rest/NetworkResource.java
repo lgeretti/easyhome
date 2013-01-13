@@ -145,7 +145,9 @@ public final class NetworkResource {
     @POST
     @Path("/jobs/{jobId}/reset")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response resetJobDate(@QueryParam("jobId") int jobId) {
+    public Response resetJobDate(@PathParam("jobId") int jobId) {
+    	
+    	System.out.println("JobId: " + jobId);
     	
         boolean existed = resEjb.resetJobDate(jobId);
         

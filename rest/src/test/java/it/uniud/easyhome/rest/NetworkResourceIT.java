@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -37,7 +38,6 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
-@Ignore
 public class NetworkResourceIT {
 	
 	private static final String TARGET = "http://localhost:8080/easyhome/rest/network";
@@ -134,7 +134,7 @@ public class NetworkResourceIT {
     }
 
 	@Test
-	public void testDelete() throws JSONException {
+	public void testDeleteNode() throws JSONException {
 		
         Node.Builder nb1 = new Node.Builder(10L);
         
@@ -237,7 +237,7 @@ public class NetworkResourceIT {
 	}
 	
 	@Test
-	public void testUpdate() throws JSONException {
+	public void testUpdateNode() throws JSONException {
 		
         Node.Builder nb = new Node.Builder(10L);
         
@@ -343,6 +343,31 @@ public class NetworkResourceIT {
         
         assertEquals(ClientResponse.Status.OK,deletionResponse.getClientResponseStatus());
 	}	
+	
+	@Test
+	public void testResetJobDate() throws JSONException {
+		
+        ClientResponse insertionResponse = postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,-12983219012L,(short)11,(byte)9);
+        
+        assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
+
+        String locationPath = insertionResponse.getLocation().getPath();
+        String[] segments = locationPath.split("/");
+        String jobIdString = segments[segments.length-1];
+        
+        NetworkJob recoveredJob = client.resource(TARGET).path("jobs").path(jobIdString).accept(MediaType.APPLICATION_JSON).get(NetworkJob.class);
+        Date oldDate = recoveredJob.getDate();
+        
+        ClientResponse resetResponse = client.resource(TARGET).path("jobs").path(jobIdString).path("reset").post(ClientResponse.class);
+        
+        assertEquals(ClientResponse.Status.OK,resetResponse.getClientResponseStatus());
+        
+        NetworkJob recoveredJob2 = client.resource(TARGET).path("jobs").path(jobIdString).accept(MediaType.APPLICATION_JSON).get(NetworkJob.class);
+        Date newDate = recoveredJob2.getDate();
+        
+        assertTrue(newDate.after(oldDate));
+    }
+	
 		
 	private ClientResponse postJob(NetworkJobType type, byte gatewayId, long nuid, short address, byte endpoint) {
 		

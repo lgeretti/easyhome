@@ -69,8 +69,8 @@ public class NodeDescrRequestProcess extends Process {
 	    			Date jobDate = job.getDate();
 	    			if (jobDate.before(fiveSecBeforeNow)) {
 	    				
-	    				//restResource.path("network").path("jobs").path(String.valueOf(job.getId())).path("reset")
-	    				//	.type(MediaType.APPLICATION_JSON).post();
+	    				restResource.path("network").path("jobs").path(String.valueOf(job.getId())).path("reset")
+	    					.type(MediaType.APPLICATION_JSON).post();
 	    				
 	    				ClientResponse getNodeResponse = restResource.path("network").path(String.valueOf(job.getNuid()))
 	      						  .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);

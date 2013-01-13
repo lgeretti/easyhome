@@ -131,10 +131,10 @@ public class NetworkEJB {
         
         boolean existed = (job != null);
         
-        job.resetDate();
-        
-        if (existed)
+        if (existed) {
+        	job.resetDate();
         	em.merge(job);
+        }
         
         return existed;		
 	}
