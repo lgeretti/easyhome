@@ -1,6 +1,7 @@
 package it.uniud.easyhome.packets.xbee;
 
 import it.uniud.easyhome.common.ByteUtils;
+import it.uniud.easyhome.common.Endianness;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.packets.*;
 
@@ -86,24 +87,22 @@ public class XBeePacketToNode extends XBeePacket {
 			sum += val;
 		}		
 		// Source endpoint
-		byte srcEndpointToWrite = (srcEndpoint == 0 ? 1 : srcEndpoint);
-		baos.write(srcEndpointToWrite);
-		sum += srcEndpointToWrite;
+		baos.write(srcEndpoint);
+		sum += srcEndpoint;
 		// Destination endpoint
-		byte dstEndpointToWrite = (dstEndpoint == 0 ? 1 : dstEndpoint);
-		baos.write(dstEndpointToWrite);
-		sum += dstEndpointToWrite;
+		baos.write(dstEndpoint);
+		sum += dstEndpoint;
 		// Cluster ID
-		for (int j=8; j>=0; j-=8) {
-			byte val = (byte)((clusterId >>> j) & 0xFF);
-			baos.write(val);
-			sum += val;
+		byte[] clusterBytes = ByteUtils.getBytes(clusterId, Endianness.BIG_ENDIAN);
+		for (int j=0; j<2; j++) {
+			baos.write(clusterBytes[j]);
+			sum += clusterBytes[j];
 		}			
 		// Profile ID
-		for (int j=8; j>=0; j-=8) {
-			byte val = (byte)((profileId >>> j) & 0xFF);
-			baos.write(val);
-			sum += val;
+		byte[] profileBytes = ByteUtils.getBytes(profileId, Endianness.BIG_ENDIAN);
+		for (int j=0; j<2; j++) {
+			baos.write(profileBytes[j]);
+			sum += profileBytes[j];
 		}			
 		// Receive options
 		baos.write(receiveOptions);
@@ -133,24 +132,15 @@ public class XBeePacketToNode extends XBeePacket {
         if (frameType != XBeeConstants.EXPLICIT_RX_INDICATOR_FRAME_TYPE) 
         	throw new InvalidPacketTypeException();
 		
-		srcAddr64 = (((long)is.read()) << 56) + 
-			       (((long)is.read()) << 48) + 
-			       (((long)is.read()) << 40) + 
-			       (((long)is.read()) << 32) +
-			       (((long)is.read()) << 24) + 
-			       (((long)is.read()) << 16) + 
-			       (((long)is.read()) << 8) + 
-			       (long)is.read();
-	    srcAddr16 = (short)((is.read() << 8) + is.read());
+		srcAddr64 = ByteUtils.getLong(is, Endianness.BIG_ENDIAN);
+	    srcAddr16 = ByteUtils.getShort(is, Endianness.BIG_ENDIAN);
 	    
-	    byte readSrcEndpoint = (byte)is.read(); 
-		srcEndpoint = (readSrcEndpoint == 1 ? 0 : readSrcEndpoint);
-		byte readDstEndpoint = (byte)is.read();
-		dstEndpoint = (readDstEndpoint == 1 ? 0 : readDstEndpoint);
+		srcEndpoint = (byte)is.read();
+		dstEndpoint = (byte)is.read();
 		         
-		clusterId = (short)((is.read() << 8) + is.read());
+		clusterId = ByteUtils.getShort(is, Endianness.BIG_ENDIAN);
 		
-		profileId = (short)((is.read() << 8) + is.read());
+		profileId = ByteUtils.getShort(is, Endianness.BIG_ENDIAN);
 		
 		receiveOptions = (byte)is.read();
 		 

@@ -5,6 +5,7 @@ import it.uniud.easyhome.exceptions.IllegalBroadcastPortException;
 import it.uniud.easyhome.exceptions.IncompletePacketException;
 import it.uniud.easyhome.exceptions.NoBytesAvailableException;
 import it.uniud.easyhome.exceptions.RoutingEntryMissingException;
+import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.packets.ModuleCoordinates;
 import it.uniud.easyhome.packets.Operation;
 import it.uniud.easyhome.packets.natives.NativePacket;
@@ -32,9 +33,9 @@ public class XBeeGateway extends Gateway {
         ModuleCoordinates dstCoords = null;
         
         // If a broadcast, we use the broadcast format for the destination coordinates, but only
-        // if the destination port is actually an administration port
+        // if the destination port is actually a management port
         if (receiveOptions == 0x02) {
-        	if (dstEndpoint == 0x00 || dstEndpoint == 0x01) {        		
+        	if (xpkt.getProfileId() == Domain.MANAGEMENT.getCode() && (dstEndpoint == 0x00 || dstEndpoint == 0x01)) {        		
 	        	dstCoords = new ModuleCoordinates((byte)0,0xFFFFL,(short)0xFFFE,(byte)0);
 	        	println("Setting destination as broadcast");
         	} else {
@@ -43,7 +44,7 @@ public class XBeeGateway extends Gateway {
         } else {
 	        
         	// If this is the implicit EasyHome controller endpoint
-        	if (dstEndpoint == 0x00 || dstEndpoint == 0x01) {
+        	if (xpkt.getProfileId() == Domain.MANAGEMENT.getCode() && (dstEndpoint == 0x00 || dstEndpoint == 0x01)) {
         		dstCoords = new ModuleCoordinates((byte)1,0x0L,(short)0x0,(byte)0);
         		println("Setting destination as domotic controller");
         	} else {
@@ -103,6 +104,14 @@ public class XBeeGateway extends Gateway {
     		buffer.write(originalBuffer, readBytes, originalBuffer.length-readBytes);
     	
     	return result;
+    }
+    
+    /**
+     * Rewrites the packet in order to allow handling by the EasyHome Management domain.
+     * @param pkt The XBee packet that will be modified.
+     */
+    private void rewrite(XBeePacketFromNode pkt) {
+    	
     }
     
     @Override

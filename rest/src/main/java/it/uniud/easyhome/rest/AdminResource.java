@@ -45,6 +45,7 @@ public class AdminResource {
 		insertProcess(ProcessKind.NODE_ANNCE_REGISTRATION);
 		insertProcess(ProcessKind.NODE_DESCR_REQUEST);
 		insertProcess(ProcessKind.NODE_DESCR_REGISTRATION);	
+		//insertProcess(ProcessKind.ACTIVE_ENDPOINTS_REQUEST);
     	
         return Response.ok().build();
     }

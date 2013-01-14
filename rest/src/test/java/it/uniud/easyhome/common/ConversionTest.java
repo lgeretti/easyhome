@@ -2,6 +2,8 @@ package it.uniud.easyhome.common;
 
 import static org.junit.Assert.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.Arrays;
 
 
@@ -21,7 +23,7 @@ public class ConversionTest {
     	    	
     	checkShort(originalBytes, Endianness.BIG_ENDIAN);
     	checkShort(originalBytes, Endianness.LITTLE_ENDIAN);
-    	
+
     	originalBytes[0] = (byte)0x7F;
     	originalBytes[0] = (byte)0x80;
     	
@@ -47,6 +49,12 @@ public class ConversionTest {
     	short conversion;
     	
     	conversion = ByteUtils.getShort(originalBytes, endianness);
+    	convertedBytes = ByteUtils.getBytes(conversion, endianness);
+    	
+    	assertTrue(Arrays.equals(originalBytes,convertedBytes));
+    	
+    	ByteArrayInputStream bais = new ByteArrayInputStream(originalBytes);
+    	conversion = ByteUtils.getShort(bais, endianness);
     	convertedBytes = ByteUtils.getBytes(conversion, endianness);
     	
     	assertTrue(Arrays.equals(originalBytes,convertedBytes));

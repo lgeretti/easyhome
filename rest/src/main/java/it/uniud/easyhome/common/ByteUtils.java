@@ -1,6 +1,17 @@
 package it.uniud.easyhome.common;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 public class ByteUtils {
+	
+	public static short getShort(ByteArrayInputStream is, Endianness endianness) {
+		if (endianness == Endianness.BIG_ENDIAN)
+			return (short)((short)(is.read() << 8) + (((short)is.read()) & 0xFF));
+		else
+			return (short)((((short)is.read()) & 0xFF) + (short)(is.read() << 8));
+	}
 	
 	public static short getShort(byte[] bytes, int start, Endianness endianness) {
 		if (start < 0 || start > bytes.length-2)
@@ -27,6 +38,17 @@ public class ByteUtils {
 		return result;
 	}
 	
+	public static long getLong(ByteArrayInputStream is, Endianness endianness) {
+		long result = 0;
+		if (endianness == Endianness.BIG_ENDIAN) {
+			for (int i=56; i>=0; i-=8)
+				result += ((long)(is.read() & 0xFF))<<i;
+		} else {
+			for (int i=0; i<=56; i+=8)
+				result += ((long)(is.read() & 0xFF))<<i;
+		}
+		return result;
+	}	
 	public static long getLong(byte[] bytes, int start, Endianness endianness) {
 		if (start < 0 || start > bytes.length-8)
 			throw new IndexOutOfBoundsException();

@@ -55,6 +55,7 @@ public class NodeRegistrationIT {
     	client.resource(TARGET).path("hub").path("gateways").delete();
     	client.resource(TARGET).path("processes").delete();
     	client.resource(TARGET).path("network").delete();
+    	client.resource(TARGET).path("network").path("jobs").delete();
     }
     
     private ClientResponse insertGateway(int port, ProtocolType protocol) {
@@ -89,12 +90,10 @@ public class NodeRegistrationIT {
 		
 		ClientResponse nodeAnnceRegProcessInsertion = insertProcess(ProcessKind.NODE_ANNCE_REGISTRATION);
 		assertEquals(ClientResponse.Status.CREATED,nodeAnnceRegProcessInsertion.getClientResponseStatus());
-		
 		ClientResponse nodeDescrAcqProcessInsertion = insertProcess(ProcessKind.NODE_DESCR_REQUEST);
 		assertEquals(ClientResponse.Status.CREATED,nodeDescrAcqProcessInsertion.getClientResponseStatus());		
 		ClientResponse nodeDescrRegProcessInsertion = insertProcess(ProcessKind.NODE_DESCR_REGISTRATION);
 		assertEquals(ClientResponse.Status.CREATED,nodeDescrRegProcessInsertion.getClientResponseStatus());	
-		
 		ClientResponse activeEpAcqProcessInsertion = insertProcess(ProcessKind.ACTIVE_ENDPOINTS_REQUEST);
 		assertEquals(ClientResponse.Status.CREATED,activeEpAcqProcessInsertion.getClientResponseStatus());		
 		ClientResponse activeEpRegProcessInsertion = insertProcess(ProcessKind.ACTIVE_ENDPOINTS_REGISTRATION);
@@ -107,8 +106,7 @@ public class NodeRegistrationIT {
 		assertEquals(ClientResponse.Status.CREATED,nodeSimpleDescrAcqProcessInsertion.getClientResponseStatus());
 		ClientResponse nodeSimpleDescrRegProcessInsertion = insertProcess(ProcessKind.SIMPLE_DESCR_REGISTRATION);
 		assertEquals(ClientResponse.Status.CREATED,nodeSimpleDescrRegProcessInsertion.getClientResponseStatus());
-		
-
+	
         Node node1 = new Node.Builder(0xA1L)
         							 .setAddress((short)0x543F)
         							 .setGatewayId((byte)gid)

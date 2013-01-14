@@ -1,5 +1,7 @@
 package it.uniud.easyhome.packets.xbee;
 
+import it.uniud.easyhome.common.ByteUtils;
+import it.uniud.easyhome.common.Endianness;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.packets.natives.NativePacket;
@@ -162,22 +164,17 @@ public class XBeePacketFromNode extends XBeePacket {
         	throw new InvalidPacketTypeException();
         
         frameId = (byte)is.read();
-		
-		long result = 0;
-		for (int i=56; i>=0; i-=8)
-			result += ((long)is.read())<<i;
-		dstAddr64 = result;
+
+		dstAddr64 = ByteUtils.getLong(is, Endianness.BIG_ENDIAN);
         
-	    dstAddr16 = (short)((is.read() << 8) + is.read());
-	    
-	    byte readSrcEndpoint = (byte)is.read(); 
-		srcEndpoint = (readSrcEndpoint == 1 ? 0 : readSrcEndpoint);
-		byte readDstEndpoint = (byte)is.read();
-		dstEndpoint = (readDstEndpoint == 1 ? 0 : readSrcEndpoint);
+	    dstAddr16 = ByteUtils.getShort(is, Endianness.BIG_ENDIAN);
+	     
+		srcEndpoint = (byte)is.read();
+		dstEndpoint = (byte)is.read();
 		         
-		clusterId = (short)((is.read() << 8) + is.read());
+		clusterId = ByteUtils.getShort(is, Endianness.BIG_ENDIAN);
 		
-		profileId = (short)((is.read() << 8) + is.read());
+		profileId = ByteUtils.getShort(is, Endianness.BIG_ENDIAN);
 		
 		broadcastRadius = (byte)is.read();
 		
@@ -199,6 +196,7 @@ public class XBeePacketFromNode extends XBeePacket {
 		
 		for (int i=0; i<apsPayloadLength; i++)
 			apsPayload[i] = (byte)is.read();
+		
 	}
 	
 }
