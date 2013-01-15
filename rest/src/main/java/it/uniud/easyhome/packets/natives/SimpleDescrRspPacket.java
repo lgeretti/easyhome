@@ -1,6 +1,7 @@
 package it.uniud.easyhome.packets.natives;
 
 import it.uniud.easyhome.common.ByteUtils;
+import it.uniud.easyhome.common.Endianness;
 import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.devices.HomeAutomationDevice;
 import it.uniud.easyhome.exceptions.InvalidNodeDescException;
@@ -35,13 +36,9 @@ public class SimpleDescrRspPacket extends NativePacket {
 	}
 	
 	public HomeAutomationDevice getDevice() {
-		short code;
 		
-		byte[] opData = this.getOperation().getData();
-		
-		code = (short)((opData[8] << 8) + opData[7]);
-		
-		return HomeAutomationDevice.fromCode(code);
+		short deviceCode = ByteUtils.getShort(this.getOperation().getData(), 7, Endianness.LITTLE_ENDIAN);
+		return HomeAutomationDevice.fromCode(deviceCode);
 	}
 	
 	public byte getEndpoint() {
@@ -49,13 +46,7 @@ public class SimpleDescrRspPacket extends NativePacket {
 	}
 	
 	public short getAddrOfInterest() {
-		short result;
-		
-		byte[] opData = this.getOperation().getData();
-		
-		result = (short)(((opData[2] & 0xFF) << 8) + (opData[1] & 0xFF));
-		
-		return result;
+		return ByteUtils.getShort(this.getOperation().getData(), 1, Endianness.LITTLE_ENDIAN);
 	}
 	
 	public static boolean validates(NativePacket pkt) {

@@ -116,7 +116,7 @@ public class NetworkResourceIT {
         
         nb1.setName("test");
         nb1.setGatewayId((byte)2);
-        nb1.setAddress((short)15);
+        nb1.setAddress((short)0x00CD);
         nb1.setCapability((byte)14);
 
         Node node1 = nb1.build();

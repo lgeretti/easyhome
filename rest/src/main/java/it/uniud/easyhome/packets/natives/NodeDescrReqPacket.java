@@ -1,5 +1,7 @@
 package it.uniud.easyhome.packets.natives;
 
+import it.uniud.easyhome.common.ByteUtils;
+import it.uniud.easyhome.common.Endianness;
 import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.Node;
@@ -31,7 +33,7 @@ public class NodeDescrReqPacket extends NativePacket {
 			 new ModuleCoordinates(destinationNode.getGatewayId(),destinationNode.getId(),destinationNode.getAddress(),(byte)0),				
 			 new Operation(seqNumber,Domain.MANAGEMENT.getCode(),ManagementContext.NODE_DESC_REQ.getCode(),
 					       (byte)0x0/*Context invariant*/,(byte)0x0/*Irrelevant*/,
-					       new byte[]{(byte)(destinationNode.getAddress() & 0xFF),(byte)((destinationNode.getAddress() >>> 8) & 0xFF)}));
+					       ByteUtils.getBytes(destinationNode.getAddress(), Endianness.LITTLE_ENDIAN)));
 	}
 	
 	public NodeDescrReqPacket(NativePacket pkt) {
@@ -39,7 +41,6 @@ public class NodeDescrReqPacket extends NativePacket {
 	}
 	
 	public short getAddrOfInterest() {
-		byte[] data = getOperation().getData();
-		return (short) ((((short)(data[0] & 0xFF)) << 8) + data[1]); 
+		return ByteUtils.getShort(getOperation().getData(), 0, Endianness.LITTLE_ENDIAN); 
 	}
 }

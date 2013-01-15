@@ -52,6 +52,7 @@ public class NodeAnnceRegistrationProcess extends Process {
 	        		long nuid = announce.getAnnouncedNuid();
 	        		byte gatewayId = announce.getSrcCoords().getGatewayId();
 	        		short address = announce.getAnnouncedAddress();
+	        		
 	        		byte capability = announce.getAnnouncedCapability();
 	        		
 	                Node.Builder nodeBuilder = new Node.Builder(nuid);

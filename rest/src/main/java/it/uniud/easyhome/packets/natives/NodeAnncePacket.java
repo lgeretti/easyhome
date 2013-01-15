@@ -1,5 +1,7 @@
 package it.uniud.easyhome.packets.natives;
 
+import it.uniud.easyhome.common.ByteUtils;
+import it.uniud.easyhome.common.Endianness;
 import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.exceptions.InvalidEndpointsException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
@@ -33,16 +35,11 @@ public class NodeAnncePacket extends NativePacket {
 	}
 	
 	public short getAnnouncedAddress() {
-		byte[] data = getOperation().getData();
-		return (short) ((((short)(data[1] & 0xFF)) << 8) + data[0]); 
+		return ByteUtils.getShort(getOperation().getData(), 0, Endianness.LITTLE_ENDIAN);
 	}
 	
 	public long getAnnouncedNuid() {
-		byte[] data = getOperation().getData();
-		long result = 0;
-		for (int i=56,j=9; i>=0; i-=8,j-=1)
-			result += ((long)(data[j] & 0xFF))<<i;
-		return result;
+		return ByteUtils.getLong(getOperation().getData(), 2, Endianness.LITTLE_ENDIAN);
 	}
 	
 	public byte getAnnouncedCapability() {

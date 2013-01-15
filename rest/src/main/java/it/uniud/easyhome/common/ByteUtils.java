@@ -55,10 +55,10 @@ public class ByteUtils {
 		long result = 0;
 		if (endianness == Endianness.BIG_ENDIAN) {
 			for (int i=56, j=0; i>=0; i-=8, j++)
-				result += ((long)(bytes[j] & 0xFF))<<i;
+				result += ((long)(bytes[start+j] & 0xFF))<<i;
 		} else {
 			for (int i=56, j=7; i>=0; i-=8, j--)
-				result += ((long)(bytes[j] & 0xFF))<<i;
+				result += ((long)(bytes[start+j] & 0xFF))<<i;
 		}
 		return result;
 	}

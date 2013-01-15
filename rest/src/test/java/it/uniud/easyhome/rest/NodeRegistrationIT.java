@@ -106,16 +106,16 @@ public class NodeRegistrationIT {
 		assertEquals(ClientResponse.Status.CREATED,nodeSimpleDescrAcqProcessInsertion.getClientResponseStatus());
 		ClientResponse nodeSimpleDescrRegProcessInsertion = insertProcess(ProcessKind.SIMPLE_DESCR_REGISTRATION);
 		assertEquals(ClientResponse.Status.CREATED,nodeSimpleDescrRegProcessInsertion.getClientResponseStatus());
-	
+		
         Node node1 = new Node.Builder(0xA1L)
-        							 .setAddress((short)0x543F)
+        							 .setAddress((short)0x00CD)
         							 .setGatewayId((byte)gid)
         							 .setCapability((byte)0x7A)
         							 .setLogicalType(NodeLogicalType.ROUTER)
         							 .setManufacturer(Manufacturer.DIGI).build();
         
         Node node2 = new Node.Builder(0xA2L)
-		 .setAddress((short)0x544F)
+		 .setAddress((short)0xCDEF)
 		 .setGatewayId((byte)gid)
 		 .setCapability((byte)0x7A)
 		 .setLogicalType(NodeLogicalType.ROUTER)
@@ -142,7 +142,10 @@ public class NodeRegistrationIT {
 	    	List<Node> nodes = JsonUtils.getListFrom(getNodesResponse, Node.class);
 	    	
 	    	if (nodes.size() == 2) {
+	    		
+	    		Thread.sleep(5000);
 	    		Node recoveredNode1 = client.resource(TARGET).path("network").path(Long.toString(node1.getId())).accept(MediaType.APPLICATION_JSON).get(Node.class);
+	    		
 	    		Map<Short,HomeAutomationDevice> devices = recoveredNode1.getMappedDevices();
 	    		if (recoveredNode1.getNeighborIds().size() == 1 &&
 	    			devices.size() == 2 &&

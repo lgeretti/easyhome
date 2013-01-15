@@ -1,6 +1,7 @@
 package it.uniud.easyhome.packets.natives;
 
 import it.uniud.easyhome.common.ByteUtils;
+import it.uniud.easyhome.common.Endianness;
 import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.exceptions.InvalidNodeDescException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
@@ -58,16 +59,13 @@ public class NodeDescrRspPacket extends NativePacket {
 	
 	public Manufacturer getManufacturerCode() {
 		
-		byte[] data = getOperation().getData();
-		short raw = (short) ((((short)(data[7] & 0xFF)) << 8) + data[6]); 
-		
+		short raw = ByteUtils.getShort(getOperation().getData(), 6, Endianness.LITTLE_ENDIAN); 
 		return Manufacturer.fromCode(raw);
 	}
 	
 	public short getAddrOfInterest() {
 		
-		byte[] data = getOperation().getData();
-		return (short) ((((short)(data[2] & 0xFF)) << 8) + data[1]); 
+		return ByteUtils.getShort(getOperation().getData(), 1, Endianness.LITTLE_ENDIAN); 
 	}
 	
 	public static boolean validates(NativePacket pkt) {
