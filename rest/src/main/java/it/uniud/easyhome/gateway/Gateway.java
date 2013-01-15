@@ -1,5 +1,6 @@
 package it.uniud.easyhome.gateway;
 
+import it.uniud.easyhome.exceptions.ChecksumException;
 import it.uniud.easyhome.exceptions.IncompletePacketException;
 import it.uniud.easyhome.exceptions.InvalidDelimiterException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
@@ -277,6 +278,8 @@ public class Gateway implements Runnable {
         	// Just move on
         } catch (IncompletePacketException ex) {
         	// Just move on
+        } catch (ChecksumException ex) {
+        	// Handled within the specific gateway
         } catch (InvalidDelimiterException ex) {
         	// Prune out the first byte
         	byte[] bufferBytes = buffer.toByteArray();

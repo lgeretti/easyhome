@@ -85,8 +85,7 @@ public abstract class XBeePacket implements Packet {
         if (octet != XBeeConstants.START_DELIMITER)
         	throw new InvalidDelimiterException();
         	
-        int highLength = is.read();
-        int length = highLength*256 + is.read();
+        int length = is.read()*256 + is.read();
         
         if (length < 0)
         	throw new IncompletePacketException();

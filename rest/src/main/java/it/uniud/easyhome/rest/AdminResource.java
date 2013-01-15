@@ -43,8 +43,8 @@ public class AdminResource {
     	
 		insertGateway(XBEE_GATEWAY_PORT, ProtocolType.XBEE);
 		insertProcess(ProcessKind.NODE_ANNCE_REGISTRATION);
-		//insertProcess(ProcessKind.NODE_DESCR_REQUEST);
-		//insertProcess(ProcessKind.NODE_DESCR_REGISTRATION);	
+		insertProcess(ProcessKind.NODE_DESCR_REQUEST);
+		insertProcess(ProcessKind.NODE_DESCR_REGISTRATION);	
 		insertProcess(ProcessKind.ACTIVE_ENDPOINTS_REQUEST);
 		insertProcess(ProcessKind.ACTIVE_ENDPOINTS_REGISTRATION);
     	

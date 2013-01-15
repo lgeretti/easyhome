@@ -1,6 +1,7 @@
 package it.uniud.easyhome.gateway;
 
 import it.uniud.easyhome.common.ByteUtils;
+import it.uniud.easyhome.exceptions.ChecksumException;
 import it.uniud.easyhome.exceptions.IllegalBroadcastPortException;
 import it.uniud.easyhome.exceptions.IncompletePacketException;
 import it.uniud.easyhome.exceptions.NoBytesAvailableException;
@@ -57,7 +58,7 @@ public class XBeeGateway extends Gateway {
 	        }
 	    }
         
-        println("XBee packet APS payload: " + ByteUtils.printBytes(xpkt.getApsPayload()));
+        //println("XBee packet APS payload: " + ByteUtils.printBytes(xpkt.getApsPayload()));
         
         Operation op = new Operation(xpkt.getTransactionSeqNumber(),xpkt.getProfileId(),
         		xpkt.getClusterId(),(byte)0x0/*Frame control*/,xpkt.getCommand(),xpkt.getApsPayload());
@@ -86,34 +87,41 @@ public class XBeeGateway extends Gateway {
     		byte[] readBytes = new byte[is.available()];
     		is.read(readBytes);
     		
-    		println("Read: " + ByteUtils.printBytes(readBytes));
+    		//println("Read: " + ByteUtils.printBytes(readBytes));
     		
     		buffer.write(readBytes);
     	}
     	
     	byte[] originalBuffer = buffer.toByteArray();
     	
-    	println("Buffer: " + ByteUtils.printBytes(originalBuffer));
+    	//println("Buffer: " + ByteUtils.printBytes(originalBuffer));
     	
-    	int readBytes = xbeePkt.read(new ByteArrayInputStream(originalBuffer));
+    	int readBytes = 0;
     	
-    	println("XBee packet: " + ByteUtils.printBytes(xbeePkt.getBytes()));
+    	try {
     	
-    	result = convertFrom(xbeePkt);
+    		readBytes = xbeePkt.read(new ByteArrayInputStream(originalBuffer));
 
-    	buffer.reset();
-    	if (readBytes < originalBuffer.length)
-    		buffer.write(originalBuffer, readBytes, originalBuffer.length-readBytes);
+    	} catch (ChecksumException ex) {
+
+    		readBytes = 4 + (originalBuffer[1]*256) + originalBuffer[2];
+    		println("Discarding checksum-failing packet of " + readBytes + " bytes");
+    		
+    		throw ex;
+    				
+    	} finally {
+
+    		// Reduces the buffer the original amount minus the bytes consumed by the packet
+       		buffer.reset();
+        	if (readBytes < originalBuffer.length)
+        		buffer.write(originalBuffer, readBytes, originalBuffer.length-readBytes);
+    	}
+    	
+    	//println("XBee packet: " + ByteUtils.printBytes(xbeePkt.getBytes()));
+    	
+   		result = convertFrom(xbeePkt);
     	
     	return result;
-    }
-    
-    /**
-     * Rewrites the packet in order to allow handling by the EasyHome Management domain.
-     * @param pkt The XBee packet that will be modified.
-     */
-    private void rewrite(XBeePacketFromNode pkt) {
-    	
     }
     
     @Override
