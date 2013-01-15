@@ -12,13 +12,25 @@ public class NodeTest {
     @Test(expected=IllegalArgumentException.class)
     public void testIncorrectConstruction() {
         
-        new Node.Builder(0);
+        new Node.Builder(1,0);
+    }
+    
+    @Test(expected=IllegalArgumentException.class)
+    public void testIncorrectConstruction2() {
+        
+        new Node.Builder(0,1);
+    }
+    
+    @Test(expected=IllegalArgumentException.class)
+    public void testIncorrectConstruction3() {
+        
+        new Node.Builder(0,0);
     }
     
     @Test(expected=IllegalArgumentException.class)
     public void testIncorrectName() {
         
-        Node.Builder nb = new Node.Builder(1);
+        Node.Builder nb = new Node.Builder(1,1);
         
         nb.setName(null);
     }
@@ -26,7 +38,7 @@ public class NodeTest {
     @Test
     public void testConstruction() {
         
-        Node.Builder nb1 = new Node.Builder(10L);
+        Node.Builder nb1 = new Node.Builder(1,10L);
         
         nb1.setName("test");
         nb1.setGatewayId((byte)2);
@@ -35,7 +47,7 @@ public class NodeTest {
         
         Node node1 = nb1.build();
         
-        Node.Builder nb2 = new Node.Builder(11L);
+        Node.Builder nb2 = new Node.Builder(2,11L);
         
         nb2.setName("test2");
         nb2.setGatewayId((byte)2);
@@ -45,7 +57,7 @@ public class NodeTest {
         Node node2 = nb2.build();
         node1.addNeighbor(node2);
         
-        assertEquals(10L, node1.getId());
+        assertEquals(10L, node1.getNuid());
         assertEquals("test", node1.getName());
         assertEquals(node1.getNeighborIds().size(),1);
     }

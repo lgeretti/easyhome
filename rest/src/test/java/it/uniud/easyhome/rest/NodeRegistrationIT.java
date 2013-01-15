@@ -91,30 +91,33 @@ public class NodeRegistrationIT {
 		ClientResponse nodeAnnceRegProcessInsertion = insertProcess(ProcessKind.NODE_ANNCE_REGISTRATION);
 		assertEquals(ClientResponse.Status.CREATED,nodeAnnceRegProcessInsertion.getClientResponseStatus());
 		ClientResponse nodeDescrAcqProcessInsertion = insertProcess(ProcessKind.NODE_DESCR_REQUEST);
-		assertEquals(ClientResponse.Status.CREATED,nodeDescrAcqProcessInsertion.getClientResponseStatus());		
+		assertEquals(ClientResponse.Status.CREATED,nodeDescrAcqProcessInsertion.getClientResponseStatus());
 		ClientResponse nodeDescrRegProcessInsertion = insertProcess(ProcessKind.NODE_DESCR_REGISTRATION);
 		assertEquals(ClientResponse.Status.CREATED,nodeDescrRegProcessInsertion.getClientResponseStatus());	
+		
 		ClientResponse activeEpAcqProcessInsertion = insertProcess(ProcessKind.ACTIVE_ENDPOINTS_REQUEST);
 		assertEquals(ClientResponse.Status.CREATED,activeEpAcqProcessInsertion.getClientResponseStatus());		
 		ClientResponse activeEpRegProcessInsertion = insertProcess(ProcessKind.ACTIVE_ENDPOINTS_REGISTRATION);
 		assertEquals(ClientResponse.Status.CREATED,activeEpRegProcessInsertion.getClientResponseStatus());			
+		
 		ClientResponse nodeNeighAcqProcessInsertion = insertProcess(ProcessKind.NODE_NEIGH_REQUEST);
 		assertEquals(ClientResponse.Status.CREATED,nodeNeighAcqProcessInsertion.getClientResponseStatus());
 		ClientResponse nodeNeighRegProcessInsertion = insertProcess(ProcessKind.NODE_NEIGH_REGISTRATION);
 		assertEquals(ClientResponse.Status.CREATED,nodeNeighRegProcessInsertion.getClientResponseStatus());	
+		
 		ClientResponse nodeSimpleDescrAcqProcessInsertion = insertProcess(ProcessKind.SIMPLE_DESCR_REQUEST);
 		assertEquals(ClientResponse.Status.CREATED,nodeSimpleDescrAcqProcessInsertion.getClientResponseStatus());
 		ClientResponse nodeSimpleDescrRegProcessInsertion = insertProcess(ProcessKind.SIMPLE_DESCR_REGISTRATION);
 		assertEquals(ClientResponse.Status.CREATED,nodeSimpleDescrRegProcessInsertion.getClientResponseStatus());
 		
-        Node node1 = new Node.Builder(0xA1L)
+        Node node1 = new Node.Builder(1,0xA1L)
         							 .setAddress((short)0x00CD)
         							 .setGatewayId((byte)gid)
         							 .setCapability((byte)0x7A)
         							 .setLogicalType(NodeLogicalType.ROUTER)
         							 .setManufacturer(Manufacturer.DIGI).build();
         
-        Node node2 = new Node.Builder(0xA2L)
+        Node node2 = new Node.Builder(2,0xA2L)
 		 .setAddress((short)0xCDEF)
 		 .setGatewayId((byte)gid)
 		 .setCapability((byte)0x7A)
@@ -142,9 +145,10 @@ public class NodeRegistrationIT {
 	    	List<Node> nodes = JsonUtils.getListFrom(getNodesResponse, Node.class);
 	    	
 	    	if (nodes.size() == 2) {
-	    		
-	    		Thread.sleep(5000);
-	    		Node recoveredNode1 = client.resource(TARGET).path("network").path(Long.toString(node1.getId())).accept(MediaType.APPLICATION_JSON).get(Node.class);
+
+	    		Node recoveredNode1 = client.resource(TARGET).path("network")
+	    									.path(Byte.toString(node1.getGatewayId())).path(Short.toString(node1.getAddress()))
+	    									.accept(MediaType.APPLICATION_JSON).get(Node.class);
 	    		
 	    		Map<Short,HomeAutomationDevice> devices = recoveredNode1.getMappedDevices();
 	    		if (recoveredNode1.getNeighborIds().size() == 1 &&

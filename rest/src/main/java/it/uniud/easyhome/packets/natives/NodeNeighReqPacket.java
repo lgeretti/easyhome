@@ -28,7 +28,7 @@ public class NodeNeighReqPacket extends NativePacket {
 	
 	public NodeNeighReqPacket(Node destinationNode, byte seqNumber) {
 		this(new ModuleCoordinates((byte)1,0L,(short)0,(byte)0),
-			 new ModuleCoordinates(destinationNode.getGatewayId(),destinationNode.getId(),destinationNode.getAddress(),(byte)0),				
+			 new ModuleCoordinates(destinationNode.getGatewayId(),destinationNode.getNuid(),destinationNode.getAddress(),(byte)0),				
 			 new Operation(seqNumber,Domain.MANAGEMENT.getCode(),ManagementContext.NODE_NEIGH_REQ.getCode(),
 					       (byte)0x0/*Context invariant*/,(byte)0x0/*Irrelevant*/,
 					       new byte[]{0})); // We choose offset 0 to get all neighbors

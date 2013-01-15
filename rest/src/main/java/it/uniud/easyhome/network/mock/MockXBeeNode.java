@@ -48,7 +48,7 @@ public class MockXBeeNode implements Runnable {
     }
     
     public long getId() {
-        return node.getId();
+        return node.getNuid();
     }
     
     public String getName() {
@@ -114,7 +114,7 @@ public class MockXBeeNode implements Runnable {
     }
     
     public synchronized void transmit(XBeePacketFromNode pkt) {
-    	network.broadcast(new XBeePacketToNode(pkt,node.getId(),node.getAddress()));
+    	network.broadcast(new XBeePacketToNode(pkt,node.getNuid(),node.getAddress()));
     }    
     
     public void turnOn() {

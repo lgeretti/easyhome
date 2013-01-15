@@ -49,54 +49,66 @@ public class NodeAnnceRegistrationProcess extends Process {
 	        	try {
 	        		NodeAnncePacket announce = new NodeAnncePacket(pkt);
 	        		
-	        		long nuid = announce.getAnnouncedNuid();
 	        		byte gatewayId = announce.getSrcCoords().getGatewayId();
+	        		long nuid = announce.getAnnouncedNuid();
 	        		short address = announce.getAnnouncedAddress();
 	        		
 	        		byte capability = announce.getAnnouncedCapability();
-	        		
-	                Node.Builder nodeBuilder = new Node.Builder(nuid);
-	                Node node = nodeBuilder.setGatewayId(gatewayId)
-	                					   .setAddress(address)
-	                					   .setCapability(capability)
-	                					   .build();
-	                
-	                ClientResponse nodeInsertionResponse = restResource.path("network")
-	                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
-	                
+
 	                MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-	                formData.add("type",NetworkJobType.NODE_DESCR_REQUEST.toString());
-	                formData.add("gid",String.valueOf(gatewayId));
-	                formData.add("nuid",String.valueOf(nuid));
-	                formData.add("address",String.valueOf(address));
+	                formData.add("gid",Byte.toString(gatewayId));
+	                formData.add("nuid",Long.toString(nuid));
+	                formData.add("address",Short.toString(address));
+	                formData.add("capability",Byte.toString(capability));
 	                
-	                ClientResponse jobInsertionResponse = restResource.path("network").path("jobs")
+	                ClientResponse nodeInsertionResponse = restResource.path("network").path("insert")
 	                		.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	                
-	                if (nodeInsertionResponse.getClientResponseStatus() == Status.CREATED && jobInsertionResponse.getClientResponseStatus() == Status.CREATED) {
+	                formData = new MultivaluedMapImpl();
+	                formData.add("type",NetworkJobType.NODE_DESCR_REQUEST.toString());
+	                formData.add("gid",Byte.toString(gatewayId));
+	                formData.add("nuid",Long.toString(nuid));
+	                formData.add("address",Short.toString(address));
+	                
+	                ClientResponse jobInsertionResponse1 = restResource.path("network").path("jobs")
+	                		.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	                
+	                formData = new MultivaluedMapImpl();
+	                formData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
+	                formData.add("gid",Byte.toString(gatewayId));
+	                formData.add("nuid",Long.toString(nuid));
+	                formData.add("address",Short.toString(address));                
+
+	                ClientResponse jobInsertionResponse2 = restResource.path("network").path("jobs")
+	                		.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	                
+	                boolean jobInsertionsSuccessful = (jobInsertionResponse1.getClientResponseStatus() == Status.CREATED &&
+	                								   jobInsertionResponse2.getClientResponseStatus() == Status.CREATED);
+	                
+	                if (nodeInsertionResponse.getClientResponseStatus() == Status.CREATED && jobInsertionsSuccessful) {
 	                	
 	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_ADDED, gatewayId, nuid, address);
 	                    try {
 	                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
 	                        networkEventsProducer.send(eventMessage);
-	                        println("Node '" + node.getName() + "' announcement registered and event dispatched");
+	                        println("Node " + gatewayId + ":" + ":" + Integer.toHexString(0xFFFF & address) + " announcement registered and event dispatched");
 	                    } catch (Exception e) {
 	                    	println("Message could not be dispatched to inbound packets topic");
 	                    }
 	                	
-	                } else if (nodeInsertionResponse.getClientResponseStatus() == Status.OK && jobInsertionResponse.getClientResponseStatus() == Status.CREATED) {
+	                } else if (nodeInsertionResponse.getClientResponseStatus() == Status.OK && jobInsertionsSuccessful) {
 	                	
 	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_ADDED, gatewayId, nuid, address);
 	                    try {
 	                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
 	                        networkEventsProducer.send(eventMessage);
-	                        println("Node '" + node.getName() + "' announcement re-registered and event dispatched");
+	                        println("Node " + gatewayId + ":" + Integer.toHexString(0xFFFF & address) + " announcement re-registered and event dispatched");
 	                    } catch (Exception e) {
 	                    	println("Message could not be dispatched to inbound packets topic");
 	                    }
 	                	
 	                } else
-	                	println("Node '" + node.getName() + "' announcement registration failed");
+	                	println("Node " + gatewayId + ":" + Integer.toHexString(0xFFFF & address) + " announcement registration failed");
 	                
 	                
 	        	} catch (InvalidPacketTypeException ex) {

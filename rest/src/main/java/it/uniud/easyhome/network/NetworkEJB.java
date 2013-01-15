@@ -1,6 +1,8 @@
 package it.uniud.easyhome.network;
 
 
+import it.uniud.easyhome.exceptions.MultipleNodesFoundException;
+import it.uniud.easyhome.exceptions.NodeNotFoundException;
 import it.uniud.easyhome.gateway.HubContext;
 
 import java.util.List;
@@ -33,27 +35,46 @@ public class NetworkEJB {
         return query.getResultList();
 	}
 	
-	public Node findNodeById(long nodeId) {
-		return em.find(Node.class, nodeId);
+	public Node findNode(byte gid, short address) {
+		
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<Node> criteria = builder.createQuery(Node.class);
+        Root<Node> node = criteria.from(Node.class);
+        criteria.select(node).where(builder.equal(node.get("gatewayId"), gid))
+        					 .where(builder.equal(node.get("address"), address));
+        
+        TypedQuery<Node> query = em.createQuery(criteria);
+        
+        List<Node> nodes = query.getResultList();
+        if (nodes.size() == 0)
+        	return null;
+        if (nodes.size() > 1)
+        	throw new MultipleNodesFoundException();
+		return nodes.get(0);
 	}
 	
+	public Node findNode(Node node) {
+        return findNode(node.getGatewayId(),node.getAddress());
+	}	
+	
 	/**
-	 * Either inserts or updates a node.
+	 * Inserts a node.
 	 * 
-	 * @param node The node to insert or update
+	 * @param node The node to insert
 	 * @return True if the node already existed
 	 */
-	public boolean insertOrUpdateNode(Node node) {
-        Node persistedNode = findNodeById(node.getId());
-        boolean existed = (persistedNode != null);
+	public boolean insertNode(Node node) {
+        boolean existed = exists(node);
         
-        if (!existed) {
+        if (!existed)
             em.persist(node);
-        } else {
-            em.merge(node);
-        }
         
         return existed;
+	}
+	
+	public boolean exists(Node node) {
+		Node persistedNode = findNode(node);
+        return (persistedNode != null);
 	}
 	
 	/**
@@ -68,12 +89,11 @@ public class NetworkEJB {
 	/**
 	 * Removes a node.
 	 * 
-	 * @param nodeId The node identifier
 	 * @return True if the node already existed
 	 */
-	public boolean removeNodeById(long nodeId) {
+	public boolean removeNode(byte gatewayId, short address) {
 		
-        Node node = findNodeById(nodeId);
+        Node node = findNode(gatewayId,address);
         
         boolean existed = (node != null);
         

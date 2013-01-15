@@ -27,7 +27,9 @@ public class Node implements Serializable {
 	private static final long serialVersionUID = -239673332667054641L;
 	
 	@Id
-    private long id;
+	private long id;
+	@Column(nullable = false)
+    private long nuid;
     @Column(nullable = false, length = 200)
     private String name;
     @Column(nullable = false)
@@ -69,7 +71,7 @@ public class Node implements Serializable {
     }
     
     public void addNeighbor(Node node) {
-    	neighborIds.add(node.getId());
+    	neighborIds.add(node.getNuid());
     }
     
 	public void setNeighbors(List<Long> neighborIds) {
@@ -108,13 +110,13 @@ public class Node implements Serializable {
         
         private Node node;
         
-        public Builder(long id) {
-            if (id == 0)
+        public Builder(long id, long nuid) {
+            if (id == 0 || nuid == 0)
                 throw new IllegalArgumentException();            
             node = new Node();
             node.id = id;
+            node.nuid = nuid;
             
-            node.name = Long.toHexString(id);
             node.logicalType = NodeLogicalType.UNDEFINED;
             node.manufacturer = Manufacturer.UNDEFINED;
             node.liveness = NodeLiveness.OK;
@@ -164,20 +166,23 @@ public class Node implements Serializable {
         }
         
         public Node build() {
-            
+        	
         	if ((node.gatewayId == 0) || (node.address == 0) || (node.capability == 0))
         		throw new NodeConstructionException();
+        	
+        	if (node.name == null)
+        		node.name = String.valueOf(node.gatewayId) + ":" + Long.toHexString(0xFFFF & node.address);
         	
             return node;
         }
     }
     
-    public long getId() {
-        return this.id;
+    public long getNuid() {
+        return this.nuid;
     }
     
-    public String getHexId() {
-    	return "0x" + Long.toHexString(id);
+    public String getHexNuid() {
+    	return "0x" + Long.toHexString(nuid);
     }
     
     public String getName() {
@@ -245,7 +250,7 @@ public class Node implements Serializable {
             throw new IllegalArgumentException();
         Node otherNode = (Node) other;
         
-        if (this.id != otherNode.id) return false;
+        if (this.nuid != otherNode.nuid) return false;
         if (!this.name.equals(otherNode.name)) return false;
         if (this.gatewayId != otherNode.gatewayId) return false;
         if (this.address != otherNode.address) return false;
@@ -262,7 +267,7 @@ public class Node implements Serializable {
         final int prime = 31;
 
         long result = 1;
-        result = prime * result + id;
+        result = prime * result + nuid;
         result = prime * result + name.hashCode();
         result = prime * result + gatewayId;
         result = prime * result + address;

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import it.uniud.easyhome.common.ByteUtils;
+import it.uniud.easyhome.common.Endianness;
 import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.exceptions.InvalidPayloadLengthException;
@@ -33,6 +34,10 @@ public class ActiveEndpointsRspPacket extends NativePacket {
 	
 	public ActiveEndpointsRspPacket(NativePacket pkt) {
 		this(pkt.getSrcCoords(),pkt.getDstCoords(),pkt.getOperation());
+	}
+	
+	public short getAddrOfInterest() {
+		return ByteUtils.getShort(getOperation().getData(), 1, Endianness.LITTLE_ENDIAN); 
 	}
 	
 	public List<Short> getActiveEndpoints() {

@@ -54,25 +54,6 @@ public class NodesController implements Runnable {
     public List<Node> getNodes() {
     	return networkEjb.getNodes();
     }
-    
-    public void doAdd() {        
-    	Node node = new Node.Builder(rnd.nextLong())
-    				.setAddress((short)(rnd.nextInt() & 0xFFFF))
-    				.setGatewayId((byte)rnd.nextInt(255))
-    				.setCapability((byte)rnd.nextInt(255))
-    				.build();
-        networkEjb.insertOrUpdateNode(node);
-        PushRenderer.render(PUSH_GROUP);
-    }
-    
-    public void doClear() {
-        networkEjb.removeAllNodes();
-        PushRenderer.render(PUSH_GROUP);
-    }
-    
-    public int getSize() {
-        return networkEjb.getNodes().size();
-    }
 
 	@Override
 	public void run() {

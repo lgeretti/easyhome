@@ -41,11 +41,13 @@ public class NodeNeighRegistrationProcess extends Process {
 	        		
 	        		List<Long> neighborIds = neighPkt.getNeighborIds();
 	        			
-	        		Node node = restResource.path("network/"+pkt.getSrcCoords().getNuid())
-	                		.accept(MediaType.APPLICATION_JSON).get(Node.class);
+	        		// FIXME : source coordinates are useless, must find another way
+	        		Node node = restResource.path("network")
+	        							.path(Byte.toString(neighPkt.getSrcCoords().getGatewayId())).path(Short.toString(neighPkt.getSrcCoords().getAddress()))
+	        							.accept(MediaType.APPLICATION_JSON).get(Node.class);
 	        		node.setNeighbors(neighborIds);
 
-	                ClientResponse updateResponse = restResource.path("network")
+	                ClientResponse updateResponse = restResource.path("network").path("update")
 	                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
 	                
 	                if (updateResponse.getClientResponseStatus() == Status.OK)

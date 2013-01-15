@@ -6,6 +6,7 @@ import java.util.List;
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.NetworkEvent;
+import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.packets.natives.ActiveEndpointsRspPacket;
 import it.uniud.easyhome.packets.natives.NativePacket;
@@ -18,11 +19,13 @@ import javax.jms.ObjectMessage;
 import javax.jms.Topic;
 import javax.naming.NamingException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class ActiveEndpointsRegistrationProcess extends Process {
 	
@@ -52,20 +55,31 @@ public class ActiveEndpointsRegistrationProcess extends Process {
 	        		
 	        		List<Short> activeEps = activeEpPkt.getActiveEndpoints();
 	        			
-	        		Node node = restResource.path("network/"+pkt.getSrcCoords().getNuid())
-	                		.accept(MediaType.APPLICATION_JSON).get(Node.class);
+	        		Node node = restResource.path("network").path(Byte.toString(activeEpPkt.getSrcCoords().getGatewayId()))
+	        								.path(Short.toString(activeEpPkt.getAddrOfInterest()))
+	        								.accept(MediaType.APPLICATION_JSON).get(Node.class);
 	        		node.setEndpoints(activeEps);
 
-	                ClientResponse updateResponse = restResource.path("network")
+	                ClientResponse updateResponse = restResource.path("network").path("update")
 	                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
 	                
 	                if (updateResponse.getClientResponseStatus() == Status.OK) {
 	                	
-	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_ENDPOINTS_ACQUIRED, node.getGatewayId(), node.getId(), node.getAddress());
+		                MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();
+		                queryData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
+		                queryData.add("gid",String.valueOf(node.getGatewayId()));
+		                queryData.add("nuid",String.valueOf(node.getNuid()));
+		                queryData.add("address",String.valueOf(node.getAddress()));
+		                
+		                println("Deleting NODE_ACTIVE_ENDPOINTS_REQUEST job for " + node.getName());
+		                
+		                restResource.path("network").path("jobs").queryParams(queryData).delete(ClientResponse.class);
+		                
+	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_ENDPOINTS_ACQUIRED, node.getGatewayId(), node.getNuid(), node.getAddress());
 	                    try {
 	                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
 	                        networkEventsProducer.send(eventMessage);
-	                        println("Node " + pkt.getSrcCoords().getNuid() + " updated with endpoints information (#" + activeEps.size() + ")");
+	                        println("Node " + node.getName() + " updated with endpoints information (#" + activeEps.size() + ")");
 	                    } catch (Exception e) {
 	                    	println("Node endpoints registration message could not be dispatched to inbound packets topic");
 	                    }

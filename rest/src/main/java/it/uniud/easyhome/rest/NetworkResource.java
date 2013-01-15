@@ -32,6 +32,7 @@ public final class NetworkResource {
 	
     private NetworkEJB resEjb;
     
+    private static int nodeId = 0;
     private static int jobId = 0;
 
     public NetworkResource() throws NamingException {
@@ -51,11 +52,11 @@ public final class NetworkResource {
     }
     
     @GET
-    @Path("{nodeid}")
+    @Path("{gid}/{address}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Node getNode(@PathParam("nodeid") long nodeId) {
+    public Node getNode(@PathParam("gid") byte gid, @PathParam("address") short address) {
         
-        Node node = resEjb.findNodeById(nodeId);
+        Node node = resEjb.findNode(gid,address);
         
         if (node == null) 
             throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -64,10 +65,10 @@ public final class NetworkResource {
     }
     
     @POST
-    @Path("{nodeid}")
-    public Response setNodeName(@PathParam("nodeid") long nodeId, @FormParam("location") String location) {
+    @Path("{gid}/{address}")
+    public Response setNodeName(@PathParam("gid") byte gid, @PathParam("address") short address, @FormParam("location") String location) {
     	
-        Node node = resEjb.findNodeById(nodeId);
+        Node node = resEjb.findNode(gid,address);
         
         if (node == null) 
             throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -80,26 +81,55 @@ public final class NetworkResource {
     }
     
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateOrInsertNode(Node node) {
+    @Path("insert")
+    public Response insertNode(@FormParam("gid") byte gid, 
+    						   @FormParam("nuid") long nuid, 
+    						   @FormParam("address") short address,
+    						   @FormParam("capability") byte capability) {
     	
-        boolean existed = resEjb.insertOrUpdateNode(node);
+    	boolean existed = false;
+    	
+    	synchronized(this) {
+    		Node.Builder nodeBuilder = new Node.Builder(++nodeId,nuid);
+    		Node node = nodeBuilder.setGatewayId(gid)
+					   .setAddress(address)
+					   .setCapability(capability)
+					   .build();
+
+    		existed = resEjb.insertNode(node);
+    	}
         
-        if (!existed)
-            return Response.created(
+        
+        if (existed)
+        	return Response.notModified().build();
+        
+        return Response.created(
                              uriInfo.getAbsolutePathBuilder()
-                                    .path(String.valueOf(node.getId()))
+                                    .path(Byte.toString(gid))
+                                    .path(Short.toString(address))
                                     .build())
                            .build();
-        else
-            return Response.ok().build();
+    }
+    
+    @POST
+    @Path("/update")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateNode(Node node) {
+    	
+        if (!resEjb.exists(node)) {
+        	throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+
+        resEjb.updateManaged(node);	
+        	
+        return Response.ok().build();
     }
       
     @DELETE
-    @Path("{nodeid}")
-    public Response deleteNode(@PathParam("nodeid") long nodeId) {
+    @Path("{gid}/{address}")
+    public Response deleteNode(@PathParam("gid") byte gid, @PathParam("address") short address) {
         
-        boolean existed = resEjb.removeNodeById(nodeId);
+        boolean existed = resEjb.removeNode(gid,address);
         
         if (!existed) {
         	throw new WebApplicationException(Response.Status.NOT_FOUND);

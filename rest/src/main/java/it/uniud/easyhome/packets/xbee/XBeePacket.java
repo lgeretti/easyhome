@@ -1,5 +1,6 @@
 package it.uniud.easyhome.packets.xbee;
 
+import it.uniud.easyhome.common.ByteUtils;
 import it.uniud.easyhome.exceptions.ChecksumException;
 import it.uniud.easyhome.exceptions.IncompletePacketException;
 import it.uniud.easyhome.exceptions.InvalidDelimiterException;
@@ -102,9 +103,9 @@ public abstract class XBeePacket implements Packet {
         }
         sum += is.read();
              
-        if (0xFF != (sum & 0xFF)) 
+        if (0xFF != (sum & 0xFF))
         	throw new ChecksumException();
-        
+        	
         handlePacketPayload(new ByteArrayInputStream(packetPayload), length);
         
         return 4+length;

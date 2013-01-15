@@ -45,8 +45,9 @@ public class SimpleDescrRequestProcess extends Process {
     		if (event != null && event.getKind() == NetworkEvent.EventKind.NODE_ENDPOINTS_ACQUIRED) {
 
     	        try {
-        	        ClientResponse getResponse = restResource.path("network").path(String.valueOf(event.getNuid()))
-  						  .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        	        ClientResponse getResponse = restResource.path("network")
+        	        								.path(Byte.toString(event.getGid())).path(Short.toString(event.getAddress()))
+        	        								.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         	        
     	        	Node node = JsonUtils.getFrom(getResponse, Node.class);
     	        	List<Short> endpoints = node.getEndpoints();

@@ -1,6 +1,5 @@
 package it.uniud.easyhome.contexts;
 
-import it.uniud.easyhome.devices.HomeAutomationDevice;
 import it.uniud.easyhome.exceptions.InvalidContextException;
 import it.uniud.easyhome.packets.Domain;
 

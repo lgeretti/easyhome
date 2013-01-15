@@ -9,6 +9,7 @@ import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.NetworkJob;
 import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.network.Node;
+import it.uniud.easyhome.packets.Packet;
 import it.uniud.easyhome.packets.natives.NodeDescrReqPacket;
 
 import javax.jms.JMSException;
@@ -38,6 +39,14 @@ public class NodeDescrRequestProcess extends Process {
         networkEventsConsumer = registerConsumerFor(networkEventsTopic);
     }
     
+    private void doRequest(Node node, NetworkJob job) throws JMSException {
+    	
+    	NodeDescrReqPacket packet = new NodeDescrReqPacket(node,++sequenceNumber);
+        ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
+        getOutboundPacketsProducer().send(outboundMessage);    
+        println("Node " + node.getName() + " descriptor request " + (job != null && job.isFresh() ? "" : "re-") + "dispatched");
+    }
+    
     @Override
 	protected void process() throws JMSException, NamingException {
     	
@@ -59,14 +68,12 @@ public class NodeDescrRequestProcess extends Process {
 		                
 		                restResource.path("network").path("jobs").path("reset").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        			
-            	        ClientResponse getNodeResponse = restResource.path("network").path(String.valueOf(event.getNuid()))
-      						  .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+            	        ClientResponse getNodeResponse = restResource.path("network")
+            	        								 .path(Byte.toString(event.getGid())).path(Short.toString(event.getAddress()))
+            	        								 .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
             	        
         	        	Node node = JsonUtils.getFrom(getNodeResponse, Node.class);
-        	        	NodeDescrReqPacket packet = new NodeDescrReqPacket(node,++sequenceNumber);
-        	            ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
-        	            getOutboundPacketsProducer().send(outboundMessage);    
-        	            println("Node '" + node.getName() + "' descriptor request dispatched");
+        	        	doRequest(node,null);
 	        		}
 	           	}    		
 	    	} else {
@@ -80,15 +87,11 @@ public class NodeDescrRequestProcess extends Process {
 	    				
 	    				restResource.path("network").path("jobs").path(String.valueOf(job.getId())).path("reset").type(MediaType.APPLICATION_JSON).post(ClientResponse.class);
 	    				
-	    				ClientResponse getNodeResponse = restResource.path("network").path(String.valueOf(job.getNuid()))
-	      						  .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-	            	        
+	    				ClientResponse getNodeResponse = restResource.path("network")
+	    													.path(Byte.toString(job.getGatewayId())).path(Short.toString(job.getAddress()))
+	    													.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         	        	Node node = JsonUtils.getFrom(getNodeResponse, Node.class);
-        	        	NodeDescrReqPacket packet = new NodeDescrReqPacket(node,++sequenceNumber);
-        	            ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
-        	            getOutboundPacketsProducer().send(outboundMessage);    
-        	            
-        	            println("Node '" + node.getName() + "' descriptor request " + (job.isFresh() ? "" : "re-") + "dispatched");
+        	        	doRequest(node,job);
 	    			}
 	    		}
 	    		

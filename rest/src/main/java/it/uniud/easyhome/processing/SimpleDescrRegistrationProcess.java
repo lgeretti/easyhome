@@ -75,12 +75,12 @@ public class SimpleDescrRegistrationProcess extends Process {
 	        	    		
 	        				node.addDevice(endpoint, device);
 	        				
-	    	                ClientResponse updateResponse = restResource.path("network")
+	    	                ClientResponse updateResponse = restResource.path("network").path("update")
 	    	                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
 	    	                
 	    	                if (updateResponse.getClientResponseStatus() == Status.OK) {
 	    	                	
-	    	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.SIMPLE_DESCR_ACQUIRED, node.getGatewayId(), node.getId(), node.getAddress(), endpoint);
+	    	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.SIMPLE_DESCR_ACQUIRED, node.getGatewayId(), node.getNuid(), node.getAddress(), endpoint);
 	    	                    try {
 	    	                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
 	    	                        networkEventsProducer.send(eventMessage);
