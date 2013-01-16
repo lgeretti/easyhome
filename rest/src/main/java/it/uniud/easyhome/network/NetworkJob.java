@@ -45,12 +45,12 @@ public class NetworkJob implements Serializable {
 	private long timestamp;
 	
 	@Column(nullable = false)
-	private boolean fresh;
+	private byte tsn;
 	
 	@SuppressWarnings("unused")
 	private NetworkJob() { }
 	
-	public NetworkJob(int id, NetworkJobType type, byte gatewayId, long nuid, short address, byte endpoint) {
+	public NetworkJob(int id, NetworkJobType type, byte gatewayId, long nuid, short address, byte endpoint, byte tsn) {
 		
 		this.id = id;
 		this.type = type;
@@ -59,7 +59,7 @@ public class NetworkJob implements Serializable {
 		this.address = address;
 		this.endpoint = endpoint;
 		this.timestamp = System.currentTimeMillis();
-		this.fresh = true;
+		this.tsn = tsn;
 	}
 	
 	public int getId() {
@@ -90,12 +90,7 @@ public class NetworkJob implements Serializable {
 		return new Date(timestamp);
 	}
 	
-	public boolean isFresh() {
-		return fresh;
-	}
-	
-	public void reset() {
-		timestamp = System.currentTimeMillis();
-		fresh = false;
+	public byte getTsn() {
+		return tsn;
 	}
 }

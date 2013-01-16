@@ -16,6 +16,7 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 
 @Stateless
 public class NetworkEJB {
@@ -111,9 +112,9 @@ public class NetworkEJB {
         	em.remove(node);
 	}
 	
-	public void insertJob(int id, NetworkJobType type, byte gatewayId, long nuid, short address, byte endpoint) {
+	public void insertJob(int id, NetworkJobType type, byte gatewayId, long nuid, short address, byte endpoint, byte tsn) {
 		
-		NetworkJob job = new NetworkJob(id, type, gatewayId, nuid, address, endpoint);
+		NetworkJob job = new NetworkJob(id, type, gatewayId, nuid, address, endpoint, tsn);
 		
 		em.persist(job);
 	}
@@ -130,67 +131,59 @@ public class NetworkEJB {
         return query.getResultList();
 	}
 	
-	public List<NetworkJob> getJobsByType(NetworkJobType type) {
-		
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<NetworkJob> criteria = builder.createQuery(NetworkJob.class);
-        Root<NetworkJob> job = criteria.from(NetworkJob.class);
-        criteria.select(job).where(builder.equal(job.get("type"), type));
+	public List<NetworkJob> getLatestJobs(NetworkJobType type) {
         
-        TypedQuery<NetworkJob> query = em.createQuery(criteria);
+        String queryString = "SELECT j FROM NetworkJob j WHERE j.id IN (SELECT MAX(j2.id) FROM NetworkJob j2 " + 
+        					 "WHERE j2.type=:t GROUP BY j2.gatewayId, j2.address, j2.endpoint)";
+        TypedQuery<NetworkJob> query = em.createQuery(queryString,NetworkJob.class).setParameter("t", type);
         
         return query.getResultList();		
 	}
 	
-	public List<NetworkJob> getJobsByTypeAndCoordinates(NetworkJobType type, byte gatewayId, short address, byte endpoint) {
+	public List<NetworkJob> getLatestJobs(NetworkJobType type, byte gatewayId, short address, byte endpoint, byte tsn) {
 		
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<NetworkJob> criteria = builder.createQuery(NetworkJob.class);
-        Root<NetworkJob> job = criteria.from(NetworkJob.class);
-        criteria.select(job).where(builder.equal(job.get("type"), type));
+        StringBuilder queryBuilder = new StringBuilder("SELECT j FROM NetworkJob j WHERE j.tsn IN (SELECT MAX(j2.tsn) FROM NetworkJob j2");
         
-        if (gatewayId != 0) {
-        	criteria.where(builder.equal(job.get("gatewayId"), gatewayId))
-        			.where(builder.equal(job.get("address"), address))
-        			.where(builder.equal(job.get("endpoint"), endpoint));
+        boolean atLeastOneClause = false;
+        
+        if (type != null || gatewayId != 0 || tsn != 0) {
+        	queryBuilder.append(" WHERE ");
         }
+        if (type != null) {
+        	atLeastOneClause = true;
+        	queryBuilder.append(" j2.type=:t ");
+        }
+        if (gatewayId != 0) {
+        	if (atLeastOneClause)
+        		queryBuilder.append(" AND ");
+        	atLeastOneClause = true;
+        	queryBuilder.append(" j2.gatewayId=:g AND j2.address=:a AND j2.endpoint=:e ");
+        }
+        if (tsn != 0) {
+        	if (atLeastOneClause)
+        		queryBuilder.append(" AND ");
+        	queryBuilder.append(" j2.tsn=:n");
+        }
+        queryBuilder.append(")");
         
-        TypedQuery<NetworkJob> query = em.createQuery(criteria);
+        TypedQuery<NetworkJob> query = em.createQuery(queryBuilder.toString(),NetworkJob.class);
+        
+        if (type != null)
+        	query.setParameter("t",type);
+        
+        if (gatewayId != 0)
+        	query.setParameter("g",gatewayId)
+			  	 .setParameter("a",address)
+			  	 .setParameter("e",endpoint);
+        
+        if (tsn != 0)
+        	query.setParameter("n", tsn);
         
         return query.getResultList();		
 	}
 	
 	public NetworkJob findJobById(int jobId) {
 		return em.find(NetworkJob.class, jobId);
-	}
-	
-	public boolean resetJobById(int jobId) {
-        NetworkJob job = findJobById(jobId);
-        
-        boolean existed = (job != null);
-        
-        if (existed) {
-        	job.reset();
-        	em.merge(job);
-        }
-        
-        return existed;		
-	}
-	
-	/***
-	 * Resets one or more jobs (one if coordinates are defined, possibly many otherwise)
-	 * 
-	 * @return True if at least one job has been found
-	 */
-	public boolean resetJobsByTypeAndCoordinates(NetworkJobType type, byte gatewayId, short address, byte endpoint) {
-		List<NetworkJob> jobs = getJobsByTypeAndCoordinates(type,gatewayId,address,endpoint);
-		
-		for (NetworkJob job : jobs) {
-			job.reset();
-			em.merge(job);
-		}
-		
-		return jobs.size() > 0;
 	}
 	
 	public void removeAllJobs() {

@@ -155,14 +155,15 @@ public final class NetworkResource {
     					   @FormParam("gid") byte gatewayId,
     					   @FormParam("nuid") long nuid,
     					   @FormParam("address") short address,
-    					   @DefaultValue("127") @FormParam("endpoint") byte endpoint) {
+    					   @DefaultValue("127") @FormParam("endpoint") byte endpoint,
+    					   @DefaultValue("0") @FormParam("tsn") byte tsn) {
     	
     	int newJobId;
     	
     	
     	synchronized(this) {
     		newJobId = ++jobId;
-	    	resEjb.insertJob(newJobId, type, gatewayId, nuid, address, endpoint);
+	    	resEjb.insertJob(newJobId, type, gatewayId, nuid, address, endpoint, tsn);
     	}
     	
     	return Response.created(
@@ -172,47 +173,22 @@ public final class NetworkResource {
     					.build();
     }
     
-    @POST
-    @Path("/jobs/{jobId}/reset")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response resetJobById(@PathParam("jobId") int jobId) {
-    	
-        boolean existed = resEjb.resetJobById(jobId);
-        
-        if (!existed) 
-            throw new WebApplicationException(Response.Status.NOT_FOUND);
-        
-        return Response.ok().build();
-    }
-    
-    @POST
-    @Path("/jobs/reset")
-    public Response resetJobByTypeAndCoordinates(@FormParam("type") NetworkJobType type,
-			   				 @FormParam("gid") byte gatewayId,
-			   				 @FormParam("address") short address,
-			   				 @DefaultValue("127") @FormParam("endpoint") byte endpoint) {
-    	
-        boolean existed = resEjb.resetJobsByTypeAndCoordinates(type,gatewayId,address,endpoint);
-        
-        if (!existed) 
-            throw new WebApplicationException(Response.Status.NOT_FOUND);
-        
-        return Response.ok().build();
-    }    
-    
     @GET
     @Path("/jobs")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<NetworkJob> getJobsByTypeAndCoordinates(
+    public List<NetworkJob> getLatestJobs(
     		   @QueryParam("type") NetworkJobType type, 
-			   @QueryParam("gid") byte gatewayId, 
-			   @QueryParam("address") short address, 
-			   @DefaultValue("127") @QueryParam("endpoint") byte endpoint) {
+    		   @DefaultValue("0") @QueryParam("gid") byte gatewayId, 
+    		   @DefaultValue("0") @QueryParam("address") short address, 
+			   @DefaultValue("127") @QueryParam("endpoint") byte endpoint,
+			   @DefaultValue("0") @QueryParam("tsn") byte tsn) {
     	
-    	if (type != null)
-    		return resEjb.getJobsByTypeAndCoordinates(type,gatewayId,address,endpoint);
-    	
-    	return resEjb.getJobs();
+    	if (gatewayId != 0 || tsn != 0)
+    		return resEjb.getLatestJobs(type,gatewayId,address,endpoint,tsn);
+    	else if (type != null)
+    		return resEjb.getLatestJobs(type);
+    	else
+    		return resEjb.getJobs();
     }
     
     @GET

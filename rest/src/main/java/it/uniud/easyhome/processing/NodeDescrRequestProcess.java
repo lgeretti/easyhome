@@ -39,12 +39,12 @@ public class NodeDescrRequestProcess extends Process {
         networkEventsConsumer = registerConsumerFor(networkEventsTopic);
     }
     
-    private void doRequest(Node node, NetworkJob job) throws JMSException {
+    private void doRequest(Node node, boolean isRepeated) throws JMSException {
     	
     	NodeDescrReqPacket packet = new NodeDescrReqPacket(node,++sequenceNumber);
         ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
         getOutboundPacketsProducer().send(outboundMessage);    
-        println("Node " + node.getName() + " descriptor request " + (job != null && job.isFresh() ? "" : "re-") + "dispatched");
+        println("Node " + node.getName() + " descriptor request " + (isRepeated ? "re-" : "") + "dispatched");
     }
     
     @Override
@@ -73,7 +73,7 @@ public class NodeDescrRequestProcess extends Process {
             	        								 .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
             	        
         	        	Node node = JsonUtils.getFrom(getNodeResponse, Node.class);
-        	        	doRequest(node,null);
+        	        	doRequest(node,false);
 	        		}
 	           	}    		
 	    	} else {
@@ -83,7 +83,7 @@ public class NodeDescrRequestProcess extends Process {
 	    		for (NetworkJob job : jobs) {
 	    			
 	    			Date jobDate = job.getDate();
-	    			if (jobDate.before(fiveSecBeforeNow) || job.isFresh()) {
+	    			if (jobDate.before(fiveSecBeforeNow)) {
 	    				
 	    				restResource.path("network").path("jobs").path(String.valueOf(job.getId())).path("reset").type(MediaType.APPLICATION_JSON).post(ClientResponse.class);
 	    				
@@ -91,7 +91,7 @@ public class NodeDescrRequestProcess extends Process {
 	    													.path(Byte.toString(job.getGatewayId())).path(Short.toString(job.getAddress()))
 	    													.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         	        	Node node = JsonUtils.getFrom(getNodeResponse, Node.class);
-        	        	doRequest(node,job);
+        	        	doRequest(node,true);
 	    			}
 	    		}
 	    		

@@ -38,12 +38,12 @@ public class ActiveEndpointsRequestProcess extends Process {
         networkEventsConsumer = registerConsumerFor(networkEventsTopic);
     }
     
-    private void doRequest(Node node, NetworkJob job) throws JMSException {
+    private void doRequest(Node node, boolean isRepeated) throws JMSException {
     	
     	ActiveEndpointsReqPacket packet = new ActiveEndpointsReqPacket(node,++sequenceNumber);
         ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
         getOutboundPacketsProducer().send(outboundMessage);    
-        println("Node " + node.getName() + " active endpoints request " + (job != null && job.isFresh() ? "" : "re-") + "dispatched");
+        println("Node " + node.getName() + " active endpoints request " + (isRepeated ? "re-" : "") + "dispatched");
     }
     
     @Override
@@ -54,7 +54,7 @@ public class ActiveEndpointsRequestProcess extends Process {
 		try {
 			List<NetworkJob> jobs = JsonUtils.getListFrom(jobListResponse, NetworkJob.class);
 	    	
-	    	if (jobs.size() == 0) {
+	    	if (jobs.isEmpty()) {
 	        	ObjectMessage msg = (ObjectMessage) networkEventsConsumer.receive();
 	        	if (msg != null) {
 	        		NetworkEvent event = (NetworkEvent) msg.getObject();
@@ -72,7 +72,7 @@ public class ActiveEndpointsRequestProcess extends Process {
             	        									.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
             	        
         	        	Node node = JsonUtils.getFrom(getNodeResponse, Node.class);
-        	        	doRequest(node,null);
+        	        	doRequest(node,false);
 	        		}
 	           	}    		
 	    	} else {
@@ -82,7 +82,9 @@ public class ActiveEndpointsRequestProcess extends Process {
 	    		for (NetworkJob job : jobs) {
 	    			
 	    			Date jobDate = job.getDate();
-	    			if (jobDate.before(fiveSecBeforeNow) || job.isFresh()) {
+	    			if (jobDate.before(fiveSecBeforeNow)) {
+	    				
+	    				boolean isRepeated = true;
 	    				
 	    				restResource.path("network").path("jobs").path(String.valueOf(job.getId())).path("reset").type(MediaType.APPLICATION_JSON).post(ClientResponse.class);
 	    				
@@ -90,7 +92,7 @@ public class ActiveEndpointsRequestProcess extends Process {
 	    						  .path(Byte.toString(job.getGatewayId())).path(Short.toString(job.getAddress()))
 	      						  .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         	        	Node node = JsonUtils.getFrom(getNodeResponse, Node.class);
-        	        	doRequest(node,job);
+        	        	doRequest(node,isRepeated);
 	    			}
 	    		}
 	    		
