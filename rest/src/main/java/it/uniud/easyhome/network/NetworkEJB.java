@@ -84,7 +84,6 @@ public class NetworkEJB {
 	 * @param node The managed node that will be updated
 	 */
 	public void updateManaged(Node node) {
-		System.out.println("Updating node " + node.getName() + " #endpoints: " + node.getEndpoints().size() + ")");
 		em.merge(node);
 	}
 	

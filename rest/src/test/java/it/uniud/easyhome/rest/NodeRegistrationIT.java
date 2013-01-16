@@ -91,7 +91,7 @@ public class NodeRegistrationIT {
 		
 		ClientResponse nodeAnnceRegProcessInsertion = insertProcess(ProcessKind.NODE_ANNCE_REGISTRATION);
 		assertEquals(ClientResponse.Status.CREATED,nodeAnnceRegProcessInsertion.getClientResponseStatus());
-		
+	
 		ClientResponse nodeDescrAcqProcessInsertion = insertProcess(ProcessKind.NODE_DESCR_REQUEST);
 		assertEquals(ClientResponse.Status.CREATED,nodeDescrAcqProcessInsertion.getClientResponseStatus());
 		ClientResponse nodeDescrRegProcessInsertion = insertProcess(ProcessKind.NODE_DESCR_REGISTRATION);
@@ -111,7 +111,6 @@ public class NodeRegistrationIT {
 		assertEquals(ClientResponse.Status.CREATED,nodeSimpleDescrAcqProcessInsertion.getClientResponseStatus());
 		ClientResponse nodeSimpleDescrRegProcessInsertion = insertProcess(ProcessKind.SIMPLE_DESCR_REGISTRATION);
 		assertEquals(ClientResponse.Status.CREATED,nodeSimpleDescrRegProcessInsertion.getClientResponseStatus());
-		
 		
         Node node1 = new Node.Builder(1,0xA1L)
         							 .setAddress((short)0x10CD)
@@ -145,7 +144,8 @@ public class NodeRegistrationIT {
         int passedTests = 0;
         while (sleepTime*counter < maximumSleepTime) {
         	counter++;
-        	System.out.println("Run #" + counter);
+        	System.out.format("Run #%d:", counter);
+        			
         	passedTests = 0;
         	
 	    	ClientResponse getNodesResponse = client.resource(TARGET).path("network")
@@ -153,7 +153,7 @@ public class NodeRegistrationIT {
 	    	List<Node> nodes = JsonUtils.getListFrom(getNodesResponse, Node.class);
 	    	
 	    	if (nodes.size() == 2) {
-	    		System.out.println("Passing number of nodes");
+	    		System.out.print("a");
 	    		passedTests++;
 	    		
 	    		Node recoveredNode1 = client.resource(TARGET).path("network")
@@ -165,17 +165,17 @@ public class NodeRegistrationIT {
 
 	    		
 	    		if (recoveredNode1.getLogicalType() == NodeLogicalType.ROUTER && recoveredNode2.getLogicalType() == NodeLogicalType.ROUTER) {
-	    			System.out.println("Passing node logical types");
+	    			System.out.print("b");
 	    			passedTests++;
 	    		}
 	    		
 	    		if (recoveredNode1.getEndpoints().size() == 2) {
-	    			System.out.println("Passing number of endpoints for node 1");
+	    			System.out.print("c");
 	    			passedTests++;
 	    		}
 	    		
 	    		if (recoveredNode1.getNeighborIds().size() == 1) {
-	    			System.out.println("Passing number of neighbors");
+	    			System.out.print("d");
 	    			passedTests++;
 	    		}
 	    		
@@ -185,7 +185,7 @@ public class NodeRegistrationIT {
 		    		devices.get((short)18) == HomeAutomationDevice.DIMMABLE_LIGHT &&
 		    		devices.get((short)3) == HomeAutomationDevice.SIMPLE_SENSOR
 		    		) {
-		    		System.out.println("Passing number of devices");
+		    		System.out.print("e");
 			    	passedTests++;
 		    	}
 			    	
@@ -194,12 +194,13 @@ public class NodeRegistrationIT {
 	        	int numJobs = JsonUtils.getListFrom(getJobsResponse, NetworkJob.class).size();
 	        	
 	        	if (numJobs == 0) {
-	        		System.out.println("Passing no jobs");
+	        		System.out.print("f");
 	        		passedTests++;
 	        	}
 	        		
 	        	
 	    	}
+	    	System.out.println();
 	    	
 	    	if (passedTests == testsToPass)
 	    		break;

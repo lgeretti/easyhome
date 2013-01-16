@@ -119,7 +119,6 @@ public final class NetworkResource {
         if (!resEjb.exists(node)) {
         	throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
-
         resEjb.updateManaged(node);	
         	
         return Response.ok().build();

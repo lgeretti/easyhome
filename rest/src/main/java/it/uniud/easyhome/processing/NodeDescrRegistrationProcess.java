@@ -61,16 +61,19 @@ public class NodeDescrRegistrationProcess extends Process {
 	        		byte gid = descr.getSrcCoords().getGatewayId();
 	        		short address = descr.getAddrOfInterest();
 	        		
-	        		ClientResponse nodeResponse = restResource.path("network").path(Byte.toString(gid)).path(Short.toString(address))
-	                											   .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-	        		Node node = JsonUtils.getFrom(nodeResponse, Node.class);
-
-    				node.setLogicalType(descr.getLogicalType());
-    				node.setManufacturer(descr.getManufacturerCode());
-
-	                ClientResponse updateResponse = restResource.path("network").path("update")
-	                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
-	                
+	        		ClientResponse updateResponse;
+	        		Node node;
+	        		synchronized(nodesLock) {
+		        		ClientResponse nodeResponse = restResource.path("network").path(Byte.toString(gid)).path(Short.toString(address))
+		                											   .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+		        		node = JsonUtils.getFrom(nodeResponse, Node.class);
+	
+	    				node.setLogicalType(descr.getLogicalType());
+	    				node.setManufacturer(descr.getManufacturerCode());
+	
+		                updateResponse = restResource.path("network").path("update")
+		                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
+	        		}
 	                if (updateResponse.getClientResponseStatus() == Status.OK) {
 	                	
 		                MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();
@@ -91,6 +94,7 @@ public class NodeDescrRegistrationProcess extends Process {
 	                	println("Node " + node.getName() + " updated with logical type information " + descr.getLogicalType() + " and manufacturer " + descr.getManufacturerCode());
 	                } else
 	                	println("Node " + node.getName() + " logical type information and manufacturer update failed");
+	                
 	    	       
 	        	} catch (InvalidPacketTypeException e) {
 	        		e.printStackTrace();

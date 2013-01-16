@@ -65,14 +65,19 @@ public class SimpleDescrRegistrationProcess extends Process {
 	        		
 	        		HomeAutomationDevice device = descr.getDevice();
 	        		
-	        		ClientResponse nodeResponse = restResource.path("network").path(Byte.toString(gid)).path(Short.toString(address))
-	                		.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-	        		Node node = JsonUtils.getFrom(nodeResponse, Node.class);
+	        		Node node;
+	        		ClientResponse updateResponse;
+	        		
+	        		synchronized(nodesLock) {
+		        		ClientResponse nodeResponse = restResource.path("network").path(Byte.toString(gid)).path(Short.toString(address))
+		                		.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+		        		node = JsonUtils.getFrom(nodeResponse, Node.class);
 
-    				node.addDevice(endpoint, device);
-    				
-	                ClientResponse updateResponse = restResource.path("network").path("update")
-	                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
+	    				node.addDevice(endpoint, device);
+	    				
+		                updateResponse = restResource.path("network").path("update")
+		                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);	        			
+	        		}
 	                
 	                if (updateResponse.getClientResponseStatus() == Status.OK) {
 	                	

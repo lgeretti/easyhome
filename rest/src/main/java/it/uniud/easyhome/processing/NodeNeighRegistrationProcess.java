@@ -41,15 +41,20 @@ public class NodeNeighRegistrationProcess extends Process {
 	        		
 	        		List<Long> neighborIds = neighPkt.getNeighborIds();
 	        			
-	        		// FIXME : source coordinates are useless, must find another way
-	        		Node node = restResource.path("network")
-	        							.path(Byte.toString(neighPkt.getSrcCoords().getGatewayId())).path(Short.toString(neighPkt.getSrcCoords().getAddress()))
-	        							.accept(MediaType.APPLICATION_JSON).get(Node.class);
-	        		node.setNeighbors(neighborIds);
-
-	                ClientResponse updateResponse = restResource.path("network").path("update")
-	                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
-	                
+	        		Node node;
+	        		ClientResponse updateResponse;
+	        		
+	        		synchronized(nodesLock) {
+		        		// FIXME : source coordinates are useless, must find another way
+		        		node = restResource.path("network")
+		        							.path(Byte.toString(neighPkt.getSrcCoords().getGatewayId())).path(Short.toString(neighPkt.getSrcCoords().getAddress()))
+		        							.accept(MediaType.APPLICATION_JSON).get(Node.class);
+		        		node.setNeighbors(neighborIds);
+	
+		        		
+		                updateResponse = restResource.path("network").path("update")
+		                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
+	        		}
 	                if (updateResponse.getClientResponseStatus() == Status.OK)
 	                	println("Node '" + node.getName() + "' updated with neighbors information");
 	                else

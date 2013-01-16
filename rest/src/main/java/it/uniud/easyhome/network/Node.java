@@ -79,6 +79,7 @@ public class Node implements Serializable {
 	}
     
 	public void setEndpoints(List<Short> endpoints) {
+		this.devices.clear();
 		for (Short ep : endpoints) {
 			this.devices.add(new DeviceIdentifier(ep,HomeAutomationDevice.UNKNOWN));
 		}

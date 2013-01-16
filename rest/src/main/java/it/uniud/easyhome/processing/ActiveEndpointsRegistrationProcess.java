@@ -61,13 +61,17 @@ public class ActiveEndpointsRegistrationProcess extends Process {
 	        		byte gatewayId = activeEpPkt.getSrcCoords().getGatewayId();
 	        		short address = activeEpPkt.getAddrOfInterest();
 	                
-	        		Node node = restResource.path("network").path(Byte.toString(gatewayId)).path(Short.toString(address))
-	        								.accept(MediaType.APPLICATION_JSON).get(Node.class);
-	        		node.setEndpoints(activeEps);
-
-	                ClientResponse updateResponse = restResource.path("network").path("update")
-	                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
-	                
+	        		Node node;
+	        		ClientResponse updateResponse;
+	        		
+	        		synchronized(nodesLock) {
+		        		node = restResource.path("network").path(Byte.toString(gatewayId)).path(Short.toString(address))
+		        								.accept(MediaType.APPLICATION_JSON).get(Node.class);
+		        		node.setEndpoints(activeEps);
+	
+		                updateResponse = restResource.path("network").path("update")
+		                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
+	        		}
 	                if (updateResponse.getClientResponseStatus() == Status.OK) {
 	                	
 		                MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();
