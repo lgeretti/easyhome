@@ -1,6 +1,5 @@
 package it.uniud.easyhome.network.mock;
 
-import it.uniud.easyhome.common.ByteUtils;
 import it.uniud.easyhome.common.RunnableState;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.packets.Packet;

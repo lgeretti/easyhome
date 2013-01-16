@@ -39,27 +39,28 @@ public class NodeNeighRegistrationProcess extends Process {
 	        	try {
 	        		NodeNeighRspPacket neighPkt = new NodeNeighRspPacket(pkt);
 	        		
-	        		List<Long> neighborIds = neighPkt.getNeighborIds();
-	        			
-	        		Node node;
-	        		ClientResponse updateResponse;
-	        		
-	        		synchronized(nodesLock) {
-		        		// FIXME : source coordinates are useless, must find another way
-		        		node = restResource.path("network")
-		        							.path(Byte.toString(neighPkt.getSrcCoords().getGatewayId())).path(Short.toString(neighPkt.getSrcCoords().getAddress()))
-		        							.accept(MediaType.APPLICATION_JSON).get(Node.class);
-		        		node.setNeighbors(neighborIds);
-	
+	        		if (neighPkt.isSuccessful()) {
+		        		List<Long> neighborIds = neighPkt.getNeighborIds();
+		        			
+		        		Node node;
+		        		ClientResponse updateResponse;
 		        		
-		                updateResponse = restResource.path("network").path("update")
-		                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
+		        		synchronized(nodesLock) {
+			        		// FIXME : source coordinates are useless, must find another way
+			        		node = restResource.path("network")
+			        							.path(Byte.toString(neighPkt.getSrcCoords().getGatewayId())).path(Short.toString(neighPkt.getSrcCoords().getAddress()))
+			        							.accept(MediaType.APPLICATION_JSON).get(Node.class);
+			        		node.setNeighbors(neighborIds);
+		
+			        		
+			                updateResponse = restResource.path("network").path("update")
+			                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
+		        		}
+		                if (updateResponse.getClientResponseStatus() == Status.OK)
+		                	println("Node '" + node.getName() + "' updated with neighbors information");
+		                else
+		                	println("Node '" + node.getName() + "' neighbors information update failed");
 	        		}
-	                if (updateResponse.getClientResponseStatus() == Status.OK)
-	                	println("Node '" + node.getName() + "' updated with neighbors information");
-	                else
-	                	println("Node '" + node.getName() + "' neighbors information update failed");
-	        		
 	        	} catch (InvalidPacketTypeException e) {
 	        		e.printStackTrace();
 	        	}

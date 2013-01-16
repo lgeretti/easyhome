@@ -1,30 +1,13 @@
 package it.uniud.easyhome.rest;
 
+import it.uniud.easyhome.network.*;
 
-import it.uniud.easyhome.common.JsonUtils;
-import it.uniud.easyhome.devices.HomeAutomationDevice;
-import it.uniud.easyhome.gateway.ProtocolType;
-import it.uniud.easyhome.network.NetworkEJB;
-import it.uniud.easyhome.network.NetworkJob;
-import it.uniud.easyhome.network.NetworkJobType;
-import it.uniud.easyhome.network.Node;
-import it.uniud.easyhome.network.NodeLogicalType;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.ws.rs.core.*;
 import javax.ws.rs.*;
-
-import org.codehaus.jettison.json.JSONException;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
 
 /** Handles the access to the network of nodes */
 @Path("/network")

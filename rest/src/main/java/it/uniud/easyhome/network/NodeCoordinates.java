@@ -1,8 +1,5 @@
 package it.uniud.easyhome.network;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
 
 /** 
@@ -41,13 +38,13 @@ public class NodeCoordinates implements Serializable {
     public String toString() {
     	StringBuilder strb = new StringBuilder();
     	
-    	strb.append("{G: ")
+    	strb.append("(")
     		.append(gid)
-    		.append("; N: ")
-    		.append(nuid)
-    		.append("; A:")
-    		.append(address)
-    		.append("}");
+    		.append(":")
+    		.append(Long.toHexString(nuid))
+    		.append(":")
+    		.append(Integer.toHexString(0xFFFF & address))
+    		.append(")");
     	
     	return strb.toString();
     }

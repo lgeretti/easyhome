@@ -35,6 +35,10 @@ public class ActiveEndpointsRspPacket extends NativePacket {
 	public ActiveEndpointsRspPacket(NativePacket pkt) {
 		this(pkt.getSrcCoords(),pkt.getDstCoords(),pkt.getOperation());
 	}
+
+	public boolean isSuccessful() {
+		return (this.getOperation().getData()[0] == 0);
+	}
 	
 	public short getAddrOfInterest() {
 		return ByteUtils.getShort(getOperation().getData(), 1, Endianness.LITTLE_ENDIAN); 

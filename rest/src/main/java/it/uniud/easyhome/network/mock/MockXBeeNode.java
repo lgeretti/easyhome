@@ -6,23 +6,15 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import it.uniud.easyhome.common.ByteUtils;
-import it.uniud.easyhome.common.Endianness;
-import it.uniud.easyhome.common.RunnableState;
+import it.uniud.easyhome.common.*;
 import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.devices.HomeAutomationDevice;
 import it.uniud.easyhome.network.Manufacturer;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.packets.Domain;
-import it.uniud.easyhome.packets.Packet;
-import it.uniud.easyhome.packets.xbee.XBeePacketToNode;
-import it.uniud.easyhome.packets.xbee.XBeePacketFromNode;
-import it.uniud.easyhome.packets.xbee.mock.ActiveEpRspOutpkt;
-import it.uniud.easyhome.packets.xbee.mock.DeviceAnnounceOutpkt;
-import it.uniud.easyhome.packets.xbee.mock.NodeDescrRspOutpkt;
-import it.uniud.easyhome.packets.xbee.mock.NodeLQIRspOutpkt;
-import it.uniud.easyhome.packets.xbee.mock.SimpleDescRspOutpkt;
+import it.uniud.easyhome.packets.xbee.*;
+import it.uniud.easyhome.packets.xbee.mock.*;
 
 public class MockXBeeNode implements Runnable {
 

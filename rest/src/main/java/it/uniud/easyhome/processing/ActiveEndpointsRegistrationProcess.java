@@ -56,44 +56,46 @@ public class ActiveEndpointsRegistrationProcess extends Process {
 	        	try {
 	        		ActiveEndpointsRspPacket activeEpPkt = new ActiveEndpointsRspPacket(pkt);
 	        		
-	        		List<Short> activeEps = activeEpPkt.getActiveEndpoints();
-	        		
-	        		byte gatewayId = activeEpPkt.getSrcCoords().getGatewayId();
-	        		short address = activeEpPkt.getAddrOfInterest();
-	                
-	        		Node node;
-	        		ClientResponse updateResponse;
-	        		
-	        		synchronized(nodesLock) {
-		        		node = restResource.path("network").path(Byte.toString(gatewayId)).path(Short.toString(address))
-		        								.accept(MediaType.APPLICATION_JSON).get(Node.class);
-		        		node.setEndpoints(activeEps);
-	
-		                updateResponse = restResource.path("network").path("update")
-		                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
+	        		if (activeEpPkt.isSuccessful()) {
+	        			
+		        		List<Short> activeEps = activeEpPkt.getActiveEndpoints();
+		        		
+		        		byte gatewayId = activeEpPkt.getSrcCoords().getGatewayId();
+		        		short address = activeEpPkt.getAddrOfInterest();
+		                
+		        		Node node;
+		        		ClientResponse updateResponse;
+		        		
+		        		synchronized(nodesLock) {
+			        		node = restResource.path("network").path(Byte.toString(gatewayId)).path(Short.toString(address))
+			        								.accept(MediaType.APPLICATION_JSON).get(Node.class);
+			        		node.setEndpoints(activeEps);
+		
+			                updateResponse = restResource.path("network").path("update")
+			                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
+		        		}
+		                if (updateResponse.getClientResponseStatus() == Status.OK) {
+		                	
+			                MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();
+			                queryData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
+			                queryData.add("gid",String.valueOf(gatewayId));
+			                queryData.add("address",String.valueOf(address));
+			                
+			                println("Deleting NODE_ACTIVE_ENDPOINTS_REQUEST job for " + node.getName());
+			                
+			                restResource.path("network").path("jobs").queryParams(queryData).delete(ClientResponse.class);
+			                
+		                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_ENDPOINTS_ACQUIRED, gatewayId, address);
+		                    try {
+		                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
+		                        networkEventsProducer.send(eventMessage);
+		                        println("Node " + node.getName() + " updated with endpoints information (" + Arrays.toString(activeEps.toArray()) + ")");
+		                    } catch (Exception e) {
+		                    	println("Node active endpoints registration message could not be dispatched to inbound packets topic");
+		                    }
+		                } else
+		                	println("Node active endpoints information update failed");
 	        		}
-	                if (updateResponse.getClientResponseStatus() == Status.OK) {
-	                	
-		                MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();
-		                queryData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
-		                queryData.add("gid",String.valueOf(gatewayId));
-		                queryData.add("address",String.valueOf(address));
-		                
-		                println("Deleting NODE_ACTIVE_ENDPOINTS_REQUEST job for " + node.getName());
-		                
-		                restResource.path("network").path("jobs").queryParams(queryData).delete(ClientResponse.class);
-		                
-	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_ENDPOINTS_ACQUIRED, gatewayId, address);
-	                    try {
-	                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
-	                        networkEventsProducer.send(eventMessage);
-	                        println("Node " + node.getName() + " updated with endpoints information (" + Arrays.toString(activeEps.toArray()) + ")");
-	                    } catch (Exception e) {
-	                    	println("Node active endpoints registration message could not be dispatched to inbound packets topic");
-	                    }
-	                } else
-	                	println("Node active endpoints information update failed");
-	                
 	        		
 	        	} catch (Exception e) {
 	        		e.printStackTrace();

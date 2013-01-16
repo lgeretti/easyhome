@@ -1,12 +1,5 @@
 package it.uniud.easyhome.rest;
 
-import java.lang.reflect.Array;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import it.uniud.easyhome.devices.DeviceIdentifier;
-import it.uniud.easyhome.devices.DevicesWrapper;
 import it.uniud.easyhome.gateway.Gateway;
 import it.uniud.easyhome.network.NetworkJob;
 import it.uniud.easyhome.network.Node;

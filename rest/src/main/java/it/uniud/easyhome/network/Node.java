@@ -7,9 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import it.uniud.easyhome.common.ConcreteClassBuilder;
-import it.uniud.easyhome.devices.Device;
 import it.uniud.easyhome.devices.DeviceIdentifier;
-import it.uniud.easyhome.devices.DevicesWrapper;
 import it.uniud.easyhome.devices.HomeAutomationDevice;
 import it.uniud.easyhome.exceptions.EndpointNotFoundException;
 import it.uniud.easyhome.exceptions.InvalidNodeTypeException;

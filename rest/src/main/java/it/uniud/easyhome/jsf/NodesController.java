@@ -1,7 +1,6 @@
 package it.uniud.easyhome.jsf;
 
 import java.util.List;
-import java.util.Random;
 
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.network.NetworkEJB;
@@ -33,8 +32,6 @@ public class NodesController implements Runnable {
     
     private static final long EVENT_WAIT_TIME_MILLIS = 500;
     
-    private Random rnd;
-    
     private volatile boolean stopped;
     
     private PortableRenderer pRenderer;
@@ -44,7 +41,6 @@ public class NodesController implements Runnable {
 	
     @PostConstruct
     public void init() {
-    	rnd = new Random();
         PushRenderer.addCurrentView(PUSH_GROUP);
         Thread thr = new Thread(this);
         thr.start();

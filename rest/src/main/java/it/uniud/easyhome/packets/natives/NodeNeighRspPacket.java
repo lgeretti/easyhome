@@ -34,6 +34,10 @@ public class NodeNeighRspPacket extends NativePacket {
 	public NodeNeighRspPacket(NativePacket pkt) {
 		this(pkt.getSrcCoords(),pkt.getDstCoords(),pkt.getOperation());
 	}
+	
+	public boolean isSuccessful() {
+		return (this.getOperation().getData()[0] == 0);
+	}
 
 	public List<Long> getNeighborIds() {
 		

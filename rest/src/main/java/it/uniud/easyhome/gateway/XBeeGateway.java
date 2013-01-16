@@ -111,7 +111,7 @@ public class XBeeGateway extends Gateway {
     				
     	} finally {
 
-    		// Reduces the buffer the original amount minus the bytes consumed by the packet
+    		// Reduces the buffer to the original amount minus the bytes consumed by the packet
        		buffer.reset();
         	if (readBytes < originalBuffer.length)
         		buffer.write(originalBuffer, readBytes, originalBuffer.length-readBytes);

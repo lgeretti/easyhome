@@ -20,6 +20,7 @@ import it.uniud.easyhome.packets.xbee.XBeePacketFromNode;
 public final class SimpleDescRspOutpkt extends XBeePacketFromNode {
 
 	private static int APS_PAYLOAD_SIZE_FIXED = 4;
+	private static byte SIMPLE_DESCRIPTOR_SIZE = 8;
 	
 	public SimpleDescRspOutpkt(MockXBeeNode node, byte endpoint) throws InvalidMockNodeException, MockXBeeNodeNotFoundException {
 		
@@ -28,7 +29,7 @@ public final class SimpleDescRspOutpkt extends XBeePacketFromNode {
 		HomeAutomationDevice dev = devices.get(new Short(endpoint));
 		
 		// We do not send the actual clusters used
-		final int APS_PAYLOAD_SIZE = APS_PAYLOAD_SIZE_FIXED + 12;
+		final int APS_PAYLOAD_SIZE = APS_PAYLOAD_SIZE_FIXED + SIMPLE_DESCRIPTOR_SIZE;
 		
 		dstAddr64 = 0x0L;
 		dstAddr16 = (short)0x0;
@@ -45,7 +46,7 @@ public final class SimpleDescRspOutpkt extends XBeePacketFromNode {
 		apsPayload[1] = nwkAddr[0];
 		apsPayload[2] = nwkAddr[1];
 		
-		apsPayload[3] = 12;
+		apsPayload[3] = SIMPLE_DESCRIPTOR_SIZE;
 		
 		// Endpoint
 		apsPayload[4] = endpoint;

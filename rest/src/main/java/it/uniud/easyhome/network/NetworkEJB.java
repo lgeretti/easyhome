@@ -2,21 +2,16 @@ package it.uniud.easyhome.network;
 
 
 import it.uniud.easyhome.exceptions.MultipleNodesFoundException;
-import it.uniud.easyhome.exceptions.NodeNotFoundException;
-import it.uniud.easyhome.gateway.HubContext;
 
 import java.util.List;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
-import javax.persistence.Parameter;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Subquery;
 
 @Stateless
 public class NetworkEJB {
@@ -130,17 +125,6 @@ public class NetworkEJB {
         
         return query.getResultList();
 	}
-	
-	/*
-	public List<NetworkJob> getLatestJobs(NetworkJobType type) {
-        
-        String queryString = "SELECT j FROM NetworkJob j WHERE j.id IN (SELECT MAX(j2.id) FROM NetworkJob j2 " + 
-        					 "WHERE j2.type=:t GROUP BY j2.gatewayId, j2.address, j2.endpoint)";
-        TypedQuery<NetworkJob> query = em.createQuery(queryString,NetworkJob.class).setParameter("t", type);
-        
-        return query.getResultList();		
-	}
-	*/
 
 	public List<NetworkJob> getLatestJobs(NetworkJobType type, byte gatewayId, short address, byte endpoint, byte tsn) {
 		

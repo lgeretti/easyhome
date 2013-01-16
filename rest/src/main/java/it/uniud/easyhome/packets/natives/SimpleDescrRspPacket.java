@@ -35,18 +35,22 @@ public class SimpleDescrRspPacket extends NativePacket {
 		this(pkt.getSrcCoords(),pkt.getDstCoords(),pkt.getOperation());
 	}
 	
-	public HomeAutomationDevice getDevice() {
-		
-		short deviceCode = ByteUtils.getShort(this.getOperation().getData(), 7, Endianness.LITTLE_ENDIAN);
-		return HomeAutomationDevice.fromCode(deviceCode);
+	public boolean isSuccessful() {
+		return (this.getOperation().getData()[0] == 0);
 	}
-	
+
+	public short getAddrOfInterest() {
+		return ByteUtils.getShort(this.getOperation().getData(), 1, Endianness.LITTLE_ENDIAN);
+	}
+
 	public byte getEndpoint() {
 		return this.getOperation().getData()[4];
 	}
 	
-	public short getAddrOfInterest() {
-		return ByteUtils.getShort(this.getOperation().getData(), 1, Endianness.LITTLE_ENDIAN);
+	public HomeAutomationDevice getDevice() {
+		
+		short deviceCode = ByteUtils.getShort(this.getOperation().getData(), 7, Endianness.LITTLE_ENDIAN);
+		return HomeAutomationDevice.fromCode(deviceCode);
 	}
 	
 	public static boolean validates(NativePacket pkt) {

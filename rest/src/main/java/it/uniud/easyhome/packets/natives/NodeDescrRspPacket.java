@@ -63,6 +63,10 @@ public class NodeDescrRspPacket extends NativePacket {
 		return Manufacturer.fromCode(raw);
 	}
 	
+	public boolean isSuccessful() {
+		return (this.getOperation().getData()[0] == 0);
+	}
+	
 	public short getAddrOfInterest() {
 		
 		return ByteUtils.getShort(getOperation().getData(), 1, Endianness.LITTLE_ENDIAN); 

@@ -1,10 +1,5 @@
 package it.uniud.easyhome.network;
 
-import it.uniud.easyhome.common.ByteUtils;
-import it.uniud.easyhome.contexts.ManagementContext;
-import it.uniud.easyhome.exceptions.InvalidContextException;
-import it.uniud.easyhome.exceptions.InvalidManufacturerCodeException;
-
 public enum Manufacturer {
 
 	DIGI ((short)0x101E), 

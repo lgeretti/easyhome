@@ -3,9 +3,9 @@ package it.uniud.easyhome.packets;
 public enum Domain {
 
 	MANAGEMENT((short)0),
-	HOME_AUTOMATION((short)260),
-	EASYHOME_MANAGEMENT((short)59984),
-	EASYHOME((short)59985);
+	HOME_AUTOMATION((short)0x0104),
+	EASYHOME_MANAGEMENT((short)0xEA50),
+	EASYHOME((short)0xEA51);
 	
 	private short code;
 	

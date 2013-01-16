@@ -58,43 +58,44 @@ public class NodeDescrRegistrationProcess extends Process {
 	        	try {
 	        		NodeDescrRspPacket descr = new NodeDescrRspPacket(pkt);
 	        		
-	        		byte gid = descr.getSrcCoords().getGatewayId();
-	        		short address = descr.getAddrOfInterest();
-	        		
-	        		ClientResponse updateResponse;
-	        		Node node;
-	        		synchronized(nodesLock) {
-		        		ClientResponse nodeResponse = restResource.path("network").path(Byte.toString(gid)).path(Short.toString(address))
-		                											   .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-		        		node = JsonUtils.getFrom(nodeResponse, Node.class);
-	
-	    				node.setLogicalType(descr.getLogicalType());
-	    				node.setManufacturer(descr.getManufacturerCode());
-	
-		                updateResponse = restResource.path("network").path("update")
-		                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
+	        		if (descr.isSuccessful()) {
+		        		byte gid = descr.getSrcCoords().getGatewayId();
+		        		short address = descr.getAddrOfInterest();
+		        		
+		        		ClientResponse updateResponse;
+		        		Node node;
+		        		synchronized(nodesLock) {
+			        		ClientResponse nodeResponse = restResource.path("network").path(Byte.toString(gid)).path(Short.toString(address))
+			                											   .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+			        		node = JsonUtils.getFrom(nodeResponse, Node.class);
+		
+		    				node.setLogicalType(descr.getLogicalType());
+		    				node.setManufacturer(descr.getManufacturerCode());
+		
+			                updateResponse = restResource.path("network").path("update")
+			                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
+		        		}
+		                if (updateResponse.getClientResponseStatus() == Status.OK) {
+		                	
+			                MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();
+			                queryData.add("type",NetworkJobType.NODE_DESCR_REQUEST.toString());
+			                queryData.add("gid",String.valueOf(gid));
+			                queryData.add("address",String.valueOf(address));
+			                
+			                println("Deleting NODE_DESCR_REQUEST job for " + node.getName());
+			                
+			                restResource.path("network").path("jobs").queryParams(queryData).delete(ClientResponse.class);
+		                	
+		                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_DESCR_ACQUIRED, node.getGatewayId(), node.getAddress());
+		                    try {
+		                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
+		                        networkEventsProducer.send(eventMessage);
+		                    } catch (JMSException ex) { }
+		                    
+		                	println("Node " + node.getName() + " updated with logical type information " + descr.getLogicalType() + " and manufacturer " + descr.getManufacturerCode());
+		                } else
+		                	println("Node " + node.getName() + " logical type information and manufacturer update failed");
 	        		}
-	                if (updateResponse.getClientResponseStatus() == Status.OK) {
-	                	
-		                MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();
-		                queryData.add("type",NetworkJobType.NODE_DESCR_REQUEST.toString());
-		                queryData.add("gid",String.valueOf(gid));
-		                queryData.add("address",String.valueOf(address));
-		                
-		                println("Deleting NODE_DESCR_REQUEST job for " + node.getName());
-		                
-		                restResource.path("network").path("jobs").queryParams(queryData).delete(ClientResponse.class);
-	                	
-	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_DESCR_ACQUIRED, node.getGatewayId(), node.getAddress());
-	                    try {
-	                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
-	                        networkEventsProducer.send(eventMessage);
-	                    } catch (JMSException ex) { }
-	                    
-	                	println("Node " + node.getName() + " updated with logical type information " + descr.getLogicalType() + " and manufacturer " + descr.getManufacturerCode());
-	                } else
-	                	println("Node " + node.getName() + " logical type information and manufacturer update failed");
-	                
 	    	       
 	        	} catch (InvalidPacketTypeException e) {
 	        		e.printStackTrace();
