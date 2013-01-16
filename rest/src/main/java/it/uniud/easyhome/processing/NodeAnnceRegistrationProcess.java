@@ -67,7 +67,6 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                formData = new MultivaluedMapImpl();
 	                formData.add("type",NetworkJobType.NODE_DESCR_REQUEST.toString());
 	                formData.add("gid",Byte.toString(gatewayId));
-	                formData.add("nuid",Long.toString(nuid));
 	                formData.add("address",Short.toString(address));
 	                
 	                ClientResponse jobInsertionResponse1 = restResource.path("network").path("jobs")
@@ -76,7 +75,6 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                formData = new MultivaluedMapImpl();
 	                formData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
 	                formData.add("gid",Byte.toString(gatewayId));
-	                formData.add("nuid",Long.toString(nuid));
 	                formData.add("address",Short.toString(address));                
 
 	                ClientResponse jobInsertionResponse2 = restResource.path("network").path("jobs")
@@ -87,7 +85,7 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                
 	                if (nodeInsertionResponse.getClientResponseStatus() == Status.CREATED && jobInsertionsSuccessful) {
 	                	
-	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_ADDED, gatewayId, nuid, address);
+	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_ADDED, gatewayId, address);
 	                    try {
 	                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
 	                        networkEventsProducer.send(eventMessage);
@@ -98,7 +96,7 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                	
 	                } else if (nodeInsertionResponse.getClientResponseStatus() == Status.OK && jobInsertionsSuccessful) {
 	                	
-	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_ADDED, gatewayId, nuid, address);
+	                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_ADDED, gatewayId, address);
 	                    try {
 	                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
 	                        networkEventsProducer.send(eventMessage);

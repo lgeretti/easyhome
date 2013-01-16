@@ -33,7 +33,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
-@Ignore
+
 public class NodeRegistrationIT {
     
 	private final static int XBEE_GATEWAY_PORT = 5050;
@@ -91,6 +91,7 @@ public class NodeRegistrationIT {
 		
 		ClientResponse nodeAnnceRegProcessInsertion = insertProcess(ProcessKind.NODE_ANNCE_REGISTRATION);
 		assertEquals(ClientResponse.Status.CREATED,nodeAnnceRegProcessInsertion.getClientResponseStatus());
+		
 		ClientResponse nodeDescrAcqProcessInsertion = insertProcess(ProcessKind.NODE_DESCR_REQUEST);
 		assertEquals(ClientResponse.Status.CREATED,nodeDescrAcqProcessInsertion.getClientResponseStatus());
 		ClientResponse nodeDescrRegProcessInsertion = insertProcess(ProcessKind.NODE_DESCR_REGISTRATION);
@@ -100,26 +101,27 @@ public class NodeRegistrationIT {
 		assertEquals(ClientResponse.Status.CREATED,activeEpAcqProcessInsertion.getClientResponseStatus());		
 		ClientResponse activeEpRegProcessInsertion = insertProcess(ProcessKind.ACTIVE_ENDPOINTS_REGISTRATION);
 		assertEquals(ClientResponse.Status.CREATED,activeEpRegProcessInsertion.getClientResponseStatus());			
-		
+
 		ClientResponse nodeNeighAcqProcessInsertion = insertProcess(ProcessKind.NODE_NEIGH_REQUEST);
 		assertEquals(ClientResponse.Status.CREATED,nodeNeighAcqProcessInsertion.getClientResponseStatus());
 		ClientResponse nodeNeighRegProcessInsertion = insertProcess(ProcessKind.NODE_NEIGH_REGISTRATION);
-		assertEquals(ClientResponse.Status.CREATED,nodeNeighRegProcessInsertion.getClientResponseStatus());	
+		assertEquals(ClientResponse.Status.CREATED,nodeNeighRegProcessInsertion.getClientResponseStatus());
 		
 		ClientResponse nodeSimpleDescrAcqProcessInsertion = insertProcess(ProcessKind.SIMPLE_DESCR_REQUEST);
 		assertEquals(ClientResponse.Status.CREATED,nodeSimpleDescrAcqProcessInsertion.getClientResponseStatus());
 		ClientResponse nodeSimpleDescrRegProcessInsertion = insertProcess(ProcessKind.SIMPLE_DESCR_REGISTRATION);
 		assertEquals(ClientResponse.Status.CREATED,nodeSimpleDescrRegProcessInsertion.getClientResponseStatus());
 		
+		
         Node node1 = new Node.Builder(1,0xA1L)
-        							 .setAddress((short)0x00CD)
+        							 .setAddress((short)0x10CD)
         							 .setGatewayId((byte)gid)
         							 .setCapability((byte)0x7A)
         							 .setLogicalType(NodeLogicalType.ROUTER)
         							 .setManufacturer(Manufacturer.DIGI).build();
         
         Node node2 = new Node.Builder(2,0xA2L)
-		 .setAddress((short)0xCDEF)
+		 .setAddress((short)0xBDEF)
 		 .setGatewayId((byte)gid)
 		 .setCapability((byte)0x7A)
 		 .setLogicalType(NodeLogicalType.ROUTER)
@@ -139,37 +141,73 @@ public class NodeRegistrationIT {
         int counter = 0;
         long sleepTime = 500;
         long maximumSleepTime = 8000;
+        int testsToPass = 6;
+        int passedTests = 0;
         while (sleepTime*counter < maximumSleepTime) {
         	counter++;
+        	System.out.println("Run #" + counter);
+        	passedTests = 0;
+        	
 	    	ClientResponse getNodesResponse = client.resource(TARGET).path("network")
 						.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	    	List<Node> nodes = JsonUtils.getListFrom(getNodesResponse, Node.class);
 	    	
 	    	if (nodes.size() == 2) {
-
+	    		System.out.println("Passing number of nodes");
+	    		passedTests++;
+	    		
 	    		Node recoveredNode1 = client.resource(TARGET).path("network")
 	    									.path(Byte.toString(node1.getGatewayId())).path(Short.toString(node1.getAddress()))
 	    									.accept(MediaType.APPLICATION_JSON).get(Node.class);
+	    		Node recoveredNode2 = client.resource(TARGET).path("network")
+						.path(Byte.toString(node2.getGatewayId())).path(Short.toString(node2.getAddress()))
+						.accept(MediaType.APPLICATION_JSON).get(Node.class);
+
 	    		
-	    		Map<Short,HomeAutomationDevice> devices = recoveredNode1.getMappedDevices();
-	    		if (recoveredNode1.getNeighborIds().size() == 1 &&
-	    			devices.size() == 2 &&
-	    			devices.get((short)18) == HomeAutomationDevice.DIMMABLE_LIGHT &&
-	    			devices.get((short)3) == HomeAutomationDevice.SIMPLE_SENSOR
-	    			)
-		    		break;
+	    		if (recoveredNode1.getLogicalType() == NodeLogicalType.ROUTER && recoveredNode2.getLogicalType() == NodeLogicalType.ROUTER) {
+	    			System.out.println("Passing node logical types");
+	    			passedTests++;
+	    		}
+	    		
+	    		if (recoveredNode1.getEndpoints().size() == 2) {
+	    			System.out.println("Passing number of endpoints for node 1");
+	    			passedTests++;
+	    		}
+	    		
+	    		if (recoveredNode1.getNeighborIds().size() == 1) {
+	    			System.out.println("Passing number of neighbors");
+	    			passedTests++;
+	    		}
+	    		
+		    	Map<Short,HomeAutomationDevice> devices = recoveredNode1.getMappedDevices();
+		    	
+		    	if (devices.size() == 2 &&
+		    		devices.get((short)18) == HomeAutomationDevice.DIMMABLE_LIGHT &&
+		    		devices.get((short)3) == HomeAutomationDevice.SIMPLE_SENSOR
+		    		) {
+		    		System.out.println("Passing number of devices");
+			    	passedTests++;
+		    	}
+			    	
+	        	ClientResponse getJobsResponse = client.resource(TARGET).path("network").path("jobs")
+	    				.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	        	int numJobs = JsonUtils.getListFrom(getJobsResponse, NetworkJob.class).size();
+	        	
+	        	if (numJobs == 0) {
+	        		System.out.println("Passing no jobs");
+	        		passedTests++;
+	        	}
+	        		
+	        	
 	    	}
+	    	
+	    	if (passedTests == testsToPass)
+	    		break;
 	    	
 	    	Thread.sleep(sleepTime);
         }
-        
-    	assertTrue(sleepTime*counter < maximumSleepTime);
     	
-    	ClientResponse getJobsResponse = client.resource(TARGET).path("network").path("jobs")
-				.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-    	int numJobs = JsonUtils.getListFrom(getJobsResponse, NetworkJob.class).size();
-    	
-    	assertEquals(0,numJobs);
+    	assertEquals(testsToPass,passedTests);
     	
     	mn.turnOff();
     	mn.unregisterAll();

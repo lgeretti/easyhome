@@ -38,6 +38,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
+@Ignore
 public class NetworkResourceIT {
 	
 	private static final String TARGET = "http://localhost:8080/easyhome/rest/network";
@@ -97,7 +98,7 @@ public class NetworkResourceIT {
     	assertEquals(HomeAutomationDevice.UNKNOWN,retrievedDevices.get((short)2));
     	assertEquals(HomeAutomationDevice.LEVEL_CONTROL_SWITCH,retrievedDevices.get((short)7));           
     }
-
+    
 	@Test
 	public void testNoNodes() throws JSONException {
 		
@@ -229,7 +230,7 @@ public class NetworkResourceIT {
 	@After
 	public void removeNodes() {
 		client.resource(TARGET).delete();
-		client.resource(TARGET).path("jobs").delete();
+		//client.resource(TARGET).path("jobs").delete();
 	}
 	
 	private ClientResponse insertNewNode(byte gatewayId, long nuid, short address, byte capability) {
@@ -246,7 +247,7 @@ public class NetworkResourceIT {
 	@Test
 	public void testInsertJob() throws JSONException {
 		
-        ClientResponse insertionResponse = postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,-12983219012L,(short)11,(byte)9,(byte)1);
+        ClientResponse insertionResponse = postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,(short)11,(byte)9,(byte)1);
         
         assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
 
@@ -262,7 +263,7 @@ public class NetworkResourceIT {
 	@Test
 	public void testDeleteJobById() throws JSONException {
 		
-        ClientResponse insertionResponse = postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,-12983219012L,(short)11,(byte)9,(byte)3);
+        ClientResponse insertionResponse = postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,(short)11,(byte)9,(byte)3);
 
         String locationPath = insertionResponse.getLocation().getPath();
         String[] segments = locationPath.split("/");
@@ -277,7 +278,7 @@ public class NetworkResourceIT {
 	@Test
 	public void testDeleteJobByCoords() throws JSONException {
 		
-        postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,-12983219012L,(short)11,(byte)9,(byte)1);
+        postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,(short)11,(byte)9,(byte)1);
 		
 		MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();
 		queryData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
@@ -324,7 +325,7 @@ public class NetworkResourceIT {
 		postBunchOfJobs();
 		
 		MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();
-		queryData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
+		queryData.add("type",NetworkJobType.NODE_DESCR_REQUEST.toString());
 		queryData.add("gid",String.valueOf((byte)3));
 		queryData.add("address",String.valueOf((short)12));
 		queryData.add("endpoint",String.valueOf((byte)7));
@@ -333,31 +334,49 @@ public class NetworkResourceIT {
         List<NetworkJob> jobList = JsonUtils.getListFrom(getResponse,NetworkJob.class);
         
         assertEquals(1,jobList.size());
+        assertEquals((byte)6,jobList.get(0).getTsn());
+	}
+	
+	@Test
+	public void testNodeSpecificJob() throws JSONException {
+		
+		postBunchOfJobs();
+		
+		MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();
+		queryData.add("gid",String.valueOf((byte)3));
+		queryData.add("address",String.valueOf((short)12));
+		queryData.add("endpoint",String.valueOf((byte)7));
+        
+        ClientResponse getResponse = client.resource(TARGET).path("jobs").queryParams(queryData).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        List<NetworkJob> jobList = JsonUtils.getListFrom(getResponse,NetworkJob.class);
+        
+        assertEquals(1,jobList.size());
+        assertEquals((byte)7,jobList.get(0).getTsn());
 	}
 	
 	private void postBunchOfJobs() {
 		
-		postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,1L,(short)9,(byte)9,(byte)1);
-		postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,1L,(short)9,(byte)9,(byte)2);
-		postJob(NetworkJobType.NODE_DESCR_REQUEST,(byte)3,1L,(short)9,(byte)9,(byte)2);
-		postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,2L,(short)10,(byte)9,(byte)3);
-		postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,3L,(short)11,(byte)9,(byte)4);
-		postJob(NetworkJobType.NODE_DESCR_REQUEST,(byte)3,3L,(short)11,(byte)9,(byte)4);
-		postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,3L,(short)11,(byte)10,(byte)5);
-		postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,4L,(short)12,(byte)7,(byte)6);
-		postJob(NetworkJobType.NODE_DESCR_REQUEST,(byte)3,4L,(short)12,(byte)7,(byte)6);
-		postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,4L,(short)12,(byte)7,(byte)7);
-		postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,4L,(short)12,(byte)9,(byte)8);
-		postJob(NetworkJobType.NODE_DESCR_REQUEST,(byte)3,4L,(short)12,(byte)9,(byte)8);
-		postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,4L,(short)12,(byte)15,(byte)9);
+		postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,(short)9,(byte)9,(byte)1);
+		postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,(short)9,(byte)9,(byte)2);
+		postJob(NetworkJobType.NODE_DESCR_REQUEST,           (byte)3,(short)9,(byte)9,(byte)2);
+		postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,(short)10,(byte)9,(byte)3);
+		postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,(short)11,(byte)9,(byte)4);
+		postJob(NetworkJobType.NODE_DESCR_REQUEST,           (byte)3,(short)11,(byte)9,(byte)4);
+		postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,(short)11,(byte)10,(byte)5);
+		postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,(short)12,(byte)7,(byte)6);
+		postJob(NetworkJobType.NODE_DESCR_REQUEST,           (byte)3,(short)12,(byte)7,(byte)5);
+		postJob(NetworkJobType.NODE_DESCR_REQUEST,           (byte)3,(short)12,(byte)7,(byte)6);
+		postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,(short)12,(byte)7,(byte)7);
+		postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,(short)12,(byte)9,(byte)8);
+		postJob(NetworkJobType.NODE_DESCR_REQUEST,           (byte)3,(short)12,(byte)9,(byte)8);
+		postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,(short)12,(byte)15,(byte)9);
 	}
 		
-	private ClientResponse postJob(NetworkJobType type, byte gatewayId, long nuid, short address, byte endpoint, byte tsn) {
+	private ClientResponse postJob(NetworkJobType type, byte gatewayId, short address, byte endpoint, byte tsn) {
 		
 		MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         formData.add("type",type.toString());
         formData.add("gid",Byte.toString(gatewayId));
-        formData.add("nuid",Long.toString(nuid));
         formData.add("address",Short.toString(address));
         formData.add("endpoint",Byte.toString(endpoint));
         formData.add("tsn",Byte.toString(tsn));

@@ -84,6 +84,7 @@ public class NetworkEJB {
 	 * @param node The managed node that will be updated
 	 */
 	public void updateManaged(Node node) {
+		System.out.println("Updating node " + node.getName() + " #endpoints: " + node.getEndpoints().size() + ")");
 		em.merge(node);
 	}
 	
@@ -112,9 +113,9 @@ public class NetworkEJB {
         	em.remove(node);
 	}
 	
-	public void insertJob(int id, NetworkJobType type, byte gatewayId, long nuid, short address, byte endpoint, byte tsn) {
+	public void insertJob(int id, NetworkJobType type, byte gatewayId, short address, byte endpoint, byte tsn) {
 		
-		NetworkJob job = new NetworkJob(id, type, gatewayId, nuid, address, endpoint, tsn);
+		NetworkJob job = new NetworkJob(id, type, gatewayId, address, endpoint, tsn);
 		
 		em.persist(job);
 	}
@@ -131,6 +132,7 @@ public class NetworkEJB {
         return query.getResultList();
 	}
 	
+	/*
 	public List<NetworkJob> getLatestJobs(NetworkJobType type) {
         
         String queryString = "SELECT j FROM NetworkJob j WHERE j.id IN (SELECT MAX(j2.id) FROM NetworkJob j2 " + 
@@ -139,44 +141,45 @@ public class NetworkEJB {
         
         return query.getResultList();		
 	}
-	
+	*/
+
 	public List<NetworkJob> getLatestJobs(NetworkJobType type, byte gatewayId, short address, byte endpoint, byte tsn) {
 		
-        StringBuilder queryBuilder = new StringBuilder("SELECT j FROM NetworkJob j WHERE j.tsn IN (SELECT MAX(j2.tsn) FROM NetworkJob j2");
+        StringBuilder queryBuilder = new StringBuilder("SELECT j FROM NetworkJob j WHERE j.id IN (SELECT MAX(j2.id) FROM NetworkJob j2");
         
         boolean atLeastOneClause = false;
         
-        if (type != null || gatewayId != 0 || tsn != 0) {
+        if (type != null || gatewayId != (byte)0 || tsn != (byte)0) {
         	queryBuilder.append(" WHERE ");
         }
         if (type != null) {
         	atLeastOneClause = true;
         	queryBuilder.append(" j2.type=:t ");
         }
-        if (gatewayId != 0) {
+        if (gatewayId != (byte)0) {
         	if (atLeastOneClause)
         		queryBuilder.append(" AND ");
         	atLeastOneClause = true;
         	queryBuilder.append(" j2.gatewayId=:g AND j2.address=:a AND j2.endpoint=:e ");
         }
-        if (tsn != 0) {
+        if (tsn != (byte)0) {
         	if (atLeastOneClause)
         		queryBuilder.append(" AND ");
         	queryBuilder.append(" j2.tsn=:n");
         }
-        queryBuilder.append(")");
+        queryBuilder.append(" GROUP BY j2.gatewayId, j2.address, j2.endpoint)");
         
         TypedQuery<NetworkJob> query = em.createQuery(queryBuilder.toString(),NetworkJob.class);
         
         if (type != null)
         	query.setParameter("t",type);
         
-        if (gatewayId != 0)
+        if (gatewayId != (byte)0)
         	query.setParameter("g",gatewayId)
 			  	 .setParameter("a",address)
 			  	 .setParameter("e",endpoint);
         
-        if (tsn != 0)
+        if (tsn != (byte)0)
         	query.setParameter("n", tsn);
         
         return query.getResultList();		

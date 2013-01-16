@@ -46,7 +46,7 @@ public class SimpleDescrRequestProcess extends Process {
 
     	        try {
         	        ClientResponse getResponse = restResource.path("network")
-        	        								.path(Byte.toString(event.getGid())).path(Short.toString(event.getAddress()))
+        	        								.path(Byte.toString(event.getGatewayId())).path(Short.toString(event.getAddress()))
         	        								.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         	        
     	        	Node node = JsonUtils.getFrom(getResponse, Node.class);
@@ -67,7 +67,8 @@ public class SimpleDescrRequestProcess extends Process {
     	        	}
     	        } catch (Exception e) {
     	        	e.printStackTrace();
-    	        	println("Simple descriptors for node cannot be recovered: issue when getting node with nuid " + Long.toHexString(event.getNuid()));
+    	        	println("Simple descriptors for node cannot be recovered: issue when getting node " 
+    	        			+ Byte.toString(event.getGatewayId()) + ":" + Integer.toHexString(0xFFFF & event.getAddress()));
     	        }
     		}
        	}

@@ -35,6 +35,8 @@ public abstract class Process implements Runnable {
 	// The time after the job should be reissued
 	protected static long JOB_TIMEOUT_MILLIS = 5000;
 	
+	protected static Object nodeLock = new Object();
+	
     private int pid;
     private final ProcessKind kind;
     

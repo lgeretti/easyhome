@@ -23,6 +23,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.codehaus.jettison.json.JSONException;
+
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
@@ -38,16 +40,34 @@ public class ActiveEndpointsRequestProcess extends Process {
         networkEventsConsumer = registerConsumerFor(networkEventsTopic);
     }
     
-    private void doRequest(Node node, boolean isRepeated) throws JMSException {
+    private void doRequest(byte gatewayId, short address, boolean isRepeated) throws JMSException, JSONException {
     	
-    	ActiveEndpointsReqPacket packet = new ActiveEndpointsReqPacket(node,++sequenceNumber);
+    	byte tsn = ++sequenceNumber;
+    	
+        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+        formData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
+        formData.add("gid",Byte.toString(gatewayId));
+        formData.add("address",Short.toString(address));
+        formData.add("tsn",Byte.toString(tsn));
+        
+        restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        
+        ClientResponse getNodeResponse = restResource.path("network")
+        								 .path(Byte.toString(gatewayId)).path(Short.toString(address))
+        								 .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        
+    	Node node = JsonUtils.getFrom(getNodeResponse, Node.class);
+    	
+    	ActiveEndpointsReqPacket packet = new ActiveEndpointsReqPacket(node,tsn);
         ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
         getOutboundPacketsProducer().send(outboundMessage);    
         println("Node " + node.getName() + " active endpoints request " + (isRepeated ? "re-" : "") + "dispatched");
     }
     
+    
     @Override
 	protected void process() throws JMSException, NamingException {
+    	
     	
 		ClientResponse jobListResponse = restResource.path("network").path("jobs").queryParam("type", NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString())
         		.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
@@ -59,20 +79,7 @@ public class ActiveEndpointsRequestProcess extends Process {
 	        	if (msg != null) {
 	        		NetworkEvent event = (NetworkEvent) msg.getObject();
 	        		if (event != null && event.getKind() == NetworkEvent.EventKind.NODE_ADDED) {
-	
-		                MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-		                formData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
-		                formData.add("gid",String.valueOf(event.getGid()));
-		                formData.add("address",String.valueOf(event.getAddress()));
-		                
-		                restResource.path("network").path("jobs").path("reset").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	        			
-            	        ClientResponse getNodeResponse = restResource.path("network")
-            	        									.path(Byte.toString(event.getGid())).path(Short.toString(event.getAddress()))
-            	        									.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-            	        
-        	        	Node node = JsonUtils.getFrom(getNodeResponse, Node.class);
-        	        	doRequest(node,false);
+	        			doRequest(event.getGatewayId(),event.getAddress(),false);
 	        		}
 	           	}    		
 	    	} else {
@@ -82,17 +89,8 @@ public class ActiveEndpointsRequestProcess extends Process {
 	    		for (NetworkJob job : jobs) {
 	    			
 	    			Date jobDate = job.getDate();
-	    			if (jobDate.before(fiveSecBeforeNow)) {
-	    				
-	    				boolean isRepeated = true;
-	    				
-	    				restResource.path("network").path("jobs").path(String.valueOf(job.getId())).path("reset").type(MediaType.APPLICATION_JSON).post(ClientResponse.class);
-	    				
-	    				ClientResponse getNodeResponse = restResource.path("network")
-	    						  .path(Byte.toString(job.getGatewayId())).path(Short.toString(job.getAddress()))
-	      						  .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-        	        	Node node = JsonUtils.getFrom(getNodeResponse, Node.class);
-        	        	doRequest(node,isRepeated);
+	    			if (jobDate.before(fiveSecBeforeNow) || job.isFirst()) {
+	    				doRequest(job.getGatewayId(),job.getAddress(),true);
 	    			}
 	    		}
 	    		
@@ -104,6 +102,7 @@ public class ActiveEndpointsRequestProcess extends Process {
         	e.printStackTrace();
         	println("Node active endpoints request could not be dispatched to outbound packets topic");
         }
+    	
     }
     
 }

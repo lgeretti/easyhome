@@ -153,7 +153,6 @@ public final class NetworkResource {
     @Path("/jobs")
     public Response addJob(@FormParam("type") NetworkJobType type,
     					   @FormParam("gid") byte gatewayId,
-    					   @FormParam("nuid") long nuid,
     					   @FormParam("address") short address,
     					   @DefaultValue("127") @FormParam("endpoint") byte endpoint,
     					   @DefaultValue("0") @FormParam("tsn") byte tsn) {
@@ -163,7 +162,7 @@ public final class NetworkResource {
     	
     	synchronized(this) {
     		newJobId = ++jobId;
-	    	resEjb.insertJob(newJobId, type, gatewayId, nuid, address, endpoint, tsn);
+	    	resEjb.insertJob(newJobId, type, gatewayId, address, endpoint, tsn);
     	}
     	
     	return Response.created(
@@ -183,12 +182,7 @@ public final class NetworkResource {
 			   @DefaultValue("127") @QueryParam("endpoint") byte endpoint,
 			   @DefaultValue("0") @QueryParam("tsn") byte tsn) {
     	
-    	if (gatewayId != 0 || tsn != 0)
-    		return resEjb.getLatestJobs(type,gatewayId,address,endpoint,tsn);
-    	else if (type != null)
-    		return resEjb.getLatestJobs(type);
-    	else
-    		return resEjb.getJobs();
+    	return resEjb.getLatestJobs(type,gatewayId,address,endpoint,tsn);
     }
     
     @GET
@@ -232,7 +226,7 @@ public final class NetworkResource {
 	    	if (endpoint == 127)
 	    		numRemoved = resEjb.removeJobs(type, gatewayId, address);
 	    	else
-	    		numRemoved = resEjb.removeJobs(type, gatewayId, address,endpoint);
+	    		numRemoved = resEjb.removeJobs(type, gatewayId, address, endpoint);
 	    	
 	    	if (numRemoved == 0)
 	    		throw new WebApplicationException(Response.Status.NOT_FOUND);

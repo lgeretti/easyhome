@@ -33,9 +33,6 @@ public class NetworkJob implements Serializable {
 	private byte gatewayId;
 	
 	@Column(nullable = false)
-	private long nuid;
-	
-	@Column(nullable = false)
 	private short address;
 	
 	@Column(nullable = false)
@@ -50,12 +47,11 @@ public class NetworkJob implements Serializable {
 	@SuppressWarnings("unused")
 	private NetworkJob() { }
 	
-	public NetworkJob(int id, NetworkJobType type, byte gatewayId, long nuid, short address, byte endpoint, byte tsn) {
+	public NetworkJob(int id, NetworkJobType type, byte gatewayId, short address, byte endpoint, byte tsn) {
 		
 		this.id = id;
 		this.type = type;
 		this.gatewayId = gatewayId;
-		this.nuid = nuid;
 		this.address = address;
 		this.endpoint = endpoint;
 		this.timestamp = System.currentTimeMillis();
@@ -74,10 +70,6 @@ public class NetworkJob implements Serializable {
 		return gatewayId;
 	}
 	
-	public long getNuid() {
-		return nuid;
-	}
-	
 	public short getAddress() {
 		return address;
 	}
@@ -92,5 +84,9 @@ public class NetworkJob implements Serializable {
 	
 	public byte getTsn() {
 		return tsn;
+	}
+	
+	public boolean isFirst() {
+		return (tsn == 0);
 	}
 }
