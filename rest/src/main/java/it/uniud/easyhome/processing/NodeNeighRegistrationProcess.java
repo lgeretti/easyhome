@@ -1,5 +1,6 @@
 package it.uniud.easyhome.processing;
 
+import java.util.Arrays;
 import java.util.List;
 
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
@@ -57,7 +58,7 @@ public class NodeNeighRegistrationProcess extends Process {
 			                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
 		        		}
 		                if (updateResponse.getClientResponseStatus() == Status.OK)
-		                	println("Node '" + node.getName() + "' updated with neighbors information");
+		                	println("Node '" + node.getName() + "' updated with neighbors information (" + Arrays.toString(neighborIds.toArray()) + ")");
 		                else
 		                	println("Node '" + node.getName() + "' neighbors information update failed");
 	        		}

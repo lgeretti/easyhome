@@ -12,6 +12,7 @@ import it.uniud.easyhome.exceptions.InvalidPayloadLengthException;
 import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.packets.ModuleCoordinates;
 import it.uniud.easyhome.packets.Operation;
+import it.uniud.easyhome.packets.ResponseStatus;
 
 public class ActiveEndpointsRspPacket extends NativePacket {
 	
@@ -36,8 +37,8 @@ public class ActiveEndpointsRspPacket extends NativePacket {
 		this(pkt.getSrcCoords(),pkt.getDstCoords(),pkt.getOperation());
 	}
 
-	public boolean isSuccessful() {
-		return (this.getOperation().getData()[0] == 0);
+	public ResponseStatus getStatus() {
+		return ResponseStatus.fromCode(this.getOperation().getData()[0]);
 	}
 	
 	public short getAddrOfInterest() {

@@ -17,6 +17,8 @@ public final class NetworkResource {
     
     private static int nodeId = 0;
     private static int jobId = 0;
+    private static Object nodeLock = new Object();
+    private static Object jobLock = new Object();
 
     public NetworkResource() throws NamingException {
     	resEjb = (NetworkEJB) new
@@ -72,7 +74,7 @@ public final class NetworkResource {
     	
     	boolean existed = false;
     	
-    	synchronized(this) {
+    	synchronized(nodeLock) {
     		Node.Builder nodeBuilder = new Node.Builder(++nodeId,nuid);
     		Node node = nodeBuilder.setGatewayId(gid)
 					   .setAddress(address)
@@ -142,7 +144,7 @@ public final class NetworkResource {
     	int newJobId;
     	
     	
-    	synchronized(this) {
+    	synchronized(jobLock) {
     		newJobId = ++jobId;
 	    	resEjb.insertJob(newJobId, type, gatewayId, address, endpoint, tsn);
     	}
@@ -174,7 +176,7 @@ public final class NetworkResource {
         
         NetworkJob job = resEjb.findJobById(jobId);
         
-        if (job == null) 
+        if (job == null)
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         
         return job;

@@ -6,6 +6,7 @@ import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.Node;
+import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.packets.natives.NodeDescrReqPacket;
 import it.uniud.easyhome.packets.natives.NodeNeighReqPacket;
 
@@ -22,7 +23,7 @@ import com.sun.jersey.api.client.ClientResponse;
 
 public class NodeNeighRequestProcess extends Process {
 	
-	public static long NEIGH_REQUEST_PERIOD_MS = 1000;
+	public static long NEIGH_REQUEST_PERIOD_MS = 3000;
 	
 	private int nodeIdx = 0;
 	
@@ -43,10 +44,13 @@ public class NodeNeighRequestProcess extends Process {
 	    	if (nodes.size() != 0) {
 		    	nodeIdx = ((nodeIdx+1) >= nodes.size()  ? 0 : nodeIdx+1);
 		
-		    	NodeNeighReqPacket packet = new NodeNeighReqPacket(nodes.get(nodeIdx),++sequenceNumber);
-		 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
-		    	getOutboundPacketsProducer().send(outboundMessage);    
-		    	println("Node '" + nodes.get(nodeIdx).getName() + "' neighbours request dispatched");
+		    	if (nodes.get(nodeIdx).getLogicalType() == NodeLogicalType.ROUTER ||
+		    			nodes.get(nodeIdx).getLogicalType() == NodeLogicalType.COORDINATOR) {
+			    	NodeNeighReqPacket packet = new NodeNeighReqPacket(nodes.get(nodeIdx),++sequenceNumber);
+			 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
+			    	getOutboundPacketsProducer().send(outboundMessage);    
+			    	println("Node '" + nodes.get(nodeIdx).getName() + "' neighbours request dispatched");
+		    	}
 	    	}	
 			Thread.sleep(NEIGH_REQUEST_PERIOD_MS);
 	    	

@@ -10,6 +10,7 @@ import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.NetworkJob;
 import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.network.Node;
+import it.uniud.easyhome.packets.ResponseStatus;
 import it.uniud.easyhome.packets.natives.ActiveEndpointsRspPacket;
 import it.uniud.easyhome.packets.natives.NativePacket;
 import it.uniud.easyhome.packets.natives.NodeNeighRspPacket;
@@ -56,7 +57,7 @@ public class ActiveEndpointsRegistrationProcess extends Process {
 	        	try {
 	        		ActiveEndpointsRspPacket activeEpPkt = new ActiveEndpointsRspPacket(pkt);
 	        		
-	        		if (activeEpPkt.isSuccessful()) {
+	        		if (activeEpPkt.getStatus() == ResponseStatus.SUCCESS) {
 	        			
 		        		List<Short> activeEps = activeEpPkt.getActiveEndpoints();
 		        		
