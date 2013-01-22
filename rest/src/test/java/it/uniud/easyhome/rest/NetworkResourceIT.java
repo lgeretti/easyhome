@@ -3,6 +3,7 @@ package it.uniud.easyhome.rest;
 import static org.junit.Assert.*;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -38,7 +39,6 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
-@Ignore
 public class NetworkResourceIT {
 	
 	private static final String TARGET = "http://localhost:8080/easyhome/rest/network";
@@ -185,6 +185,57 @@ public class NetworkResourceIT {
     }
 	
 	@Test
+	public void testComplexNetwork() throws JSONException {
+		
+    	byte gid = 2;
+    	byte capability = 14;
+    	
+    	int numNodes = 8;
+    	
+    	Map<Integer,Node> nodes = new HashMap<Integer,Node>();
+    	
+    	for (int i=1; i<=numNodes; i++) {
+    		ClientResponse insertionResponse = insertNewNode(gid,(short)i,(short)i,capability);
+            assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());    		
+            nodes.put(i,client.resource(TARGET).path(Byte.toString(gid)).path(Short.toString((short)i)).accept(MediaType.APPLICATION_JSON).get(Node.class));
+    	}
+        
+    	nodes.get(1).setLogicalType(NodeLogicalType.COORDINATOR);
+    	nodes.get(2).setLogicalType(NodeLogicalType.ROUTER);
+    	nodes.get(3).setLogicalType(NodeLogicalType.ROUTER);
+    	nodes.get(4).setLogicalType(NodeLogicalType.END_DEVICE);
+    	nodes.get(5).setLogicalType(NodeLogicalType.ROUTER);
+    	nodes.get(6).setLogicalType(NodeLogicalType.END_DEVICE);
+    	nodes.get(7).setLogicalType(NodeLogicalType.END_DEVICE);
+    	nodes.get(8).setLogicalType(NodeLogicalType.END_DEVICE);
+    	
+        nodes.get(1).addNeighbor(nodes.get(2));
+        nodes.get(1).addNeighbor(nodes.get(3));
+        nodes.get(1).addNeighbor(nodes.get(8));
+        nodes.get(2).addNeighbor(nodes.get(3));
+        nodes.get(2).addNeighbor(nodes.get(4));
+        nodes.get(3).addNeighbor(nodes.get(5));
+        nodes.get(5).addNeighbor(nodes.get(6));
+
+    	for (int i=1; i<=numNodes; i++) {
+            ClientResponse updateResponse = client.resource(TARGET).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,nodes.get(i));
+            assertEquals(ClientResponse.Status.OK,updateResponse.getClientResponseStatus());
+    	}
+        
+        ClientResponse reachableNodesResponse = client.resource(TARGET).path("reachable").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        List<Node> reachableNodes = JsonUtils.getListFrom(reachableNodesResponse, Node.class);
+        
+        assertEquals(7,reachableNodes.size());
+        
+        client.resource(TARGET).path("prune").post();
+        
+		ClientResponse getResponse = client.resource(TARGET).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+		List<Node> nodeList = JsonUtils.getListFrom(getResponse,Node.class);
+		
+		assertEquals(7,nodeList.size());
+    }
+	
+	@Test
 	public void testUpdateNode() throws JSONException {
 		
     	byte gid = 2;
@@ -230,7 +281,7 @@ public class NetworkResourceIT {
 	@After
 	public void removeNodes() {
 		client.resource(TARGET).delete();
-		//client.resource(TARGET).path("jobs").delete();
+		client.resource(TARGET).path("jobs").delete();
 	}
 	
 	private ClientResponse insertNewNode(byte gatewayId, long nuid, short address, byte capability) {

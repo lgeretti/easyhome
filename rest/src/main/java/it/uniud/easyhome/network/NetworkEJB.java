@@ -2,8 +2,15 @@ package it.uniud.easyhome.network;
 
 
 import it.uniud.easyhome.exceptions.MultipleNodesFoundException;
+import it.uniud.easyhome.exceptions.NodeNotFoundException;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Queue;
+import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -80,6 +87,13 @@ public class NetworkEJB {
 	 */
 	public void updateManaged(Node node) {
 		em.merge(node);
+	}
+	
+	/**
+	 * Removes a node guaranteed to be managed by the entity manager.
+	 */
+	public void removeUnmanaged(Node node) {
+		em.remove(node);
 	}
 	
 	/**
@@ -211,5 +225,85 @@ public class NetworkEJB {
 				.setParameter("g", gatewayId)
 				.setParameter("a",address)
 				.executeUpdate();
+	}
+
+	public List<Node> getReachableNodes() {
+
+		List<Node> coordinators = em.createQuery("SELECT n FROM Node n WHERE n.logicalType = :t",Node.class)
+											   .setParameter("t", NodeLogicalType.COORDINATOR)
+											   .getResultList();
+		
+		List<Node> result = new ArrayList<Node>();
+
+		
+		for (Node coord : coordinators) {
+			byte currentGatewayId = coord.getGatewayId();
+			short currentAddress = coord.getAddress();
+
+			Set<Short> addressesFound = new HashSet<Short>();
+			Set<Node> nodesFound = new HashSet<Node>();
+			Queue<Short> addressesToCheck = new ConcurrentLinkedQueue<Short>();
+
+			addressesFound.add(currentAddress);
+			traverseReachableNodes(nodesFound, addressesFound, addressesToCheck, currentAddress, currentGatewayId);
+			
+			result.addAll(nodesFound);
+		}
+		
+		return result;
+	}
+
+	private void traverseReachableNodes(Set<Node> nodesFound, Set<Short> addressesFound, Queue<Short> addressesToCheck, 
+										short currentAddress, byte currentGatewayId) {
+		
+		Node node = findNode(currentGatewayId,currentAddress);
+		
+		if (node == null)
+			throw new NodeNotFoundException();
+		
+		//System.out.println("Looking up " + node.getName());
+
+		nodesFound.add(node);
+		
+		if (node.getLogicalType() == NodeLogicalType.ROUTER || node.getLogicalType() == NodeLogicalType.COORDINATOR) {
+		
+			//System.out.println("Found " + node.getNeighborAddresses().size() + " neighbors");
+			
+			for (Short neighborAddr : node.getNeighborAddresses()) {
+				if (!addressesFound.contains(neighborAddr)) {
+				//	System.out.println("Address " + neighborAddr + " is new, adding");
+					addressesToCheck.add(neighborAddr);
+					addressesFound.add(neighborAddr);
+				} else {
+				//	System.out.println("Address " + neighborAddr + " is already present, not adding");
+				}
+			}
+		}
+		
+		Short nextAddress = addressesToCheck.poll();
+		if (nextAddress != null)
+			traverseReachableNodes(nodesFound, addressesFound, addressesToCheck, nextAddress, currentGatewayId);
+	}
+
+	public void pruneUnreachableNodes() {
+		
+		List<Node> nodes = getNodes();
+		List<Node> reachableNodes = getReachableNodes();
+		
+		for (Node node : nodes) {
+			boolean found = false;
+			
+			for (Node reachableNode : reachableNodes) {
+				if (node.equals(reachableNode)) {
+					found = true;
+					break;
+				}
+			}
+			
+			if (!found) {
+				em.remove(node);
+				System.out.println("Removed node " + node.getName());
+			}
+		}
 	}
 }

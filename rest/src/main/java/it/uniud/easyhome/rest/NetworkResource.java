@@ -3,6 +3,7 @@ package it.uniud.easyhome.rest;
 import it.uniud.easyhome.network.*;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -30,10 +31,21 @@ public final class NetworkResource {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Node> getNodes() {
-        
+    public List<Node> getNodes() {        
         return resEjb.getNodes();
-        
+    }
+    
+    @GET
+    @Path("reachable")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Node> getReachableNodes() {
+    	return resEjb.getReachableNodes();
+    }
+    
+    @POST
+    @Path("prune")
+    public void pruneUnreachableNodes() {
+    	resEjb.pruneUnreachableNodes();
     }
     
     @GET
@@ -128,8 +140,6 @@ public final class NetworkResource {
         
         return Response.ok().build();
     }    
-    
-    
 
     @DELETE
     public Response deleteNodes() {
@@ -151,7 +161,6 @@ public final class NetworkResource {
     					   @DefaultValue("0") @FormParam("tsn") byte tsn) {
     	
     	int newJobId;
-    	
     	
     	synchronized(jobLock) {
     		newJobId = ++jobId;
