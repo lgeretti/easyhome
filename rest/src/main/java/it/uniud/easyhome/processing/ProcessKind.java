@@ -62,6 +62,12 @@ public enum ProcessKind {
 		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {
 			return new SimpleDescrRegistrationProcess(pid,uriInfo,this);
 		}
+	},
+	NETWORK_UPDATE {
+		@Override
+		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {
+			return new NetworkUpdateProcess(pid,uriInfo,this);
+		}
 	};
 	
 	public abstract Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException;

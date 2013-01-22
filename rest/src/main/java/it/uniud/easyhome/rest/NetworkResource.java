@@ -45,8 +45,18 @@ public final class NetworkResource {
     @POST
     @Path("prune")
     public void pruneUnreachableNodes() {
-    	resEjb.pruneUnreachableNodes();
+    	synchronized(nodeLock) {
+    		resEjb.pruneUnreachableNodes();
+    	}
     }
+    
+    @POST
+    @Path("acknowledge")
+    public void acknowledgeNewReachableNodes() {
+    	synchronized(nodeLock) {
+    		resEjb.acknowledgeNewReachableNodes();
+    	}
+    }    
     
     @GET
     @Path("{gid}/{address}")

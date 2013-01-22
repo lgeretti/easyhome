@@ -306,4 +306,26 @@ public class NetworkEJB {
 			}
 		}
 	}
+
+	public void acknowledgeNewReachableNodes() {
+		
+		List<Node> nodes = getNodes();
+		List<Node> reachableNodes = getReachableNodes();
+		
+		for (Node reachableNode : reachableNodes) {
+			boolean found = false;
+			
+			for (Node node : nodes) {
+				if (reachableNode.equals(node)) {
+					found = true;
+					break;
+				}
+			}
+			
+			if (!found) {
+				insertNode(reachableNode);
+				System.out.println("Inserted node " + reachableNode.getName());
+			}
+		}
+	}
 }
