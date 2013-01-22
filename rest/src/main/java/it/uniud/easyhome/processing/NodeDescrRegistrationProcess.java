@@ -9,6 +9,7 @@ import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.network.Node;
+import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.packets.natives.NativePacket;
 import it.uniud.easyhome.packets.natives.NodeAnncePacket;
 import it.uniud.easyhome.packets.natives.NodeDescrRspPacket;
@@ -85,7 +86,18 @@ public class NodeDescrRegistrationProcess extends Process {
 			                println("Deleting NODE_DESCR_REQUEST job for " + node.getName());
 			                
 			                restResource.path("network").path("jobs").queryParams(queryData).delete(ClientResponse.class);
-		                	
+			                
+			                if (descr.getLogicalType() == NodeLogicalType.END_DEVICE || 
+			                	descr.getLogicalType() == NodeLogicalType.ROUTER) {
+				                MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+				                formData = new MultivaluedMapImpl();
+				                formData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
+				                formData.add("gid",Byte.toString(gid));
+				                formData.add("address",Short.toString(address));                
+	
+				                restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+			                }
+			                
 		                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_DESCR_ACQUIRED, node.getGatewayId(), node.getAddress());
 		                    try {
 		                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);

@@ -94,7 +94,7 @@ public class XBeeGateway extends Gateway {
     	
     	byte[] originalBuffer = buffer.toByteArray();
     	
-    	//println("Buffer: " + ByteUtils.printBytes(originalBuffer));
+    	println("Buffer: " + ByteUtils.printBytes(originalBuffer));
     	
     	int readBytes = 0;
     	

@@ -69,19 +69,10 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                formData.add("gid",Byte.toString(gatewayId));
 	                formData.add("address",Short.toString(address));
 	                
-	                ClientResponse jobInsertionResponse1 = restResource.path("network").path("jobs")
+	                ClientResponse jobInsertionResponse = restResource.path("network").path("jobs")
 	                		.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	                
-	                formData = new MultivaluedMapImpl();
-	                formData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
-	                formData.add("gid",Byte.toString(gatewayId));
-	                formData.add("address",Short.toString(address));                
-
-	                ClientResponse jobInsertionResponse2 = restResource.path("network").path("jobs")
-	                		.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	                
-	                boolean jobInsertionsSuccessful = (jobInsertionResponse1.getClientResponseStatus() == Status.CREATED &&
-	                								   jobInsertionResponse2.getClientResponseStatus() == Status.CREATED);
+	                boolean jobInsertionsSuccessful = (jobInsertionResponse.getClientResponseStatus() == Status.CREATED);
 	                
 	                if (nodeInsertionResponse.getClientResponseStatus() == Status.CREATED && jobInsertionsSuccessful) {
 	                	

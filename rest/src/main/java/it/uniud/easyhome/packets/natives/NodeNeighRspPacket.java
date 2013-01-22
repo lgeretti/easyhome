@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.uniud.easyhome.common.ByteUtils;
+import it.uniud.easyhome.common.Endianness;
 import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.exceptions.InvalidNodeDescException;
 import it.uniud.easyhome.exceptions.InvalidPacketLengthException;
@@ -39,19 +40,16 @@ public class NodeNeighRspPacket extends NativePacket {
 		return (this.getOperation().getData()[0] == 0);
 	}
 
-	public List<Long> getNeighborIds() {
+	public List<Short> getNeighborAddresses() {
 		
-		List<Long> result = new ArrayList<Long>();
+		List<Short> result = new ArrayList<Short>();
 		
 		byte[] opData = this.getOperation().getData();
 		
 		int numNeighbors = opData[3];
 		
 		for (int n=0;n<numNeighbors;n++) {
-			long val = 0;
-			for (int i=0, j=0; i<=56; i+=8, j++)
-				val += ((long)(opData[12+j+n*22] & 0xFF))<<i;
-			result.add(val);
+			result.add(ByteUtils.getShort(opData, 20+n*22, Endianness.LITTLE_ENDIAN));
 		}
 		
 		return result;

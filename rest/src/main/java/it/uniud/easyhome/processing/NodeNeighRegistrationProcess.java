@@ -41,7 +41,7 @@ public class NodeNeighRegistrationProcess extends Process {
 	        		NodeNeighRspPacket neighPkt = new NodeNeighRspPacket(pkt);
 	        		
 	        		if (neighPkt.isSuccessful()) {
-		        		List<Long> neighborIds = neighPkt.getNeighborIds();
+		        		List<Short> neighborIds = neighPkt.getNeighborAddresses();
 		        			
 		        		Node node;
 		        		ClientResponse updateResponse;

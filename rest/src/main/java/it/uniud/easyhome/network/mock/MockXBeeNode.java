@@ -71,7 +71,7 @@ public class MockXBeeNode implements Runnable {
     	
     	List<MockXBeeNode> neighbors = new ArrayList<MockXBeeNode>();
     	
-    	for (Long neighborId : node.getNeighborIds()) {
+    	for (Short neighborId : node.getNeighborAddresses()) {
     		
     		MockXBeeNode recoveredNode = getMockXBeeNode(neighborId);
     		
@@ -92,10 +92,10 @@ public class MockXBeeNode implements Runnable {
     	return node.getMappedDevices();
     }
     
-    private MockXBeeNode getMockXBeeNode(long id) {
+    private MockXBeeNode getMockXBeeNode(short address) {
     	
     	for (MockXBeeNode node : network.getNodes()) {
-    		if (node.getId() == id)
+    		if (node.getAddress() == address)
     			return node;
     	}
     	return null;

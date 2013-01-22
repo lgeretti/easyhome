@@ -85,11 +85,13 @@ public class ActiveEndpointsRegistrationProcess extends Process {
 			                println("Deleting NODE_ACTIVE_ENDPOINTS_REQUEST job for " + node.getName());
 			                
 			                restResource.path("network").path("jobs").queryParams(queryData).delete(ClientResponse.class);
-			                
-		                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_ENDPOINTS_ACQUIRED, gatewayId, address);
+		                	
 		                    try {
-		                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
-		                        networkEventsProducer.send(eventMessage);
+		                    	if (activeEps.size() > 0) {
+		                    		NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_ENDPOINTS_ACQUIRED, gatewayId, address);
+			                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
+			                        networkEventsProducer.send(eventMessage);
+		                    	}
 		                        println("Node " + node.getName() + " updated with endpoints information (" + Arrays.toString(activeEps.toArray()) + ")");
 		                    } catch (Exception e) {
 		                    	println("Node active endpoints registration message could not be dispatched to inbound packets topic");

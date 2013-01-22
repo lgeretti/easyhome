@@ -47,7 +47,7 @@ public class Node implements Serializable {
     
     @ElementCollection
     @CollectionTable(name = "NeighborIds")
-    private List<Long> neighborIds = new ArrayList<Long>();
+    private List<Short> neighborIds = new ArrayList<Short>();
     
     @Embedded
     @ElementCollection
@@ -69,10 +69,10 @@ public class Node implements Serializable {
     }
     
     public void addNeighbor(Node node) {
-    	neighborIds.add(node.getNuid());
+    	neighborIds.add(node.getAddress());
     }
     
-	public void setNeighbors(List<Long> neighborIds) {
+	public void setNeighbors(List<Short> neighborIds) {
 		this.neighborIds = neighborIds;
 	}
     
@@ -217,7 +217,7 @@ public class Node implements Serializable {
     	return this.liveness;
     }
     
-    public List<Long> getNeighborIds() {
+    public List<Short> getNeighborAddresses() {
     	return this.neighborIds;
     }
     

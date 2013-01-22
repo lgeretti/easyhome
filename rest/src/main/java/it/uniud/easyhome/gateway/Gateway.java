@@ -273,6 +273,7 @@ public class Gateway implements Runnable {
         try {
         	
         	NativePacket nativePkt = readFrom(is,buffer);
+        	println("Inbound packet received from " + nativePkt.getSrcCoords());
         	dispatchPacket(nativePkt,jmsSession,inboundProducer,outboundProducer);
         } catch (NoBytesAvailableException ex) {
         	// Just move on
@@ -312,7 +313,7 @@ public class Gateway implements Runnable {
             	byte dstGid = nativePkt.getDstCoords().getGatewayId();
             	if (srcGid != id) {
 	            	if (dstGid == id || dstGid == 0) {
-	            		println("Packet received from " + nativePkt.getSrcCoords());
+	            		println("Outbound packet received from " + nativePkt.getSrcCoords());
 	            		write(nativePkt,os);
 	            	}
             	}

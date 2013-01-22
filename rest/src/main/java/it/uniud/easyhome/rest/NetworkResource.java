@@ -53,15 +53,17 @@ public final class NetworkResource {
     @Path("{gid}/{address}")
     public Response setNodeName(@PathParam("gid") byte gid, @PathParam("address") short address, @FormParam("location") String location) {
     	
-        Node node = resEjb.findNode(gid,address);
+    	synchronized(nodeLock) {
+	        Node node = resEjb.findNode(gid,address);
+	        
+	        if (node == null) 
+	            throw new WebApplicationException(Response.Status.NOT_FOUND);
+	        
+	        node.setLocation(location);
+	        
+	        resEjb.updateManaged(node);
+    	}
         
-        if (node == null) 
-            throw new WebApplicationException(Response.Status.NOT_FOUND);
-        
-        node.setLocation(location);
-        
-        resEjb.updateManaged(node);
-    	
     	return Response.ok().build();
     }
     
@@ -104,8 +106,10 @@ public final class NetworkResource {
         if (!resEjb.exists(node)) {
         	throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
-        resEjb.updateManaged(node);	
-        	
+        synchronized(nodeLock) {
+        	resEjb.updateManaged(node);	
+        }	
+        
         return Response.ok().build();
     }
       
@@ -113,8 +117,11 @@ public final class NetworkResource {
     @Path("{gid}/{address}")
     public Response deleteNode(@PathParam("gid") byte gid, @PathParam("address") short address) {
         
-        boolean existed = resEjb.removeNode(gid,address);
-        
+    	boolean existed;
+    	synchronized(nodeLock) {
+    		existed = resEjb.removeNode(gid,address);
+    	}
+    	
         if (!existed) {
         	throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
@@ -127,7 +134,9 @@ public final class NetworkResource {
     @DELETE
     public Response deleteNodes() {
         
-    	resEjb.removeAllNodes();
+    	synchronized(nodeLock) {
+    		resEjb.removeAllNodes();
+    	}
         
         return Response.ok().build();
     }
@@ -186,7 +195,10 @@ public final class NetworkResource {
     @Path("/jobs/{jobid}")
     public Response deleteJob(@PathParam("jobid") int jobId) {
         
-        boolean existed = resEjb.removeJobById(jobId);
+    	boolean existed;
+    	synchronized(jobLock) {
+    		existed = resEjb.removeJobById(jobId);	
+    	}
         
         if (!existed) {
         	throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -202,18 +214,20 @@ public final class NetworkResource {
     						   @QueryParam("address") short address, 
     						   @DefaultValue("127") @QueryParam("endpoint") byte endpoint) {
     	
-    	if (type == null) 
-    		resEjb.removeAllJobs();
-	    else {
-	    	int numRemoved;
-	    	
-	    	if (endpoint == 127)
-	    		numRemoved = resEjb.removeJobs(type, gatewayId, address);
-	    	else
-	    		numRemoved = resEjb.removeJobs(type, gatewayId, address, endpoint);
-	    	
-	    	if (numRemoved == 0)
-	    		throw new WebApplicationException(Response.Status.NOT_FOUND);
+    	synchronized(jobLock) {
+	    	if (type == null) 
+	    		resEjb.removeAllJobs();
+		    else {
+		    	int numRemoved;
+		    	
+		    	if (endpoint == 127)
+		    		numRemoved = resEjb.removeJobs(type, gatewayId, address);
+		    	else
+		    		numRemoved = resEjb.removeJobs(type, gatewayId, address, endpoint);
+		    	
+		    	if (numRemoved == 0)
+		    		throw new WebApplicationException(Response.Status.NOT_FOUND);
+	    	}
     	}
     	
     	return Response.ok().build();

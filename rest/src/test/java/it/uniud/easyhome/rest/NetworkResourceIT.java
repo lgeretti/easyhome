@@ -176,7 +176,7 @@ public class NetworkResourceIT {
         assertEquals(ClientResponse.Status.OK,updateResponse.getClientResponseStatus());
         
         recoveredNode1 = client.resource(TARGET).path(Byte.toString(gid)).path(Short.toString(address1)).accept(MediaType.APPLICATION_JSON).get(Node.class);
-        assertEquals(1,recoveredNode1.getNeighborIds().size());
+        assertEquals(1,recoveredNode1.getNeighborAddresses().size());
         
 		ClientResponse getResponse = client.resource(TARGET).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 		List<Node> nodeList = JsonUtils.getListFrom(getResponse,Node.class);

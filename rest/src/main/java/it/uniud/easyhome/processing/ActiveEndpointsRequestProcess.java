@@ -9,6 +9,7 @@ import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.NetworkJob;
 import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.network.Node;
+import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.packets.natives.ActiveEndpointsReqPacket;
 import it.uniud.easyhome.packets.natives.NodeDescrReqPacket;
 import it.uniud.easyhome.packets.natives.SimpleDescrReqPacket;
@@ -42,26 +43,30 @@ public class ActiveEndpointsRequestProcess extends Process {
     
     private void doRequest(byte gatewayId, short address, boolean isRepeated) throws JMSException, JSONException {
     	
-    	byte tsn = ++sequenceNumber;
-    	
-        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        formData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
-        formData.add("gid",Byte.toString(gatewayId));
-        formData.add("address",Short.toString(address));
-        formData.add("tsn",Byte.toString(tsn));
-        
-        restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-        
         ClientResponse getNodeResponse = restResource.path("network")
-        								 .path(Byte.toString(gatewayId)).path(Short.toString(address))
-        								 .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+				 .path(Byte.toString(gatewayId)).path(Short.toString(address))
+				 .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+
+        Node node = JsonUtils.getFrom(getNodeResponse, Node.class);
         
-    	Node node = JsonUtils.getFrom(getNodeResponse, Node.class);
+        if (node.getLogicalType() == NodeLogicalType.END_DEVICE ||
+        	node.getLogicalType() == NodeLogicalType.ROUTER) {
     	
-    	ActiveEndpointsReqPacket packet = new ActiveEndpointsReqPacket(node,tsn);
-        ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
-        getOutboundPacketsProducer().send(outboundMessage);    
-        println("Node " + node.getName() + " active endpoints request " + (isRepeated ? "re-" : "") + "dispatched");
+	    	byte tsn = ++sequenceNumber;
+	    	
+	        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+	        formData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
+	        formData.add("gid",Byte.toString(gatewayId));
+	        formData.add("address",Short.toString(address));
+	        formData.add("tsn",Byte.toString(tsn));
+	        
+	        restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	    	
+	    	ActiveEndpointsReqPacket packet = new ActiveEndpointsReqPacket(node,tsn);
+	        ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
+	        getOutboundPacketsProducer().send(outboundMessage);    
+	        println("Node " + node.getName() + " active endpoints request " + (isRepeated ? "re-" : "") + "dispatched");
+        }
     }
     
     
@@ -78,7 +83,8 @@ public class ActiveEndpointsRequestProcess extends Process {
 	        	ObjectMessage msg = (ObjectMessage) networkEventsConsumer.receive();
 	        	if (msg != null) {
 	        		NetworkEvent event = (NetworkEvent) msg.getObject();
-	        		if (event != null && event.getKind() == NetworkEvent.EventKind.NODE_ADDED) {
+	        		if (event != null && event.getKind() == NetworkEvent.EventKind.NODE_DESCR_ACQUIRED) {
+	        			
 	        			doRequest(event.getGatewayId(),event.getAddress(),false);
 	        		}
 	           	}    		
