@@ -5,6 +5,7 @@ import java.util.List;
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.network.NetworkEvent;
+import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.packets.natives.NodeDescrReqPacket;
@@ -16,10 +17,12 @@ import javax.jms.ObjectMessage;
 import javax.jms.Topic;
 import javax.naming.NamingException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class NodeNeighRequestProcess extends Process {
 	
@@ -41,22 +44,33 @@ public class NodeNeighRequestProcess extends Process {
 	        	        
 	    	List<Node> nodes = JsonUtils.getListFrom(getResponse, Node.class);
 	    
-	    	if (nodes.size() != 0) {
+	    	if (!nodes.isEmpty()) {
 		    	nodeIdx = ((nodeIdx+1) >= nodes.size()  ? 0 : nodeIdx+1);
 		
-		    	if (nodes.get(nodeIdx).getLogicalType() == NodeLogicalType.ROUTER ||
-		    			nodes.get(nodeIdx).getLogicalType() == NodeLogicalType.COORDINATOR) {
-			    	NodeNeighReqPacket packet = new NodeNeighReqPacket(nodes.get(nodeIdx),++sequenceNumber);
+		    	Node node = nodes.get(nodeIdx);
+		    	
+		    	if (node.getLogicalType() == NodeLogicalType.ROUTER || node.getLogicalType() == NodeLogicalType.COORDINATOR) {
+		    		
+		    		sequenceNumber++;
+		    		
+		            MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+		            formData.add("type",NetworkJobType.NODE_NEIGH_REQUEST.toString());
+		            formData.add("gid",Byte.toString(node.getGatewayId()));
+		            formData.add("address",Short.toString(node.getAddress()));
+		            formData.add("tsn",Byte.toString(sequenceNumber));
+		            
+		            restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+		    		
+			    	NodeNeighReqPacket packet = new NodeNeighReqPacket(node,sequenceNumber);
 			 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
 			    	getOutboundPacketsProducer().send(outboundMessage);    
-			    	println("Node '" + nodes.get(nodeIdx).getName() + "' neighbours request dispatched");
-		    	}
-	    	}	
+			    	println("Node '" + node.getName() + "' neighbours request dispatched");
+		    	} 
+	    	}
 			Thread.sleep(NEIGH_REQUEST_PERIOD_MS);
 	    	
         } catch (Exception e) {
         	e.printStackTrace();
-        	println("Node neighbours requests could not be dispatched");
         }
     }
     

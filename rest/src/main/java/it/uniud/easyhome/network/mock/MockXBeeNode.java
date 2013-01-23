@@ -151,7 +151,7 @@ public class MockXBeeNode implements Runnable {
 				short nwkAddress = ByteUtils.getShort(pkt.getApsPayload(),0,Endianness.LITTLE_ENDIAN);
 				if (nwkAddress == node.getAddress()) {
 					try {
-						transmit(new NodeDescrRspOutpkt(this));
+						transmit(new NodeDescrRspOutpkt(this,pkt.getTransactionSeqNumber()));
 					} catch (InvalidMockNodeException e) {
 						e.printStackTrace();
 						runningState = RunnableState.STOPPING;
@@ -160,7 +160,7 @@ public class MockXBeeNode implements Runnable {
 			}      
 			else if (pkt.getClusterId() == ManagementContext.NODE_NEIGH_REQ.getCode()) {
 				try {
-					transmit(new NodeLQIRspOutpkt(this));
+					transmit(new NodeLQIRspOutpkt(this,pkt.getTransactionSeqNumber()));
 				} catch (InvalidMockNodeException | MockXBeeNodeNotFoundException e) {
 					e.printStackTrace();
 					runningState = RunnableState.STOPPING;
@@ -168,7 +168,7 @@ public class MockXBeeNode implements Runnable {
 			}
 			else if (pkt.getClusterId() == ManagementContext.ACTIVE_EP_REQ.getCode()) {
 				try {
-					transmit(new ActiveEpRspOutpkt(this));
+					transmit(new ActiveEpRspOutpkt(this,pkt.getTransactionSeqNumber()));
 				} catch (InvalidMockNodeException | MockXBeeNodeNotFoundException e) {
 					e.printStackTrace();
 					runningState = RunnableState.STOPPING;
@@ -177,7 +177,7 @@ public class MockXBeeNode implements Runnable {
 			else if (pkt.getClusterId() == ManagementContext.SIMPLE_DESC_REQ.getCode()) {
 				try {
 					byte endpoint = pkt.getApsPayload()[2];
-					transmit(new SimpleDescRspOutpkt(this,endpoint));
+					transmit(new SimpleDescRspOutpkt(this,endpoint,pkt.getTransactionSeqNumber()));
 				} catch (InvalidMockNodeException | MockXBeeNodeNotFoundException e) {
 					e.printStackTrace();
 					runningState = RunnableState.STOPPING;

@@ -12,7 +12,7 @@ public final class NodeDescrRspOutpkt extends XBeePacketFromNode {
 
 	private static int APS_PAYLOAD_SIZE = 16;
 	
-	public NodeDescrRspOutpkt(MockXBeeNode node) throws InvalidMockNodeException {
+	public NodeDescrRspOutpkt(MockXBeeNode node, byte tsn) throws InvalidMockNodeException {
 		
 		dstAddr64 = 0x0L;
 		dstAddr16 = (short)0x0;
@@ -22,7 +22,7 @@ public final class NodeDescrRspOutpkt extends XBeePacketFromNode {
 		dstEndpoint = 0x00;
 		apsPayload = new byte[APS_PAYLOAD_SIZE];
 		
-		transactionSeqNumber = node.nextSeqNumber();
+		transactionSeqNumber = tsn;
 		
 		apsPayload[0] = (byte)0; // SUCCESS
 		

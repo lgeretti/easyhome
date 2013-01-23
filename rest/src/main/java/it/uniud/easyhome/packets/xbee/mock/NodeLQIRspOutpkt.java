@@ -17,7 +17,7 @@ public final class NodeLQIRspOutpkt extends XBeePacketFromNode {
 	private static int APS_PAYLOAD_SIZE_FIXED = 4;
 	private static int APS_PAYLOAD_SIZE_PER_ELEMENT = 22;
 	
-	public NodeLQIRspOutpkt(MockXBeeNode node) throws InvalidMockNodeException, MockXBeeNodeNotFoundException {
+	public NodeLQIRspOutpkt(MockXBeeNode node, byte tsn) throws InvalidMockNodeException, MockXBeeNodeNotFoundException {
 		
 		if (node.getLogicalType() == NodeLogicalType.END_DEVICE)
 			throw new InvalidMockNodeException();
@@ -34,7 +34,7 @@ public final class NodeLQIRspOutpkt extends XBeePacketFromNode {
 		dstEndpoint = 0x00;
 		apsPayload = new byte[APS_PAYLOAD_SIZE];
 		
-		transactionSeqNumber = node.nextSeqNumber();
+		transactionSeqNumber = tsn;
 		
 		apsPayload[0] = 0; // SUCCESS
 		apsPayload[1] = (byte)(neighbors.size() & 0xFF);

@@ -51,6 +51,7 @@ public class NetworkUpdateProcess extends Process {
     	        try {
     	        	
     	        	restResource.path("network").path("prune").type(MediaType.APPLICATION_JSON).post();
+    	        	//restResource.path("network").path("relocalize").type(MediaType.APPLICATION_JSON).post();
     	        	
     	        	ClientResponse missingNodesCoordsResponse = restResource.path("network").path("missingcoords").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	                List<NodeCoordinates> missingNodesCoords = JsonUtils.getListFrom(missingNodesCoordsResponse, NodeCoordinates.class);

@@ -22,7 +22,7 @@ public final class SimpleDescRspOutpkt extends XBeePacketFromNode {
 	private static int APS_PAYLOAD_SIZE_FIXED = 4;
 	private static byte SIMPLE_DESCRIPTOR_SIZE = 8;
 	
-	public SimpleDescRspOutpkt(MockXBeeNode node, byte endpoint) throws InvalidMockNodeException, MockXBeeNodeNotFoundException {
+	public SimpleDescRspOutpkt(MockXBeeNode node, byte endpoint, byte tsn) throws InvalidMockNodeException, MockXBeeNodeNotFoundException {
 		
 		Map<Short,HomeAutomationDevice> devices = node.getDevices();
 		
@@ -39,7 +39,7 @@ public final class SimpleDescRspOutpkt extends XBeePacketFromNode {
 		dstEndpoint = 0x00;
 		apsPayload = new byte[APS_PAYLOAD_SIZE];
 		
-		transactionSeqNumber = node.nextSeqNumber();
+		transactionSeqNumber = tsn;
 		
 		apsPayload[0] = 0; // SUCCESS
 		byte[] nwkAddr = ByteUtils.getBytes(node.getAddress(), Endianness.LITTLE_ENDIAN);

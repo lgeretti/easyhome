@@ -83,8 +83,6 @@ public class NodeDescrRegistrationProcess extends Process {
 			                queryData.add("gid",String.valueOf(gid));
 			                queryData.add("address",String.valueOf(address));
 			                
-			                println("Deleting NODE_DESCR_REQUEST job for " + node.getName());
-			                
 			                restResource.path("network").path("jobs").queryParams(queryData).delete(ClientResponse.class);
 			                
 			                if (descr.getLogicalType() == NodeLogicalType.END_DEVICE || 

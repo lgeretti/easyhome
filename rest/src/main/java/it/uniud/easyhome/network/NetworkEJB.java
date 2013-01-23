@@ -323,7 +323,7 @@ public class NetworkEJB {
 			
 			if (!found) {
 				em.remove(node);
-				System.out.println("Removed node " + node.getName());
+				//System.out.println("Removed node " + node.getName());
 			}
 		}
 	}
