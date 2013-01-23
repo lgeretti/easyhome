@@ -60,6 +60,12 @@ public class NetworkEJB {
         return findNode(node.getGatewayId(),node.getAddress());
 	}	
 	
+	public List<Node> getAllNodesOfType(NodeLogicalType type) {
+		return em.createQuery("SELECT n FROM Node n WHERE n.logicalType = :t",Node.class)
+				   .setParameter("t", type)
+				   .getResultList();
+	}
+	
 	/**
 	 * Inserts a node.
 	 * 
@@ -227,31 +233,44 @@ public class NetworkEJB {
 				.executeUpdate();
 	}
 
-	public List<Node> getReachableNodes() {
+	public List<Node> getPersistedReachableNodes() {
 
-		List<Node> coordinators = em.createQuery("SELECT n FROM Node n WHERE n.logicalType = :t",Node.class)
-											   .setParameter("t", NodeLogicalType.COORDINATOR)
-											   .getResultList();
-		
-		List<Node> nodesFound = new ArrayList<Node>();
-
+		Set<Node> nodesFound = new HashSet<Node>();
 		Set<NodeCompactCoordinates> coordsMissing = new HashSet<NodeCompactCoordinates>();
+		
+		reachablePersistedNodesAndMissingCoords(coordsMissing, nodesFound);
+		
+		List<Node> result = new ArrayList<Node>();
+		result.addAll(nodesFound);
+		return result;
+	}
+	
+	public List<NodeCompactCoordinates> getMissingCoordinates() {
+
+		Set<Node> nodesFound = new HashSet<Node>();
+		Set<NodeCompactCoordinates> coordsMissing = new HashSet<NodeCompactCoordinates>();
+		
+		reachablePersistedNodesAndMissingCoords(coordsMissing, nodesFound);
+		
+		List<NodeCompactCoordinates> result = new ArrayList<NodeCompactCoordinates>();
+		result.addAll(coordsMissing);
+		return result;
+	}
+	
+	private void reachablePersistedNodesAndMissingCoords(Set<NodeCompactCoordinates> missingResult, Set<Node> reachablePersistedResult) {
+		
+		List<Node> coordinators = getAllNodesOfType(NodeLogicalType.COORDINATOR);
 		
 		for (Node coord : coordinators) {
 			byte currentGatewayId = coord.getGatewayId();
 			short currentAddress = coord.getAddress();
 
 			Set<Short> currentAddressesFound = new HashSet<Short>();
-			Set<Node> currentNodesFound = new HashSet<Node>();
 			Queue<Short> currentAddressesToCheck = new ConcurrentLinkedQueue<Short>();
 
 			currentAddressesFound.add(currentAddress);
-			traverseReachableNodes(coordsMissing, currentNodesFound, currentAddressesFound, currentAddressesToCheck, currentAddress, currentGatewayId);
-			
-			nodesFound.addAll(currentNodesFound);
+			traverseReachableNodes(missingResult, reachablePersistedResult, currentAddressesFound, currentAddressesToCheck, currentAddress, currentGatewayId);
 		}
-		
-		return nodesFound;
 	}
 
 	private void traverseReachableNodes(Set<NodeCompactCoordinates> coordsMissing, Set<Node> nodesFound, Set<Short> addressesFound, Queue<Short> addressesToCheck, 
@@ -259,24 +278,26 @@ public class NetworkEJB {
 		
 		Node node = findNode(currentGatewayId,currentAddress);
 		
-		if (node == null)
+		//System.out.println("Looking up " + currentGatewayId + ":" + currentAddress);
+		
+		if (node == null) {
+			//System.out.println("Not found in the persistence");
 			coordsMissing.add(new NodeCompactCoordinates(currentGatewayId,currentAddress));
-		else {
-			System.out.println("Looking up " + node.getName());
-	
+		} else {
+			
 			nodesFound.add(node);
 			
 			if (node.getLogicalType() == NodeLogicalType.ROUTER || node.getLogicalType() == NodeLogicalType.COORDINATOR) {
 			
-				System.out.println("Found " + node.getNeighbors().size() + " neighbors");
+				//System.out.println("Found " + node.getNeighbors().size() + " neighbors");
 				
 				for (Neighbor neighbor : node.getNeighbors()) {
 					if (!addressesFound.contains(neighbor.getAddress())) {
-						System.out.println("Address " + neighbor + " is new, adding");
+						//System.out.println("Address " + neighbor + " is new, adding");
 						addressesToCheck.add(neighbor.getAddress());
 						addressesFound.add(neighbor.getAddress());
 					} else {
-						System.out.println("Address " + neighbor + " is already present, not adding");
+						//System.out.println("Address " + neighbor + " is already present, not adding");
 					}
 				}
 			}
@@ -287,15 +308,15 @@ public class NetworkEJB {
 		}
 	}
 
-	public void pruneUnreachableNodes() {
+	public void prunePersistedUnreachableNodes() {
 		
 		List<Node> nodes = getNodes();
-		List<Node> reachableNodes = getReachableNodes();
+		List<Node> persistedReachableNodes = getPersistedReachableNodes();
 		
 		for (Node node : nodes) {
 			boolean found = false;
 			
-			for (Node reachableNode : reachableNodes) {
+			for (Node reachableNode : persistedReachableNodes) {
 				if (node.equals(reachableNode)) {
 					found = true;
 					break;
@@ -305,28 +326,6 @@ public class NetworkEJB {
 			if (!found) {
 				em.remove(node);
 				System.out.println("Removed node " + node.getName());
-			}
-		}
-	}
-
-	public void acknowledgeNewReachableNodes() {
-		
-		List<Node> nodes = getNodes();
-		List<Node> reachableNodes = getReachableNodes();
-		
-		for (Node reachableNode : reachableNodes) {
-			boolean found = false;
-			
-			for (Node node : nodes) {
-				if (reachableNode.equals(node)) {
-					found = true;
-					break;
-				}
-			}
-			
-			if (!found) {
-				insertNode(reachableNode);
-				System.out.println("Inserted node " + reachableNode.getName());
 			}
 		}
 	}

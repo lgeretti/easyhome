@@ -36,27 +36,27 @@ public final class NetworkResource {
     }
     
     @GET
-    @Path("reachable")
+    @Path("persistedreachable")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Node> getReachableNodes() {
-    	return resEjb.getReachableNodes();
+    public List<Node> getPersistedReachableNodes() {
+    	return resEjb.getPersistedReachableNodes();
     }
+    
+    @GET
+    @Path("missingcoords")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<NodeCompactCoordinates> getMissingNodesCoords() {
+    	return resEjb.getMissingCoordinates();
+    }    
+    
     
     @POST
     @Path("prune")
     public void pruneUnreachableNodes() {
     	synchronized(nodeLock) {
-    		resEjb.pruneUnreachableNodes();
+    		resEjb.prunePersistedUnreachableNodes();
     	}
-    }
-    
-    @POST
-    @Path("acknowledge")
-    public void acknowledgeNewReachableNodes() {
-    	synchronized(nodeLock) {
-    		resEjb.acknowledgeNewReachableNodes();
-    	}
-    }    
+    }  
     
     @GET
     @Path("{gid}/{address}")

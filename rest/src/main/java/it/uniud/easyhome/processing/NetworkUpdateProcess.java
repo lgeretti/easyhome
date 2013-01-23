@@ -8,6 +8,7 @@ import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.Node;
+import it.uniud.easyhome.network.NodeCompactCoordinates;
 import it.uniud.easyhome.packets.natives.NodeDescrReqPacket;
 import it.uniud.easyhome.packets.natives.SimpleDescrReqPacket;
 
@@ -42,8 +43,17 @@ public class NetworkUpdateProcess extends Process {
 
     	        try {
     	        	
-    	        	restResource.path("network").path("acknowledge").type(MediaType.APPLICATION_JSON).post();
-	                restResource.path("network").path("prune").type(MediaType.APPLICATION_JSON).post();
+    	        	restResource.path("network").path("prune").type(MediaType.APPLICATION_JSON).post();
+    	        	
+    	        	ClientResponse missingNodesCoordsResponse = restResource.path("network").path("missingcoords").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	                List<NodeCompactCoordinates> missingNodesCoords = JsonUtils.getListFrom(missingNodesCoordsResponse, NodeCompactCoordinates.class);
+	                
+	                println("Missing nodes: " + Arrays.toString(missingNodesCoords.toArray()));
+	                
+	                for (NodeCompactCoordinates missingNodeCoord : missingNodesCoords) {
+	                	
+	                	
+	                }
 	                
     	        } catch (Exception e) {
     	        	e.printStackTrace();

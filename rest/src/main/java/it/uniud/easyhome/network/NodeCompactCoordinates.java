@@ -2,16 +2,22 @@ package it.uniud.easyhome.network;
 
 import java.io.Serializable;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /** 
  * Immutable class for compact coordinates of a node across the EasyHome network. 
  */
+@XmlRootElement
 public class NodeCompactCoordinates implements Serializable {
     
 	private static final long serialVersionUID = 1859073539716463156L;
 	
 	// Gateway (and consequently subnetwork) identifier (!=0)
+	@XmlElement(name="gid")
     private byte gid;
     // Address within the network (!=0)
+	@XmlElement(name="address")
     private short address;
     
     public byte getGatewayId() {

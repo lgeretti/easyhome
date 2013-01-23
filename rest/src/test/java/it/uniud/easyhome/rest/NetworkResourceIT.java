@@ -16,6 +16,7 @@ import it.uniud.easyhome.devices.HomeAutomationDevice;
 import it.uniud.easyhome.network.NetworkJob;
 import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.network.Node;
+import it.uniud.easyhome.network.NodeCompactCoordinates;
 import it.uniud.easyhome.network.NodeLogicalType;
 
 import javax.ws.rs.core.MediaType;
@@ -222,10 +223,10 @@ public class NetworkResourceIT {
             assertEquals(ClientResponse.Status.OK,updateResponse.getClientResponseStatus());
     	}
         
-        ClientResponse reachableNodesResponse = client.resource(TARGET).path("reachable").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-        List<Node> reachableNodes = JsonUtils.getListFrom(reachableNodesResponse, Node.class);
+        ClientResponse persistedReachableNodesResponse = client.resource(TARGET).path("persistedreachable").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        List<Node> persistedReachable = JsonUtils.getListFrom(persistedReachableNodesResponse, Node.class);
         
-        assertEquals(7,reachableNodes.size());
+        assertEquals(7,persistedReachable.size());
         
         client.resource(TARGET).path("prune").post();
         
@@ -233,6 +234,14 @@ public class NetworkResourceIT {
 		List<Node> nodeList = JsonUtils.getListFrom(getResponse,Node.class);
 		
 		assertEquals(7,nodeList.size());
+		
+		ClientResponse removeResponse = client.resource(TARGET).path(Byte.toString(gid)).path(Short.toString((short)6)).delete(ClientResponse.class);
+	    assertEquals(ClientResponse.Status.OK,removeResponse.getClientResponseStatus());
+		
+        ClientResponse missingCoordsResponse = client.resource(TARGET).path("missingcoords").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        List<NodeCompactCoordinates> missingCoords = JsonUtils.getListFrom(missingCoordsResponse, NodeCompactCoordinates.class);
+		
+        assertEquals(1, missingCoords.size());
     }
 	
 	@Test
