@@ -10,6 +10,7 @@ import it.uniud.easyhome.common.*;
 import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.devices.HomeAutomationDevice;
 import it.uniud.easyhome.network.Manufacturer;
+import it.uniud.easyhome.network.Neighbor;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.packets.Domain;
@@ -71,9 +72,9 @@ public class MockXBeeNode implements Runnable {
     	
     	List<MockXBeeNode> neighbors = new ArrayList<MockXBeeNode>();
     	
-    	for (Short neighborId : node.getNeighborAddresses()) {
+    	for (Neighbor neighborCoords : node.getNeighbors()) {
     		
-    		MockXBeeNode recoveredNode = getMockXBeeNode(neighborId);
+    		MockXBeeNode recoveredNode = getMockXBeeNode(neighborCoords);
     		
     		if (recoveredNode == null)
     			throw new MockXBeeNodeNotFoundException();
@@ -92,10 +93,10 @@ public class MockXBeeNode implements Runnable {
     	return node.getMappedDevices();
     }
     
-    private MockXBeeNode getMockXBeeNode(short address) {
+    private MockXBeeNode getMockXBeeNode(Neighbor neighborCoords) {
     	
     	for (MockXBeeNode node : network.getNodes()) {
-    		if (node.getAddress() == address)
+    		if (node.getAddress() == neighborCoords.getAddress())
     			return node;
     	}
     	return null;

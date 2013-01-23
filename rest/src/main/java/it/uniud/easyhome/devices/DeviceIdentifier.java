@@ -19,6 +19,7 @@ public class DeviceIdentifier implements Serializable {
 		this.device = device;
 	}
 	
+	@SuppressWarnings("unused")
 	private DeviceIdentifier() { }
 
 	public short getEndpoint() {

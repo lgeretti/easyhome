@@ -2,23 +2,20 @@ package it.uniud.easyhome.network;
 
 import java.io.Serializable;
 
-/** 
- * Immutable class for absolute coordinates of a module across the EasyHome network. 
- */
-public class NodeCoordinates implements Serializable {
+import javax.persistence.Embeddable;
 
-	private static final long serialVersionUID = 458835586884747577L;
+/** 
+ * Immutable class for coordinates of a neighbor within a subnetwork.
+ */
+@Embeddable
+public class Neighbor implements Serializable {
     
-    // Gateway (and consequently subnetwork) identifier (!=0)
-    private byte gid;
+	private static final long serialVersionUID = -7424774896258284764L;
+
     // Node unique id (global address, like a IEEE MAC address, fixed for a node)
     private long nuid;
     // Address within the network (!=0)
     private short address;
-    
-    public byte getGatewayId() {
-        return gid;
-    }
     
     public long getNuid() {
     	return nuid;
@@ -28,18 +25,26 @@ public class NodeCoordinates implements Serializable {
         return address;
     }
     
-    public NodeCoordinates(byte gid, long nuid, short address) {
-        this.gid = gid;
+    @SuppressWarnings("unused")
+	private Neighbor() { }
+    
+    public Neighbor(long nuid, short address) {
         this.nuid = nuid;
         this.address = address;
+    }
+    
+    public void setNuid(long nuid) {
+    	this.nuid = nuid;
+    }
+    
+    public void setAddress(short address) {
+    	this.address = address;
     }
     
     public String toString() {
     	StringBuilder strb = new StringBuilder();
     	
     	strb.append("(")
-    		.append(gid)
-    		.append(":")
     		.append(Long.toHexString(nuid))
     		.append(":")
     		.append(Integer.toHexString(0xFFFF & address))
@@ -51,13 +56,11 @@ public class NodeCoordinates implements Serializable {
     @Override
     public boolean equals(Object other) {
         
-        if (!(other instanceof NodeCoordinates))
+        if (!(other instanceof Neighbor))
             return false;
         
-        NodeCoordinates otherCoords = (NodeCoordinates) other;
-        
-        if (otherCoords.getGatewayId() != this.getGatewayId())
-            return false;
+        Neighbor otherCoords = (Neighbor) other;
+
         if (otherCoords.getNuid() != this.getNuid())
             return false;
         if (otherCoords.getAddress() != this.getAddress())
@@ -69,7 +72,6 @@ public class NodeCoordinates implements Serializable {
     @Override
     public int hashCode() {
         int hash = 1;
-        hash = hash * 31 + gid;
         hash = (int)(hash * 31 + nuid);
         hash = hash * 31 + address;
         return hash;

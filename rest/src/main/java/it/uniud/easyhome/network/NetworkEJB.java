@@ -259,32 +259,32 @@ public class NetworkEJB {
 		
 		Node node = findNode(currentGatewayId,currentAddress);
 		
-		if (node == null) {
+		if (node == null)
 			coordsMissing.add(new NodeCompactCoordinates(currentGatewayId,currentAddress));
-		}
-		
-		//System.out.println("Looking up " + node.getName());
-
-		nodesFound.add(node);
-		
-		if (node.getLogicalType() == NodeLogicalType.ROUTER || node.getLogicalType() == NodeLogicalType.COORDINATOR) {
-		
-			//System.out.println("Found " + node.getNeighborAddresses().size() + " neighbors");
+		else {
+			System.out.println("Looking up " + node.getName());
+	
+			nodesFound.add(node);
 			
-			for (Short neighborAddr : node.getNeighborAddresses()) {
-				if (!addressesFound.contains(neighborAddr)) {
-				//	System.out.println("Address " + neighborAddr + " is new, adding");
-					addressesToCheck.add(neighborAddr);
-					addressesFound.add(neighborAddr);
-				} else {
-				//	System.out.println("Address " + neighborAddr + " is already present, not adding");
+			if (node.getLogicalType() == NodeLogicalType.ROUTER || node.getLogicalType() == NodeLogicalType.COORDINATOR) {
+			
+				System.out.println("Found " + node.getNeighbors().size() + " neighbors");
+				
+				for (Neighbor neighbor : node.getNeighbors()) {
+					if (!addressesFound.contains(neighbor.getAddress())) {
+						System.out.println("Address " + neighbor + " is new, adding");
+						addressesToCheck.add(neighbor.getAddress());
+						addressesFound.add(neighbor.getAddress());
+					} else {
+						System.out.println("Address " + neighbor + " is already present, not adding");
+					}
 				}
 			}
+			
+			Short nextAddress = addressesToCheck.poll();
+			if (nextAddress != null)
+				traverseReachableNodes(coordsMissing, nodesFound, addressesFound, addressesToCheck, nextAddress, currentGatewayId);
 		}
-		
-		Short nextAddress = addressesToCheck.poll();
-		if (nextAddress != null)
-			traverseReachableNodes(coordsMissing, nodesFound, addressesFound, addressesToCheck, nextAddress, currentGatewayId);
 	}
 
 	public void pruneUnreachableNodes() {

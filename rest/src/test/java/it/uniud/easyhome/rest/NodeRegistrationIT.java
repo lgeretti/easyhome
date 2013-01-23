@@ -174,7 +174,7 @@ public class NodeRegistrationIT {
 	    			passedTests++;
 	    		}
 	    		
-	    		if (recoveredNode1.getNeighborAddresses().size() == 1) {
+	    		if (recoveredNode1.getNeighbors().size() == 1) {
 	    			System.out.print("d");
 	    			passedTests++;
 	    		}

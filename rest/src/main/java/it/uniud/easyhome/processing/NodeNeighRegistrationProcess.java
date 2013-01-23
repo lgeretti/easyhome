@@ -5,6 +5,7 @@ import java.util.List;
 
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
+import it.uniud.easyhome.network.Neighbor;
 import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.packets.natives.NativePacket;
@@ -50,7 +51,7 @@ public class NodeNeighRegistrationProcess extends Process {
 	        		NodeNeighRspPacket neighPkt = new NodeNeighRspPacket(pkt);
 	        		
 	        		if (neighPkt.isSuccessful()) {
-		        		List<Short> newNeighborAddresses = neighPkt.getNeighborAddresses();
+		        		List<Neighbor> newNeighbors = neighPkt.getNeighbors();
 		        			
 		        		Node node;
 		        		ClientResponse updateResponse;
@@ -61,9 +62,9 @@ public class NodeNeighRegistrationProcess extends Process {
 			        							.path(Byte.toString(neighPkt.getSrcCoords().getGatewayId())).path(Short.toString(neighPkt.getSrcCoords().getAddress()))
 			        							.accept(MediaType.APPLICATION_JSON).get(Node.class);
 			        		
-			        		if (neighborsChanged(node, newNeighborAddresses)) {
+			        		if (neighborsChanged(node, newNeighbors)) {
 			        			
-			        			node.setNeighbors(newNeighborAddresses);
+			        			node.setNeighbors(newNeighbors);
 				        		
 				                updateResponse = restResource.path("network").path("update")
 				                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
@@ -75,7 +76,7 @@ public class NodeNeighRegistrationProcess extends Process {
 			                    } catch (JMSException ex) { }
 				                
 				                if (updateResponse.getClientResponseStatus() == Status.OK)
-				                	println("Node '" + node.getName() + "' updated with neighbors information (" + Arrays.toString(newNeighborAddresses.toArray()) + ")");
+				                	println("Node '" + node.getName() + "' updated with neighbors information (" + Arrays.toString(newNeighbors.toArray()) + ")");
 				                else
 				                	println("Node '" + node.getName() + "' neighbors information update failed");
 			        		} else {
@@ -90,17 +91,17 @@ public class NodeNeighRegistrationProcess extends Process {
     	}
     }
     
-    private boolean neighborsChanged(Node node, List<Short> newNeighborAddresses) {
+    private boolean neighborsChanged(Node node, List<Neighbor> newNeighbors) {
     	
-    	List<Short> oldNeighborAddresses = node.getNeighborAddresses();
+    	List<Neighbor> oldNeighbors = node.getNeighbors();
     	
-    	if (oldNeighborAddresses.size() != newNeighborAddresses.size())
+    	if (oldNeighbors.size() != newNeighbors.size())
     		return true;
     	
-    	for (Short oldNeighborAddress : oldNeighborAddresses) {
+    	for (Neighbor oldNeighbor : oldNeighbors) {
     		boolean found = false;
-    		for (Short newNeighborAddress : newNeighborAddresses) {
-    			if (newNeighborAddress.equals(oldNeighborAddress)) {
+    		for (Neighbor newNeighborAddress : newNeighbors) {
+    			if (newNeighborAddress.equals(oldNeighbor)) {
     				found = true;
     				break;
     			}

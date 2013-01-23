@@ -59,7 +59,7 @@ public class NodeTest {
         
         assertEquals(10L, node1.getNuid());
         assertEquals("test", node1.getName());
-        assertEquals(node1.getNeighborAddresses().size(),1);
+        assertEquals(node1.getNeighbors().size(),1);
     }
     
 }

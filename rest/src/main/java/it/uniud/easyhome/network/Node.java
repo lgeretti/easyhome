@@ -45,9 +45,10 @@ public class Node implements Serializable {
     @Column
     private Manufacturer manufacturer;
     
+    @Embedded
     @ElementCollection
-    @CollectionTable(name = "NeighborIds")
-    private List<Short> neighborIds = new ArrayList<Short>();
+    @CollectionTable(name = "Neighbors")
+    private List<Neighbor> neighbors = new ArrayList<Neighbor>();
     
     @Embedded
     @ElementCollection
@@ -69,11 +70,11 @@ public class Node implements Serializable {
     }
     
     public void addNeighbor(Node node) {
-    	neighborIds.add(node.getAddress());
+    	neighbors.add(new Neighbor(node.getNuid(),node.getAddress()));
     }
     
-	public void setNeighbors(List<Short> neighborIds) {
-		this.neighborIds = neighborIds;
+	public void setNeighbors(List<Neighbor> neighbors) {
+		this.neighbors = neighbors;
 	}
     
 	public void setEndpoints(List<Short> endpoints) {
@@ -217,8 +218,8 @@ public class Node implements Serializable {
     	return this.liveness;
     }
     
-    public List<Short> getNeighborAddresses() {
-    	return this.neighborIds;
+    public List<Neighbor> getNeighbors() {
+    	return this.neighbors;
     }
     
     public List<Short> getEndpoints() {

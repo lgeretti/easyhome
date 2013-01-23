@@ -9,6 +9,7 @@ import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.exceptions.InvalidNodeDescException;
 import it.uniud.easyhome.exceptions.InvalidPacketLengthException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
+import it.uniud.easyhome.network.Neighbor;
 import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.packets.ModuleCoordinates;
@@ -40,16 +41,17 @@ public class NodeNeighRspPacket extends NativePacket {
 		return (this.getOperation().getData()[0] == 0);
 	}
 
-	public List<Short> getNeighborAddresses() {
+	public List<Neighbor> getNeighbors() {
 		
-		List<Short> result = new ArrayList<Short>();
+		List<Neighbor> result = new ArrayList<Neighbor>();
 		
 		byte[] opData = this.getOperation().getData();
 		
 		int numNeighbors = opData[3];
 		
 		for (int n=0;n<numNeighbors;n++) {
-			result.add(ByteUtils.getShort(opData, 20+n*22, Endianness.LITTLE_ENDIAN));
+			result.add(new Neighbor(ByteUtils.getLong(opData, 12+n*22, Endianness.LITTLE_ENDIAN),
+											   ByteUtils.getShort(opData, 20+n*22, Endianness.LITTLE_ENDIAN)));
 		}
 		
 		return result;
