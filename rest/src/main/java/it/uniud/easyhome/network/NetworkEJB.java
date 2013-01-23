@@ -233,33 +233,35 @@ public class NetworkEJB {
 											   .setParameter("t", NodeLogicalType.COORDINATOR)
 											   .getResultList();
 		
-		List<Node> result = new ArrayList<Node>();
+		List<Node> nodesFound = new ArrayList<Node>();
 
+		Set<NodeCompactCoordinates> coordsMissing = new HashSet<NodeCompactCoordinates>();
 		
 		for (Node coord : coordinators) {
 			byte currentGatewayId = coord.getGatewayId();
 			short currentAddress = coord.getAddress();
 
-			Set<Short> addressesFound = new HashSet<Short>();
-			Set<Node> nodesFound = new HashSet<Node>();
-			Queue<Short> addressesToCheck = new ConcurrentLinkedQueue<Short>();
+			Set<Short> currentAddressesFound = new HashSet<Short>();
+			Set<Node> currentNodesFound = new HashSet<Node>();
+			Queue<Short> currentAddressesToCheck = new ConcurrentLinkedQueue<Short>();
 
-			addressesFound.add(currentAddress);
-			traverseReachableNodes(nodesFound, addressesFound, addressesToCheck, currentAddress, currentGatewayId);
+			currentAddressesFound.add(currentAddress);
+			traverseReachableNodes(coordsMissing, currentNodesFound, currentAddressesFound, currentAddressesToCheck, currentAddress, currentGatewayId);
 			
-			result.addAll(nodesFound);
+			nodesFound.addAll(currentNodesFound);
 		}
 		
-		return result;
+		return nodesFound;
 	}
 
-	private void traverseReachableNodes(Set<Node> nodesFound, Set<Short> addressesFound, Queue<Short> addressesToCheck, 
+	private void traverseReachableNodes(Set<NodeCompactCoordinates> coordsMissing, Set<Node> nodesFound, Set<Short> addressesFound, Queue<Short> addressesToCheck, 
 										short currentAddress, byte currentGatewayId) {
 		
 		Node node = findNode(currentGatewayId,currentAddress);
 		
-		if (node == null)
-			throw new NodeNotFoundException();
+		if (node == null) {
+			coordsMissing.add(new NodeCompactCoordinates(currentGatewayId,currentAddress));
+		}
 		
 		//System.out.println("Looking up " + node.getName());
 
@@ -282,7 +284,7 @@ public class NetworkEJB {
 		
 		Short nextAddress = addressesToCheck.poll();
 		if (nextAddress != null)
-			traverseReachableNodes(nodesFound, addressesFound, addressesToCheck, nextAddress, currentGatewayId);
+			traverseReachableNodes(coordsMissing, nodesFound, addressesFound, addressesToCheck, nextAddress, currentGatewayId);
 	}
 
 	public void pruneUnreachableNodes() {
