@@ -35,8 +35,6 @@ public class Node implements Serializable {
     @Column(nullable = false)
     private short address;    
     @Column(nullable = false)
-    private byte capability;
-    @Column(nullable = false)
     private NodeLogicalType logicalType;
     @Column(nullable = false)
     private NodeLiveness liveness;
@@ -141,13 +139,6 @@ public class Node implements Serializable {
             return this;
         }        
         
-        public Builder setCapability(byte capability) {
-        	if (capability == 0)
-                throw new IllegalArgumentException();
-            node.capability = capability;
-            return this;        		
-        }
-        
         public Builder setLogicalType(NodeLogicalType logicalType) {
         	node.logicalType = logicalType;
         	return this;
@@ -165,7 +156,7 @@ public class Node implements Serializable {
         
         public Node build() {
         	
-        	if ((node.gatewayId == 0) || (node.capability == 0))
+        	if (node.gatewayId == 0)
         		throw new NodeConstructionException();
         	
         	if (node.name == null)
@@ -187,16 +178,16 @@ public class Node implements Serializable {
         return this.name;
     }
     
+    public NodeCoordinates getCoordinates() {
+    	return new NodeCoordinates(gatewayId,nuid,address);
+    }
+    
     public byte getGatewayId() {
         return this.gatewayId;
     }
     
     public short getAddress() {
         return this.address;
-    }
-    
-    public byte getCapability() {
-    	return this.capability;
     }
     
     public Manufacturer getManufacturer() {
@@ -252,7 +243,6 @@ public class Node implements Serializable {
         if (!this.name.equals(otherNode.name)) return false;
         if (this.gatewayId != otherNode.gatewayId) return false;
         if (this.address != otherNode.address) return false;
-        if (this.capability != otherNode.capability) return false;
         if (this.logicalType != otherNode.logicalType) return false;
         if (this.liveness != otherNode.liveness) return false;
         if (this.manufacturer != otherNode.manufacturer) return false;
@@ -269,7 +259,6 @@ public class Node implements Serializable {
         result = prime * result + name.hashCode();
         result = prime * result + gatewayId;
         result = prime * result + address;
-        result = prime * result + capability;
         result = prime * result + logicalType.hashCode();
         result = prime * result + liveness.hashCode();
         result = prime * result + manufacturer.hashCode();

@@ -38,7 +38,7 @@ public class XBeeGateway extends Gateway {
         if (receiveOptions == 0x02) {
         	if (xpkt.getProfileId() == Domain.MANAGEMENT.getCode() && (dstEndpoint == 0x00 || dstEndpoint == 0x01)) {        		
 	        	dstCoords = new ModuleCoordinates((byte)0,0xFFFFL,(short)0xFFFE,(byte)0);
-	        	println("Setting destination as broadcast");
+	        	//println("Setting destination as broadcast");
         	} else {
         		throw new IllegalBroadcastPortException();
         	}
@@ -47,7 +47,7 @@ public class XBeeGateway extends Gateway {
         	// If this is the implicit EasyHome controller endpoint
         	if (xpkt.getProfileId() == Domain.MANAGEMENT.getCode() && (dstEndpoint == 0x00 || dstEndpoint == 0x01)) {
         		dstCoords = new ModuleCoordinates((byte)1,0x0L,(short)0x0,(byte)0);
-        		println("Setting destination as domotic controller");
+        		//println("Setting destination as domotic controller");
         	} else {
         		dstCoords = getCoordinatesFor(dstEndpoint);
         	}
@@ -94,7 +94,7 @@ public class XBeeGateway extends Gateway {
     	
     	byte[] originalBuffer = buffer.toByteArray();
     	
-    	println("Buffer: " + ByteUtils.printBytes(originalBuffer));
+    	//println("Buffer: " + ByteUtils.printBytes(originalBuffer));
     	
     	int readBytes = 0;
     	

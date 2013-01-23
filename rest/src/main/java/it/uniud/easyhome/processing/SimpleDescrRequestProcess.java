@@ -56,13 +56,13 @@ public class SimpleDescrRequestProcess extends Process {
     	    	        	SimpleDescrReqPacket packet = new SimpleDescrReqPacket(node,i,++sequenceNumber);
     	    	            ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
     	    	            getOutboundPacketsProducer().send(outboundMessage);    
-    	    	            println("Simple descriptor for endpoint " + endpoints.get(i) + " of node'" + node.getName() + "' request dispatched");	
+    	    	            println("Simple descriptor for endpoint " + endpoints.get(i) + " of node " + node.getName() + " request dispatched");	
     	        			Thread.sleep(WAIT_TIME_BETWEEN_REQUESTS_MILLIS);
     	        		} catch (Exception e) {
     	    	        	e.printStackTrace();
     	    	        	i--;
-    	    	        	println("Simple descriptor request for endpoint " + endpoints.get(i) + " of node '" + node.getName() +  
-    	    	        			"' could not be dispatched, retrying");
+    	    	        	println("Simple descriptor request for endpoint " + endpoints.get(i) + " of node " + node.getName() +  
+    	    	        			" could not be dispatched, retrying");
     	    	        }
     	        	}
     	        } catch (Exception e) {

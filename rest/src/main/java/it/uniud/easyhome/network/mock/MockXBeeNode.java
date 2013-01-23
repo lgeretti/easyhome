@@ -56,10 +56,6 @@ public class MockXBeeNode implements Runnable {
         return node.getAddress();
     }
     
-    public byte getCapability() {
-    	return node.getCapability();
-    }
-    
     public NodeLogicalType getLogicalType() {
     	return node.getLogicalType();
     }

@@ -45,7 +45,7 @@ public final class NetworkResource {
     @GET
     @Path("missingcoords")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<NodeCompactCoordinates> getMissingNodesCoords() {
+    public List<NodeCoordinates> getMissingNodesCoords() {
     	return resEjb.getMissingCoordinates();
     }    
     
@@ -93,8 +93,7 @@ public final class NetworkResource {
     @Path("insert")
     public Response insertNode(@FormParam("gid") byte gid, 
     						   @FormParam("nuid") long nuid, 
-    						   @FormParam("address") short address,
-    						   @FormParam("capability") byte capability) {
+    						   @FormParam("address") short address) {
     	
     	boolean existed = false;
     	
@@ -102,7 +101,6 @@ public final class NetworkResource {
     		Node.Builder nodeBuilder = new Node.Builder(++nodeId,nuid);
     		Node node = nodeBuilder.setGatewayId(gid)
 					   .setAddress(address)
-					   .setCapability(capability)
 					   .build();
 
     		existed = resEjb.insertNode(node);

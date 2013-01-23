@@ -23,7 +23,7 @@ import com.sun.jersey.api.client.ClientResponse;
 
 public class NodeNeighRequestProcess extends Process {
 	
-	public static long NEIGH_REQUEST_PERIOD_MS = 5000;
+	public static long NEIGH_REQUEST_PERIOD_MS = 4000;
 	
 	private int nodeIdx = 0;
 	

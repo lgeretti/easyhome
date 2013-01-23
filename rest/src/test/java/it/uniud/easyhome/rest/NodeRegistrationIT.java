@@ -33,7 +33,6 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
-@Ignore
 public class NodeRegistrationIT {
     
 	private final static int XBEE_GATEWAY_PORT = 5050;
@@ -112,34 +111,44 @@ public class NodeRegistrationIT {
 		ClientResponse nodeSimpleDescrRegProcessInsertion = insertProcess(ProcessKind.SIMPLE_DESCR_REGISTRATION);
 		assertEquals(ClientResponse.Status.CREATED,nodeSimpleDescrRegProcessInsertion.getClientResponseStatus());
 		
-        Node node1 = new Node.Builder(1,0xA1L)
-        							 .setAddress((short)0x10CD)
+        Node node1 = new Node.Builder(1,0x1)
+        							 .setAddress((short)0x1)
         							 .setGatewayId((byte)gid)
-        							 .setCapability((byte)0x7A)
-        							 .setLogicalType(NodeLogicalType.ROUTER)
+        							 .setLogicalType(NodeLogicalType.COORDINATOR)
         							 .setManufacturer(Manufacturer.DIGI).build();
         
-        Node node2 = new Node.Builder(2,0xA2L)
-		 .setAddress((short)0xBDEF)
+        Node node2 = new Node.Builder(2,0x2)
+		 .setAddress((short)0x2)
 		 .setGatewayId((byte)gid)
-		 .setCapability((byte)0x7A)
 		 .setLogicalType(NodeLogicalType.ROUTER)
 		 .setManufacturer(Manufacturer.DIGI).build();
         
+        Node node3 = new Node.Builder(2,0x3)
+		 .setAddress((short)0x3)
+		 .setGatewayId((byte)gid)
+		 .setLogicalType(NodeLogicalType.END_DEVICE)
+		 .setManufacturer(Manufacturer.DIGI).build();
+        
         node1.addNeighbor(node2);
-        node1.setEndpoints(Arrays.asList((short)18,(short)3));
-        node1.addDevice((short)18, HomeAutomationDevice.DIMMABLE_LIGHT);
-        node1.addDevice((short)3, HomeAutomationDevice.SIMPLE_SENSOR);
+        
+        node2.addNeighbor(node1);
+        
+        node3.setEndpoints(Arrays.asList((short)18,(short)3));
+        node3.addDevice((short)18, HomeAutomationDevice.DIMMABLE_LIGHT);
+        node3.addDevice((short)3, HomeAutomationDevice.SIMPLE_SENSOR);
+        
+        node2.addNeighbor(node3);
         
         mn.register(node1);
         mn.register(node2);
+        mn.register(node3);
         mn.turnOn();
         
         // Robustly check that we persist within a reasonably high time, since 
         // the process persists it asynchronously
         int counter = 0;
         long sleepTime = 500;
-        long maximumSleepTime = 8000;
+        long maximumSleepTime = 15000;
         int testsToPass = 6;
         int passedTests = 0;
         while (sleepTime*counter < maximumSleepTime) {
@@ -152,7 +161,7 @@ public class NodeRegistrationIT {
 						.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	    	List<Node> nodes = JsonUtils.getListFrom(getNodesResponse, Node.class);
 	    	
-	    	if (nodes.size() == 2) {
+	    	if (nodes.size() == mn.getNodes().size()) {
 	    		System.out.print("a");
 	    		passedTests++;
 	    		
@@ -162,24 +171,28 @@ public class NodeRegistrationIT {
 	    		Node recoveredNode2 = client.resource(TARGET).path("network")
 						.path(Byte.toString(node2.getGatewayId())).path(Short.toString(node2.getAddress()))
 						.accept(MediaType.APPLICATION_JSON).get(Node.class);
-
+	    		Node recoveredNode3 = client.resource(TARGET).path("network")
+						.path(Byte.toString(node3.getGatewayId())).path(Short.toString(node3.getAddress()))
+						.accept(MediaType.APPLICATION_JSON).get(Node.class);
 	    		
-	    		if (recoveredNode1.getLogicalType() == NodeLogicalType.ROUTER && recoveredNode2.getLogicalType() == NodeLogicalType.ROUTER) {
+	    		if (recoveredNode1.getLogicalType() == NodeLogicalType.COORDINATOR  
+	    			&& recoveredNode2.getLogicalType() == NodeLogicalType.ROUTER
+	    			&& recoveredNode3.getLogicalType() == NodeLogicalType.END_DEVICE) {
 	    			System.out.print("b");
 	    			passedTests++;
 	    		}
 	    		
-	    		if (recoveredNode1.getEndpoints().size() == 2) {
+	    		if (recoveredNode1.getNeighbors().size() == 1 && recoveredNode2.getNeighbors().size() == 2) {
 	    			System.out.print("c");
 	    			passedTests++;
 	    		}
-	    		
-	    		if (recoveredNode1.getNeighbors().size() == 1) {
+
+	    		if (recoveredNode3.getEndpoints().size() == 2) {
 	    			System.out.print("d");
 	    			passedTests++;
 	    		}
 	    		
-		    	Map<Short,HomeAutomationDevice> devices = recoveredNode1.getMappedDevices();
+		    	Map<Short,HomeAutomationDevice> devices = recoveredNode3.getMappedDevices();
 		    	
 		    	if (devices.size() == 2 &&
 		    		devices.get((short)18) == HomeAutomationDevice.DIMMABLE_LIGHT &&

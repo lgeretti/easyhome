@@ -236,53 +236,50 @@ public class NetworkEJB {
 	public List<Node> getPersistedReachableNodes() {
 
 		Set<Node> nodesFound = new HashSet<Node>();
-		Set<NodeCompactCoordinates> coordsMissing = new HashSet<NodeCompactCoordinates>();
 		
-		reachablePersistedNodesAndMissingCoords(coordsMissing, nodesFound);
+		reachablePersistedNodesAndMissingCoords(new HashSet<NodeCoordinates>(), nodesFound);
 		
 		List<Node> result = new ArrayList<Node>();
 		result.addAll(nodesFound);
 		return result;
 	}
 	
-	public List<NodeCompactCoordinates> getMissingCoordinates() {
+	public List<NodeCoordinates> getMissingCoordinates() {
 
-		Set<Node> nodesFound = new HashSet<Node>();
-		Set<NodeCompactCoordinates> coordsMissing = new HashSet<NodeCompactCoordinates>();
+		Set<NodeCoordinates> coordsMissing = new HashSet<NodeCoordinates>();
 		
-		reachablePersistedNodesAndMissingCoords(coordsMissing, nodesFound);
+		reachablePersistedNodesAndMissingCoords(coordsMissing, new HashSet<Node>());
 		
-		List<NodeCompactCoordinates> result = new ArrayList<NodeCompactCoordinates>();
+		List<NodeCoordinates> result = new ArrayList<NodeCoordinates>();
 		result.addAll(coordsMissing);
 		return result;
 	}
 	
-	private void reachablePersistedNodesAndMissingCoords(Set<NodeCompactCoordinates> missingResult, Set<Node> reachablePersistedResult) {
+	private void reachablePersistedNodesAndMissingCoords(Set<NodeCoordinates> missingResult, Set<Node> reachablePersistedResult) {
 		
 		List<Node> coordinators = getAllNodesOfType(NodeLogicalType.COORDINATOR);
 		
 		for (Node coord : coordinators) {
-			byte currentGatewayId = coord.getGatewayId();
-			short currentAddress = coord.getAddress();
 
-			Set<Short> currentAddressesFound = new HashSet<Short>();
-			Queue<Short> currentAddressesToCheck = new ConcurrentLinkedQueue<Short>();
+			Set<NodeCoordinates> currentAddressesFound = new HashSet<NodeCoordinates>();
+			Queue<NodeCoordinates> currentAddressesToCheck = new ConcurrentLinkedQueue<NodeCoordinates>();
 
-			currentAddressesFound.add(currentAddress);
-			traverseReachableNodes(missingResult, reachablePersistedResult, currentAddressesFound, currentAddressesToCheck, currentAddress, currentGatewayId);
+			currentAddressesFound.add(coord.getCoordinates());
+			traverseReachableNodes(missingResult, reachablePersistedResult, currentAddressesFound, currentAddressesToCheck, coord.getCoordinates());
 		}
 	}
 
-	private void traverseReachableNodes(Set<NodeCompactCoordinates> coordsMissing, Set<Node> nodesFound, Set<Short> addressesFound, Queue<Short> addressesToCheck, 
-										short currentAddress, byte currentGatewayId) {
+	private void traverseReachableNodes(Set<NodeCoordinates> coordsMissing, Set<Node> nodesFound, 
+										Set<NodeCoordinates> coordinatesFound, Queue<NodeCoordinates> coordinatesToCheck, 
+										NodeCoordinates currentCoordinates) {
 		
-		Node node = findNode(currentGatewayId,currentAddress);
+		Node node = findNode(currentCoordinates.getGatewayId(),currentCoordinates.getAddress());
 		
 		//System.out.println("Looking up " + currentGatewayId + ":" + currentAddress);
 		
 		if (node == null) {
 			//System.out.println("Not found in the persistence");
-			coordsMissing.add(new NodeCompactCoordinates(currentGatewayId,currentAddress));
+			coordsMissing.add(currentCoordinates);
 		} else {
 			
 			nodesFound.add(node);
@@ -292,19 +289,20 @@ public class NetworkEJB {
 				//System.out.println("Found " + node.getNeighbors().size() + " neighbors");
 				
 				for (Neighbor neighbor : node.getNeighbors()) {
-					if (!addressesFound.contains(neighbor.getAddress())) {
+					NodeCoordinates neighborCoords = new NodeCoordinates(node.getGatewayId(),neighbor.getNuid(),neighbor.getAddress());
+					if (!coordinatesFound.contains(neighborCoords)) {
 						//System.out.println("Address " + neighbor + " is new, adding");
-						addressesToCheck.add(neighbor.getAddress());
-						addressesFound.add(neighbor.getAddress());
+						coordinatesToCheck.add(neighborCoords);
+						coordinatesFound.add(neighborCoords);
 					} else {
 						//System.out.println("Address " + neighbor + " is already present, not adding");
 					}
 				}
 			}
 			
-			Short nextAddress = addressesToCheck.poll();
-			if (nextAddress != null)
-				traverseReachableNodes(coordsMissing, nodesFound, addressesFound, addressesToCheck, nextAddress, currentGatewayId);
+			NodeCoordinates nextNodeCoordinates = coordinatesToCheck.poll();
+			if (nextNodeCoordinates != null)
+				traverseReachableNodes(coordsMissing, nodesFound, coordinatesFound, coordinatesToCheck, nextNodeCoordinates);
 		}
 	}
 

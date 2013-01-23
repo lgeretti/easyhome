@@ -43,8 +43,6 @@ public class NodeTest {
         nb1.setName("test");
         nb1.setGatewayId((byte)2);
         nb1.setAddress((short)15);
-        nb1.setCapability((byte)14);
-        
         Node node1 = nb1.build();
         
         Node.Builder nb2 = new Node.Builder(2,11L);
@@ -52,8 +50,6 @@ public class NodeTest {
         nb2.setName("test2");
         nb2.setGatewayId((byte)2);
         nb2.setAddress((short)24);
-        nb2.setCapability((byte)14);
-        
         Node node2 = nb2.build();
         node1.addNeighbor(node2);
         

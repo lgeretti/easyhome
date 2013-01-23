@@ -42,10 +42,6 @@ public class NodeAnncePacket extends NativePacket {
 		return ByteUtils.getLong(getOperation().getData(), 2, Endianness.LITTLE_ENDIAN);
 	}
 	
-	public byte getAnnouncedCapability() {
-		return getOperation().getData()[APS_PAYLOAD_LENGTH-1];
-	}
-	
 	public static boolean validates(NativePacket pkt) {
 		
 		if (pkt == null)

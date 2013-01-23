@@ -82,8 +82,6 @@ public class ActiveEndpointsRegistrationProcess extends Process {
 			                queryData.add("gid",String.valueOf(gatewayId));
 			                queryData.add("address",String.valueOf(address));
 			                
-			                println("Deleting NODE_ACTIVE_ENDPOINTS_REQUEST job for " + node.getName());
-			                
 			                restResource.path("network").path("jobs").queryParams(queryData).delete(ClientResponse.class);
 		                	
 		                    try {

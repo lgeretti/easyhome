@@ -52,14 +52,11 @@ public class NodeAnnceRegistrationProcess extends Process {
 	        		byte gatewayId = announce.getSrcCoords().getGatewayId();
 	        		long nuid = announce.getAnnouncedNuid();
 	        		short address = announce.getAnnouncedAddress();
-	        		
-	        		byte capability = announce.getAnnouncedCapability();
 
 	                MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
 	                formData.add("gid",Byte.toString(gatewayId));
 	                formData.add("nuid",Long.toString(nuid));
 	                formData.add("address",Short.toString(address));
-	                formData.add("capability",Byte.toString(capability));
 	                
 	                ClientResponse nodeInsertionResponse = restResource.path("network").path("insert")
 	                		.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);

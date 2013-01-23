@@ -29,7 +29,7 @@ public final class DeviceAnnounceOutpkt extends XBeePacketFromNode {
 		for (int i=0; i<8; i++)
 			apsPayload[i+2] = idBytes[i];
 		
-		apsPayload[10] = node.getCapability();
+		// The capability byte is ignored
 	}
 	
 }
