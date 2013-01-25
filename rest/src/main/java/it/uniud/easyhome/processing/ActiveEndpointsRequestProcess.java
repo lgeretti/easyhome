@@ -49,8 +49,7 @@ public class ActiveEndpointsRequestProcess extends Process {
 
         Node node = JsonUtils.getFrom(getNodeResponse, Node.class);
         
-        if (node.getLogicalType() == NodeLogicalType.END_DEVICE ||
-        	node.getLogicalType() == NodeLogicalType.ROUTER) {
+        if (node.getLogicalType() == NodeLogicalType.END_DEVICE) {
     	
 	    	byte tsn = ++sequenceNumber;
 	    	
@@ -107,8 +106,15 @@ public class ActiveEndpointsRequestProcess extends Process {
         } catch (Exception e) {
         	e.printStackTrace();
         	println("Node active endpoints request could not be dispatched to outbound packets topic");
+        	try {
+				Thread.sleep(JOB_POLLING_TIME_MILLIS);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
         }
     	
+		
     }
     
 }

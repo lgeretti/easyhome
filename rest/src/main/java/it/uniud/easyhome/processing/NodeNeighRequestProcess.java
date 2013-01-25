@@ -26,7 +26,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class NodeNeighRequestProcess extends Process {
 	
-	public static long NEIGH_REQUEST_PERIOD_MS = 4000;
+	public static long NEIGH_REQUEST_PERIOD_MS = 7000;
 	
 	private int nodeIdx = 0;
 	

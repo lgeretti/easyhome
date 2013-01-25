@@ -106,11 +106,11 @@ public class NodeNeighRegistrationProcess extends Process {
 				                    } catch (JMSException ex) { }
 					                
 					                if (updateResponse.getClientResponseStatus() == Status.OK)
-					                	println("Node '" + node.getName() + "' updated with neighbors information");
+					                	println("Node '" + node.getName() + "' updated with neighbors information (#" + newNeighbors.size() + ")");
 					                else
 					                	println("Node '" + node.getName() + "' neighbors information update failed");
 				        		} else {
-				        			println("Node '" + node.getName() + "' has unchanged neighbor information");
+				        			println("Node '" + node.getName() + "' has unchanged neighbor information (#" + newNeighbors.size() + ")");
 				        		}
 			        		}
 		                }

@@ -1,5 +1,6 @@
 package it.uniud.easyhome.gateway;
 
+import it.uniud.easyhome.common.ByteUtils;
 import it.uniud.easyhome.exceptions.ChecksumException;
 import it.uniud.easyhome.exceptions.IncompletePacketException;
 import it.uniud.easyhome.exceptions.InvalidDelimiterException;
@@ -10,6 +11,7 @@ import it.uniud.easyhome.packets.natives.NativePacket;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +19,7 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -215,31 +218,30 @@ public class Gateway implements Runnable {
                 ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                 
                 while (!disconnected) {
-                	
+    	            
 		            handleInboundPacketFrom(istream,buffer,jmsSession,inboundProducer,outboundProducer);
-                    handleOutboundPacketsTo(ostream,outboundConsumer);	                    
+                    handleOutboundPacketsTo(ostream,outboundConsumer);
                 }
-            
+                
             } catch (Exception ex) {
               println("Exception: " + ex.getCause().toString() + ", will try to reconnect");
             } finally {
-              try {
-            	  if (skt != null) skt.close();
-              } catch (IOException ex) {
-          		// Whatever the case, the connection is not available anymore
-              } finally {
-            	  println("Connection with " + skt + " closed");  
-              }
-              
-        	  try {
-        		  if (jmsConnection != null)
-        			  jmsConnection.close();
-        	  } catch (JMSException ex) {
-        		// Whatever the case, the connection is not available anymore  
-        	  }
+	              try {
+	            	  if (skt != null) skt.close();
+	              } catch (IOException ex) {
+	          		  // Whatever the case, the connection is not available anymore
+	              } finally {
+		        	  try {
+		        		  if (jmsConnection != null)
+		        			  jmsConnection.close();
+		        	  } catch (JMSException ex) {
+		        		// Whatever the case, the connection is not available anymore  
+		        	  }
+	              }
             }
           }
         } catch (Exception ex) {
+        	
             if (ex instanceof SocketException)
             	println("Gateway is closed");
             else
@@ -300,7 +302,7 @@ public class Gateway implements Runnable {
     	// To be overridden
     }
     
-    private final void handleOutboundPacketsTo(OutputStream os, MessageConsumer consumer) {
+    private final void handleOutboundPacketsTo(OutputStream os, MessageConsumer consumer) throws IOException {
     	
         try {
             while (true) {
@@ -318,8 +320,10 @@ public class Gateway implements Runnable {
 	            	}
             	}
             }
-
-        } catch (Exception e) {
+        } catch (IOException e) {
+        	e.printStackTrace();
+        	throw e;
+        } catch (JMSException e) {
             e.printStackTrace();
         }
     	

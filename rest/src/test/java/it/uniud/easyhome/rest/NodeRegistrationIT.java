@@ -148,7 +148,7 @@ public class NodeRegistrationIT {
         // the process persists it asynchronously
         int counter = 0;
         long sleepTime = 500;
-        long maximumSleepTime = 15000;
+        long maximumSleepTime = 25000;
         int testsToPass = 6;
         int passedTests = 0;
         while (sleepTime*counter < maximumSleepTime) {
