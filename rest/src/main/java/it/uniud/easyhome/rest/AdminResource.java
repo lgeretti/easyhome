@@ -51,6 +51,8 @@ public class AdminResource {
 		//insertProcess(ProcessKind.SIMPLE_DESCR_REGISTRATION);
 		insertProcess(ProcessKind.NODE_NEIGH_REQUEST);
 		insertProcess(ProcessKind.NODE_NEIGH_REGISTRATION);
+		insertProcess(ProcessKind.NODE_DISCOVERY_REQUEST);
+		insertProcess(ProcessKind.NODE_DISCOVERY_REGISTRATION);
 		insertProcess(ProcessKind.NETWORK_UPDATE);
         return Response.ok().build();
     }

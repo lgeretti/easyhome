@@ -36,8 +36,8 @@ public class XBeeGateway extends Gateway {
         // If a broadcast, we use the broadcast format for the destination coordinates, but only
         // if the destination port is actually a management port
         if (receiveOptions == 0x02) {
-        	if (xpkt.getProfileId() == Domain.MANAGEMENT.getCode() && (dstEndpoint == 0x00 || dstEndpoint == 0x01)) {        		
-	        	dstCoords = new ModuleCoordinates((byte)0,0xFFFFL,(short)0xFFFE,(byte)0);
+        	if (xpkt.getProfileId() == Domain.MANAGEMENT.getCode() && (dstEndpoint == 0x00 || dstEndpoint == (byte)0xEA)) {        		
+	        	dstCoords = new ModuleCoordinates((byte)0,0xFFFFL,(short)0xFFFE,dstEndpoint);
 	        	//println("Setting destination as broadcast");
         	} else {
         		throw new IllegalBroadcastPortException();
@@ -45,8 +45,8 @@ public class XBeeGateway extends Gateway {
         } else {
 	        
         	// If this is the implicit EasyHome controller endpoint
-        	if (xpkt.getProfileId() == Domain.MANAGEMENT.getCode() && (dstEndpoint == 0x00 || dstEndpoint == 0x01)) {
-        		dstCoords = new ModuleCoordinates((byte)1,0x0L,(short)0x0,(byte)0);
+        	if (xpkt.getProfileId() == Domain.MANAGEMENT.getCode() && (dstEndpoint == 0x00 || dstEndpoint == (byte)0xEA)) {
+        		dstCoords = new ModuleCoordinates((byte)1,0x0L,(short)0x0,dstEndpoint);
         		//println("Setting destination as domotic controller");
         	} else {
         		dstCoords = getCoordinatesFor(dstEndpoint);

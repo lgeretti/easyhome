@@ -5,6 +5,7 @@ import java.util.List;
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.exceptions.InvalidNodeDescException;
+import it.uniud.easyhome.exceptions.InvalidNodeLogicalTypeException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.NetworkJobType;
@@ -109,7 +110,7 @@ public class NodeDescrRegistrationProcess extends Process {
 	    	       
 	        	} catch (InvalidPacketTypeException e) {
 	        		e.printStackTrace();
-	        	} catch (InvalidNodeDescException e) {
+	        	} catch (InvalidNodeLogicalTypeException e) {
 					e.printStackTrace();
 				} catch (JSONException e) {
 					e.printStackTrace();

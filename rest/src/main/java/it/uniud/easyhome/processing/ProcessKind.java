@@ -39,6 +39,18 @@ public enum ProcessKind {
 			return new NodeNeighRegistrationProcess(pid,uriInfo,this);
 		}
 	},
+	NODE_DISCOVERY_REQUEST {
+		@Override
+		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {
+			return new NodeDiscoveryRequestProcess(pid,uriInfo,this);
+		}
+	},
+	NODE_DISCOVERY_REGISTRATION {
+		@Override
+		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {
+			return new NodeDiscoveryRegistrationProcess(pid,uriInfo,this);
+		}
+	},
 	ACTIVE_ENDPOINTS_REQUEST {
 		@Override
 		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {
