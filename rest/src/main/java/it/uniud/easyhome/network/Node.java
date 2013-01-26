@@ -20,9 +20,7 @@ import javax.xml.bind.annotation.*;
 @Table(name = "Node")
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Node implements Serializable {
-
-	private static final long serialVersionUID = -239673332667054641L;
+public class Node {
 	
 	@Id
 	private long id;

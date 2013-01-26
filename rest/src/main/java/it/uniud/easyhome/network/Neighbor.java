@@ -38,16 +38,6 @@ public class Neighbor implements Serializable {
         this.address = address;
     }
     
-    /*
-    public void setNuid(long nuid) {
-    	this.nuid = nuid;
-    }
-    
-    public void setAddress(short address) {
-    	this.address = address;
-    }
-    */
-    
     public String toString() {
     	StringBuilder strb = new StringBuilder();
     	

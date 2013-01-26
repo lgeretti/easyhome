@@ -15,9 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Table(name = "NetworkJob")
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class NetworkJob implements Serializable {
-
-	private static final long serialVersionUID = -5044126796040723474L;
+public class NetworkJob {
 
 	@Id
 	private int id;

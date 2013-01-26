@@ -1,6 +1,5 @@
 package it.uniud.easyhome.network;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.AttributeOverrides;
@@ -18,9 +17,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Table(name = "Link")
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Link implements Serializable {
-
-	private static final long serialVersionUID = 7233524750252380817L;
+public class Link {
 	
 	@Id
 	private long id;

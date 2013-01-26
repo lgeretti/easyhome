@@ -1,26 +1,25 @@
 package it.uniud.easyhome.network;
 
-import java.io.Serializable;
-
-import javax.xml.bind.annotation.XmlElement;
+import javax.persistence.Column;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /** 
  * Immutable class for absolute coordinates of a module across the EasyHome network. 
  */
 @XmlRootElement
-public class NodeCoordinates implements Serializable {
-
-	private static final long serialVersionUID = 458835586884747577L;
+@XmlAccessorType(XmlAccessType.FIELD)
+public class NodeCoordinates {
     
     // Gateway (and consequently subnetwork) identifier (!=0)
-	@XmlElement(name="gatewayId")
+	@Column(nullable = false)
     private byte gatewayId;
     // Node unique id (global address, like a IEEE MAC address, fixed for a node)
-	@XmlElement(name="nuid")
+	@Column(nullable = false)
     private long nuid;
     // Address within the network (!=0)
-    @XmlElement(name="address")
+	@Column(nullable = false)
     private short address;
     
     public byte getGatewayId() {

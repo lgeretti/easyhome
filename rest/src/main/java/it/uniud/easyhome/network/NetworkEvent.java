@@ -42,7 +42,7 @@ public class NetworkEvent implements Serializable {
 		return address;
 	}
 	
-	public byte endpoint() {
+	public byte getEndpoint() {
 		return endpoint;
 	}
 }
