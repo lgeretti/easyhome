@@ -65,6 +65,7 @@ public class AdminResource {
     	client.resource(TARGET).path("processes").delete();
     	client.resource(TARGET).path("network").delete();
     	client.resource(TARGET).path("network").path("jobs").delete();
+    	client.resource(TARGET).path("network").path("links").delete();
     	
         return Response.ok().build();
     }

@@ -93,6 +93,8 @@ public class NodeDiscoveryRegistrationProcess extends Process {
 		                formData.add("destinationAddress",Short.toString(discAddress));
 		                
 		                restResource.path("network").path("links").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+		                
+		                restResource.path("network").path("links").path("cleanup").post();
 	        		}
 	        	} catch (InvalidPacketTypeException e) {
 	        		e.printStackTrace();

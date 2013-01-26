@@ -4,6 +4,7 @@ package it.uniud.easyhome.network;
 import it.uniud.easyhome.exceptions.MultipleLinkException;
 import it.uniud.easyhome.exceptions.MultipleNodesFoundException;
 import it.uniud.easyhome.exceptions.NodeNotFoundException;
+import it.uniud.easyhome.processing.NodeDiscoveryRequestProcess;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,6 +36,21 @@ public class NetworkEJB {
         CriteriaQuery<Node> criteria = builder.createQuery(Node.class);
         Root<Node> root = criteria.from(Node.class);
         criteria.select(root);
+        
+        TypedQuery<Node> query = em.createQuery(criteria);
+        
+        return query.getResultList();
+	}
+
+	public List<Node> getInfrastructuralNodes() {
+		
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<Node> criteria = builder.createQuery(Node.class);
+        Root<Node> node = criteria.from(Node.class);
+        criteria.select(node).where(
+        		builder.or(
+        				builder.equal(node.get("logicalType"),NodeLogicalType.ROUTER),
+        				builder.equal(node.get("logicalType"),NodeLogicalType.COORDINATOR)));
         
         TypedQuery<Node> query = em.createQuery(criteria);
         
@@ -145,6 +161,16 @@ public class NetworkEJB {
 		em.persist(link);
 	}
 	
+	public void cleanupLinks() {
+	
+		StringBuilder queryBuilder = new StringBuilder("DELETE FROM Link l ")
+		.append("WHERE l.timestamp<=:t ");
+		
+		TypedQuery<Link> query = em.createQuery(queryBuilder.toString(),Link.class)
+		.setParameter("t", System.currentTimeMillis()-2*NodeDiscoveryRequestProcess.DISCOVERY_REQUEST_PERIOD_MS);
+		
+		query.executeUpdate();
+	}
 	
 	public Link findLinkById(long id) {
 		return em.find(Link.class, id);

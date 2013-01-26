@@ -225,6 +225,11 @@ public class NetworkResourceIT {
         List<NodeCoordinates> missingCoords = JsonUtils.getListFrom(missingCoordsResponse, NodeCoordinates.class);
 		
         assertEquals(1, missingCoords.size());
+        
+		getResponse = client.resource(TARGET).path("infrastructural").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+		List<Node> infrastructuralNodesList = JsonUtils.getListFrom(getResponse,Node.class);
+		
+		assertEquals(4,infrastructuralNodesList.size());
     }
 	
 	@Test

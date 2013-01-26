@@ -27,7 +27,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class NodeDiscoveryRequestProcess extends Process {
 	
-	public static long DISCOVERY_REQUEST_PERIOD_MS = 5000;
+	public static long DISCOVERY_REQUEST_PERIOD_MS = 10000;
 	
 	private int nodeIdx = 0;
 	
@@ -41,7 +41,8 @@ public class NodeDiscoveryRequestProcess extends Process {
 	protected void process() throws JMSException, NamingException {
 
     	try {
-	    	ClientResponse getResponse = restResource.path("network").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+    		
+	    	ClientResponse getResponse = restResource.path("network").path("infrastructural").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        	        
 	    	List<Node> nodes = JsonUtils.getListFrom(getResponse, Node.class);
 	    
@@ -50,17 +51,16 @@ public class NodeDiscoveryRequestProcess extends Process {
 		
 		    	Node node = nodes.get(nodeIdx);
 		    	
-		    	if (node.getLogicalType() == NodeLogicalType.ROUTER || node.getLogicalType() == NodeLogicalType.COORDINATOR) {
-		    		
-		    		sequenceNumber++;
-		    		
-		    		NodeDiscoveryReqPacket packet = new NodeDiscoveryReqPacket(node,sequenceNumber);
-			 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
-			    	getOutboundPacketsProducer().send(outboundMessage);    
-			    	println("Node '" + node.getName() + "' discovery request dispatched");
-		    	} 
+	    		sequenceNumber++;
+	    		
+	    		NodeDiscoveryReqPacket packet = new NodeDiscoveryReqPacket(node,sequenceNumber);
+		 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
+		    	getOutboundPacketsProducer().send(outboundMessage);    
+		    	println("Node " + node.getName() + " discovery request dispatched");
+		    	Thread.sleep(DISCOVERY_REQUEST_PERIOD_MS/nodes.size());
+	    	} else {
+	    		Thread.sleep(1000);
 	    	}
-			Thread.sleep(DISCOVERY_REQUEST_PERIOD_MS);
 	    	
         } catch (Exception e) {
         	e.printStackTrace();

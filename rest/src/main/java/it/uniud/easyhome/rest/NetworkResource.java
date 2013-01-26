@@ -39,6 +39,13 @@ public final class NetworkResource {
     }
     
     @GET
+    @Path("infrastructural")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Node> getInfrastructuralNodes() {        
+        return resEjb.getInfrastructuralNodes();
+    }
+    
+    @GET
     @Path("persistedreachable")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Node> getPersistedReachableNodes() {
@@ -160,6 +167,17 @@ public final class NetworkResource {
     			return Response.ok().build();
     		}
     	}
+    }
+    
+    @POST
+    @Path("links/cleanup")
+    public Response cleanupLinks() {
+    	
+    	synchronized(linkLock) {
+    		resEjb.cleanupLinks();
+    	}
+    	
+    	return Response.ok().build();
     }
 
 	@GET
