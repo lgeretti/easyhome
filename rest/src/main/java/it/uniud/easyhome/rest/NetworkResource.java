@@ -142,8 +142,8 @@ public final class NetworkResource {
     	
     	synchronized(linkLock) {
     		
-    		Link link = resEjb.findLink(gatewayId,source,destination);
-
+    		Link link = resEjb.findLink(gatewayId,source,destination); 
+    			
     		if (link == null) {
 	    		thisLinkId = ++linkId;
 	    		

@@ -63,13 +63,17 @@ public class NodeDiscoveryRegistrationProcess extends Process {
 	        		NodeDiscoveryRspPacket discPkt = new NodeDiscoveryRspPacket(pkt);
 	        		
 	        		if (discPkt.isSuccessful()) {
+	        			byte gatewayId = discPkt.getSrcCoords().getGatewayId();
+	        			short senderAddress = discPkt.getSenderAddress();
 		        		long discNuid = discPkt.getNuid();
 		        		short discAddress = discPkt.getAddrOfInterest();
-		        		byte gatewayId = discPkt.getSrcCoords().getGatewayId();
 		        		NodeLogicalType discLogicalType = discPkt.getLogicalType();
 		        		Manufacturer discManufacturer = discPkt.getManufacturer();
-		        		
-		                MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+
+		        		Node sender = restResource.path("network").path(Byte.toString(gatewayId)).path(Short.toString(senderAddress))
+		        						.accept(MediaType.APPLICATION_JSON).get(Node.class); 
+		                
+		        		MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
 		                formData.add("gid",Byte.toString(gatewayId));
 		                formData.add("nuid",Long.toString(discNuid));
 		                formData.add("address",Short.toString(discAddress));
@@ -78,20 +82,23 @@ public class NodeDiscoveryRegistrationProcess extends Process {
 		                
 		                restResource.path("network").path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 		        		
-		        		short senderAddress = discPkt.getSenderAddress();
-		        		
-		                println("Node " + gatewayId + ":" + Integer.toHexString(0xFFFFFFFF & senderAddress) + " discovered node " 
-		                		+ Long.toHexString(discNuid) + ":" + Integer.toHexString(0xFFFFFFFF & discAddress) + " of type " + discLogicalType + " and manufacturer " + discManufacturer);
+		                println("Node " + sender.getName() + " discovered " 
+		                		+ Long.toHexString(discNuid) + ":" + Integer.toHexString(0xFFFF & discAddress) + " of type " + discLogicalType);
+		                
+		                formData = new MultivaluedMapImpl();
+		                formData.add("gatewayId",Byte.toString(gatewayId));
+		                formData.add("sourceNuid",Long.toString(sender.getNuid()));
+		                formData.add("sourceAddress",Short.toString(sender.getAddress()));
+		                formData.add("destinationNuid",Long.toString(discNuid));
+		                formData.add("destinationAddress",Short.toString(discAddress));
+		                
+		                restResource.path("network").path("links").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        		}
 	        	} catch (InvalidPacketTypeException e) {
 	        		e.printStackTrace();
 	        	} catch (InvalidNodeLogicalTypeException e) {
-	        		
+	        		// Never going to happen anyway
 	        	}
-	        		/*catch (JSONException e) {
-	        	}
-					e.printStackTrace();
-				}*/
         	}	
     	}
     }

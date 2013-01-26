@@ -15,6 +15,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -49,12 +51,14 @@ public class NetworkEJB {
         
         TypedQuery<Node> query = em.createQuery(criteria);
         
-        List<Node> nodes = query.getResultList();
-        if (nodes.size() == 0)
-        	return null;
-        if (nodes.size() > 1)
+        Node result = null;
+        try {
+        	result = query.getSingleResult();
+        } catch (NonUniqueResultException ex) {
         	throw new MultipleNodesFoundException();
-		return nodes.get(0);
+        } catch (NoResultException ex) {
+        }
+        return result;
 	}
 	
 	public Node findNode(Node node) {
@@ -147,7 +151,7 @@ public class NetworkEJB {
 	}
 	
 
-	public Link findLink(byte gatewayId, Neighbor source, Neighbor destination) throws MultipleLinkException {
+	public Link findLink(byte gatewayId, Neighbor source, Neighbor destination) {
 	
 		StringBuilder queryBuilder = new StringBuilder("SELECT l FROM Link l ")
 											.append("WHERE l.gatewayId=:g ")
@@ -159,15 +163,16 @@ public class NetworkEJB {
         						   .setParameter("s", source)
         						   .setParameter("d", destination);
         
-        List<Link> results = query.getResultList();
+        Link result = null;
         
-        if (results.size() == 0)
-        	return null;
-        
-        if (results.size() > 1)
+        try {
+        	result = query.getSingleResult();
+        } catch (NonUniqueResultException ex) {
         	throw new MultipleLinkException();
+        } catch (NoResultException ex) {
+        }
         
-        return results.get(0);		
+        return result;	
 	}
 	
 	public List<Link> getLinks() {

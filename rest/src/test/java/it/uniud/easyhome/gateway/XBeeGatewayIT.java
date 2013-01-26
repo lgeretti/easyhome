@@ -21,13 +21,14 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
-@Ignore
 public class XBeeGatewayIT {
    
 	private static final String TARGET = "http://localhost:8080/easyhome/rest/hub/gateways";
 	
+	private final static byte SRC_GATEWAY_ID = 2;
 	private final static int SRC_GATEWAY_PORT = 5050;
 	private final static ProtocolType SRC_GATEWAY_PROTOCOL = ProtocolType.XBEE;
+	private final static byte DST_GATEWAY_ID = 3;
 	private final static int DST_GATEWAY_PORT = 6060;
 	private final static ProtocolType DST_GATEWAY_PROTOCOL = ProtocolType.XBEE;
 	
@@ -46,12 +47,12 @@ public class XBeeGatewayIT {
         int dstPort = 2;
         int srcEndpoint = 15;
         
-        ClientResponse srcGwInsertionResponse = insertGateway(SRC_GATEWAY_PORT,SRC_GATEWAY_PROTOCOL);
+        ClientResponse srcGwInsertionResponse = insertGateway(SRC_GATEWAY_ID,SRC_GATEWAY_PORT,SRC_GATEWAY_PROTOCOL);
         String locationPath = srcGwInsertionResponse.getLocation().getPath();
         String[] segments = locationPath.split("/");
         int srcGid = Integer.parseInt(segments[segments.length-1]);
 
-        ClientResponse dstGwInsertionResponse = insertGateway(DST_GATEWAY_PORT,DST_GATEWAY_PROTOCOL);
+        ClientResponse dstGwInsertionResponse = insertGateway(DST_GATEWAY_ID,DST_GATEWAY_PORT,DST_GATEWAY_PROTOCOL);
         locationPath = dstGwInsertionResponse.getLocation().getPath();
         segments = locationPath.split("/");
         int dstGid = Integer.parseInt(segments[segments.length-1]);
@@ -157,9 +158,10 @@ public class XBeeGatewayIT {
         assertEquals(0xFF, receivedSum & 0xFF);
     }
     
-    private ClientResponse insertGateway(int port, ProtocolType protocol) {
+    private ClientResponse insertGateway(byte id, int port, ProtocolType protocol) {
         
     	MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+    	formData.add("id", Byte.toString(id));
     	formData.add("port", String.valueOf(port));
     	formData.add("protocol", protocol.toString());
     	ClientResponse response = client.resource(TARGET)

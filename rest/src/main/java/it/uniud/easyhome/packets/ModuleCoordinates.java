@@ -84,15 +84,15 @@ public class ModuleCoordinates implements Serializable {
     public String toString() {
     	StringBuilder strb = new StringBuilder();
     	
-    	strb.append("{G: ")
+    	strb.append("(")
     		.append(gid)
-    		.append("; N: ")
-    		.append(ByteUtils.printBytes(nuid))
-    		.append("; A: ")
-    		.append(ByteUtils.printBytes(address))
-    		.append("; E: ")
-    		.append(endpoint)
-    		.append("}");
+    		.append(":")
+    		.append(Long.toHexString(nuid))
+    		.append(":")
+    		.append(Integer.toHexString(0xFFFF & address))
+    		.append(":")
+    		.append(Integer.toHexString(0xFF & endpoint))
+    		.append(")");
     	
     	return strb.toString();
     }
