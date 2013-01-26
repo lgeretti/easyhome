@@ -286,14 +286,13 @@ public class NetworkResourceIT {
 	}
 	
 	@Test
-	public void testInsertLink() throws JSONException {
+	public void testInsertAndUpdateLink() throws JSONException {
 		
 		byte gatewayId = 2;
 		Neighbor source = new Neighbor(11L,(short)1);
 		Neighbor destination = new Neighbor(12L,(short)2);
 		
 		ClientResponse insertionResponse = insertLink(gatewayId,source,destination);
-		
 		assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
 		
         String locationPath = insertionResponse.getLocation().getPath();
@@ -308,6 +307,12 @@ public class NetworkResourceIT {
         assertEquals(gatewayId,link.getGatewayId());
         assertTrue(source.equals(link.getSource()));
         assertTrue(destination.equals(link.getDestination()));
+        
+		ClientResponse updateResponse = insertLink(gatewayId,source,destination);
+		assertEquals(ClientResponse.Status.OK,updateResponse.getClientResponseStatus());
+		
+		Link updatedLink = client.resource(TARGET).path("links").path(Long.toString(id)).accept(MediaType.APPLICATION_JSON).get(Link.class);
+	    assertTrue(updatedLink.getDate().after(link.getDate()));
 	}
 	
 	

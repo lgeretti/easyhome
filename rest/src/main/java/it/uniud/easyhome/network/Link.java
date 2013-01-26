@@ -63,6 +63,10 @@ public class Link {
 	public Date getDate() {
 		return new Date(timestamp);
 	}
+	
+	public void update() {
+		this.timestamp = System.currentTimeMillis();
+	}
     
     public String toString() {
     	StringBuilder strb = new StringBuilder();

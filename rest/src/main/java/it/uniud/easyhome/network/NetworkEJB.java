@@ -1,6 +1,7 @@
 package it.uniud.easyhome.network;
 
 
+import it.uniud.easyhome.exceptions.MultipleLinkException;
 import it.uniud.easyhome.exceptions.MultipleNodesFoundException;
 import it.uniud.easyhome.exceptions.NodeNotFoundException;
 
@@ -134,8 +135,8 @@ public class NetworkEJB {
         	em.remove(node);
 	}
 	
-	public void insertLink(long id, byte gatewayId, long sourceNuid, short sourceAddress, long destinationNuid, short destinationAddress) {
-		Link link = new Link(id, gatewayId, new Neighbor(sourceNuid,sourceAddress), new Neighbor(destinationNuid,destinationAddress));
+	public void insertLink(long id, byte gatewayId, Neighbor source, Neighbor destination) {
+		Link link = new Link(id, gatewayId, source, destination);
 		
 		em.persist(link);
 	}
@@ -143,6 +144,30 @@ public class NetworkEJB {
 	
 	public Link findLinkById(long id) {
 		return em.find(Link.class, id);
+	}
+	
+
+	public Link findLink(byte gatewayId, Neighbor source, Neighbor destination) throws MultipleLinkException {
+	
+		StringBuilder queryBuilder = new StringBuilder("SELECT l FROM Link l ")
+											.append("WHERE l.gatewayId=:g ")
+											.append("AND l.source=:s ")
+											.append("AND l.destination=:d");
+											
+        TypedQuery<Link> query = em.createQuery(queryBuilder.toString(),Link.class)
+        						   .setParameter("g", gatewayId)
+        						   .setParameter("s", source)
+        						   .setParameter("d", destination);
+        
+        List<Link> results = query.getResultList();
+        
+        if (results.size() == 0)
+        	return null;
+        
+        if (results.size() > 1)
+        	throw new MultipleLinkException();
+        
+        return results.get(0);		
 	}
 	
 	public List<Link> getLinks() {
@@ -155,6 +180,17 @@ public class NetworkEJB {
         TypedQuery<Link> query = em.createQuery(criteria);
         
         return query.getResultList();
+	}
+	
+	public void updateLink(Link link) {
+		Link retrieved = em.find(Link.class, link.getId());
+		
+		if (retrieved == null)
+			throw new RuntimeException("Missing link to update");
+		
+		retrieved.update();
+		
+		em.merge(retrieved);
 	}
 	
 	public boolean removeLink(long id) {

@@ -1,5 +1,6 @@
 package it.uniud.easyhome.rest;
 
+import it.uniud.easyhome.exceptions.MultipleLinkException;
 import it.uniud.easyhome.network.*;
 
 import java.util.List;
@@ -128,29 +129,40 @@ public final class NetworkResource {
     
     @POST
     @Path("links")
-    public Response insertLink(@FormParam("gatewayId") byte gatewayId, 
+    public Response insertOrUpdateLink(@FormParam("gatewayId") byte gatewayId, 
     						   @FormParam("sourceNuid") long sourceNuid, 
     						   @FormParam("sourceAddress") short sourceAddress,
     						   @FormParam("destinationNuid") long destinationNuid,
-    						   @FormParam("destinationAddress") short destinationAddress) {
+    						   @FormParam("destinationAddress") short destinationAddress) throws MultipleLinkException {
     	
     	long thisLinkId;
     	
+    	Neighbor source = new Neighbor(sourceNuid,sourceAddress);
+    	Neighbor destination = new Neighbor(destinationNuid,destinationAddress);
+    	
     	synchronized(linkLock) {
-
-    		thisLinkId = ++linkId;
     		
-    		resEjb.insertLink(thisLinkId, gatewayId, sourceNuid, sourceAddress, destinationNuid, destinationAddress);
+    		Link link = resEjb.findLink(gatewayId,source,destination);
+
+    		if (link == null) {
+	    		thisLinkId = ++linkId;
+	    		
+	    		resEjb.insertLink(thisLinkId, gatewayId, source, destination);
+	    		
+	            return Response.created(
+                        uriInfo.getAbsolutePathBuilder()
+                               .path(Long.toString(thisLinkId))
+                               .build())
+                      .build();
+    		} else {
+    			resEjb.updateLink(link);
+    			
+    			return Response.ok().build();
+    		}
     	}
-        
-        return Response.created(
-                             uriInfo.getAbsolutePathBuilder()
-                                    .path(Long.toString(thisLinkId))
-                                    .build())
-                           .build();
     }
-    
-    @GET
+
+	@GET
     @Path("links/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Link getLink(@PathParam("id") long id) {
