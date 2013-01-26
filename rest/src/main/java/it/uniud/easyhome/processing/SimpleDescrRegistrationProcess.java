@@ -82,7 +82,8 @@ public class SimpleDescrRegistrationProcess extends Process {
 		                
 		                if (updateResponse.getClientResponseStatus() == Status.OK) {
 		                	
-		                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.SIMPLE_DESCR_ACQUIRED, node.getGatewayId(), node.getAddress(), endpoint);
+		                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.SIMPLE_DESCR_ACQUIRED, 
+		                								node.getCoordinates().getGatewayId(), node.getCoordinates().getAddress(), endpoint);
 		                    try {
 		                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
 		                        networkEventsProducer.send(eventMessage);

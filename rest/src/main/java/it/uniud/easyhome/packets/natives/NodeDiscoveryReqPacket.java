@@ -35,10 +35,10 @@ public class NodeDiscoveryReqPacket extends NativePacket {
 	
 	public NodeDiscoveryReqPacket(Node destinationNode, byte seqNumber) {
 		this(new ModuleCoordinates((byte)1,0L,(short)0,(byte)0xEA),
-			 new ModuleCoordinates(destinationNode.getGatewayId(),destinationNode.getNuid(),destinationNode.getAddress(),(byte)0xEA),				
+			 new ModuleCoordinates(destinationNode.getCoordinates(),(byte)0xEA),				
 			 new Operation(seqNumber,Domain.MANAGEMENT.getCode(),ManagementContext.NODE_DISCOVERY_REQ.getCode(),
 					       (byte)0x0/*Context invariant*/,(byte)0x0/*Irrelevant*/,
-					       ByteUtils.getBytes(destinationNode.getAddress(), Endianness.LITTLE_ENDIAN)));
+					       ByteUtils.getBytes(destinationNode.getCoordinates().getAddress(), Endianness.LITTLE_ENDIAN)));
 	}
 	
 	public NodeDiscoveryReqPacket(NativePacket pkt) {

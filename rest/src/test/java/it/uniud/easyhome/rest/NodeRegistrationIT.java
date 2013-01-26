@@ -112,23 +112,17 @@ public class NodeRegistrationIT {
 		ClientResponse nodeSimpleDescrRegProcessInsertion = insertProcess(ProcessKind.SIMPLE_DESCR_REGISTRATION);
 		assertEquals(ClientResponse.Status.CREATED,nodeSimpleDescrRegProcessInsertion.getClientResponseStatus());
 		
-        Node node1 = new Node.Builder(1,0x1)
-        							 .setAddress((short)0x1)
-        							 .setGatewayId((byte)gid)
-        							 .setLogicalType(NodeLogicalType.COORDINATOR)
-        							 .setManufacturer(Manufacturer.DIGI).build();
+        Node node1 = new Node.Builder(1,(byte)gid,0x1,(short)0x1)
+        							.setLogicalType(NodeLogicalType.COORDINATOR)
+        							.setManufacturer(Manufacturer.DIGI).build();
         
-        Node node2 = new Node.Builder(2,0x2)
-		 .setAddress((short)0x2)
-		 .setGatewayId((byte)gid)
-		 .setLogicalType(NodeLogicalType.ROUTER)
-		 .setManufacturer(Manufacturer.DIGI).build();
+        Node node2 = new Node.Builder(2,(byte)gid,0x2,(short)0x2)
+		 							.setLogicalType(NodeLogicalType.ROUTER)
+		 							.setManufacturer(Manufacturer.DIGI).build();
         
-        Node node3 = new Node.Builder(2,0x3)
-		 .setAddress((short)0x3)
-		 .setGatewayId((byte)gid)
-		 .setLogicalType(NodeLogicalType.END_DEVICE)
-		 .setManufacturer(Manufacturer.DIGI).build();
+        Node node3 = new Node.Builder(3,(byte)gid,0x3,(short)0x3)
+		 							.setLogicalType(NodeLogicalType.END_DEVICE)
+		 							.setManufacturer(Manufacturer.DIGI).build();
         
         node1.addNeighbor(node2);
         
@@ -167,13 +161,16 @@ public class NodeRegistrationIT {
 	    		passedTests++;
 	    		
 	    		Node recoveredNode1 = client.resource(TARGET).path("network")
-	    									.path(Byte.toString(node1.getGatewayId())).path(Short.toString(node1.getAddress()))
+	    									.path(Byte.toString(node1.getCoordinates().getGatewayId()))
+	    									.path(Short.toString(node1.getCoordinates().getAddress()))
 	    									.accept(MediaType.APPLICATION_JSON).get(Node.class);
 	    		Node recoveredNode2 = client.resource(TARGET).path("network")
-						.path(Byte.toString(node2.getGatewayId())).path(Short.toString(node2.getAddress()))
+						.path(Byte.toString(node2.getCoordinates().getGatewayId()))
+						.path(Short.toString(node2.getCoordinates().getAddress()))
 						.accept(MediaType.APPLICATION_JSON).get(Node.class);
 	    		Node recoveredNode3 = client.resource(TARGET).path("network")
-						.path(Byte.toString(node3.getGatewayId())).path(Short.toString(node3.getAddress()))
+						.path(Byte.toString(node3.getCoordinates().getGatewayId()))
+						.path(Short.toString(node3.getCoordinates().getAddress()))
 						.accept(MediaType.APPLICATION_JSON).get(Node.class);
 	    		
 	    		if (recoveredNode1.getLogicalType() == NodeLogicalType.COORDINATOR  

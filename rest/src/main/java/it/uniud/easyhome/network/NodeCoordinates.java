@@ -1,6 +1,7 @@
 package it.uniud.easyhome.network;
 
 import javax.persistence.Column;
+import javax.persistence.Embeddable;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -8,6 +9,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 /** 
  * Immutable class for absolute coordinates of a module across the EasyHome network. 
  */
+@Embeddable
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class NodeCoordinates {

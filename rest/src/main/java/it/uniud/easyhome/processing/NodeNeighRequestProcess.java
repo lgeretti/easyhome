@@ -57,8 +57,8 @@ public class NodeNeighRequestProcess extends Process {
 		    		
 		            MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
 		            formData.add("type",NetworkJobType.NODE_NEIGH_REQUEST.toString());
-		            formData.add("gid",Byte.toString(node.getGatewayId()));
-		            formData.add("address",Short.toString(node.getAddress()));
+		            formData.add("gid",Byte.toString(node.getCoordinates().getGatewayId()));
+		            formData.add("address",Short.toString(node.getCoordinates().getAddress()));
 		            formData.add("tsn",Byte.toString(sequenceNumber));
 		            
 		            restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);

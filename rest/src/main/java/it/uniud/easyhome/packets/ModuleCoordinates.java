@@ -1,6 +1,7 @@
 package it.uniud.easyhome.packets;
 
 import it.uniud.easyhome.common.ByteUtils;
+import it.uniud.easyhome.network.NodeCoordinates;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,6 +47,13 @@ public class ModuleCoordinates implements Serializable {
         this.gid = gid;
         this.nuid = nuid;
         this.address = address;
+        this.endpoint = endpoint;
+    }
+    
+    public ModuleCoordinates(NodeCoordinates nodeCoords, byte endpoint) {
+        this.gid = nodeCoords.getGatewayId();
+        this.nuid = nodeCoords.getNuid();
+        this.address = nodeCoords.getAddress();
         this.endpoint = endpoint;
     }
     

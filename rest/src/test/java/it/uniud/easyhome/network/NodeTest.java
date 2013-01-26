@@ -12,25 +12,25 @@ public class NodeTest {
     @Test(expected=IllegalArgumentException.class)
     public void testIncorrectConstruction() {
         
-        new Node.Builder(1,0);
+        new Node.Builder(1,(byte)0,0,(short)0);
     }
     
     @Test(expected=IllegalArgumentException.class)
     public void testIncorrectConstruction2() {
         
-        new Node.Builder(0,1);
+        new Node.Builder(0,(byte)1,0,(short)0);
     }
     
     @Test(expected=IllegalArgumentException.class)
     public void testIncorrectConstruction3() {
         
-        new Node.Builder(0,0);
+        new Node.Builder(0,(byte)0,0,(short)0);
     }
     
     @Test(expected=IllegalArgumentException.class)
     public void testIncorrectName() {
         
-        Node.Builder nb = new Node.Builder(1,1);
+        Node.Builder nb = new Node.Builder(1,(byte)1,0,(short)0);
         
         nb.setName(null);
     }
@@ -38,22 +38,18 @@ public class NodeTest {
     @Test
     public void testConstruction() {
         
-        Node.Builder nb1 = new Node.Builder(1,10L);
+        Node.Builder nb1 = new Node.Builder(1,(byte)2,10L,(short)0);
         
         nb1.setName("test");
-        nb1.setGatewayId((byte)2);
-        nb1.setAddress((short)15);
         Node node1 = nb1.build();
         
-        Node.Builder nb2 = new Node.Builder(2,11L);
+        Node.Builder nb2 = new Node.Builder(2,(byte)2,11L,(short)0);
         
         nb2.setName("test2");
-        nb2.setGatewayId((byte)2);
-        nb2.setAddress((short)24);
         Node node2 = nb2.build();
         node1.addNeighbor(node2);
         
-        assertEquals(10L, node1.getNuid());
+        assertEquals(10L, node1.getCoordinates().getNuid());
         assertEquals("test", node1.getName());
         assertEquals(node1.getNeighbors().size(),1);
     }

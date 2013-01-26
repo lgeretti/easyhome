@@ -26,7 +26,7 @@ public final class NodeDescrRspOutpkt extends XBeePacketFromNode {
 		
 		apsPayload[0] = (byte)0; // SUCCESS
 		
-		byte[] addrBytes = ByteUtils.getBytes(node.getAddress(), Endianness.LITTLE_ENDIAN);
+		byte[] addrBytes = ByteUtils.getBytes(node.getCoordinates().getAddress(), Endianness.LITTLE_ENDIAN);
 		apsPayload[1] = addrBytes[0];
 		apsPayload[2] = addrBytes[1];
 		

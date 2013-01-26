@@ -21,11 +21,11 @@ public final class DeviceAnnounceOutpkt extends XBeePacketFromNode {
 		
 		transactionSeqNumber = node.nextSeqNumber();
 		
-		byte[] addrBytes = ByteUtils.getBytes(node.getAddress(), Endianness.LITTLE_ENDIAN);
+		byte[] addrBytes = ByteUtils.getBytes(node.getCoordinates().getAddress(), Endianness.LITTLE_ENDIAN);
 		apsPayload[0] = addrBytes[0];
 		apsPayload[1] = addrBytes[1];
 		
-		byte[] idBytes = ByteUtils.getBytes(node.getId(), Endianness.LITTLE_ENDIAN);
+		byte[] idBytes = ByteUtils.getBytes(node.getCoordinates().getNuid(), Endianness.LITTLE_ENDIAN);
 		for (int i=0; i<8; i++)
 			apsPayload[i+2] = idBytes[i];
 		

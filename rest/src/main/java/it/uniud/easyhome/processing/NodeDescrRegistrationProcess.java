@@ -97,7 +97,8 @@ public class NodeDescrRegistrationProcess extends Process {
 				                restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 			                }
 			                
-		                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_DESCR_ACQUIRED, node.getGatewayId(), node.getAddress());
+		                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_DESCR_ACQUIRED, 
+		                											node.getCoordinates().getGatewayId(), node.getCoordinates().getAddress());
 		                    try {
 		                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
 		                        networkEventsProducer.send(eventMessage);

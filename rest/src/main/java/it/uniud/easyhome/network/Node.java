@@ -24,14 +24,10 @@ public class Node {
 	
 	@Id
 	private long id;
-	@Column(nullable = false)
-    private long nuid;
     @Column(nullable = false, length = 200)
     private String name;
-    @Column(nullable = false)
-    private byte gatewayId;
-    @Column(nullable = false)
-    private short address;    
+    @Embedded
+    private NodeCoordinates coordinates;
     @Column(nullable = false)
     private NodeLogicalType logicalType;
     @Column(nullable = false)
@@ -66,7 +62,7 @@ public class Node {
     }
     
     public void addNeighbor(Node node) {
-    	neighbors.add(new Neighbor(node.getNuid(),node.getAddress()));
+    	neighbors.add(new Neighbor(node.coordinates.getNuid(),node.coordinates.getAddress()));
     }
     
 	public void setNeighbors(List<Neighbor> neighbors) {
@@ -106,12 +102,12 @@ public class Node {
         
         private Node node;
         
-        public Builder(long id, long nuid) {
+        public Builder(long id, byte gatewayId, long nuid, short address) {
             if (id == 0 || nuid == 0)
                 throw new IllegalArgumentException();            
             node = new Node();
             node.id = id;
-            node.nuid = nuid;
+            node.coordinates = new NodeCoordinates(gatewayId, nuid, address);
             
             node.logicalType = NodeLogicalType.UNDEFINED;
             node.manufacturer = Manufacturer.UNDEFINED;
@@ -123,19 +119,7 @@ public class Node {
                 throw new IllegalArgumentException();
             node.name = name;
             return this;
-        }
-        
-        public Builder setGatewayId(byte gid) {
-            if (gid == 0)
-                throw new IllegalArgumentException();
-            node.gatewayId = gid;
-            return this;
-        }
-        
-        public Builder setAddress(short address) {
-            node.address = address;
-            return this;
-        }        
+        }   
         
         public Builder setLogicalType(NodeLogicalType logicalType) {
         	node.logicalType = logicalType;
@@ -154,22 +138,14 @@ public class Node {
         
         public Node build() {
         	
-        	if (node.gatewayId == 0)
+        	if (node.coordinates.getGatewayId() == 0)
         		throw new NodeConstructionException();
         	
         	if (node.name == null)
-        		node.name = String.valueOf(node.gatewayId) + ":" + Long.toHexString(0xFFFF & node.address);
+        		node.name = node.coordinates.toString();
         	
             return node;
         }
-    }
-    
-    public long getNuid() {
-        return this.nuid;
-    }
-    
-    public String getHexNuid() {
-    	return "0x" + Long.toHexString(nuid);
     }
     
     public String getName() {
@@ -177,15 +153,7 @@ public class Node {
     }
     
     public NodeCoordinates getCoordinates() {
-    	return new NodeCoordinates(gatewayId,nuid,address);
-    }
-    
-    public byte getGatewayId() {
-        return this.gatewayId;
-    }
-    
-    public short getAddress() {
-        return this.address;
+    	return coordinates;
     }
     
     public Manufacturer getManufacturer() {
@@ -237,10 +205,8 @@ public class Node {
             throw new IllegalArgumentException();
         Node otherNode = (Node) other;
         
-        if (this.nuid != otherNode.nuid) return false;
+        if (!this.coordinates.equals(otherNode.coordinates)) return false;
         if (!this.name.equals(otherNode.name)) return false;
-        if (this.gatewayId != otherNode.gatewayId) return false;
-        if (this.address != otherNode.address) return false;
         if (this.logicalType != otherNode.logicalType) return false;
         if (this.liveness != otherNode.liveness) return false;
         if (this.manufacturer != otherNode.manufacturer) return false;
@@ -253,10 +219,8 @@ public class Node {
         final int prime = 31;
 
         long result = 1;
-        result = prime * result + nuid;
         result = prime * result + name.hashCode();
-        result = prime * result + gatewayId;
-        result = prime * result + address;
+        result = prime * result + coordinates.hashCode();
         result = prime * result + logicalType.hashCode();
         result = prime * result + liveness.hashCode();
         result = prime * result + manufacturer.hashCode();

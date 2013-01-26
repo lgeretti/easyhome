@@ -47,13 +47,13 @@ public final class NodeLQIRspOutpkt extends XBeePacketFromNode {
 			// Data in little-endian format
 			
 			// Extended PAN address (plainly using 16 bit network address)
-			byte[] nwkAddr = ByteUtils.getBytes(neighbor.getAddress(), Endianness.LITTLE_ENDIAN);
+			byte[] nwkAddr = ByteUtils.getBytes(neighbor.getCoordinates().getAddress(), Endianness.LITTLE_ENDIAN);
 			apsPayload[idx++] = nwkAddr[0];
 			apsPayload[idx++] = nwkAddr[1];
 			for (int i=0;i<6;i++)
 				apsPayload[idx++] = (byte)0;
 			// MAC address
-			byte[] macAddr = ByteUtils.getBytes(neighbor.getId(), Endianness.LITTLE_ENDIAN);
+			byte[] macAddr = ByteUtils.getBytes(neighbor.getCoordinates().getNuid(), Endianness.LITTLE_ENDIAN);
 			for (int i=0;i<8;i++)
 				apsPayload[idx++] = macAddr[i];
 			// NWK address

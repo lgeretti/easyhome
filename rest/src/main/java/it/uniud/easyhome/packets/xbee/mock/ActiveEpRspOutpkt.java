@@ -33,7 +33,7 @@ public final class ActiveEpRspOutpkt extends XBeePacketFromNode {
 		transactionSeqNumber = tsn;
 		
 		apsPayload[0] = 0; // SUCCESS
-		byte[] nwkAddr = ByteUtils.getBytes(node.getAddress(),Endianness.LITTLE_ENDIAN);
+		byte[] nwkAddr = ByteUtils.getBytes(node.getCoordinates().getAddress(),Endianness.LITTLE_ENDIAN);
 		apsPayload[1] = nwkAddr[0];
 		apsPayload[2] = nwkAddr[1];
 		apsPayload[3] = (byte)(endpoints.size() & 0xFF);

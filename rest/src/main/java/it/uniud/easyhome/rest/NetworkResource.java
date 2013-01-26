@@ -110,9 +110,7 @@ public final class NetworkResource {
     	boolean existed = false;
     	
     	synchronized(nodeLock) {
-    		Node.Builder nodeBuilder = new Node.Builder(++nodeId,nuid)
-    											.setGatewayId(gid)
-    											.setAddress(address);
+    		Node.Builder nodeBuilder = new Node.Builder(++nodeId,gid,nuid,address);
 					   
     		if (logicalType != null)
     			nodeBuilder.setLogicalType(logicalType);

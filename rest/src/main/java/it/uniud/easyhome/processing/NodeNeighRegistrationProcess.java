@@ -99,7 +99,8 @@ public class NodeNeighRegistrationProcess extends Process {
 					                updateResponse = restResource.path("network").path("update")
 					                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
 					                
-				                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_NEIGHBORS_CHANGED, node.getGatewayId(), node.getAddress());
+				                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_NEIGHBORS_CHANGED, 
+				                								node.getCoordinates().getGatewayId(), node.getCoordinates().getAddress());
 				                    try {
 				                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
 				                        networkEventsProducer.send(eventMessage);

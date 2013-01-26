@@ -62,8 +62,8 @@ public class NetworkEJB {
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<Node> criteria = builder.createQuery(Node.class);
         Root<Node> node = criteria.from(Node.class);
-        criteria.select(node).where(builder.equal(node.get("gatewayId"), gid))
-        					 .where(builder.equal(node.get("address"), address));
+        criteria.select(node).where(builder.equal(node.get("coordinates").get("gatewayId"), gid))
+        					 .where(builder.equal(node.get("coordinates").get("address"), address));
         
         TypedQuery<Node> query = em.createQuery(criteria);
         
@@ -78,7 +78,7 @@ public class NetworkEJB {
 	}
 	
 	public Node findNode(Node node) {
-        return findNode(node.getGatewayId(),node.getAddress());
+        return findNode(node.getCoordinates().getGatewayId(),node.getCoordinates().getAddress());
 	}	
 	
 	public List<Node> getAllNodesOfType(NodeLogicalType type) {
@@ -404,7 +404,7 @@ public class NetworkEJB {
 				//System.out.println("Found " + node.getNeighbors().size() + " neighbors");
 				
 				for (Neighbor neighbor : node.getNeighbors()) {
-					NodeCoordinates neighborCoords = new NodeCoordinates(node.getGatewayId(),neighbor.getNuid(),neighbor.getAddress());
+					NodeCoordinates neighborCoords = new NodeCoordinates(node.getCoordinates().getGatewayId(),neighbor.getNuid(),neighbor.getAddress());
 					if (!coordinatesFound.contains(neighborCoords)) {
 						//System.out.println("Address " + neighbor + " is new, adding");
 						coordinatesToCheck.add(neighborCoords);

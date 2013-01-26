@@ -47,7 +47,7 @@ public class NetworkResourceIT {
     	long nuid = 10L;
     	short address = 15;
         
-        ClientResponse insertionResponse = insertNewNode(gid,nuid,address);
+        ClientResponse insertionResponse = insertNewNode(new NodeCoordinates(gid,nuid,address));
         assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
 
         ClientResponse retrievalResponse = client.resource(TARGET).path(Byte.toString(gid)).path(Short.toString(address))
@@ -105,12 +105,9 @@ public class NetworkResourceIT {
     	long nuid = 10L;
     	short address = 0x00CD;
 		
-        Node node1 = new Node.Builder(1,nuid)
-        						.setGatewayId(gid)
-        						.setAddress(address)
-        						.build();
+        Node node1 = new Node.Builder(1,gid,nuid,address).build();
        
-        ClientResponse insertionResponse = insertNewNode(gid,nuid,address);
+        ClientResponse insertionResponse = insertNewNode(new NodeCoordinates(gid,nuid,address));
         assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
 
         Node recoveredNode = client.resource(TARGET).path(Byte.toString(gid)).path(Short.toString(address)).accept(MediaType.APPLICATION_JSON).get(Node.class);
@@ -130,7 +127,7 @@ public class NetworkResourceIT {
     	long nuid = 10L;
     	short address = 0x00CD;
        
-        insertNewNode(gid,nuid,address);
+        insertNewNode(new NodeCoordinates(gid,nuid,address));
 
         ClientResponse deletionResponse = client.resource(TARGET).path(Byte.toString(gid)).path(Short.toString(address)).delete(ClientResponse.class);
         
@@ -147,9 +144,9 @@ public class NetworkResourceIT {
     	short address1 = 0x00CD;
     	short address2 = (short)0xAFCD;
 
-        ClientResponse firstInsertionResponse = insertNewNode(gid,nuid1,address1);
+        ClientResponse firstInsertionResponse = insertNewNode(new NodeCoordinates(gid,nuid1,address1));
         assertEquals(ClientResponse.Status.CREATED,firstInsertionResponse.getClientResponseStatus());
-        ClientResponse secondInsertionResponse = insertNewNode(gid,nuid2,address2);
+        ClientResponse secondInsertionResponse = insertNewNode(new NodeCoordinates(gid,nuid2,address2));
         assertEquals(ClientResponse.Status.CREATED,secondInsertionResponse.getClientResponseStatus());
         
         Node recoveredNode1 = client.resource(TARGET).path(Byte.toString(gid)).path(Short.toString(address1)).accept(MediaType.APPLICATION_JSON).get(Node.class);
@@ -179,7 +176,7 @@ public class NetworkResourceIT {
     	Map<Integer,Node> nodes = new HashMap<Integer,Node>();
     	
     	for (int i=1; i<=numNodes; i++) {
-    		ClientResponse insertionResponse = insertNewNode(gid,(short)i,(short)i);
+    		ClientResponse insertionResponse = insertNewNode(new NodeCoordinates(gid,i,(short)i));
             assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());    		
             nodes.put(i,client.resource(TARGET).path(Byte.toString(gid)).path(Short.toString((short)i)).accept(MediaType.APPLICATION_JSON).get(Node.class));
     	}
@@ -239,13 +236,11 @@ public class NetworkResourceIT {
     	long nuid = 10L;
     	short address = 0x00CD;
 		
-        Node node = new Node.Builder(1,nuid)
+        Node node = new Node.Builder(1,gid,nuid,address)
         				.setName("test")
-        				.setGatewayId(gid)
-        				.setAddress(address)
         				.build();
        
-        insertNewNode(node.getGatewayId(),node.getNuid(),node.getAddress());
+        insertNewNode(node.getCoordinates());
         
         ClientResponse insertionResponse = client.resource(TARGET).path(Byte.toString(gid)).path(Short.toString((address)))
         											  .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
@@ -280,12 +275,12 @@ public class NetworkResourceIT {
 		client.resource(TARGET).path("links").delete();
 	}
 	
-	private ClientResponse insertNewNode(byte gatewayId, long nuid, short address) {
+	private ClientResponse insertNewNode(NodeCoordinates coords) {
 		
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        formData.add("gid",Byte.toString(gatewayId));
-        formData.add("nuid",Long.toString(nuid));
-        formData.add("address",Short.toString(address));
+        formData.add("gid",Byte.toString(coords.getGatewayId()));
+        formData.add("nuid",Long.toString(coords.getNuid()));
+        formData.add("address",Short.toString(coords.getAddress()));
 		
         return client.resource(TARGET).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	}

@@ -87,8 +87,8 @@ public class NodeDiscoveryRegistrationProcess extends Process {
 		                
 		                formData = new MultivaluedMapImpl();
 		                formData.add("gatewayId",Byte.toString(gatewayId));
-		                formData.add("sourceNuid",Long.toString(sender.getNuid()));
-		                formData.add("sourceAddress",Short.toString(sender.getAddress()));
+		                formData.add("sourceNuid",Long.toString(sender.getCoordinates().getNuid()));
+		                formData.add("sourceAddress",Short.toString(sender.getCoordinates().getAddress()));
 		                formData.add("destinationNuid",Long.toString(discNuid));
 		                formData.add("destinationAddress",Short.toString(discAddress));
 		                

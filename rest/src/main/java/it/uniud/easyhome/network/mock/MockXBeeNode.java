@@ -12,6 +12,7 @@ import it.uniud.easyhome.devices.HomeAutomationDevice;
 import it.uniud.easyhome.network.Manufacturer;
 import it.uniud.easyhome.network.Neighbor;
 import it.uniud.easyhome.network.Node;
+import it.uniud.easyhome.network.NodeCoordinates;
 import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.packets.xbee.*;
@@ -40,20 +41,12 @@ public class MockXBeeNode implements Runnable {
     	this.network = network;
     }
     
-    public long getId() {
-        return node.getNuid();
+    public NodeCoordinates getCoordinates() {
+        return node.getCoordinates();
     }
     
     public String getName() {
         return node.getName();
-    }
-    
-    public byte getGatewayId() {
-        return node.getGatewayId();
-    }
-    
-    public short getAddress() {
-        return node.getAddress();
     }
     
     public NodeLogicalType getLogicalType() {
@@ -92,7 +85,7 @@ public class MockXBeeNode implements Runnable {
     private MockXBeeNode getMockXBeeNode(Neighbor neighborCoords) {
     	
     	for (MockXBeeNode node : network.getNodes()) {
-    		if (node.getAddress() == neighborCoords.getAddress())
+    		if (node.getCoordinates().getAddress() == neighborCoords.getAddress())
     			return node;
     	}
     	return null;
@@ -103,7 +96,7 @@ public class MockXBeeNode implements Runnable {
     }
     
     public synchronized void transmit(XBeePacketFromNode pkt) {
-    	network.broadcast(new XBeePacketToNode(pkt,node.getNuid(),node.getAddress()));
+    	network.broadcast(new XBeePacketToNode(pkt,node.getCoordinates().getNuid(),node.getCoordinates().getAddress()));
     }    
     
     public void turnOn() {
@@ -149,7 +142,7 @@ public class MockXBeeNode implements Runnable {
     	if (pkt.getProfileId() == Domain.MANAGEMENT.getCode()) {
 			if (pkt.getClusterId() == ManagementContext.NODE_DESC_REQ.getCode()) {
 				short nwkAddress = ByteUtils.getShort(pkt.getApsPayload(),0,Endianness.LITTLE_ENDIAN);
-				if (nwkAddress == node.getAddress()) {
+				if (nwkAddress == node.getCoordinates().getAddress()) {
 					try {
 						transmit(new NodeDescrRspOutpkt(this,pkt.getTransactionSeqNumber()));
 					} catch (InvalidMockNodeException e) {
