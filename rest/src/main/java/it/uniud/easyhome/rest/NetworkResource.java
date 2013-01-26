@@ -93,22 +93,28 @@ public final class NetworkResource {
     @Path("insert")
     public Response insertNode(@FormParam("gid") byte gid, 
     						   @FormParam("nuid") long nuid, 
-    						   @FormParam("address") short address) {
+    						   @FormParam("address") short address,
+    						   @FormParam("logicalType") NodeLogicalType logicalType,
+    						   @FormParam("manufacturer") Manufacturer manufacturer) {
     	
     	boolean existed = false;
     	
     	synchronized(nodeLock) {
-    		Node.Builder nodeBuilder = new Node.Builder(++nodeId,nuid);
-    		Node node = nodeBuilder.setGatewayId(gid)
-					   .setAddress(address)
-					   .build();
+    		Node.Builder nodeBuilder = new Node.Builder(++nodeId,nuid)
+    											.setGatewayId(gid)
+    											.setAddress(address);
+					   
+    		if (logicalType != null)
+    			nodeBuilder.setLogicalType(logicalType);
+    		if (manufacturer != null)
+    			nodeBuilder.setManufacturer(manufacturer);
 
-    		existed = resEjb.insertNode(node);
+    		existed = resEjb.insertOrUpdateNode(nodeBuilder.build());
     	}
         
         
         if (existed)
-        	return Response.notModified().build();
+        	return Response.ok().build();
         
         return Response.created(
                              uriInfo.getAbsolutePathBuilder()

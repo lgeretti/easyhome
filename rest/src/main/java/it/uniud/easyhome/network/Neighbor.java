@@ -4,9 +4,6 @@ import java.io.Serializable;
 
 import javax.persistence.Embeddable;
 
-/** 
- * Immutable class for coordinates of a neighbor within a subnetwork.
- */
 @Embeddable
 public class Neighbor implements Serializable {
     

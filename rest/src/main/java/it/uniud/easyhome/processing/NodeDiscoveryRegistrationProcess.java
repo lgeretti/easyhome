@@ -69,7 +69,14 @@ public class NodeDiscoveryRegistrationProcess extends Process {
 		        		NodeLogicalType discLogicalType = discPkt.getLogicalType();
 		        		Manufacturer discManufacturer = discPkt.getManufacturer();
 		        		
-		        		Node discoveredNode = new Node.Builder(50,discNuid).setGatewayId(gatewayId).setAddress(discAddress).setLogicalType(discLogicalType).setManufacturer(discManufacturer).build();
+		                MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+		                formData.add("gid",Byte.toString(gatewayId));
+		                formData.add("nuid",Long.toString(discNuid));
+		                formData.add("address",Short.toString(discAddress));
+		                formData.add("logicalType",discLogicalType.toString());
+		                formData.add("manufacturer",discManufacturer.toString());
+		                
+		                restResource.path("network").path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 		        		
 		        		short senderAddress = discPkt.getSenderAddress();
 		        		

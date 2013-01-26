@@ -72,13 +72,20 @@ public class NetworkEJB {
 	 * @param node The node to insert
 	 * @return True if the node already existed
 	 */
-	public boolean insertNode(Node node) {
-        boolean existed = exists(node);
+	public boolean insertOrUpdateNode(Node node) {
+        Node persistedNode = findNode(node);
         
-        if (!existed)
+        if (persistedNode == null)
             em.persist(node);
-        
-        return existed;
+        else {
+        	if (node.getLogicalType() != null)
+        		persistedNode.setLogicalType(node.getLogicalType());
+        	if (node.getManufacturer() != null)
+        		persistedNode.setManufacturer(node.getManufacturer());
+        	
+        	em.merge(persistedNode);
+        }
+        return (persistedNode != null);
 	}
 	
 	public boolean exists(Node node) {
