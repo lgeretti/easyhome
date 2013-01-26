@@ -50,9 +50,7 @@ public class NodeDiscoveryRequestProcess extends Process {
 		
 		    	Node node = nodes.get(nodeIdx);
 		    	
-		    	// NOTE: temporarily removed coordinator as recipient
-		    	// || node.getLogicalType() == NodeLogicalType.COORDINATOR
-		    	if (node.getLogicalType() == NodeLogicalType.ROUTER) {
+		    	if (node.getLogicalType() == NodeLogicalType.ROUTER || node.getLogicalType() == NodeLogicalType.COORDINATOR) {
 		    		
 		    		sequenceNumber++;
 		    		

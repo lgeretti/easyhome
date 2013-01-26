@@ -92,8 +92,6 @@ public abstract class XBeePacket implements Packet {
         
         waitForAvailability(is, length);
         
-        System.out.println("Available bytes: " + is.available());
-        
         byte[] packetPayload = new byte[length];
         
         int sum = 0;

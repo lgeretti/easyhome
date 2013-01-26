@@ -46,7 +46,7 @@ public class HubResourceIT {
 	@Test
 	public void createGateway() throws JSONException {
 		
-		ClientResponse creationResponse = insertGateway(GATEWAY_PORT,GATEWAY_PROTOCOL);
+		ClientResponse creationResponse = insertGateway((byte)2,GATEWAY_PORT,GATEWAY_PROTOCOL);
 		
 		assertEquals(ClientResponse.Status.CREATED,creationResponse.getClientResponseStatus());
 		
@@ -58,9 +58,9 @@ public class HubResourceIT {
 	@Test
 	public void createTwoGateways() throws JSONException {
 		
-		insertGateway(GATEWAY_PORT,GATEWAY_PROTOCOL);
+		insertGateway((byte)2,GATEWAY_PORT,GATEWAY_PROTOCOL);
 		
-		ClientResponse creationResponse2 = insertGateway(GATEWAY_PORT+1,GATEWAY_PROTOCOL);
+		ClientResponse creationResponse2 = insertGateway((byte)3,GATEWAY_PORT+1,GATEWAY_PROTOCOL);
 		assertEquals(ClientResponse.Status.CREATED,creationResponse2.getClientResponseStatus());
 		
 		ClientResponse response = client.resource(TARGET).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
@@ -71,7 +71,7 @@ public class HubResourceIT {
 	@Test
 	public void deleteGateway() throws JSONException {
 		
-		insertGateway(GATEWAY_PORT,GATEWAY_PROTOCOL);
+		insertGateway((byte)2,GATEWAY_PORT,GATEWAY_PROTOCOL);
 		
     	ClientResponse deletionResponse =  client.resource(TARGET).delete(ClientResponse.class);
     	
@@ -82,14 +82,14 @@ public class HubResourceIT {
     public void putRoutingEntry() {
         
         int srcGatewayPort = 5000;
-        int dstGid = 2;
+        byte dstGid = 2;
         long dstNuid = 0x55AAAAAA;
         int dstAddress = 20;
         int dstPort = 4;
         
         ProtocolType protocol = ProtocolType.XBEE;
         
-        ClientResponse gwInsertionResponse = insertGateway(srcGatewayPort,protocol);
+        ClientResponse gwInsertionResponse = insertGateway(dstGid,srcGatewayPort,protocol);
         assertEquals(ClientResponse.Status.CREATED,gwInsertionResponse.getClientResponseStatus());
         String locationPath = gwInsertionResponse.getLocation().getPath();
         String[] segments = locationPath.split("/");
@@ -126,9 +126,10 @@ public class HubResourceIT {
     	client.resource(TARGET).delete();
     }
     
-    private ClientResponse insertGateway(int port, ProtocolType protocol) {
+    private ClientResponse insertGateway(byte gid, int port, ProtocolType protocol) {
         
     	MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+    	formData.add("id", Byte.toString(gid));
     	formData.add("port", String.valueOf(port));
     	formData.add("protocol", protocol.toString());
     	ClientResponse response = client.resource(TARGET)
