@@ -9,6 +9,8 @@ import java.util.Map;
 
 import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.devices.HomeAutomationDevice;
+import it.uniud.easyhome.network.Link;
+import it.uniud.easyhome.network.Neighbor;
 import it.uniud.easyhome.network.NetworkJob;
 import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.network.Node;
@@ -231,7 +233,6 @@ public class NetworkResourceIT {
     	byte gid = 2;
     	long nuid = 10L;
     	short address = 0x00CD;
-    	byte capability = 14;
 		
         Node node = new Node.Builder(1,nuid)
         				.setName("test")
@@ -271,6 +272,7 @@ public class NetworkResourceIT {
 	public void removeNodes() {
 		client.resource(TARGET).delete();
 		client.resource(TARGET).path("jobs").delete();
+		client.resource(TARGET).path("links").delete();
 	}
 	
 	private ClientResponse insertNewNode(byte gatewayId, long nuid, short address) {
@@ -281,6 +283,44 @@ public class NetworkResourceIT {
         formData.add("address",Short.toString(address));
 		
         return client.resource(TARGET).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	}
+	
+	@Test
+	public void testInsertLink() throws JSONException {
+		
+		byte gatewayId = 2;
+		Neighbor source = new Neighbor(11L,(short)1);
+		Neighbor destination = new Neighbor(12L,(short)2);
+		
+		ClientResponse insertionResponse = insertLink(gatewayId,source,destination);
+		
+		assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
+		
+        String locationPath = insertionResponse.getLocation().getPath();
+        String[] segments = locationPath.split("/");
+        long id = Long.parseLong(segments[segments.length-1]);
+		
+        ClientResponse getResponse = client.resource(TARGET).path("links").path(Long.toString(id)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        assertEquals(ClientResponse.Status.OK,getResponse.getClientResponseStatus());
+        
+        Link link = JsonUtils.getFrom(getResponse, Link.class);
+        
+        assertEquals(gatewayId,link.getGatewayId());
+        assertTrue(source.equals(link.getSource()));
+        assertTrue(destination.equals(link.getDestination()));
+	}
+	
+	
+	private ClientResponse insertLink(byte gatewayId, Neighbor source, Neighbor destination) throws JSONException {
+		
+        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+        formData.add("gatewayId",Byte.toString(gatewayId));
+        formData.add("sourceNuid",Long.toString(source.getNuid()));
+        formData.add("sourceAddress",Short.toString(source.getAddress()));
+        formData.add("destinationNuid",Long.toString(destination.getNuid()));
+        formData.add("destinationAddress",Short.toString(destination.getAddress()));
+        
+        return client.resource(TARGET).path("links").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);		
 	}
 	
 	@Test

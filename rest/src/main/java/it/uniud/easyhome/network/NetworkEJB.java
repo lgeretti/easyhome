@@ -134,6 +134,47 @@ public class NetworkEJB {
         	em.remove(node);
 	}
 	
+	public void insertLink(long id, byte gatewayId, long sourceNuid, short sourceAddress, long destinationNuid, short destinationAddress) {
+		Link link = new Link(id, gatewayId, new Neighbor(sourceNuid,sourceAddress), new Neighbor(destinationNuid,destinationAddress));
+		
+		em.persist(link);
+	}
+	
+	
+	public Link findLinkById(long id) {
+		return em.find(Link.class, id);
+	}
+	
+	public List<Link> getLinks() {
+		
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<Link> criteria = builder.createQuery(Link.class);
+        Root<Link> root = criteria.from(Link.class);
+        criteria.select(root);
+        
+        TypedQuery<Link> query = em.createQuery(criteria);
+        
+        return query.getResultList();
+	}
+	
+	public boolean removeLink(long id) {
+		Link link = em.find(Link.class, id);
+		
+		if (link != null) {
+			em.detach(link);
+			return true;
+		} else 
+			return false;
+	}
+	
+	public void removeAllLinks() {
+        
+        List<Link> links = getLinks();
+        
+        for (Link link: links)
+        	em.remove(link);
+	}
+	
 	public void insertJob(int id, NetworkJobType type, byte gatewayId, short address, byte endpoint, byte tsn) {
 		
 		NetworkJob job = new NetworkJob(id, type, gatewayId, address, endpoint, tsn);

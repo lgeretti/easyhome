@@ -17,8 +17,10 @@ public final class NetworkResource {
     private NetworkEJB resEjb;
     
     private static int nodeId = 0;
+    private static long linkId = 0;
     private static int jobId = 0;
     private static Object nodeLock = new Object();
+    private static Object linkLock = new Object();
     private static Object jobLock = new Object();
 
     public NetworkResource() throws NamingException {
@@ -122,6 +124,71 @@ public final class NetworkResource {
                                     .path(Short.toString(address))
                                     .build())
                            .build();
+    }
+    
+    @POST
+    @Path("links")
+    public Response insertLink(@FormParam("gatewayId") byte gatewayId, 
+    						   @FormParam("sourceNuid") long sourceNuid, 
+    						   @FormParam("sourceAddress") short sourceAddress,
+    						   @FormParam("destinationNuid") long destinationNuid,
+    						   @FormParam("destinationAddress") short destinationAddress) {
+    	
+    	long thisLinkId;
+    	
+    	synchronized(linkLock) {
+
+    		thisLinkId = ++linkId;
+    		
+    		resEjb.insertLink(thisLinkId, gatewayId, sourceNuid, sourceAddress, destinationNuid, destinationAddress);
+    	}
+        
+        return Response.created(
+                             uriInfo.getAbsolutePathBuilder()
+                                    .path(Long.toString(thisLinkId))
+                                    .build())
+                           .build();
+    }
+    
+    @GET
+    @Path("links/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Link getLink(@PathParam("id") long id) {
+        
+        Link link = resEjb.findLinkById(id);
+        
+        if (link == null) 
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        
+        return link;
+    }
+    
+    @DELETE
+    @Path("links/{id}")
+    public Response deleteLink(@PathParam("id") long id) {
+    	
+    	boolean existed;
+    	
+    	synchronized(linkLock) {
+        	existed = resEjb.removeLink(id);
+    	}
+    	
+        if (!existed) {
+        	throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+        
+        return Response.ok().build();
+    }
+    
+    @DELETE
+    @Path("links")
+    public Response deleteLinks() {
+        
+    	synchronized(linkLock) {
+    		resEjb.removeAllLinks();
+    	}
+        
+        return Response.ok().build();
     }
     
     @POST

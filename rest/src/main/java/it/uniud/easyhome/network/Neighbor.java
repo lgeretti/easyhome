@@ -2,16 +2,24 @@ package it.uniud.easyhome.network;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 
 @Embeddable
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Neighbor implements Serializable {
     
 	private static final long serialVersionUID = -7424774896258284764L;
 
     // Node unique id (global address, like a IEEE MAC address, fixed for a node)
+	@Column(nullable = false)
     private long nuid;
     // Address within the network (!=0)
+	@Column(nullable = false)
     private short address;
     
     public long getNuid() {
@@ -30,6 +38,7 @@ public class Neighbor implements Serializable {
         this.address = address;
     }
     
+    /*
     public void setNuid(long nuid) {
     	this.nuid = nuid;
     }
@@ -37,13 +46,14 @@ public class Neighbor implements Serializable {
     public void setAddress(short address) {
     	this.address = address;
     }
+    */
     
     public String toString() {
     	StringBuilder strb = new StringBuilder();
     	
     	strb.append("(")
     		.append(Long.toHexString(nuid))
-    		.append(":")
+    		.append(".")
     		.append(Integer.toHexString(0xFFFF & address))
     		.append(")");
     	
@@ -69,7 +79,8 @@ public class Neighbor implements Serializable {
     @Override
     public int hashCode() {
         int hash = 1;
-        hash = (int)(hash * 31 + nuid);
+        hash = hash * 31 + (int)(0xFFFFFFFF & nuid);
+        hash = hash * 31 + (int)((nuid >>> 32) & 0xFFFFFFFF);
         hash = hash * 31 + address;
         return hash;
     }

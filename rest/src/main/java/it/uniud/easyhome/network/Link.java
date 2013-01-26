@@ -3,8 +3,10 @@ package it.uniud.easyhome.network;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.AttributeOverrides;
+import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -24,27 +26,24 @@ public class Link implements Serializable {
 	private long id;
 	@Column(nullable = false)
 	private byte gatewayId;
-	@Column(nullable = false)
-	private long sourceNuid;
-	@Column(nullable = false)
-    private short sourceAddress;
-    @Column(nullable = false)
-    private short destinationAddress;
-    @Column(nullable = false)
-	private long destinationNuid;
+	@Embedded
+	@AttributeOverrides({@AttributeOverride(name="nuid", column=@Column(name="SRC_NUID")),@AttributeOverride(name="address", column=@Column(name="SRC_ADDRESS"))})
+	private Neighbor source;
+	@Embedded
+	@AttributeOverrides({@AttributeOverride(name="nuid", column=@Column(name="DST_NUID")),@AttributeOverride(name="address", column=@Column(name="DST_ADDRESS"))})
+	private Neighbor destination;
+	
 	@Column(nullable = false)
 	private long timestamp;
     
     @SuppressWarnings("unused")
 	private Link() { }
     
-    public Link(long id, byte gatewayId, long sourceNuid, short sourceAddress, long destinationNuid, short destinationAddress) {
+    public Link(long id, byte gatewayId, Neighbor source, Neighbor destination) {
         this.id = id;
         this.gatewayId = gatewayId;
-        this.sourceNuid = sourceNuid;
-        this.sourceAddress = sourceAddress;
-        this.destinationNuid = destinationNuid;
-        this.destinationAddress = destinationAddress;
+        this.source = source;
+        this.destination = destination;
         this.timestamp = System.currentTimeMillis();
     }
     
@@ -56,22 +55,14 @@ public class Link implements Serializable {
 		return gatewayId;
 	}
 
-    public long getSourceNuid() {
-    	return sourceNuid;
-    }
-	
-    public short getSourceAddress() {
-    	return sourceAddress;
+    public Neighbor getSource() {
+    	return source;
     }
 
-    public long getDestinationNuid() {
-    	return destinationNuid;
+    public Neighbor getDestination() {
+    	return destination;
     }
-    
-    public short getDestinationAddress() {
-        return destinationAddress;
-    }
-	
+    	
 	public Date getDate() {
 		return new Date(timestamp);
 	}
@@ -82,9 +73,9 @@ public class Link implements Serializable {
     	strb.append("(")
     		.append(Long.toHexString(gatewayId))
     		.append(": ")
-    		.append(Integer.toHexString(0xFFFF & sourceAddress))
+    		.append(source.toString())
     		.append("->")
-    		.append(Integer.toHexString(0xFFFF & destinationAddress));
+    		.append(destination.toString());
     	
     	return strb.toString();
     }
@@ -99,13 +90,9 @@ public class Link implements Serializable {
 
         if (otherCoords.getGatewayId() != this.getGatewayId())
             return false;
-        if (otherCoords.getSourceNuid() != this.getSourceNuid())
+        if (!otherCoords.getSource().equals(this.getSource()))
             return false;
-        if (otherCoords.getSourceAddress() != this.getSourceAddress())
-            return false;
-        if (otherCoords.getDestinationNuid() != this.getDestinationNuid())
-            return false;        
-        if (otherCoords.getDestinationAddress() != this.getDestinationAddress())
+        if (!otherCoords.getDestination().equals(this.getDestination()))
             return false;
         
         return true;
@@ -116,12 +103,8 @@ public class Link implements Serializable {
         int hash = 1;
         hash = (int)(hash * 31 + id);
         hash = hash * 31 + gatewayId;
-        hash = hash * 31 + (int)(0xFFFFFFFF & sourceNuid);
-        hash = hash * 31 + (int)((sourceNuid >>> 32) & 0xFFFFFFFF);
-        hash = hash * 31 + sourceAddress;
-        hash = hash * 31 + (int)(0xFFFFFFFF & destinationNuid);
-        hash = hash * 31 + (int)((destinationNuid >>> 32) & 0xFFFFFFFF);
-        hash = hash * 31 + destinationAddress;
+        hash = hash * 31 + source.hashCode();
+        hash = hash * 31 + destination.hashCode();
         return hash;
     }
     
