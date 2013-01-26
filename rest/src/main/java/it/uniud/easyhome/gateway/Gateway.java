@@ -1,7 +1,9 @@
 package it.uniud.easyhome.gateway;
 
 import it.uniud.easyhome.common.ByteUtils;
+import it.uniud.easyhome.common.RunnableState;
 import it.uniud.easyhome.exceptions.ChecksumException;
+import it.uniud.easyhome.exceptions.IllegalGatewayStateException;
 import it.uniud.easyhome.exceptions.IncompletePacketException;
 import it.uniud.easyhome.exceptions.InvalidDelimiterException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
@@ -94,8 +96,8 @@ public class Gateway implements Runnable {
     private int mappedEndpointCounter = 2;
     
     protected ServerSocket server = null;
-    
-	protected volatile boolean disconnected = false;
+	
+	protected volatile RunnableState state = RunnableState.STOPPED;
 	
     @SuppressWarnings("unused")
     private Gateway() { }
@@ -164,21 +166,24 @@ public class Gateway implements Runnable {
     }
     
     public void open() { 
-    	// To be overridden
+    	if (state != RunnableState.STOPPED)
+    		throw new IllegalGatewayStateException();
+    	state = RunnableState.STARTING;
+    	
+    	start();
     }
     
+    // To be overridden
+    protected void start() {
+    	
+    }
+
+    /** Close the server */
     public final void close() {
-        try {
-        	disconnect();
-            server.close();
-        } catch (IOException ex) {
-            // We swallow any IO error
-        }
-    }
-    
-    /** Drop any existing connection */
-    public final void disconnect() {
-    	disconnected = true;
+    	state = RunnableState.STOPPING;
+    	try {
+    		server.close();	
+    	} catch (Exception ex) { }
     }
     
     protected final void println(String msg) {
@@ -188,18 +193,23 @@ public class Gateway implements Runnable {
     @Override
     public final void run() {
     	
-        try {
-          server = new ServerSocket(port, MAX_CONNECTIONS);
-          println("Gateway opened on port " + server.getLocalPort());
+    	state = RunnableState.STARTED;
 
-          while (true) {
+        while (state != RunnableState.STOPPING) {
+        	
+        	Socket skt = null;
+        	Connection jmsConnection = null;
+        	
+        	try {
+        		
+            	println("Trying to open the socket for the gateway...");
+        	
+	        	server = new ServerSocket(port, MAX_CONNECTIONS);
+	        	println("Gateway opened on port " + server.getLocalPort());
+	            
+	            skt = server.accept();
             
-            Socket skt = server.accept();
-            Connection jmsConnection = null;
-            try {
                 println("Connection established with " + skt);
-                
-                disconnected = false;
                 
                 InputStream istream = new BufferedInputStream(skt.getInputStream());
                 OutputStream ostream = new BufferedOutputStream(skt.getOutputStream());
@@ -221,17 +231,18 @@ public class Gateway implements Runnable {
                 
                 ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                 
-                while (!disconnected) {
-    	            
+                while (state != RunnableState.STOPPING) {
+                	
 		            handleInboundPacketFrom(istream,buffer,jmsSession,inboundProducer,outboundProducer);
                     handleOutboundPacketsTo(ostream,outboundConsumer);
                 }
                 
             } catch (Exception ex) {
-              println("Exception: " + ex.getCause().toString() + ", will try to reconnect");
+            	ex.printStackTrace();
             } finally {
 	              try {
 	            	  if (skt != null) skt.close();
+	            	  server.close();
 	              } catch (IOException ex) {
 	          		  // Whatever the case, the connection is not available anymore
 	              } finally {
@@ -243,14 +254,9 @@ public class Gateway implements Runnable {
 		        	  }
 	              }
             }
-          }
-        } catch (Exception ex) {
-        	
-            if (ex instanceof SocketException)
-            	println("Gateway is closed");
-            else
-            	println("Gateway could not be opened");
         }
+        state = RunnableState.STOPPED;
+        println("Gateway is closed");
     }
     
     /**
@@ -279,7 +285,7 @@ public class Gateway implements Runnable {
         try {
         	
         	NativePacket nativePkt = readFrom(is,buffer);
-        	println("Inbound packet received from " + nativePkt.getSrcCoords());
+        	//println("Inbound packet received from " + nativePkt.getSrcCoords());
         	dispatchPacket(nativePkt,jmsSession,inboundProducer,outboundProducer);
         } catch (NoBytesAvailableException ex) {
         	// Just move on
@@ -312,16 +318,14 @@ public class Gateway implements Runnable {
             while (true) {
             	ObjectMessage msg = (ObjectMessage) consumer.receive(MESSAGE_WAIT_TIME_MS);
                 if (msg == null) {
-                	println("No outbound packet received");
                 	break;
                 }
-                println("Outbound packet received");
             	NativePacket nativePkt = (NativePacket) msg.getObject();
             	byte srcGid = nativePkt.getSrcCoords().getGatewayId();
             	byte dstGid = nativePkt.getDstCoords().getGatewayId();
             	if (srcGid != id) {
 	            	if (dstGid == id || dstGid == 0) {
-	            		println("Outbound packet received from " + nativePkt.getSrcCoords());
+	            		//println("Outbound packet received from " + nativePkt.getSrcCoords());
 	            		write(nativePkt,os);
 	            	}
             	}

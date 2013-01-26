@@ -60,24 +60,27 @@ public class HubResource {
         } else
             return Response.status(Response.Status.NOT_FOUND).build();
     }
-
+    
     @POST
-    @Path("gateways/{gid}/disconnect")
-    public Response disconnectGateway(@PathParam("gid") byte gid) {
+    @Path("gateways/{gid}/open")
+    public Response openGateway(@PathParam("gid") byte gid) {
         
         if (networkContext.hasGateway(gid)) {
-            networkContext.disconnectGateway(gid);
+            networkContext.openGateway(gid);
             return Response.ok().build();
         } else
             return Response.status(Response.Status.NOT_FOUND).build();
     }
     
     @POST
-    @Path("gateways/disconnect")
-    public Response disconnectAllGateways() {
+    @Path("gateways/{gid}/close")
+    public Response closeGateway(@PathParam("gid") byte gid) {
         
-        networkContext.disconnectAllGateways();
-        return Response.ok().build();
+        if (networkContext.hasGateway(gid)) {
+            networkContext.closeGateway(gid);
+            return Response.ok().build();
+        } else
+            return Response.status(Response.Status.NOT_FOUND).build();
     }
     
     @DELETE

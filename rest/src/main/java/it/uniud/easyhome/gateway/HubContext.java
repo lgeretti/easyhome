@@ -74,6 +74,20 @@ public class HubContext {
         
         gateways.add(gw);
     }
+
+    public void openGateway(int gid) {
+        for (Gateway gw : gateways)
+            if (gw.getId() == gid) {
+            	gw.open();
+            }
+    }
+    
+    public void closeGateway(int gid) {
+        for (Gateway gw : gateways)
+            if (gw.getId() == gid) {
+            	gw.close();
+            }
+    }
     
     public boolean hasGateway(int gid) {
         for (Gateway gw : gateways)
@@ -81,17 +95,6 @@ public class HubContext {
                 return true;
         
         return false;
-    }
-    
-    public void disconnectGateway(int gid) {
-        for (Gateway gw : gateways)
-            if (gw.getId() == gid)
-                gw.disconnect();    	
-    }
-    
-    public void disconnectAllGateways() {
-        for (Gateway gw : gateways)
-            gw.disconnect();
     }
     
     public void removeGateway(int gid) {

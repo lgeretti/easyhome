@@ -67,7 +67,7 @@ public class XBeeGateway extends Gateway {
     }
     
     @Override
-    public final void open() {
+    protected final void start() {
 
         Thread thr = new Thread(this);
         thr.start();
