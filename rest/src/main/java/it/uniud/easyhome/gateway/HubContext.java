@@ -1,5 +1,6 @@
 package it.uniud.easyhome.gateway;
 
+import it.uniud.easyhome.exceptions.GatewayIdentifierAlreadyPresentException;
 import it.uniud.easyhome.exceptions.PortAlreadyBoundException;
 
 import java.util.ArrayList;
@@ -17,19 +18,9 @@ public class HubContext {
     
     private final List<Gateway> gateways = new ArrayList<Gateway>();
     
-    // Identifiers are guaranteed as unique, hence we cannot rely on the gateways size
-    // gid = 0 for broadcast
-    // gid = 1 for the native network
-    // hence actual gateways start from 2 onwards
-    private byte gidCount = 1;
-    
     public List<Gateway> getGateways() {
         return gateways;
     }  
-    
-    public int getGidCount() {
-    	return gidCount;
-    }
     
     private HubContext() {
     }
@@ -51,17 +42,19 @@ public class HubContext {
     /** 
      * Adds a new gateway.
      * 
+     * @param id The gateway id
      * @param protocol The protocol used by the gateway
      * @param port The port for the gateway (must not be already bound)
      * @return The gid of the created gateway
      */
-    public int addGateway(ProtocolType protocol, int port) {
+    public void addGateway(byte id, ProtocolType protocol, int port) {
         
-        for (Gateway gw : gateways)
+        for (Gateway gw : gateways) {
             if (gw.getPort() == port)
                 throw new PortAlreadyBoundException();
-        
-        byte gid = ++gidCount;
+            if (gw.getId() == id)
+            	throw new GatewayIdentifierAlreadyPresentException();
+        }
         
         Gateway gw = null;
         
@@ -69,7 +62,7 @@ public class HubContext {
         
             case XBEE:  
         
-                gw = new XBeeGateway(gid,port);
+                gw = new XBeeGateway(id,port);
                 break;
             
             case NATIVE:
@@ -80,8 +73,6 @@ public class HubContext {
         gw.open();
         
         gateways.add(gw);
-        
-        return gid;
     }
     
     public boolean hasGateway(int gid) {

@@ -71,6 +71,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Gateway implements Runnable {
     
+    // id = 0 for broadcast
+    // id = 1 for the native network
 	@XmlElement(name="id")
     protected byte id;
 	
@@ -99,6 +101,8 @@ public class Gateway implements Runnable {
     private Gateway() { }
     
     protected Gateway(byte id, ProtocolType protocolType, int port) {
+    	if (id == 0 || id == 1)
+    		throw new RuntimeException("The gateway id must be different from 0 or 1");
     	this.id = id;
     	this.protocolType = protocolType;
     	this.port = port;
@@ -180,7 +184,7 @@ public class Gateway implements Runnable {
     protected final void println(String msg) {
     	System.out.println("Gw #" + id + ": " + msg);
     }
-
+    
     @Override
     public final void run() {
     	
@@ -275,7 +279,7 @@ public class Gateway implements Runnable {
         try {
         	
         	NativePacket nativePkt = readFrom(is,buffer);
-        	//println("Inbound packet received from " + nativePkt.getSrcCoords());
+        	println("Inbound packet received from " + nativePkt.getSrcCoords());
         	dispatchPacket(nativePkt,jmsSession,inboundProducer,outboundProducer);
         } catch (NoBytesAvailableException ex) {
         	// Just move on
@@ -308,14 +312,16 @@ public class Gateway implements Runnable {
             while (true) {
             	ObjectMessage msg = (ObjectMessage) consumer.receive(MESSAGE_WAIT_TIME_MS);
                 if (msg == null) {
+                	println("No outbound packet received");
                 	break;
                 }
+                println("Outbound packet received");
             	NativePacket nativePkt = (NativePacket) msg.getObject();
             	byte srcGid = nativePkt.getSrcCoords().getGatewayId();
             	byte dstGid = nativePkt.getDstCoords().getGatewayId();
             	if (srcGid != id) {
 	            	if (dstGid == id || dstGid == 0) {
-	            		//println("Outbound packet received from " + nativePkt.getSrcCoords());
+	            		println("Outbound packet received from " + nativePkt.getSrcCoords());
 	            		write(nativePkt,os);
 	            	}
             	}

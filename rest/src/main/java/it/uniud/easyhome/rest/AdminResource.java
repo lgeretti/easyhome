@@ -14,11 +14,13 @@ public class AdminResource {
     
 	private static final String TARGET = "http://localhost:8080/easyhome/rest/";
 	private static Client client = Client.create();
+	private static final byte XBEE_GATEWAY_ID = (byte)2;
 	private static final int XBEE_GATEWAY_PORT = 5100;
     
-    private ClientResponse insertGateway(int port, ProtocolType protocol) {
+    private ClientResponse insertGateway(byte id, int port, ProtocolType protocol) {
         
     	MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+    	formData.add("id", Byte.toString(id));
     	formData.add("port", String.valueOf(port));
     	formData.add("protocol", protocol.toString());
     	ClientResponse response = client.resource(TARGET).path("hub").path("gateways")
@@ -36,12 +38,68 @@ public class AdminResource {
     	
     	return response;
     } 
+
+    @Path("/upgateway")
+    @POST
+    public Response upgateway() {
+    	
+		insertGateway(XBEE_GATEWAY_ID,XBEE_GATEWAY_PORT, ProtocolType.XBEE);
+        return Response.ok().build();
+    }
+
+    @Path("/downgateway")
+    @POST
+    public Response downgateway() {
+    	
+    	client.resource(TARGET).path("hub").path("gateways").delete();
+        return Response.ok().build();
+    }
+    
+    @Path("/upprocesses")
+    @POST
+    public Response upprocesses() {
+
+		insertProcess(ProcessKind.NODE_ANNCE_REGISTRATION);
+		insertProcess(ProcessKind.NODE_DESCR_REQUEST);
+		insertProcess(ProcessKind.NODE_DESCR_REGISTRATION);	
+		//insertProcess(ProcessKind.ACTIVE_ENDPOINTS_REQUEST);
+		//insertProcess(ProcessKind.ACTIVE_ENDPOINTS_REGISTRATION);
+		//insertProcess(ProcessKind.SIMPLE_DESCR_REQUEST);
+		//insertProcess(ProcessKind.SIMPLE_DESCR_REGISTRATION);
+		insertProcess(ProcessKind.NODE_NEIGH_REQUEST);
+		insertProcess(ProcessKind.NODE_NEIGH_REGISTRATION);
+		insertProcess(ProcessKind.NODE_DISCOVERY_REQUEST);
+		insertProcess(ProcessKind.NODE_DISCOVERY_REGISTRATION);
+		insertProcess(ProcessKind.NETWORK_UPDATE);
+        return Response.ok().build();
+    }
+    
+    @Path("/downnetwork")
+    @POST
+    public Response downnetwork() {
+
+    	client.resource(TARGET).path("processes").delete();
+    	client.resource(TARGET).path("network").delete();
+    	//client.resource(TARGET).path("network").path("jobs").delete();
+    	
+        return Response.ok().build();
+    }
+    
+    @Path("/downprocesses")
+    @POST
+    public Response downprocesses() {
+
+    	client.resource(TARGET).path("processes").delete();
+    	client.resource(TARGET).path("network").path("jobs").delete();
+    	
+        return Response.ok().build();
+    }
     
     @Path("/up")
     @POST
     public Response up() {
     	
-		insertGateway(XBEE_GATEWAY_PORT, ProtocolType.XBEE);
+		insertGateway(XBEE_GATEWAY_ID,XBEE_GATEWAY_PORT, ProtocolType.XBEE);
 		insertProcess(ProcessKind.NODE_ANNCE_REGISTRATION);
 		insertProcess(ProcessKind.NODE_DESCR_REQUEST);
 		insertProcess(ProcessKind.NODE_DESCR_REGISTRATION);	

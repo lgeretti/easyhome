@@ -36,16 +36,16 @@ public class HubResource {
     // curl -X POST http://localhost:8080/easyhome/rest/hub/gateways -H "Content-Type: application/x-www-form-urlencoded" --data-binary "port=5100&protocol=XBEE" 
     @POST
     @Path("gateways")
-    public Response registerGateway(@FormParam("protocol") ProtocolType protocol,
+    public Response registerGateway(@FormParam("id") byte id, @FormParam("protocol") ProtocolType protocol,
             @FormParam("port") int port) {
 
         try {
-            int gid = networkContext.addGateway(protocol, port);
+            networkContext.addGateway(id, protocol, port);
 
             return Response.created(
-                uriInfo.getAbsolutePathBuilder().path(String.valueOf(gid)).build())                
+                uriInfo.getAbsolutePathBuilder().path(String.valueOf(id)).build())                
                 .build();
-        } catch (PortAlreadyBoundException ex) {
+        } catch (Exception ex) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
     }
@@ -148,22 +148,6 @@ public class HubResource {
                                 .path(String.valueOf(entryPort))
                                 .build())                
                 .build();
-    }
-    
-    @POST
-    @Path("populate")
-    public Response populate() {
-    	
-    	// We can have more than 1 network only if at least one gateway has been registered
-    	if (networkContext.getGidCount() > 1)
-    		return Response.notModified().build();
-    	
-    	registerGateway(ProtocolType.XBEE,5050);
-    	registerGateway(ProtocolType.XBEE,6060);
-        
-    	putRoutingEntry((byte)2,(byte)3,2309737967L,(short)15,(byte)7);
-    	
-    	return Response.ok().build();
     }
     
 }
