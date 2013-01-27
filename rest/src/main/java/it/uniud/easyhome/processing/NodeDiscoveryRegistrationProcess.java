@@ -9,7 +9,7 @@ import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.exceptions.InvalidNodeLogicalTypeException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.Manufacturer;
-import it.uniud.easyhome.network.Neighbor;
+import it.uniud.easyhome.network.LocalCoordinates;
 import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.NetworkJob;
 import it.uniud.easyhome.network.NetworkJobType;
@@ -80,10 +80,13 @@ public class NodeDiscoveryRegistrationProcess extends Process {
 		                formData.add("logicalType",discLogicalType.toString());
 		                formData.add("manufacturer",discManufacturer.toString());
 		                
-		                restResource.path("network").path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+		                ClientResponse insertionResponse = restResource.path("network").path("insert")
+		                									.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+		                
+		                String insertionString = (ClientResponse.Status.CREATED == insertionResponse.getClientResponseStatus() ? " (inserted)" : " (updated)");
 		        		
 		                println("Node " + sender.getName() + " discovered " 
-		                		+ Long.toHexString(discNuid) + ":" + Integer.toHexString(0xFFFF & discAddress) + " of type " + discLogicalType);
+		                		+ Long.toHexString(discNuid) + ":" + Integer.toHexString(0xFFFF & discAddress) + " of type " + discLogicalType + insertionString);
 		                
 		                formData = new MultivaluedMapImpl();
 		                formData.add("gatewayId",Byte.toString(gatewayId));
@@ -93,8 +96,6 @@ public class NodeDiscoveryRegistrationProcess extends Process {
 		                formData.add("destinationAddress",Short.toString(discAddress));
 		                
 		                restResource.path("network").path("links").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-		                
-		                restResource.path("network").path("links").path("cleanup").post();
 	        		}
 	        	} catch (InvalidPacketTypeException e) {
 	        		e.printStackTrace();
@@ -105,16 +106,16 @@ public class NodeDiscoveryRegistrationProcess extends Process {
     	}
     }
     
-    private boolean neighborsChanged(Node node, List<Neighbor> newNeighbors) {
+    private boolean neighborsChanged(Node node, List<LocalCoordinates> newNeighbors) {
     	
-    	List<Neighbor> oldNeighbors = node.getNeighbors();
+    	List<LocalCoordinates> oldNeighbors = node.getNeighbors();
     	
     	if (oldNeighbors.size() != newNeighbors.size())
     		return true;
     	
-    	for (Neighbor oldNeighbor : oldNeighbors) {
+    	for (LocalCoordinates oldNeighbor : oldNeighbors) {
     		boolean found = false;
-    		for (Neighbor newNeighborAddress : newNeighbors) {
+    		for (LocalCoordinates newNeighborAddress : newNeighbors) {
     			if (newNeighborAddress.equals(oldNeighbor)) {
     				found = true;
     				break;

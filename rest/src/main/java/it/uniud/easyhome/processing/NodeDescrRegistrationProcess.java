@@ -77,6 +77,7 @@ public class NodeDescrRegistrationProcess extends Process {
 			                updateResponse = restResource.path("network").path("update")
 			                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
 		        		}
+		        		// The operation may fail if the node has been removed in the meanwhile (unlikely, but still)
 		                if (updateResponse.getClientResponseStatus() == Status.OK) {
 		                	
 			                MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();

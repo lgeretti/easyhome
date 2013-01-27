@@ -5,9 +5,9 @@ import it.uniud.easyhome.common.Endianness;
 import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.exceptions.*;
 import it.uniud.easyhome.network.Manufacturer;
+import it.uniud.easyhome.network.ModuleCoordinates;
 import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.packets.Domain;
-import it.uniud.easyhome.packets.ModuleCoordinates;
 import it.uniud.easyhome.packets.Operation;
 
 public class NodeDiscoveryRspPacket extends NativePacket {

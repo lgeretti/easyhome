@@ -27,7 +27,7 @@ public class Node {
     @Column(nullable = false, length = 200)
     private String name;
     @Embedded
-    private NodeCoordinates coordinates;
+    private GlobalCoordinates coordinates;
     @Column(nullable = false)
     private NodeLogicalType logicalType;
     @Column(nullable = false)
@@ -40,7 +40,7 @@ public class Node {
     @Embedded
     @ElementCollection
     @CollectionTable(name = "Neighbors")
-    private List<Neighbor> neighbors = new ArrayList<Neighbor>();
+    private List<LocalCoordinates> neighbors = new ArrayList<LocalCoordinates>();
     
     @Embedded
     @ElementCollection
@@ -62,10 +62,10 @@ public class Node {
     }
     
     public void addNeighbor(Node node) {
-    	neighbors.add(new Neighbor(node.coordinates.getNuid(),node.coordinates.getAddress()));
+    	neighbors.add(new LocalCoordinates(node.coordinates.getNuid(),node.coordinates.getAddress()));
     }
     
-	public void setNeighbors(List<Neighbor> neighbors) {
+	public void setNeighbors(List<LocalCoordinates> neighbors) {
 		this.neighbors = neighbors;
 	}
     
@@ -107,7 +107,7 @@ public class Node {
                 throw new IllegalArgumentException();            
             node = new Node();
             node.id = id;
-            node.coordinates = new NodeCoordinates(gatewayId, nuid, address);
+            node.coordinates = new GlobalCoordinates(gatewayId, nuid, address);
             
             node.logicalType = NodeLogicalType.UNDEFINED;
             node.manufacturer = Manufacturer.UNDEFINED;
@@ -152,7 +152,7 @@ public class Node {
         return this.name;
     }
     
-    public NodeCoordinates getCoordinates() {
+    public GlobalCoordinates getCoordinates() {
     	return coordinates;
     }
     
@@ -175,7 +175,7 @@ public class Node {
     	return this.liveness;
     }
     
-    public List<Neighbor> getNeighbors() {
+    public List<LocalCoordinates> getNeighbors() {
     	return this.neighbors;
     }
     

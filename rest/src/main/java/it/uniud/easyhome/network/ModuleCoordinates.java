@@ -1,7 +1,6 @@
-package it.uniud.easyhome.packets;
+package it.uniud.easyhome.network;
 
 import it.uniud.easyhome.common.ByteUtils;
-import it.uniud.easyhome.network.NodeCoordinates;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,30 +12,29 @@ import java.io.Serializable;
  */
 public class ModuleCoordinates implements Serializable {
 
-    private static final long serialVersionUID = -5009839141486612459L;
+	private static final long serialVersionUID = -4456393211251496309L;
 
-    public static final int OCTETS = 12;
+	public static final int OCTETS = 12;
     
-    // Gateway (and consequently subnetwork) identifier (0 for broadcast, 1 for the native TCP/IP subnetwork)
-    private byte gid;
-    // Node unique id (global address, like a IEEE MAC address, fixed for a node) (0x0 for a gateway node if gid!=1, or the domotic controller if gid==1, 
-    // 0x000000000000FFFF for a broadcast)
-    private long nuid;
-    // Address within the network (0x0000 for the gateway, 0xFFFE if broadcast or unknown)
-    private short address;
+    // The coordinates
+    private GlobalCoordinates nodeCoordinates;
     // Endpoint of the interested module (0 addresses the management endpoint)
     private byte endpoint;
     
     public byte getGatewayId() {
-        return gid;
+        return nodeCoordinates.getGatewayId();
     }
     
     public long getNuid() {
-    	return nuid;
+    	return nodeCoordinates.getNuid();
     }
     
     public short getAddress() {
-        return address;
+        return nodeCoordinates.getAddress();
+    }
+    
+    public GlobalCoordinates getNodeCoordinates() {
+    	return nodeCoordinates;
     }
     
     public byte getEndpoint() {
@@ -44,23 +42,19 @@ public class ModuleCoordinates implements Serializable {
     }
     
     public ModuleCoordinates(byte gid, long nuid, short address, byte endpoint) {
-        this.gid = gid;
-        this.nuid = nuid;
-        this.address = address;
+        this.nodeCoordinates = new GlobalCoordinates(gid,nuid,address);
         this.endpoint = endpoint;
     }
     
-    public ModuleCoordinates(NodeCoordinates nodeCoords, byte endpoint) {
-        this.gid = nodeCoords.getGatewayId();
-        this.nuid = nodeCoords.getNuid();
-        this.address = nodeCoords.getAddress();
+    public ModuleCoordinates(GlobalCoordinates nodeCoords, byte endpoint) {
+        this.nodeCoordinates = nodeCoords;
         this.endpoint = endpoint;
     }
     
     public ModuleCoordinates(InputStream is) throws IOException {
 
-        gid = (byte)is.read();
-    	nuid = (((long)is.read()) << 56) + 
+        byte gid = (byte)is.read();
+    	long nuid = (((long)is.read()) << 56) + 
     		   (((long)is.read()) << 48) + 
     		   (((long)is.read()) << 40) + 
     		   (((long)is.read()) << 32) +
@@ -68,12 +62,17 @@ public class ModuleCoordinates implements Serializable {
 			   (((long)is.read()) << 16) + 
 			   (((long)is.read()) << 8) + 
 			   (long)is.read();
-        address = (short)((is.read()<<8)+is.read());
+        short address = (short)((is.read()<<8)+is.read());
+        this.nodeCoordinates = new GlobalCoordinates(gid,nuid,address);
         endpoint = (byte)is.read();
     }
     
     public void write(OutputStream os) throws IOException {
         
+    	byte gid = nodeCoordinates.getGatewayId();
+    	long nuid = nodeCoordinates.getNuid();
+    	short address = nodeCoordinates.getAddress();
+    	
         os.write(gid & 0xFF);
         os.write((int)((nuid >>> 56) & 0xFF)); 
         os.write((int)((nuid >>> 48) & 0xFF));
@@ -93,11 +92,11 @@ public class ModuleCoordinates implements Serializable {
     	StringBuilder strb = new StringBuilder();
     	
     	strb.append("(")
-    		.append(gid)
+    		.append(nodeCoordinates.getGatewayId())
     		.append(":")
-    		.append(Long.toHexString(nuid))
+    		.append(Long.toHexString(nodeCoordinates.getNuid()))
     		.append(":")
-    		.append(Integer.toHexString(0xFFFF & address))
+    		.append(Integer.toHexString(0xFFFF & nodeCoordinates.getAddress()))
     		.append(":")
     		.append(Integer.toHexString(0xFF & endpoint))
     		.append(")");
@@ -113,11 +112,7 @@ public class ModuleCoordinates implements Serializable {
         
         ModuleCoordinates otherCoords = (ModuleCoordinates) other;
         
-        if (otherCoords.getGatewayId() != this.getGatewayId())
-            return false;
-        if (otherCoords.getNuid() != this.getNuid())
-            return false;
-        if (otherCoords.getAddress() != this.getAddress())
+        if (!otherCoords.getNodeCoordinates().equals(otherCoords.getNodeCoordinates()))
             return false;
         if (otherCoords.getEndpoint() != this.getEndpoint())
             return false;
@@ -128,9 +123,7 @@ public class ModuleCoordinates implements Serializable {
     @Override
     public int hashCode() {
         int hash = 1;
-        hash = hash * 31 + gid;
-        hash = (int)(hash * 31 + nuid);
-        hash = hash * 31 + address;
+        hash = hash * 31 + nodeCoordinates.hashCode();
         hash = hash * 31 + endpoint;
         return hash;
     }

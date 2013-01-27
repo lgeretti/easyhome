@@ -11,9 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Embeddable
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Neighbor implements Serializable {
-    
-	private static final long serialVersionUID = -7424774896258284764L;
+public class LocalCoordinates {
 
     // Node unique id (global address, like a IEEE MAC address, fixed for a node)
 	@Column(nullable = false)
@@ -31,9 +29,9 @@ public class Neighbor implements Serializable {
     }
     
     @SuppressWarnings("unused")
-	private Neighbor() { }
+	private LocalCoordinates() { }
     
-    public Neighbor(long nuid, short address) {
+    public LocalCoordinates(long nuid, short address) {
         this.nuid = nuid;
         this.address = address;
     }
@@ -53,10 +51,10 @@ public class Neighbor implements Serializable {
     @Override
     public boolean equals(Object other) {
         
-        if (!(other instanceof Neighbor))
+        if (!(other instanceof LocalCoordinates))
             return false;
         
-        Neighbor otherCoords = (Neighbor) other;
+        LocalCoordinates otherCoords = (LocalCoordinates) other;
 
         if (otherCoords.getNuid() != this.getNuid())
             return false;

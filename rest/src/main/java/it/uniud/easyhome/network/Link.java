@@ -25,10 +25,10 @@ public class Link {
 	private byte gatewayId;
 	@Embedded
 	@AttributeOverrides({@AttributeOverride(name="nuid", column=@Column(name="SRC_NUID")),@AttributeOverride(name="address", column=@Column(name="SRC_ADDRESS"))})
-	private Neighbor source;
+	private LocalCoordinates source;
 	@Embedded
 	@AttributeOverrides({@AttributeOverride(name="nuid", column=@Column(name="DST_NUID")),@AttributeOverride(name="address", column=@Column(name="DST_ADDRESS"))})
-	private Neighbor destination;
+	private LocalCoordinates destination;
 	
 	@Column(nullable = false)
 	private long timestamp;
@@ -36,7 +36,7 @@ public class Link {
     @SuppressWarnings("unused")
 	private Link() { }
     
-    public Link(long id, byte gatewayId, Neighbor source, Neighbor destination) {
+    public Link(long id, byte gatewayId, LocalCoordinates source, LocalCoordinates destination) {
         this.id = id;
         this.gatewayId = gatewayId;
         this.source = source;
@@ -52,11 +52,11 @@ public class Link {
 		return gatewayId;
 	}
 
-    public Neighbor getSource() {
+    public LocalCoordinates getSource() {
     	return source;
     }
 
-    public Neighbor getDestination() {
+    public LocalCoordinates getDestination() {
     	return destination;
     }
     	

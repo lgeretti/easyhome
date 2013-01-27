@@ -6,8 +6,8 @@ import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.exceptions.InvalidEndpointsException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.exceptions.InvalidPayloadLengthException;
+import it.uniud.easyhome.network.ModuleCoordinates;
 import it.uniud.easyhome.packets.Domain;
-import it.uniud.easyhome.packets.ModuleCoordinates;
 import it.uniud.easyhome.packets.Operation;
 
 public class NodeAnncePacket extends NativePacket {

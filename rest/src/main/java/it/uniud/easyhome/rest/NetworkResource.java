@@ -46,29 +46,6 @@ public final class NetworkResource {
     }
     
     @GET
-    @Path("persistedreachable")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<Node> getPersistedReachableNodes() {
-    	return resEjb.getPersistedReachableNodes();
-    }
-    
-    @GET
-    @Path("missingcoords")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<NodeCoordinates> getMissingNodesCoords() {
-    	return resEjb.getMissingCoordinates();
-    }    
-    
-    
-    @POST
-    @Path("prune")
-    public void pruneUnreachableNodes() {
-    	synchronized(nodeLock) {
-    		resEjb.prunePersistedUnreachableNodes();
-    	}
-    }  
-    
-    @GET
     @Path("{gid}/{address}")
     @Produces(MediaType.APPLICATION_JSON)
     public Node getNode(@PathParam("gid") byte gid, @PathParam("address") short address) {
@@ -142,8 +119,8 @@ public final class NetworkResource {
     	
     	long thisLinkId;
     	
-    	Neighbor source = new Neighbor(sourceNuid,sourceAddress);
-    	Neighbor destination = new Neighbor(destinationNuid,destinationAddress);
+    	LocalCoordinates source = new LocalCoordinates(sourceNuid,sourceAddress);
+    	LocalCoordinates destination = new LocalCoordinates(destinationNuid,destinationAddress);
     	
     	synchronized(linkLock) {
     		
@@ -168,14 +145,20 @@ public final class NetworkResource {
     }
     
     @POST
-    @Path("links/cleanup")
-    public Response cleanupLinks() {
+    @Path("cleanup")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Node> cleanupLinksAndNodes() {
+    	
+    	List<Node> cleanedNodes;
     	
     	synchronized(linkLock) {
     		resEjb.cleanupLinks();
     	}
+    	synchronized(nodeLock) {
+    		cleanedNodes = resEjb.cleanupNodesAndJobs();
+    	}
     	
-    	return Response.ok().build();
+    	return cleanedNodes;
     }
 
 	@GET

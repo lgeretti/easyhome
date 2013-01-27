@@ -10,11 +10,11 @@ import java.util.Map;
 import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.devices.HomeAutomationDevice;
 import it.uniud.easyhome.network.Link;
-import it.uniud.easyhome.network.Neighbor;
+import it.uniud.easyhome.network.LocalCoordinates;
 import it.uniud.easyhome.network.NetworkJob;
 import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.network.Node;
-import it.uniud.easyhome.network.NodeCoordinates;
+import it.uniud.easyhome.network.GlobalCoordinates;
 import it.uniud.easyhome.network.NodeLogicalType;
 
 import javax.ws.rs.core.MediaType;
@@ -47,7 +47,7 @@ public class NetworkResourceIT {
     	long nuid = 10L;
     	short address = 15;
         
-        ClientResponse insertionResponse = insertNewNode(new NodeCoordinates(gid,nuid,address));
+        ClientResponse insertionResponse = insertNewNode(new GlobalCoordinates(gid,nuid,address));
         assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
 
         ClientResponse retrievalResponse = client.resource(TARGET).path(Byte.toString(gid)).path(Short.toString(address))
@@ -107,7 +107,7 @@ public class NetworkResourceIT {
 		
         Node node1 = new Node.Builder(1,gid,nuid,address).build();
        
-        ClientResponse insertionResponse = insertNewNode(new NodeCoordinates(gid,nuid,address));
+        ClientResponse insertionResponse = insertNewNode(new GlobalCoordinates(gid,nuid,address));
         assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
 
         Node recoveredNode = client.resource(TARGET).path(Byte.toString(gid)).path(Short.toString(address)).accept(MediaType.APPLICATION_JSON).get(Node.class);
@@ -127,7 +127,7 @@ public class NetworkResourceIT {
     	long nuid = 10L;
     	short address = 0x00CD;
        
-        insertNewNode(new NodeCoordinates(gid,nuid,address));
+        insertNewNode(new GlobalCoordinates(gid,nuid,address));
 
         ClientResponse deletionResponse = client.resource(TARGET).path(Byte.toString(gid)).path(Short.toString(address)).delete(ClientResponse.class);
         
@@ -144,9 +144,9 @@ public class NetworkResourceIT {
     	short address1 = 0x00CD;
     	short address2 = (short)0xAFCD;
 
-        ClientResponse firstInsertionResponse = insertNewNode(new NodeCoordinates(gid,nuid1,address1));
+        ClientResponse firstInsertionResponse = insertNewNode(new GlobalCoordinates(gid,nuid1,address1));
         assertEquals(ClientResponse.Status.CREATED,firstInsertionResponse.getClientResponseStatus());
-        ClientResponse secondInsertionResponse = insertNewNode(new NodeCoordinates(gid,nuid2,address2));
+        ClientResponse secondInsertionResponse = insertNewNode(new GlobalCoordinates(gid,nuid2,address2));
         assertEquals(ClientResponse.Status.CREATED,secondInsertionResponse.getClientResponseStatus());
         
         Node recoveredNode1 = client.resource(TARGET).path(Byte.toString(gid)).path(Short.toString(address1)).accept(MediaType.APPLICATION_JSON).get(Node.class);
@@ -176,7 +176,7 @@ public class NetworkResourceIT {
     	Map<Integer,Node> nodes = new HashMap<Integer,Node>();
     	
     	for (int i=1; i<=numNodes; i++) {
-    		ClientResponse insertionResponse = insertNewNode(new NodeCoordinates(gid,i,(short)i));
+    		ClientResponse insertionResponse = insertNewNode(new GlobalCoordinates(gid,i,(short)i));
             assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());    		
             nodes.put(i,client.resource(TARGET).path(Byte.toString(gid)).path(Short.toString((short)i)).accept(MediaType.APPLICATION_JSON).get(Node.class));
     	}
@@ -203,27 +203,7 @@ public class NetworkResourceIT {
             assertEquals(ClientResponse.Status.OK,updateResponse.getClientResponseStatus());
     	}
         
-        ClientResponse persistedReachableNodesResponse = client.resource(TARGET).path("persistedreachable").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-        List<Node> persistedReachable = JsonUtils.getListFrom(persistedReachableNodesResponse, Node.class);
-        
-        assertEquals(7,persistedReachable.size());
-        
-        client.resource(TARGET).path("prune").post();
-        
-		ClientResponse getResponse = client.resource(TARGET).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-		List<Node> nodeList = JsonUtils.getListFrom(getResponse,Node.class);
-		
-		assertEquals(7,nodeList.size());
-		
-		ClientResponse removeResponse = client.resource(TARGET).path(Byte.toString(gid)).path(Short.toString((short)6)).delete(ClientResponse.class);
-	    assertEquals(ClientResponse.Status.OK,removeResponse.getClientResponseStatus());
-		
-        ClientResponse missingCoordsResponse = client.resource(TARGET).path("missingcoords").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-        List<NodeCoordinates> missingCoords = JsonUtils.getListFrom(missingCoordsResponse, NodeCoordinates.class);
-		
-        assertEquals(1, missingCoords.size());
-        
-		getResponse = client.resource(TARGET).path("infrastructural").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+		ClientResponse getResponse = client.resource(TARGET).path("infrastructural").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 		List<Node> infrastructuralNodesList = JsonUtils.getListFrom(getResponse,Node.class);
 		
 		assertEquals(4,infrastructuralNodesList.size());
@@ -275,7 +255,7 @@ public class NetworkResourceIT {
 		client.resource(TARGET).path("links").delete();
 	}
 	
-	private ClientResponse insertNewNode(NodeCoordinates coords) {
+	private ClientResponse insertNewNode(GlobalCoordinates coords) {
 		
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         formData.add("gid",Byte.toString(coords.getGatewayId()));
@@ -289,8 +269,8 @@ public class NetworkResourceIT {
 	public void testInsertAndUpdateLink() throws JSONException {
 		
 		byte gatewayId = 2;
-		Neighbor source = new Neighbor(11L,(short)1);
-		Neighbor destination = new Neighbor(12L,(short)2);
+		LocalCoordinates source = new LocalCoordinates(11L,(short)1);
+		LocalCoordinates destination = new LocalCoordinates(12L,(short)2);
 		
 		ClientResponse insertionResponse = insertLink(gatewayId,source,destination);
 		assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
@@ -316,7 +296,7 @@ public class NetworkResourceIT {
 	}
 	
 	
-	private ClientResponse insertLink(byte gatewayId, Neighbor source, Neighbor destination) throws JSONException {
+	private ClientResponse insertLink(byte gatewayId, LocalCoordinates source, LocalCoordinates destination) throws JSONException {
 		
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         formData.add("gatewayId",Byte.toString(gatewayId));

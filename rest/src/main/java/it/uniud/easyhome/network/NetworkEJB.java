@@ -19,6 +19,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -155,7 +156,7 @@ public class NetworkEJB {
         	em.remove(node);
 	}
 	
-	public void insertLink(long id, byte gatewayId, Neighbor source, Neighbor destination) {
+	public void insertLink(long id, byte gatewayId, LocalCoordinates source, LocalCoordinates destination) {
 		Link link = new Link(id, gatewayId, source, destination);
 		
 		em.persist(link);
@@ -177,7 +178,7 @@ public class NetworkEJB {
 	}
 	
 
-	public Link findLink(byte gatewayId, Neighbor source, Neighbor destination) {
+	public Link findLink(byte gatewayId, LocalCoordinates source, LocalCoordinates destination) {
 	
 		StringBuilder queryBuilder = new StringBuilder("SELECT l FROM Link l ")
 											.append("WHERE l.gatewayId=:g ")
@@ -347,99 +348,55 @@ public class NetworkEJB {
 				.setParameter("a",address)
 				.executeUpdate();
 	}
-
-	public List<Node> getPersistedReachableNodes() {
-
-		Set<Node> nodesFound = new HashSet<Node>();
+	
+	/**
+	 * Get all the missing nodes.
+	 * 
+	 * We consider a missing node one that is not a coordinator (otherwise if no other node exists in the subnetwork, then
+	 * the coordinator would be removed) and participates in no links (both source or destination) and that is of manufacturer DIGI or UNDEFINED.
+	 * We accept to remove UNDEFINED-manufacturer nodes because it may happen that the node exits the network before being
+	 * able to assess its manufacturer: in that case we would have a dangling node that would never be removed. Other manufacturers
+	 * are unable to reply to the discovery protocol, hence we cannot really remove them: they will be removed manually. 
+	 */
+	private List<Node> getMissingNodes() {
 		
-		reachablePersistedNodesAndMissingCoords(new HashSet<NodeCoordinates>(), nodesFound);
-		
-		List<Node> result = new ArrayList<Node>();
-		result.addAll(nodesFound);
-		return result;
+		StringBuilder queryBuilder = new StringBuilder("SELECT n FROM Node n WHERE ")
+												.append("(n.manufacturer=:m1 OR n.manufacturer=:m2) ")
+												.append("AND n.logicalType <> :clt ")
+												.append("AND n.coordinates.nuid NOT IN ")
+												.append("(SELECT l1.source.nuid FROM Link l1)")
+												.append("AND n.coordinates.nuid NOT IN ")
+												.append("(SELECT l2.destination.nuid FROM Link l2)");
+
+		return em.createQuery(queryBuilder.toString(),Node.class)
+				 .setParameter("clt",NodeLogicalType.COORDINATOR)
+				 .setParameter("m1",Manufacturer.DIGI)
+				 .setParameter("m2", Manufacturer.UNDEFINED)
+				 .getResultList();
 	}
 	
-	public List<NodeCoordinates> getMissingCoordinates() {
-
-		Set<NodeCoordinates> coordsMissing = new HashSet<NodeCoordinates>();
-		
-		reachablePersistedNodesAndMissingCoords(coordsMissing, new HashSet<Node>());
-		
-		List<NodeCoordinates> result = new ArrayList<NodeCoordinates>();
-		result.addAll(coordsMissing);
-		return result;
-	}
 	
-	private void reachablePersistedNodesAndMissingCoords(Set<NodeCoordinates> missingResult, Set<Node> reachablePersistedResult) {
+	/**
+	 * Clean up missing nodes and their corresponding jobs. 
+	 * 
+	 * NOTE: may still remove an end device that announced itself and for which no neighbor discovered the presence yet (acceptable).
+	 * 
+	 * @return The cleaned nodes
+	 */
+	public List<Node> cleanupNodesAndJobs() {
 		
-		List<Node> coordinators = getAllNodesOfType(NodeLogicalType.COORDINATOR);
+		List<Node> missingNodes = getMissingNodes();
 		
-		for (Node coord : coordinators) {
-
-			Set<NodeCoordinates> currentAddressesFound = new HashSet<NodeCoordinates>();
-			Queue<NodeCoordinates> currentAddressesToCheck = new ConcurrentLinkedQueue<NodeCoordinates>();
-
-			currentAddressesFound.add(coord.getCoordinates());
-			traverseReachableNodes(missingResult, reachablePersistedResult, currentAddressesFound, currentAddressesToCheck, coord.getCoordinates());
+		String deleteQueryString = new StringBuilder("DELETE FROM NetworkJob j WHERE j.gatewayId=:g AND j.address=:a").toString();
+		
+		for (Node node : missingNodes) {
+			em.remove(node);
+			
+			em.createQuery(deleteQueryString)
+							.setParameter("g", node.getCoordinates().getGatewayId())
+							.setParameter("a", node.getCoordinates().getAddress()).executeUpdate();
 		}
-	}
-
-	private void traverseReachableNodes(Set<NodeCoordinates> coordsMissing, Set<Node> nodesFound, 
-										Set<NodeCoordinates> coordinatesFound, Queue<NodeCoordinates> coordinatesToCheck, 
-										NodeCoordinates currentCoordinates) {
 		
-		Node node = findNode(currentCoordinates.getGatewayId(),currentCoordinates.getAddress());
-		
-		//System.out.println("Looking up " + currentGatewayId + ":" + currentAddress);
-		
-		if (node == null) {
-			//System.out.println("Not found in the persistence");
-			coordsMissing.add(currentCoordinates);
-		} else {
-			
-			nodesFound.add(node);
-			
-			if (node.getLogicalType() == NodeLogicalType.ROUTER || node.getLogicalType() == NodeLogicalType.COORDINATOR) {
-			
-				//System.out.println("Found " + node.getNeighbors().size() + " neighbors");
-				
-				for (Neighbor neighbor : node.getNeighbors()) {
-					NodeCoordinates neighborCoords = new NodeCoordinates(node.getCoordinates().getGatewayId(),neighbor.getNuid(),neighbor.getAddress());
-					if (!coordinatesFound.contains(neighborCoords)) {
-						//System.out.println("Address " + neighbor + " is new, adding");
-						coordinatesToCheck.add(neighborCoords);
-						coordinatesFound.add(neighborCoords);
-					} else {
-						//System.out.println("Address " + neighbor + " is already present, not adding");
-					}
-				}
-			}
-			
-			NodeCoordinates nextNodeCoordinates = coordinatesToCheck.poll();
-			if (nextNodeCoordinates != null)
-				traverseReachableNodes(coordsMissing, nodesFound, coordinatesFound, coordinatesToCheck, nextNodeCoordinates);
-		}
-	}
-
-	public void prunePersistedUnreachableNodes() {
-		
-		List<Node> nodes = getNodes();
-		List<Node> persistedReachableNodes = getPersistedReachableNodes();
-		
-		for (Node node : nodes) {
-			boolean found = false;
-			
-			for (Node reachableNode : persistedReachableNodes) {
-				if (node.equals(reachableNode)) {
-					found = true;
-					break;
-				}
-			}
-			
-			if (!found) {
-				em.remove(node);
-				//System.out.println("Removed node " + node.getName());
-			}
-		}
+		return missingNodes;
 	}
 }

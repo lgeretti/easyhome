@@ -4,7 +4,7 @@ import it.uniud.easyhome.exceptions.PortAlreadyBoundException;
 import it.uniud.easyhome.gateway.Gateway;
 import it.uniud.easyhome.gateway.HubContext;
 import it.uniud.easyhome.gateway.ProtocolType;
-import it.uniud.easyhome.packets.ModuleCoordinates;
+import it.uniud.easyhome.network.ModuleCoordinates;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package it.uniud.easyhome.packets.natives;
 
 import it.uniud.easyhome.exceptions.InvalidDelimiterException;
-import it.uniud.easyhome.packets.ModuleCoordinates;
+import it.uniud.easyhome.network.ModuleCoordinates;
 import it.uniud.easyhome.packets.Operation;
 import it.uniud.easyhome.packets.Packet;
 

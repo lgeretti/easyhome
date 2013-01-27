@@ -6,7 +6,7 @@ import java.util.List;
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
-import it.uniud.easyhome.network.Neighbor;
+import it.uniud.easyhome.network.LocalCoordinates;
 import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.NetworkJob;
 import it.uniud.easyhome.network.NetworkJobType;
@@ -58,7 +58,7 @@ public class NodeNeighRegistrationProcess extends Process {
 	        		NodeNeighRspPacket neighPkt = new NodeNeighRspPacket(pkt);
 	        		
 	        		if (neighPkt.isSuccessful()) {
-		        		List<Neighbor> newNeighbors = neighPkt.getNeighbors();
+		        		List<LocalCoordinates> newNeighbors = neighPkt.getNeighbors();
 		        		
 		        		byte tsn = neighPkt.getOperation().getSequenceNumber();	
 		        		
@@ -125,16 +125,16 @@ public class NodeNeighRegistrationProcess extends Process {
     	}
     }
     
-    private boolean neighborsChanged(Node node, List<Neighbor> newNeighbors) {
+    private boolean neighborsChanged(Node node, List<LocalCoordinates> newNeighbors) {
     	
-    	List<Neighbor> oldNeighbors = node.getNeighbors();
+    	List<LocalCoordinates> oldNeighbors = node.getNeighbors();
     	
     	if (oldNeighbors.size() != newNeighbors.size())
     		return true;
     	
-    	for (Neighbor oldNeighbor : oldNeighbors) {
+    	for (LocalCoordinates oldNeighbor : oldNeighbors) {
     		boolean found = false;
-    		for (Neighbor newNeighborAddress : newNeighbors) {
+    		for (LocalCoordinates newNeighborAddress : newNeighbors) {
     			if (newNeighborAddress.equals(oldNeighbor)) {
     				found = true;
     				break;

@@ -1,5 +1,7 @@
 package it.uniud.easyhome.network;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -7,20 +9,23 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /** 
- * Immutable class for absolute coordinates of a module across the EasyHome network. 
+ * Immutable class for global coordinates of a node across the EasyHome network. 
  */
 @Embeddable
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class NodeCoordinates {
-    
-    // Gateway (and consequently subnetwork) identifier (!=0)
+public class GlobalCoordinates implements Serializable {
+
+	private static final long serialVersionUID = 5341871780590147681L;
+	
+	// Gateway (and consequently subnetwork) identifier (0 for broadcast, 1 for the native TCP/IP subnetwork)
 	@Column(nullable = false)
     private byte gatewayId;
-    // Node unique id (global address, like a IEEE MAC address, fixed for a node)
+    // Node unique id (global address, like a IEEE MAC address, fixed for a node) (0x0 for a gateway node if gid!=1, or the domotic controller if gid==1, 
+    // 0x000000000000FFFF for a broadcast)
 	@Column(nullable = false)
     private long nuid;
-    // Address within the network (!=0)
+    // Address within the network (0x0000 for the gateway, 0xFFFE if broadcast or unknown)
 	@Column(nullable = false)
     private short address;
     
@@ -37,9 +42,9 @@ public class NodeCoordinates {
     }
     
     @SuppressWarnings("unused")
-	private NodeCoordinates() { }
+	private GlobalCoordinates() { }
     
-    public NodeCoordinates(byte gatewayId, long nuid, short address) {
+    public GlobalCoordinates(byte gatewayId, long nuid, short address) {
         this.gatewayId = gatewayId;
         this.nuid = nuid;
         this.address = address;
@@ -62,10 +67,10 @@ public class NodeCoordinates {
     @Override
     public boolean equals(Object other) {
         
-        if (!(other instanceof NodeCoordinates))
+        if (!(other instanceof GlobalCoordinates))
             return false;
         
-        NodeCoordinates otherCoords = (NodeCoordinates) other;
+        GlobalCoordinates otherCoords = (GlobalCoordinates) other;
         
         if (otherCoords.getGatewayId() != this.getGatewayId())
             return false;

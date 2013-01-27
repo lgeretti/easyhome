@@ -7,9 +7,9 @@ import it.uniud.easyhome.exceptions.InvalidNodeDescException;
 import it.uniud.easyhome.exceptions.InvalidNodeLogicalTypeException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.Manufacturer;
+import it.uniud.easyhome.network.ModuleCoordinates;
 import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.packets.Domain;
-import it.uniud.easyhome.packets.ModuleCoordinates;
 import it.uniud.easyhome.packets.Operation;
 
 public class NodeDescrRspPacket extends NativePacket {

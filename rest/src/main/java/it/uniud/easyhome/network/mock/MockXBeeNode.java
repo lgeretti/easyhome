@@ -10,9 +10,9 @@ import it.uniud.easyhome.common.*;
 import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.devices.HomeAutomationDevice;
 import it.uniud.easyhome.network.Manufacturer;
-import it.uniud.easyhome.network.Neighbor;
+import it.uniud.easyhome.network.LocalCoordinates;
 import it.uniud.easyhome.network.Node;
-import it.uniud.easyhome.network.NodeCoordinates;
+import it.uniud.easyhome.network.GlobalCoordinates;
 import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.packets.xbee.*;
@@ -41,7 +41,7 @@ public class MockXBeeNode implements Runnable {
     	this.network = network;
     }
     
-    public NodeCoordinates getCoordinates() {
+    public GlobalCoordinates getCoordinates() {
         return node.getCoordinates();
     }
     
@@ -61,7 +61,7 @@ public class MockXBeeNode implements Runnable {
     	
     	List<MockXBeeNode> neighbors = new ArrayList<MockXBeeNode>();
     	
-    	for (Neighbor neighborCoords : node.getNeighbors()) {
+    	for (LocalCoordinates neighborCoords : node.getNeighbors()) {
     		
     		MockXBeeNode recoveredNode = getMockXBeeNode(neighborCoords);
     		
@@ -82,7 +82,7 @@ public class MockXBeeNode implements Runnable {
     	return node.getMappedDevices();
     }
     
-    private MockXBeeNode getMockXBeeNode(Neighbor neighborCoords) {
+    private MockXBeeNode getMockXBeeNode(LocalCoordinates neighborCoords) {
     	
     	for (MockXBeeNode node : network.getNodes()) {
     		if (node.getCoordinates().getAddress() == neighborCoords.getAddress())
