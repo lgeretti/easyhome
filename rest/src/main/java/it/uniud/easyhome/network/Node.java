@@ -91,8 +91,13 @@ public class Node {
 		devices.get(epIndex).setDevice(device);
 	}
 	
+
+	public void setName(String name) {
+		this.name = name;
+	}
+	
 	public void setLocation(String location) throws InvalidNodeTypeException {
-		if (this.logicalType == NodeLogicalType.END_DEVICE)
+		if (this.manufacturer == Manufacturer.DIGI && logicalType == NodeLogicalType.END_DEVICE)
 			throw new InvalidNodeTypeException();
 		
 		this.location = location;
