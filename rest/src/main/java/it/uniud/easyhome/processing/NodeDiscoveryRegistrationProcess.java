@@ -88,6 +88,26 @@ public class NodeDiscoveryRegistrationProcess extends Process {
 			                									.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 			                
 			                String insertionString = (ClientResponse.Status.CREATED == insertionResponse.getClientResponseStatus() ? " (inserted)" : " (updated)");
+			                
+			                if (ClientResponse.Status.CREATED == insertionResponse.getClientResponseStatus()) {
+			                	
+			                	if (discLogicalType == NodeLogicalType.END_DEVICE) {
+						                formData = new MultivaluedMapImpl();
+						                formData = new MultivaluedMapImpl();
+						                formData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
+						                formData.add("gid",Byte.toString(gatewayId));
+						                formData.add("address",Short.toString(discAddress));                
+			
+						                restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+					                }
+					                
+				                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_DESCR_ACQUIRED,gatewayId, discAddress);
+				                    try {
+				                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
+				                        networkEventsProducer.send(eventMessage);
+				                    } catch (JMSException ex) { }
+			                	
+			                }
 			        		
 			                println("Node " + sender.getName() + " discovered " 
 			                		+ Long.toHexString(discNuid) + ":" + Integer.toHexString(0xFFFF & discAddress) + " of type " + discLogicalType + insertionString);

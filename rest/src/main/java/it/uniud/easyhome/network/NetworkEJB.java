@@ -168,7 +168,7 @@ public class NetworkEJB {
 		.append("WHERE l.timestamp<=:t ");
 		
 		TypedQuery<Link> query = em.createQuery(queryBuilder.toString(),Link.class)
-		.setParameter("t", System.currentTimeMillis()-2*NodeDiscoveryRequestProcess.DISCOVERY_REQUEST_PERIOD_MS);
+		.setParameter("t", System.currentTimeMillis()-4*NodeDiscoveryRequestProcess.DISCOVERY_REQUEST_PERIOD_MS);
 		
 		query.executeUpdate();
 	}

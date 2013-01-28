@@ -87,8 +87,7 @@ public class NodeDescrRegistrationProcess extends Process {
 			                
 			                restResource.path("network").path("jobs").queryParams(queryData).delete(ClientResponse.class);
 			                
-			                if (descr.getLogicalType() == NodeLogicalType.END_DEVICE || 
-			                	descr.getLogicalType() == NodeLogicalType.ROUTER) {
+			                if (descr.getLogicalType() == NodeLogicalType.END_DEVICE) {
 				                MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
 				                formData = new MultivaluedMapImpl();
 				                formData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
