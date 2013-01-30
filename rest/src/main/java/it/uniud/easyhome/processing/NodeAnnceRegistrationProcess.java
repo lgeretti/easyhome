@@ -97,7 +97,7 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                	println("Node " + gatewayId + ":" + Integer.toHexString(0xFFFF & address) + " announcement registration failed");
 	                
 	                
-	        	} catch (InvalidPacketTypeException ex) {
+	        	} catch (Exception ex) {
 	        		ex.printStackTrace();
 	        		return;
 	        	}

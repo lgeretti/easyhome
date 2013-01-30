@@ -113,7 +113,7 @@ public class NodeDescrRegistrationProcess extends Process {
 	        		e.printStackTrace();
 	        	} catch (InvalidNodeLogicalTypeException e) {
 					e.printStackTrace();
-				} catch (JSONException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
         	}

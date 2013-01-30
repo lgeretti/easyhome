@@ -176,7 +176,6 @@ public class NetworkEJB {
 	public Link findLinkById(long id) {
 		return em.find(Link.class, id);
 	}
-	
 
 	public Link findLink(byte gatewayId, LocalCoordinates source, LocalCoordinates destination) {
 	

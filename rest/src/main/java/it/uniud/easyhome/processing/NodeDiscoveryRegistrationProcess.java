@@ -130,8 +130,7 @@ public class NodeDiscoveryRegistrationProcess extends Process {
 	        		e.printStackTrace();
 	        	} catch (InvalidNodeLogicalTypeException e) {
 	        		// Never going to happen anyway
-	        	} catch (JSONException e) {
-					// TODO Auto-generated catch block
+	        	} catch (Exception e) {
 					e.printStackTrace();
 				}
         	}	
