@@ -15,6 +15,7 @@ import it.uniud.easyhome.network.NetworkJob;
 import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
+import it.uniud.easyhome.packets.ResponseStatus;
 import it.uniud.easyhome.packets.natives.NativePacket;
 import it.uniud.easyhome.packets.natives.NodeDiscoveryRspPacket;
 import it.uniud.easyhome.packets.natives.NodeNeighRspPacket;
@@ -62,7 +63,7 @@ public class NodeDiscoveryRegistrationProcess extends Process {
 	        	try {
 	        		NodeDiscoveryRspPacket discPkt = new NodeDiscoveryRspPacket(pkt);
 	        		
-	        		if (discPkt.isSuccessful()) {
+	        		if (discPkt.getStatus() == ResponseStatus.SUCCESS) {
 	        			byte gatewayId = discPkt.getSrcCoords().getGatewayId();
 	        			short senderAddress = discPkt.getSenderAddress();
 		        		long discNuid = discPkt.getNuid();

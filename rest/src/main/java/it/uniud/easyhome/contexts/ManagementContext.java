@@ -10,12 +10,15 @@ public enum ManagementContext implements Context {
 	NODE_ANNOUNCE((short)0x13),
 	NODE_NEIGH_REQ((short)0x31),
 	NODE_NEIGH_RSP((short)0x8031),
-	NODE_DISCOVERY_REQ((short)0x32),
-	NODE_DISCOVERY_RSP((short)0x8032),
 	ACTIVE_EP_REQ((short)0x5),
 	ACTIVE_EP_RSP((short)0x8005),
 	SIMPLE_DESC_REQ((short)0x4),
-	SIMPLE_DESC_RSP((short)0x8004);
+	SIMPLE_DESC_RSP((short)0x8004),
+	NODE_DISCOVERY_REQ((short)0x32),
+	NODE_DISCOVERY_RSP((short)0x8032),
+	NODE_POWER_LEVEL_REQ((short)0x90),
+	NODE_POWER_LEVEL_RSP((short)0x8090),
+	NODE_POWER_LEVEL_SET((short)0x91);
 	
 	private short code;
 	

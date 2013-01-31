@@ -4,7 +4,7 @@ public enum Manufacturer {
 
 	DIGI ((short)0x101E), 
 	UNDEFINED ((short)0x0), // Not previously defined, like before being collected from the node
-	UNKNOWN ((short)0xFFFF); // Defined but not within this enumeration
+	OTHER ((short)0xFFFF); // Defined but not within this enumeration
 	
 	private short code;
 	
@@ -24,8 +24,9 @@ public enum Manufacturer {
 				result = cxt;
 		}
 		
+		// If the code is not present, we choose to let the manufacturer fall as Other, i.e., the code is always correct
 		if (result == null)
-			result = Manufacturer.UNKNOWN;
+			result = Manufacturer.OTHER;
 		
 		return result;
 	}	

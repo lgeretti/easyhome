@@ -9,6 +9,7 @@ import it.uniud.easyhome.network.ModuleCoordinates;
 import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.packets.Operation;
+import it.uniud.easyhome.packets.ResponseStatus;
 
 public class NodeDiscoveryRspPacket extends NativePacket {
 
@@ -62,8 +63,8 @@ public class NodeDiscoveryRspPacket extends NativePacket {
 		return Manufacturer.fromCode(raw);
 	}
 	
-	public boolean isSuccessful() {
-		return (this.getOperation().getData()[0] == 0);
+	public ResponseStatus getStatus() {
+		return ResponseStatus.fromCode(this.getOperation().getData()[0]);
 	}
 	
 	public short getSenderAddress() {

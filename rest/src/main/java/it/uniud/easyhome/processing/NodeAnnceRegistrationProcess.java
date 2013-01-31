@@ -6,6 +6,7 @@ import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.network.Node;
+import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.packets.natives.NativePacket;
 import it.uniud.easyhome.packets.natives.NodeAnncePacket;
 
@@ -57,6 +58,10 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                formData.add("gid",Byte.toString(gatewayId));
 	                formData.add("nuid",Long.toString(nuid));
 	                formData.add("address",Short.toString(address));
+	                
+	                if (address == 0) {
+	                	formData.add("logicalType", NodeLogicalType.COORDINATOR.toString());
+	                }
 	                
 	                ClientResponse nodeInsertionResponse = restResource.path("network").path("insert")
 	                		.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);

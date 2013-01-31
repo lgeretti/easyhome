@@ -97,14 +97,15 @@ public class NetworkEJB {
 	public boolean insertOrUpdateNode(Node node) {
         Node persistedNode = findNode(node);
         
-        if (persistedNode == null)
+        if (persistedNode == null) {
             em.persist(node);
-        else {
-        	if (node.getLogicalType() != null)
-        		persistedNode.setLogicalType(node.getLogicalType());
-        	if (node.getManufacturer() != null)
-        		persistedNode.setManufacturer(node.getManufacturer());
+        } else {
         	
+        	if (node.getLogicalType() != NodeLogicalType.UNDEFINED)
+        		persistedNode.setLogicalType(node.getLogicalType());
+        	if (node.getManufacturer() != Manufacturer.UNDEFINED)
+        		persistedNode.setManufacturer(node.getManufacturer());
+
         	em.merge(persistedNode);
         }
         return (persistedNode != null);

@@ -11,6 +11,7 @@ import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.devices.HomeAutomationDevice;
 import it.uniud.easyhome.network.Link;
 import it.uniud.easyhome.network.LocalCoordinates;
+import it.uniud.easyhome.network.Manufacturer;
 import it.uniud.easyhome.network.NetworkJob;
 import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.network.Node;
@@ -119,6 +120,44 @@ public class NetworkResourceIT {
         assertEquals(1,nodeList.size());
         assertEquals(node1,nodeList.get(0));
     }
+	
+	@Test
+	public void testReInsertNode() throws JSONException {
+
+    	byte gid = 2;
+    	long nuid = 10L;
+    	short address = 0x00CD;
+    	NodeLogicalType logicalType = NodeLogicalType.ROUTER;
+    	Manufacturer manufacturer = Manufacturer.DIGI;
+		
+        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+        formData.add("gid",Byte.toString(gid));
+        formData.add("nuid",Long.toString(nuid));
+        formData.add("address",Short.toString(address));
+        formData.add("logicalType",logicalType.toString());
+        formData.add("manufacturer",manufacturer.toString());
+		
+        ClientResponse insertionResponse = client.resource(TARGET).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
+        
+        Node recoveredNode = client.resource(TARGET).path(Byte.toString(gid)).path(Short.toString(address)).accept(MediaType.APPLICATION_JSON).get(Node.class);
+        
+        assertEquals(logicalType,recoveredNode.getLogicalType());
+        assertEquals(manufacturer,recoveredNode.getManufacturer());
+        
+        formData = new MultivaluedMapImpl();
+        formData.add("gid",Byte.toString(gid));
+        formData.add("nuid",Long.toString(nuid));
+        formData.add("address",Short.toString(address));
+        
+        ClientResponse reInsertionResponse = client.resource(TARGET).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        assertEquals(ClientResponse.Status.OK,reInsertionResponse.getClientResponseStatus());
+        
+        recoveredNode = client.resource(TARGET).path(Byte.toString(gid)).path(Short.toString(address)).accept(MediaType.APPLICATION_JSON).get(Node.class);
+        
+        assertEquals(logicalType,recoveredNode.getLogicalType());
+        assertEquals(manufacturer,recoveredNode.getManufacturer());
+	}
 
 	@Test
 	public void testDeleteNode() throws JSONException {

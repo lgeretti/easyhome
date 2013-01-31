@@ -39,18 +39,6 @@ public enum ProcessKind {
 			return new NodeNeighRegistrationProcess(pid,uriInfo,this);
 		}
 	},
-	NODE_DISCOVERY_REQUEST {
-		@Override
-		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {
-			return new NodeDiscoveryRequestProcess(pid,uriInfo,this);
-		}
-	},
-	NODE_DISCOVERY_REGISTRATION {
-		@Override
-		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {
-			return new NodeDiscoveryRegistrationProcess(pid,uriInfo,this);
-		}
-	},
 	ACTIVE_ENDPOINTS_REQUEST {
 		@Override
 		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {
@@ -75,6 +63,30 @@ public enum ProcessKind {
 			return new SimpleDescrRegistrationProcess(pid,uriInfo,this);
 		}
 	},
+	NODE_DISCOVERY_REQUEST {
+		@Override
+		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {
+			return new NodeDiscoveryRequestProcess(pid,uriInfo,this);
+		}
+	},
+	NODE_DISCOVERY_REGISTRATION {
+		@Override
+		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {
+			return new NodeDiscoveryRegistrationProcess(pid,uriInfo,this);
+		}
+	},
+	NODE_POWER_LEVEL_REQUEST {
+		@Override
+		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {
+			return new NodePowerLevelRequestProcess(pid,uriInfo,this);
+		}
+	},
+	NODE_POWER_LEVEL_ACKNOWLEDGMENT {
+		@Override
+		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {
+			return new NodePowerLevelAcknowledgementProcess(pid,uriInfo,this);
+		}
+	},	
 	NETWORK_UPDATE {
 		@Override
 		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {

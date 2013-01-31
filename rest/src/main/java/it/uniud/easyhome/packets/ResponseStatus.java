@@ -17,7 +17,7 @@ public enum ResponseStatus {
 		return code;
 	}
 	
-	public static ResponseStatus fromCode(short code) {
+	public static ResponseStatus fromCode(byte code) {
 		
 		ResponseStatus result = null;
 		for (ResponseStatus status: ResponseStatus.values()) {
