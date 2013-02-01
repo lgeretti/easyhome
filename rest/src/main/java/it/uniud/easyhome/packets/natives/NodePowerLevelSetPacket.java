@@ -4,6 +4,7 @@ import it.uniud.easyhome.common.ByteUtils;
 import it.uniud.easyhome.common.Endianness;
 import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.exceptions.*;
+import it.uniud.easyhome.network.GlobalCoordinates;
 import it.uniud.easyhome.network.ModuleCoordinates;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.packets.Domain;
@@ -28,9 +29,9 @@ public class NodePowerLevelSetPacket extends NativePacket {
 			throw new InvalidPayloadLengthException();
 	}
 	
-	public NodePowerLevelSetPacket(Node destinationNode, byte level, byte seqNumber) {
-		this(new ModuleCoordinates((byte)1,0L,(short)0,(byte)0),
-			 new ModuleCoordinates(destinationNode.getCoordinates(),(byte)0),				
+	public NodePowerLevelSetPacket(GlobalCoordinates destinationCoordinates, byte level, byte seqNumber) {
+		this(new ModuleCoordinates((byte)1,0L,(short)0,(byte)0xEA),
+			 new ModuleCoordinates(destinationCoordinates,(byte)0xEA),				
 			 new Operation(seqNumber,Domain.MANAGEMENT.getCode(),ManagementContext.NODE_POWER_LEVEL_SET.getCode(),
 					       (byte)0x0/*Context invariant*/,(byte)0x0/*Irrelevant*/,
 					       new byte[]{level}));

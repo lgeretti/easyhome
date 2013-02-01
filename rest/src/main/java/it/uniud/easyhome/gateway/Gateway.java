@@ -1,6 +1,7 @@
 package it.uniud.easyhome.gateway;
 
 import it.uniud.easyhome.common.ByteUtils;
+import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.RunnableState;
 import it.uniud.easyhome.exceptions.ChecksumException;
 import it.uniud.easyhome.exceptions.IllegalGatewayStateException;
@@ -215,10 +216,10 @@ public class Gateway implements Runnable {
                 OutputStream ostream = new BufferedOutputStream(skt.getOutputStream());
                 
     	   		Context jndiContext = new InitialContext();
-    	        ConnectionFactory connectionFactory = (ConnectionFactory) jndiContext.lookup("jms/easyhome/ConnectionFactory");
+    	        ConnectionFactory connectionFactory = (ConnectionFactory) jndiContext.lookup(JMSConstants.CONNECTION_FACTORY);
     	        
-                Topic outboundTopic = (Topic) jndiContext.lookup("jms/easyhome/OutboundPacketsTopic");
-                Topic inboundTopic = (Topic) jndiContext.lookup("jms/easyhome/InboundPacketsTopic");
+                Topic outboundTopic = (Topic) jndiContext.lookup(JMSConstants.OUTBOUND_PACKETS_TOPIC);
+                Topic inboundTopic = (Topic) jndiContext.lookup(JMSConstants.INBOUND_PACKETS_TOPIC);
                 
     	        jmsConnection = connectionFactory.createConnection();
     	        Session jmsSession = jmsConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);

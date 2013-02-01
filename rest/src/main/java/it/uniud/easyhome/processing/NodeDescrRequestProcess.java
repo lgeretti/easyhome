@@ -57,7 +57,7 @@ public class NodeDescrRequestProcess extends Process {
         
     	Node node = JsonUtils.getFrom(getNodeResponse, Node.class);
     	
-    	NodeDescrReqPacket packet = new NodeDescrReqPacket(node,tsn);
+    	NodeDescrReqPacket packet = new NodeDescrReqPacket(node.getCoordinates(),tsn);
         ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
         getOutboundPacketsProducer().send(outboundMessage);    
         println("Node " + node.getName() + " descriptor request " + (isRepeated ? "re-" : "") + "dispatched");

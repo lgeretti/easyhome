@@ -61,7 +61,7 @@ public class ActiveEndpointsRequestProcess extends Process {
 	        
 	        restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	    	
-	    	ActiveEndpointsReqPacket packet = new ActiveEndpointsReqPacket(node,tsn);
+	    	ActiveEndpointsReqPacket packet = new ActiveEndpointsReqPacket(node.getCoordinates(),tsn);
 	        ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
 	        getOutboundPacketsProducer().send(outboundMessage);    
 	        println("Node " + node.getName() + " active endpoints request " + (isRepeated ? "re-" : "") + "dispatched");

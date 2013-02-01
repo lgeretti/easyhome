@@ -61,9 +61,10 @@ public final class NetworkResource {
     // curl -X POST http://localhost:8080/easyhome/rest/network/2/0 -H "Content-Type: application/x-www-form-urlencoded" --data-binary "name=Gateway&location=Salotto" 
     @POST
     @Path("{gid}/{address}")
-    public Response setNameOrLocation(@PathParam("gid") byte gid, @PathParam("address") short address, 
+    public Response setSomething(@PathParam("gid") byte gid, @PathParam("address") short address, 
     								  @FormParam("name") String name, 
-    								  @FormParam("location") String location) {
+    								  @FormParam("location") String location,
+    								  @DefaultValue("-1") @FormParam("powerLevel") byte powerLevel) {
     	
     	synchronized(nodeLock) {
 	        Node node = resEjb.findNode(gid,address);
@@ -76,6 +77,10 @@ public final class NetworkResource {
 	        
 	        if (location != null)
 	        	node.setLocation(location);
+	        
+	        if (powerLevel != -1) {
+	        	node.setPowerLevel(powerLevel);
+	        }
 	        
 	        resEjb.updateManaged(node);
     	}

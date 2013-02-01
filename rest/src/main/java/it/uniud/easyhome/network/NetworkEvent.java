@@ -10,24 +10,34 @@ import java.io.Serializable;
  */
 public class NetworkEvent implements Serializable {
 
-	private static final long serialVersionUID = -926685643567817992L;
+	private static final long serialVersionUID = 564739889945686964L;
 
-	public static enum EventKind { NODE_ADDED, NODE_REMOVED, NODE_DESCR_ACQUIRED, NODE_ENDPOINTS_ACQUIRED, SIMPLE_DESCR_ACQUIRED, NODE_NEIGHBORS_CHANGED}; 
+	public static enum EventKind { NODE_ADDED, NODE_REMOVED, NODE_DESCR_ACQUIRED, NODE_ENDPOINTS_ACQUIRED, SIMPLE_DESCR_ACQUIRED, NODE_NEIGHBORS_CHANGED, NODE_POWER_LEVEL_SET}; 
 	
 	private EventKind kind;
 	private byte gid;
 	private short address;
 	private byte endpoint;
+	private byte[] payload;
 	
 	public NetworkEvent(EventKind kind, byte gid, short address) {
-		this(kind,gid,address,(byte)127);
+		this(kind,gid,address,(byte)127, new byte[0]);
 	}
 	
 	public NetworkEvent(EventKind kind, byte gid, short address, byte endpoint) {
+		this(kind,gid,address,endpoint, new byte[0]);
+	}
+	
+	public NetworkEvent(EventKind kind, byte gid, short address, byte[] payload) {
+		this(kind,gid,address,(byte)127, payload);
+	}
+	
+	public NetworkEvent(EventKind kind, byte gid, short address, byte endpoint, byte[] payload) {
 		this.kind = kind;
 		this.gid = gid;
 		this.address = address;
 		this.endpoint = endpoint;
+		this.payload = payload;
 	}
 	
 	public EventKind getKind() {
@@ -44,5 +54,9 @@ public class NetworkEvent implements Serializable {
 	
 	public byte getEndpoint() {
 		return endpoint;
+	}
+	
+	public byte[] getPayload() {
+		return payload;
 	}
 }

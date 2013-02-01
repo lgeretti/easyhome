@@ -53,7 +53,7 @@ public class SimpleDescrRequestProcess extends Process {
     	        	List<Short> endpoints = node.getEndpoints();
     	        	for (int i=0; i<endpoints.size(); i++) {
     	        		try {
-    	    	        	SimpleDescrReqPacket packet = new SimpleDescrReqPacket(node,i,++sequenceNumber);
+    	    	        	SimpleDescrReqPacket packet = new SimpleDescrReqPacket(node.getCoordinates(),node.getEndpoints().get(i).byteValue(),++sequenceNumber);
     	    	            ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
     	    	            getOutboundPacketsProducer().send(outboundMessage);    
     	    	            println("Simple descriptor for endpoint " + endpoints.get(i) + " of node " + node.getName() + " request dispatched");	

@@ -8,6 +8,7 @@ import it.uniud.easyhome.exceptions.InvalidDomainException;
 import it.uniud.easyhome.exceptions.InvalidEndpointsException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.exceptions.InvalidPayloadLengthException;
+import it.uniud.easyhome.network.GlobalCoordinates;
 import it.uniud.easyhome.network.ModuleCoordinates;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.packets.Domain;
@@ -33,12 +34,12 @@ public class NodeDiscoveryReqPacket extends NativePacket {
 			throw new InvalidPayloadLengthException();
 	}
 	
-	public NodeDiscoveryReqPacket(Node destinationNode, byte seqNumber) {
+	public NodeDiscoveryReqPacket(GlobalCoordinates destinationCoordinates, byte seqNumber) {
 		this(new ModuleCoordinates((byte)1,0L,(short)0,(byte)0xEA),
-			 new ModuleCoordinates(destinationNode.getCoordinates(),(byte)0xEA),				
+			 new ModuleCoordinates(destinationCoordinates,(byte)0xEA),				
 			 new Operation(seqNumber,Domain.MANAGEMENT.getCode(),ManagementContext.NODE_DISCOVERY_REQ.getCode(),
 					       (byte)0x0/*Context invariant*/,(byte)0x0/*Irrelevant*/,
-					       ByteUtils.getBytes(destinationNode.getCoordinates().getAddress(), Endianness.LITTLE_ENDIAN)));
+					       ByteUtils.getBytes(destinationCoordinates.getAddress(), Endianness.LITTLE_ENDIAN)));
 	}
 	
 	public NodeDiscoveryReqPacket(NativePacket pkt) {

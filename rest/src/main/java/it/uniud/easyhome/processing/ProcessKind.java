@@ -87,6 +87,12 @@ public enum ProcessKind {
 			return new NodePowerLevelAcknowledgementProcess(pid,uriInfo,this);
 		}
 	},	
+	NODE_POWER_LEVEL_SET {
+		@Override
+		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {
+			return new NodePowerLevelSetProcess(pid,uriInfo,this);
+		}
+	},		
 	NETWORK_UPDATE {
 		@Override
 		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {

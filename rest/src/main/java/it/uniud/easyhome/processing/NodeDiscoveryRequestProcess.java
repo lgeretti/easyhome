@@ -53,7 +53,7 @@ public class NodeDiscoveryRequestProcess extends Process {
 		    	
 	    		sequenceNumber++;
 	    		
-	    		NodeDiscoveryReqPacket packet = new NodeDiscoveryReqPacket(node,sequenceNumber);
+	    		NodeDiscoveryReqPacket packet = new NodeDiscoveryReqPacket(node.getCoordinates(),sequenceNumber);
 		 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
 		    	getOutboundPacketsProducer().send(outboundMessage);    
 		    	println("Node " + node.getName() + " discovery request dispatched");

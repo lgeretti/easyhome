@@ -122,6 +122,46 @@ public class NetworkResourceIT {
     }
 	
 	@Test
+	public void testSetNameLocationPowerLevel() throws JSONException {
+		
+    	byte gid = 2;
+    	long nuid = 10L;
+    	short address = 0x00CD;
+    	String name = "Fridge";
+    	String location = "Kitchen";
+    	byte powerLevel = 3;
+		
+        Node node1 = new Node.Builder(1,gid,nuid,address).build();
+       
+        ClientResponse insertionResponse = insertNewNode(new GlobalCoordinates(gid,nuid,address));
+        assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
+
+        MultivaluedMap<String,String> formData;
+        ClientResponse updateResponse;
+        
+        formData = new MultivaluedMapImpl();
+        formData.add("name",name);
+        updateResponse = client.resource(TARGET).path(Byte.toString(gid)).path(Short.toString(address)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        assertEquals(ClientResponse.Status.OK,updateResponse.getClientResponseStatus());
+
+        formData = new MultivaluedMapImpl();
+        formData.add("location",location);
+        updateResponse = client.resource(TARGET).path(Byte.toString(gid)).path(Short.toString(address)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        assertEquals(ClientResponse.Status.OK,updateResponse.getClientResponseStatus());
+        
+        formData = new MultivaluedMapImpl();
+        formData.add("powerLevel",Byte.toString(powerLevel));
+        updateResponse = client.resource(TARGET).path(Byte.toString(gid)).path(Short.toString(address)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        assertEquals(ClientResponse.Status.OK,updateResponse.getClientResponseStatus());
+        
+        Node node = client.resource(TARGET).path(Byte.toString(gid)).path(Short.toString(address)).accept(MediaType.APPLICATION_JSON).get(Node.class);
+
+        assertEquals(name,node.getName());
+        assertEquals(location,node.getLocation());
+        assertEquals(powerLevel,node.getPowerLevel());
+    }
+	
+	@Test
 	public void testReInsertNode() throws JSONException {
 
     	byte gid = 2;

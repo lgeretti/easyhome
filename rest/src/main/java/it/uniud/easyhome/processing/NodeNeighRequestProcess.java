@@ -63,7 +63,7 @@ public class NodeNeighRequestProcess extends Process {
 		            
 		            restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 		    		
-			    	NodeNeighReqPacket packet = new NodeNeighReqPacket(node,sequenceNumber);
+			    	NodeNeighReqPacket packet = new NodeNeighReqPacket(node.getCoordinates(),sequenceNumber);
 			 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
 			    	getOutboundPacketsProducer().send(outboundMessage);    
 			    	println("Node '" + node.getName() + "' neighbours request dispatched");

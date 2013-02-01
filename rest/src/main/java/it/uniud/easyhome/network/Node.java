@@ -30,12 +30,12 @@ public class Node {
     private GlobalCoordinates coordinates;
     @Column(nullable = false)
     private NodeLogicalType logicalType;
-    @Column(nullable = false)
-    private NodeLiveness liveness;
     @Column
     private String location;    
     @Column
     private Manufacturer manufacturer;
+    @Column
+    private byte powerLevel;
     
     @Embedded
     @ElementCollection
@@ -53,12 +53,12 @@ public class Node {
     	this.logicalType = logicalType;
     }
     
-    public void setLiveness(NodeLiveness liveness) {
-    	this.liveness = liveness;
-    }
-    
     public void setManufacturer(Manufacturer manufacturer) {
     	this.manufacturer = manufacturer;
+    }
+    
+    public void setPowerLevel(byte powerLevel) {
+    	this.powerLevel = powerLevel;
     }
     
     public void addNeighbor(Node node) {
@@ -113,10 +113,9 @@ public class Node {
             node = new Node();
             node.id = id;
             node.coordinates = new GlobalCoordinates(gatewayId, nuid, address);
-            
+            node.powerLevel = -1;
             node.logicalType = NodeLogicalType.UNDEFINED;
             node.manufacturer = Manufacturer.UNDEFINED;
-            node.liveness = NodeLiveness.OK;
         }
         
         public Builder setName(String name) {
@@ -128,11 +127,6 @@ public class Node {
         
         public Builder setLogicalType(NodeLogicalType logicalType) {
         	node.logicalType = logicalType;
-        	return this;
-        }
-        
-        public Builder setLiveness(NodeLiveness liveness) {
-        	node.liveness = liveness;
         	return this;
         }
         
@@ -165,6 +159,10 @@ public class Node {
     	return this.manufacturer;
     }
     
+    public byte getPowerLevel() {
+    	return this.powerLevel;
+    }
+    
     public NodeLogicalType getLogicalType() {
     	return this.logicalType;
     }
@@ -175,10 +173,6 @@ public class Node {
 		
 		return this.location;
 	}
-    
-    public NodeLiveness getLiveness() {
-    	return this.liveness;
-    }
     
     public List<LocalCoordinates> getNeighbors() {
     	return this.neighbors;
@@ -213,7 +207,6 @@ public class Node {
         if (!this.coordinates.equals(otherNode.coordinates)) return false;
         if (!this.name.equals(otherNode.name)) return false;
         if (this.logicalType != otherNode.logicalType) return false;
-        if (this.liveness != otherNode.liveness) return false;
         if (this.manufacturer != otherNode.manufacturer) return false;
         
         return true;
@@ -227,7 +220,6 @@ public class Node {
         result = prime * result + name.hashCode();
         result = prime * result + coordinates.hashCode();
         result = prime * result + logicalType.hashCode();
-        result = prime * result + liveness.hashCode();
         result = prime * result + manufacturer.hashCode();
         return (int)result;
     }

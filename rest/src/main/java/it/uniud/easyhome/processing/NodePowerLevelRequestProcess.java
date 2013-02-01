@@ -54,7 +54,7 @@ public class NodePowerLevelRequestProcess extends Process {
 		    	
 	    		sequenceNumber++;
 	    		
-	    		NodePowerLevelReqPacket packet = new NodePowerLevelReqPacket(node,sequenceNumber);
+	    		NodePowerLevelReqPacket packet = new NodePowerLevelReqPacket(node.getCoordinates(),sequenceNumber);
 		 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
 		    	getOutboundPacketsProducer().send(outboundMessage);    
 		    	println("Node " + node.getName() + " power level request dispatched");
