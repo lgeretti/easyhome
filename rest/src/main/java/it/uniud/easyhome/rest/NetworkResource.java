@@ -17,7 +17,7 @@ public final class NetworkResource {
 	
     private NetworkEJB resEjb;
     
-    private static int nodeId = 0;
+    private static long nodeId = 0;
     private static long linkId = 0;
     private static int jobId = 0;
     private static Object nodeLock = new Object();
@@ -99,7 +99,10 @@ public final class NetworkResource {
     	boolean existed = false;
     	
     	synchronized(nodeLock) {
-    		Node.Builder nodeBuilder = new Node.Builder(++nodeId,gid,nuid,address);
+    		
+    		long newNodeId = nodeId + 1;
+    		
+    		Node.Builder nodeBuilder = new Node.Builder(newNodeId,gid,nuid,address);
 					   
     		if (logicalType != null)
     			nodeBuilder.setLogicalType(logicalType);
@@ -107,6 +110,10 @@ public final class NetworkResource {
     			nodeBuilder.setManufacturer(manufacturer);
 
     		existed = resEjb.insertOrUpdateNode(nodeBuilder.build());
+    		
+    		// This is in order to avoid increasing when not necessary
+    		if (existed)
+    			nodeId++;
     	}
         
         if (existed)
