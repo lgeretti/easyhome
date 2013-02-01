@@ -95,7 +95,13 @@ public class NodeDescrRegistrationProcess extends Process {
 				                formData.add("address",Short.toString(address));                
 	
 				                restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-			                }
+			                } else if (descr.getLogicalType() == NodeLogicalType.ROUTER || descr.getLogicalType() == NodeLogicalType.COORDINATOR) {
+			                	MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+				                formData.add("type",NetworkJobType.NODE_POWER_LEVEL_REQUEST.toString());
+				                formData.add("gid",Byte.toString(gid));
+				                formData.add("address",Short.toString(address));                
+				                restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+				            }
 			                
 		                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_DESCR_ACQUIRED, 
 		                											node.getCoordinates().getGatewayId(), node.getCoordinates().getAddress());

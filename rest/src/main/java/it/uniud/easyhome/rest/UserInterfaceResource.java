@@ -78,11 +78,18 @@ public class UserInterfaceResource {
     						   @FormParam("address") short address,
     						   @FormParam("powerLevel") byte powerLevel) throws JSONException, JMSException, NamingException {
     	
+    	if (powerLevel < 0 || powerLevel > 4)
+    		throw new WebApplicationException(Response.Status.BAD_REQUEST);
+    	
     	ClientResponse nodeResponse = client.resource(TARGET).path("network").path(Byte.toString(gid)).path(Short.toString(address)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
     	Node node = JsonUtils.getFrom(nodeResponse, Node.class);
     	
     	if (nodeResponse.getClientResponseStatus() == ClientResponse.Status.NOT_FOUND)
-    		throw new WebApplicationException(Response.Status.NOT_FOUND); 
+    		throw new WebApplicationException(Response.Status.NOT_FOUND);
+    	
+    	MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+        formData.add("powerLevel",Byte.toString(powerLevel));
+        client.resource(TARGET).path("network").path(Byte.toString(gid)).path(Short.toString(address)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         	
    		jndiContext = new InitialContext();
         ConnectionFactory connectionFactory = (ConnectionFactory) jndiContext.lookup(JMSConstants.CONNECTION_FACTORY);

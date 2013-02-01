@@ -109,7 +109,6 @@ public final class NetworkResource {
     		existed = resEjb.insertOrUpdateNode(nodeBuilder.build());
     	}
         
-        
         if (existed)
         	return Response.ok().build();
         
