@@ -243,9 +243,9 @@ public class NetworkEJB {
         	em.remove(link);
 	}
 	
-	public void insertJob(int id, NetworkJobType type, byte gatewayId, short address, byte endpoint, byte tsn) {
+	public void insertJob(int id, NetworkJobType type, byte gatewayId, short address, byte endpoint, byte tsn, byte payload) {
 		
-		NetworkJob job = new NetworkJob(id, type, gatewayId, address, endpoint, tsn);
+		NetworkJob job = new NetworkJob(id, type, gatewayId, address, endpoint, tsn, payload);
 		
 		em.persist(job);
 	}

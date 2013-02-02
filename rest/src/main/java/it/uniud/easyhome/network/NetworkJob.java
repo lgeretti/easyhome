@@ -37,11 +37,15 @@ public class NetworkJob {
 	
 	@Column(nullable = false)
 	private byte tsn;
+	// One-byte payload
+	@Column(nullable = false)
+	private byte payload;
+	
 	
 	@SuppressWarnings("unused")
 	private NetworkJob() { }
 	
-	public NetworkJob(int id, NetworkJobType type, byte gatewayId, short address, byte endpoint, byte tsn) {
+	public NetworkJob(int id, NetworkJobType type, byte gatewayId, short address, byte endpoint, byte tsn, byte payload) {
 		
 		this.id = id;
 		this.type = type;
@@ -50,6 +54,7 @@ public class NetworkJob {
 		this.endpoint = endpoint;
 		this.timestamp = System.currentTimeMillis();
 		this.tsn = tsn;
+		this.payload = payload;
 	}
 	
 	public int getId() {
@@ -78,6 +83,10 @@ public class NetworkJob {
 	
 	public byte getTsn() {
 		return tsn;
+	}
+	
+	public byte getPayload() {
+		return payload;
 	}
 	
 	public boolean isFirst() {

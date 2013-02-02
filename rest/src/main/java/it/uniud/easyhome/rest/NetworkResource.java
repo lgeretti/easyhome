@@ -111,8 +111,8 @@ public final class NetworkResource {
 
     		existed = resEjb.insertOrUpdateNode(nodeBuilder.build());
     		
-    		// This is in order to avoid increasing when not necessary
-    		if (existed)
+    		// This is in order to avoid increasing the node id when not necessary
+    		if (!existed)
     			nodeId++;
     	}
         
@@ -268,13 +268,14 @@ public final class NetworkResource {
     					   @FormParam("gid") byte gatewayId,
     					   @FormParam("address") short address,
     					   @DefaultValue("127") @FormParam("endpoint") byte endpoint,
-    					   @DefaultValue("0") @FormParam("tsn") byte tsn) {
+    					   @DefaultValue("0") @FormParam("tsn") byte tsn,
+    					   @DefaultValue("0") @FormParam("payload") byte payload) {
     	
     	int newJobId;
     	
     	synchronized(jobLock) {
     		newJobId = ++jobId;
-	    	resEjb.insertJob(newJobId, type, gatewayId, address, endpoint, tsn);
+	    	resEjb.insertJob(newJobId, type, gatewayId, address, endpoint, tsn, payload);
     	}
     	
     	return Response.created(

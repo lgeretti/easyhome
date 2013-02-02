@@ -10,10 +10,11 @@ import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.gateway.ProtocolType;
 import it.uniud.easyhome.network.Manufacturer;
 import it.uniud.easyhome.network.NetworkEvent;
+import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.packets.natives.NodeNeighReqPacket;
-import it.uniud.easyhome.packets.natives.NodePowerLevelSetPacket;
+import it.uniud.easyhome.packets.natives.NodePowerLevelSetIssuePacket;
 import it.uniud.easyhome.processing.*;
 
 import javax.jms.Connection;
@@ -87,23 +88,27 @@ public class UserInterfaceResource {
     	if (nodeResponse.getClientResponseStatus() == ClientResponse.Status.NOT_FOUND)
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
     	
-    	MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        formData.add("powerLevel",Byte.toString(powerLevel));
-        client.resource(TARGET).path("network").path(Byte.toString(gid)).path(Short.toString(address)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+        formData.add("type",NetworkJobType.NODE_POWER_LEVEL_SET_ISSUE.toString());
+        formData.add("gid",Byte.toString(gid));
+        formData.add("address",Short.toString(address));
+        formData.add("tsn",Byte.toString((byte)0));
+        formData.add("payload",Byte.toString(powerLevel));       
+        client.resource(TARGET).path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         	
    		jndiContext = new InitialContext();
         ConnectionFactory connectionFactory = (ConnectionFactory) jndiContext.lookup(JMSConstants.CONNECTION_FACTORY);
         
-        Topic outboundPacketsTopic = (Topic) jndiContext.lookup(JMSConstants.OUTBOUND_PACKETS_TOPIC);
+        Topic networkEventsTopic = (Topic) jndiContext.lookup(JMSConstants.NETWORK_EVENTS_TOPIC);
         
         jmsConnection = connectionFactory.createConnection();
         jmsSession = jmsConnection.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
-        MessageProducer producer = jmsSession.createProducer(outboundPacketsTopic);
+        MessageProducer producer = jmsSession.createProducer(networkEventsTopic);
             
         jmsConnection.start();
         
-        NodePowerLevelSetPacket packet = new NodePowerLevelSetPacket(node.getCoordinates(),powerLevel,(byte)0);
- 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
+        NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_POWER_LEVEL_SET_ISSUE,gid,address,new byte[]{powerLevel});
+ 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(event);
     	producer.send(outboundMessage);    
     	
     	jmsConnection.close();
@@ -126,8 +131,9 @@ public class UserInterfaceResource {
 		insertProcess(ProcessKind.NODE_DISCOVERY_REQUEST);
 		insertProcess(ProcessKind.NODE_DISCOVERY_REGISTRATION);
 		insertProcess(ProcessKind.NODE_POWER_LEVEL_REQUEST);
-		insertProcess(ProcessKind.NODE_POWER_LEVEL_ACKNOWLEDGMENT);
-		insertProcess(ProcessKind.NODE_POWER_LEVEL_SET);
+		insertProcess(ProcessKind.NODE_POWER_LEVEL_REGISTRATION);
+		insertProcess(ProcessKind.NODE_POWER_LEVEL_SET_ISSUE);
+		insertProcess(ProcessKind.NODE_POWER_LEVEL_SET_ACKNOWLEDGMENT);
 		insertProcess(ProcessKind.NETWORK_UPDATE);
 		
         return Response.ok().build();

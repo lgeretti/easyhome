@@ -81,18 +81,24 @@ public enum ProcessKind {
 			return new NodePowerLevelRequestProcess(pid,uriInfo,this);
 		}
 	},
-	NODE_POWER_LEVEL_ACKNOWLEDGMENT {
+	NODE_POWER_LEVEL_REGISTRATION {
 		@Override
 		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {
 			return new NodePowerLevelRegistrationProcess(pid,uriInfo,this);
 		}
 	},	
-	NODE_POWER_LEVEL_SET {
+	NODE_POWER_LEVEL_SET_ISSUE {
 		@Override
 		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {
-			return new NodePowerLevelSetProcess(pid,uriInfo,this);
+			return new NodePowerLevelSetIssueProcess(pid,uriInfo,this);
 		}
-	},		
+	},
+	NODE_POWER_LEVEL_SET_ACKNOWLEDGMENT {
+		@Override
+		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {
+			return new NodePowerLevelSetAcknowledgmentProcess(pid,uriInfo,this);
+		}
+	},	
 	NETWORK_UPDATE {
 		@Override
 		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {

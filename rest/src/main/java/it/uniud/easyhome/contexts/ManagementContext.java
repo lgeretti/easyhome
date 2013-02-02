@@ -18,7 +18,8 @@ public enum ManagementContext implements Context {
 	NODE_DISCOVERY_RSP((short)0x8032),
 	NODE_POWER_LEVEL_REQ((short)0x90),
 	NODE_POWER_LEVEL_RSP((short)0x8090),
-	NODE_POWER_LEVEL_SET((short)0x91);
+	NODE_POWER_LEVEL_SET_ISS((short)0x91),
+	NODE_POWER_LEVEL_SET_ACK((short)0x8091);
 	
 	private short code;
 	
