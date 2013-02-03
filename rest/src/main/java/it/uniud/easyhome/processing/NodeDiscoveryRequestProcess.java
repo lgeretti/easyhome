@@ -43,7 +43,6 @@ public class NodeDiscoveryRequestProcess extends Process {
     	try {
     		
 	    	ClientResponse getResponse = restResource.path("network").path("infrastructural").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-	        	        
 	    	List<Node> nodes = JsonUtils.getListFrom(getResponse, Node.class);
 	    
 	    	if (!nodes.isEmpty()) {

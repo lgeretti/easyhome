@@ -12,7 +12,16 @@ public class NetworkEvent implements Serializable {
 
 	private static final long serialVersionUID = 564739889945686964L;
 
-	public static enum EventKind { NODE_ADDED, NODE_REMOVED, NODE_DESCR_ACQUIRED, NODE_ENDPOINTS_ACQUIRED, SIMPLE_DESCR_ACQUIRED, NODE_NEIGHBORS_CHANGED, NODE_POWER_LEVEL_SET_ISSUE}; 
+	public static enum EventKind { 
+		NODE_ADDED, 
+		NODE_REMOVED, 
+		NODE_DESCR_ACQUIRED, 
+		NODE_ENDPOINTS_ACQUIRED, 
+		SIMPLE_DESCR_ACQUIRED, 
+		NODE_NEIGHBORS_CHANGED, 
+		NODE_POWER_LEVEL_SET_ISSUE, 
+		NETWORK_GRAPH_MINIMIZATION
+		}; 
 	
 	private EventKind kind;
 	private byte gid;

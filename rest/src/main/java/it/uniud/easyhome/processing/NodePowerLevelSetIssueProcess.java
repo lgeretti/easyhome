@@ -110,12 +110,6 @@ public class NodePowerLevelSetIssueProcess extends Process {
         } catch (Exception e) {
         	e.printStackTrace();
         	println("Node power level set issue could not be dispatched to outbound packets topic");
-        	try {
-				Thread.sleep(JOB_POLLING_TIME_MILLIS);
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
         }
     	
 		

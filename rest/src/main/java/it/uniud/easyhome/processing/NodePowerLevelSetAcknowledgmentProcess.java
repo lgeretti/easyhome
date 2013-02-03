@@ -6,6 +6,7 @@ import java.util.List;
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
+import it.uniud.easyhome.exceptions.PowerLevelSetIssueJobNotPresentException;
 import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.NetworkJob;
 import it.uniud.easyhome.network.NetworkJobType;
@@ -79,12 +80,14 @@ public class NodePowerLevelSetAcknowledgmentProcess extends Process {
 				                	
 				                    println("Node " + node.getName() + " updated with power level (" + powerLevel + ")");
 				                } else
-				                	println("Node " + node.getName() + " power level information insertion failed");	
-				        
+				                	println("Node " + node.getName() + " power level information insertion failed");
 				        	}
-		        		
 		        		}
 	        		}
+	        		
+	        	} catch (PowerLevelSetIssueJobNotPresentException e) {
+	        		
+	        		println("No corresponding power level set issue job found: acknowledgment ignored");
 	        		
 	        	} catch (Exception e) {
 	        		e.printStackTrace();
@@ -102,6 +105,9 @@ public class NodePowerLevelSetAcknowledgmentProcess extends Process {
 		ClientResponse jobListResponse = restResource.path("network").path("jobs").queryParams(queryData)
 										.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 		List<NetworkJob> jobs = JsonUtils.getListFrom(jobListResponse, NetworkJob.class);
+
+		if (jobs.isEmpty())
+			throw new PowerLevelSetIssueJobNotPresentException();
 		
 		return jobs.get(0).getPayload();
     }

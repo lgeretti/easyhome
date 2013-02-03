@@ -104,7 +104,13 @@ public enum ProcessKind {
 		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {
 			return new NetworkUpdateProcess(pid,uriInfo,this);
 		}
-	};
+	}, 
+	NETWORK_GRAPH_MINIMIZATION {
+		@Override
+		public Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException {
+			return new NetworkGraphMinimizationProcess(pid,uriInfo,this);
+		}
+	}; 
 	
 	public abstract Process newProcess(int pid, UriInfo uriInfo) throws NamingException, JMSException;
 }

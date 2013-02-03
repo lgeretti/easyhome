@@ -95,7 +95,7 @@ public class UserInterfaceResource {
         formData.add("tsn",Byte.toString((byte)0));
         formData.add("payload",Byte.toString(powerLevel));       
         client.resource(TARGET).path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-        	
+        
    		jndiContext = new InitialContext();
         ConnectionFactory connectionFactory = (ConnectionFactory) jndiContext.lookup(JMSConstants.CONNECTION_FACTORY);
         
@@ -108,6 +108,30 @@ public class UserInterfaceResource {
         jmsConnection.start();
         
         NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_POWER_LEVEL_SET_ISSUE,gid,address,new byte[]{powerLevel});
+ 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(event);
+    	producer.send(outboundMessage);    
+    	
+    	jmsConnection.close();
+    	
+        return Response.ok().build();    	
+    }
+    
+    @Path("/minimizeGraph") 
+    @POST
+    public Response minimizeGraph() throws JSONException, JMSException, NamingException {
+        	
+   		jndiContext = new InitialContext();
+        ConnectionFactory connectionFactory = (ConnectionFactory) jndiContext.lookup(JMSConstants.CONNECTION_FACTORY);
+        
+        Topic networkEventsTopic = (Topic) jndiContext.lookup(JMSConstants.NETWORK_EVENTS_TOPIC);
+        
+        jmsConnection = connectionFactory.createConnection();
+        jmsSession = jmsConnection.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
+        MessageProducer producer = jmsSession.createProducer(networkEventsTopic);
+            
+        jmsConnection.start();
+        
+        NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NETWORK_GRAPH_MINIMIZATION,(byte)0,(short)0);
  	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(event);
     	producer.send(outboundMessage);    
     	
@@ -135,6 +159,7 @@ public class UserInterfaceResource {
 		insertProcess(ProcessKind.NODE_POWER_LEVEL_SET_ISSUE);
 		insertProcess(ProcessKind.NODE_POWER_LEVEL_SET_ACKNOWLEDGMENT);
 		insertProcess(ProcessKind.NETWORK_UPDATE);
+		insertProcess(ProcessKind.NETWORK_GRAPH_MINIMIZATION);
 		
         return Response.ok().build();
     }
