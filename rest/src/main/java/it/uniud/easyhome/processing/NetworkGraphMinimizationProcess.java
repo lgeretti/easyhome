@@ -1,9 +1,13 @@
 package it.uniud.easyhome.processing;
 
 import java.util.Date;
+import java.util.Deque;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.JsonUtils;
@@ -37,7 +41,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 public class NetworkGraphMinimizationProcess extends Process {
 	
 	private static final long MAXIMIZATION_PERIOD_MS = 10000;
-	private static final long MINIMIZATION_PERIOD_MS = 10000;
+	private static final long MINIMIZATION_PERIOD_MS = NetworkUpdateProcess.JOB_TIMEOUT_MILLIS;
 	private static final short MAX_PL_SET_ISS_RETRIES = 2;
 	private static final short MAX_PL_SET_ACK_RETRIES = 3;
 	private static final long ACKNOWLEDGE_WAIT_GRANULARITY_MS = 1000;
@@ -112,7 +116,7 @@ public class NetworkGraphMinimizationProcess extends Process {
         } catch (InterruptedException e) {
         	println("Network graph minimization interrupted");
         } catch (NodeNotFoundException e) {
-        	println("Network graph minimization aborted due to a missing node during maximization");
+        	println("Network graph minimization aborted due to a missing node during the procedure");
         } catch (Exception e) {
         	e.printStackTrace();
         	println("Network graph minimization failure");
@@ -150,12 +154,97 @@ public class NetworkGraphMinimizationProcess extends Process {
     	println("Network graph maximization phase completed");
     }
     
-    private void minimizeNetworkGraph() throws InterruptedException, JSONException {
+    private void minimizeNetworkGraph() throws InterruptedException, JMSException, NodeNotFoundException, JSONException {
     	
     	println("Network graph minimization phase started");
     	
+    	ClientResponse getResponse = restResource.path("network").path("infrastructural").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+    	List<Node> nodes = JsonUtils.getListFrom(getResponse, Node.class);
+    	
+    	int numNodes = nodes.size();
+    	
+    	Queue<MinimizationEntry> entries = new ConcurrentLinkedQueue<MinimizationEntry>();
+    	for (Node node : nodes)
+    		entries.add(new MinimizationEntry(node.getCoordinates().getGatewayId(),node.getCoordinates().getAddress(),node.getPowerLevel()));
+    	
+    	while (!entries.isEmpty()) {
+    		
+    		MinimizationEntry entry = entries.poll();
+    		
+    		println("Trying to reduce " + entry);
+    		
+    		entry.reducePowerLevel();
+    		requestPowerLevelChange(entry.getGatewayId(),entry.getAddress(),entry.getPowerLevel());
+    		
+    		Thread.sleep(MINIMIZATION_PERIOD_MS);
+    		
+        	getResponse = restResource.path("network").path("infrastructural").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        	nodes = JsonUtils.getListFrom(getResponse, Node.class);
+        	
+        	if (nodes.size() < numNodes) {
+        		
+        		println("Reduction resulted in reduced graph size, thus restoring power level and discarding the node");
+        		entry.increasePowerLevel();
+        		requestPowerLevelChange(entry.getGatewayId(),entry.getAddress(),entry.getPowerLevel());
+        		
+        	} else {
+
+            	if (entry.getPowerLevel() > 0) {
+            		entries.offer(entry);
+            		println("Reduced successfully");
+            	} else
+            		println("Reduced to zero successfully, hence discarding the node");
+        	}
+    	}
     	
     	println("Network graph minimization phase completed");
+    }
+    
+    private class MinimizationEntry {
+    	
+    	private byte gatewayId;
+    	private short address;
+    	private byte powerLevel;
+    	
+    	public MinimizationEntry(byte gatewayId, short address, byte powerLevel) {
+    		this.gatewayId = gatewayId;
+    		this.address = address;
+    		this.powerLevel = powerLevel;
+    	}
+    	
+    	public byte getGatewayId() {
+    		return gatewayId;
+    	}
+    	
+    	public short getAddress() {
+    		return address;
+    	}
+    	
+    	public byte getPowerLevel() {
+    		return powerLevel;
+    	}
+    	
+    	public void reducePowerLevel() {
+    		--powerLevel;
+    	}
+
+    	public void increasePowerLevel() {
+    		--powerLevel;
+    	}
+    	
+    	public String toString() {
+    		
+    		StringBuilder strb = new StringBuilder();
+    		
+    		strb.append(gatewayId)
+    			.append(":")
+    			.append(Integer.toHexString(0xFFFF & address))
+    			.append("@")
+    			.append(powerLevel);
+    		
+    		return strb.toString();
+    	}
+
     }
     
 }
