@@ -32,15 +32,31 @@ public class NetworkEJB {
 	private EntityManager em;
 	
 	public List<Node> getNodes() {
+		return getNodes((byte)0,0);
+	}
+	
+	public List<Node> getNodes(byte gatewayId, long nuid) {
+		
+		boolean findSpecificNode = (gatewayId > 0);
 		
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<Node> criteria = builder.createQuery(Node.class);
-        Root<Node> root = criteria.from(Node.class);
-        criteria.select(root);
+        Root<Node> node = criteria.from(Node.class);
+        criteria.select(node);
+        
+        if (findSpecificNode)
+        	criteria.where(builder.and(
+        			builder.equal(node.get("coordinates").get("gatewayId"), gatewayId),
+        			builder.equal(node.get("coordinates").get("nuid"), nuid)));
         
         TypedQuery<Node> query = em.createQuery(criteria);
         
-        return query.getResultList();
+        List<Node> result = query.getResultList();
+        
+        if (findSpecificNode && result.size()>1)
+        	throw new MultipleNodesFoundException();
+        
+        return result;
 	}
 
 	public List<Node> getInfrastructuralNodes() {
@@ -98,6 +114,7 @@ public class NetworkEJB {
         Node persistedNode = findNode(node);
         
         if (persistedNode == null) {
+        	acquirePersistentInfoOn(node);
             em.persist(node);
         } else {
         	
@@ -131,6 +148,29 @@ public class NetworkEJB {
 	public void removeUnmanaged(Node node) {
 		em.remove(node);
 	}
+	
+	private void acquirePersistentInfoOn(Node node) {
+		
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<NodePersistentInfo> criteria = builder.createQuery(NodePersistentInfo.class);
+        Root<NodePersistentInfo> info = criteria.from(NodePersistentInfo.class);
+        criteria.select(info).where(builder.and(
+        			builder.equal(info.get("gatewayId"), node.getCoordinates().getGatewayId()),
+        			builder.equal(info.get("nuid"), node.getCoordinates().getNuid())));
+        
+        TypedQuery<NodePersistentInfo> query = em.createQuery(criteria);
+        
+        try {
+        	NodePersistentInfo correspondingInfo = query.getSingleResult();
+        	
+        	node.setLocation(correspondingInfo.getLocation());
+        	if (correspondingInfo.getName() != null)
+        		node.setName(correspondingInfo.getName());
+        	
+        } catch (NoResultException ex) {
+        	// Nothing to do in this case
+        }
+    }
 	
 	/**
 	 * Removes a node.

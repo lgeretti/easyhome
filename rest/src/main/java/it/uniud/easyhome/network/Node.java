@@ -97,9 +97,6 @@ public class Node {
 	}
 	
 	public void setLocation(String location) throws InvalidNodeTypeException {
-		if (this.manufacturer == Manufacturer.DIGI && logicalType == NodeLogicalType.END_DEVICE)
-			throw new InvalidNodeTypeException();
-		
 		this.location = location;
 	}
 

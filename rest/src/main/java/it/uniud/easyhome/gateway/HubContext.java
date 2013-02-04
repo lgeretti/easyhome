@@ -49,6 +49,9 @@ public class HubContext {
      */
     public void addGateway(byte id, ProtocolType protocol, int port) {
         
+    	if (id < 1)
+    		throw new RuntimeException("Gateway id must be greater than zero");
+    	
         for (Gateway gw : gateways) {
             if (gw.getPort() == port)
                 throw new PortAlreadyBoundException();

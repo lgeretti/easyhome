@@ -71,8 +71,9 @@ public class NodePowerLevelSetAcknowledgmentProcess extends Process {
 			        		if (getResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
 
 			        			Node node = JsonUtils.getFrom(getResponse, Node.class);
+			        			node.setPowerLevel(powerLevel);
 			        			
-			        			ClientResponse updateResponse = updateNodePowerLevel(gatewayId,address,powerLevel);
+			        			ClientResponse updateResponse = restResource.path("network").path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
 			        			
 				                if (updateResponse.getClientResponseStatus() == Status.OK) {
 				                	
@@ -110,14 +111,6 @@ public class NodePowerLevelSetAcknowledgmentProcess extends Process {
 			throw new PowerLevelSetIssueJobNotPresentException();
 		
 		return jobs.get(0).getPayload();
-    }
-    
-    private ClientResponse updateNodePowerLevel(byte gatewayId, short address, byte powerLevel) throws JSONException {
-    	
-        MultivaluedMap<String,String> formParams = new MultivaluedMapImpl();
-        formParams.add("powerLevel",Byte.toString(powerLevel));
-        return restResource.path("network").path(Byte.toString(gatewayId)).path(Short.toString(address))
-        		.type(MediaType.APPLICATION_FORM_URLENCODED).post(ClientResponse.class,formParams);
     }
     
     private void cleanJobs(byte gatewayId, short address) throws JSONException {

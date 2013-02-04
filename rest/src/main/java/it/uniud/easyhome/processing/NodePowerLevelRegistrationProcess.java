@@ -59,9 +59,6 @@ public class NodePowerLevelRegistrationProcess extends Process {
 	        			byte gatewayId = plPkt.getSrcCoords().getGatewayId();
 	        			short address = plPkt.getAddrOfInterest();
 	        			byte powerLevel = plPkt.getPowerLevel();
-	        			
-		        		Node node;
-		        		ClientResponse updateResponse;
 		        		
 		        		synchronized(nodesLock) {
 			        		ClientResponse getResponse = restResource.path("network").path(Byte.toString(gatewayId)).path(Short.toString(address))
@@ -69,13 +66,11 @@ public class NodePowerLevelRegistrationProcess extends Process {
 			        		
 			        		if (getResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
 
-			        			node = JsonUtils.getFrom(getResponse, Node.class);
-				                MultivaluedMap<String,String> formParams = new MultivaluedMapImpl();
-				                formParams.add("powerLevel",Byte.toString(powerLevel));
-			        			updateResponse = restResource.path("network").path(Byte.toString(gatewayId)).path(Short.toString(address))
-				                		.type(MediaType.APPLICATION_FORM_URLENCODED).post(ClientResponse.class,formParams);
-			        		
+			        			Node node = JsonUtils.getFrom(getResponse, Node.class);
+			        			node.setPowerLevel(powerLevel);
 			        			
+			        			ClientResponse updateResponse = restResource.path("network").path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
+			        						        			
 				                if (updateResponse.getClientResponseStatus() == Status.OK) {
 				                	
 					                MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();

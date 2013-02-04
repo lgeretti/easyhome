@@ -38,7 +38,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
-@Path("/ui")
+@Path("/admin")
 public class UserInterfaceResource {
     
 	private static final String TARGET = "http://localhost:8080/easyhome/rest/";
@@ -138,6 +138,15 @@ public class UserInterfaceResource {
     	jmsConnection.close();
     	
         return Response.ok().build();    	
+    }
+    
+    @Path("/persistence/name")
+    @POST
+    public Response changeNodeName() throws JSONException {
+    	
+    	
+    	
+    	return Response.ok().build();
     }
     
     @Path("/up")

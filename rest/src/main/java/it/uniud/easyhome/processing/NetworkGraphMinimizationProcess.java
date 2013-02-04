@@ -67,7 +67,7 @@ public class NetworkGraphMinimizationProcess extends Process {
 	        formData.add("gid",Byte.toString(gatewayId));
 	        formData.add("address",Short.toString(address));
 	        formData.add("powerLevel",Byte.toString(powerLevel));
-	        ClientResponse changeIssueResponse = restResource.path("ui").path("changePower").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	        ClientResponse changeIssueResponse = restResource.path("admin").path("changePower").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        
         	if (changeIssueResponse.getClientResponseStatus() == ClientResponse.Status.NOT_FOUND)
         		throw new NodeNotFoundException();

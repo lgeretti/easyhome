@@ -34,8 +34,9 @@ public final class NetworkResource {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Node> getNodes() {        
-        return resEjb.getNodes();
+    public List<Node> getNodes(@QueryParam("gid") byte gatewayId, 
+ 		   					   @QueryParam("nuid") long nuid) {        
+        return resEjb.getNodes(gatewayId,nuid);
     }
     
     @GET
@@ -58,35 +59,6 @@ public final class NetworkResource {
         return node;
     }
     
-    // curl -X POST http://localhost:8080/easyhome/rest/network/2/0 -H "Content-Type: application/x-www-form-urlencoded" --data-binary "name=Gateway&location=Salotto" 
-    @POST
-    @Path("{gid}/{address}")
-    public Response setSomething(@PathParam("gid") byte gid, @PathParam("address") short address, 
-    								  @FormParam("name") String name, 
-    								  @FormParam("location") String location,
-    								  @DefaultValue("-1") @FormParam("powerLevel") byte powerLevel) {
-    	
-    	synchronized(nodeLock) {
-	        Node node = resEjb.findNode(gid,address);
-	        
-	        if (node == null) 
-	            throw new WebApplicationException(Response.Status.NOT_FOUND);
-	        
-	        if (name != null)
-	        	node.setName(name);
-	        
-	        if (location != null)
-	        	node.setLocation(location);
-	        
-	        if (powerLevel != -1) {
-	        	node.setPowerLevel(powerLevel);
-	        }
-	        
-	        resEjb.updateManaged(node);
-    	}
-        
-    	return Response.ok().build();
-    }
     
     @POST
     @Path("insert")

@@ -86,7 +86,8 @@ public class GlobalCoordinates implements Serializable {
     public int hashCode() {
         int hash = 1;
         hash = hash * 31 + gatewayId;
-        hash = (int)(hash * 31 + nuid);
+        hash = hash * 31 + (int)(0xFFFFFFFF & nuid);
+        hash = hash * 31 + (int)((nuid >>> 32) & 0xFFFFFFFF);
         hash = hash * 31 + address;
         return hash;
     }
