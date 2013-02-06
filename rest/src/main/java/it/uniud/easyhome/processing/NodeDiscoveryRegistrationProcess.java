@@ -15,6 +15,7 @@ import it.uniud.easyhome.network.NetworkJob;
 import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
+import it.uniud.easyhome.network.NodePersistentInfo;
 import it.uniud.easyhome.packets.ResponseStatus;
 import it.uniud.easyhome.packets.natives.NativePacket;
 import it.uniud.easyhome.packets.natives.NodeDiscoveryRspPacket;
@@ -85,6 +86,9 @@ public class NodeDiscoveryRegistrationProcess extends Process {
 			                formData.add("logicalType",discLogicalType.toString());
 			                formData.add("manufacturer",discManufacturer.toString());
 			                
+			                if (discLogicalType == NodeLogicalType.END_DEVICE && sender.getLocation() != null)
+			                	formData.add("location",sender.getLocation());
+			                
 			                ClientResponse insertionResponse = restResource.path("network").path("insert")
 			                									.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 			                
@@ -124,8 +128,9 @@ public class NodeDiscoveryRegistrationProcess extends Process {
 			                formData.add("destinationNuid",Long.toString(discNuid));
 			                formData.add("destinationAddress",Short.toString(discAddress));
 			                
-			                restResource.path("network").path("links").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-		        		} else if(senderRetrievalResponse.getClientResponseStatus() == ClientResponse.Status.NOT_FOUND) {
+			                ClientResponse linkInsertionResponse = restResource.path("network").path("links").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+			                
+		        		} else if(ClientResponse.Status.NOT_FOUND == senderRetrievalResponse.getClientResponseStatus()) {
 		        			
 		        			println("Node " + gatewayId + ":" + senderAddress + " discovered " 
 			                		+ Long.toHexString(discNuid) + ":" + Integer.toHexString(0xFFFF & discAddress) + " of type " + discLogicalType + ", but nothing done due to missing source");

@@ -36,16 +36,9 @@ public final class PersistentInfoResource {
     }
     
     @GET
-    @Path("{gid}/{exaNuid}")
+    @Path("{gid}/{nuid}")
     @Produces(MediaType.APPLICATION_JSON)
-    public NodePersistentInfo getNodePersistentInfo(@PathParam("gid") byte gid, @PathParam("exaNuid") String exaNuid) {
-        
-    	long nuid;
-    	try {
-    		nuid = Long.decode(exaNuid);
-    	} catch (NumberFormatException ex) {
-    		throw new WebApplicationException(Response.Status.BAD_REQUEST);
-    	}
+    public NodePersistentInfo getNodePersistentInfo(@PathParam("gid") byte gid, @PathParam("nuid") long nuid) {
     	
         NodePersistentInfo info = resEjb.getPersistentInfo(gid,nuid);
         
@@ -57,18 +50,11 @@ public final class PersistentInfoResource {
     
     // curl -X POST http://localhost:8080/easyhome/rest/persistentinfo/2/0 -H "Content-Type: application/x-www-form-urlencoded" --data-binary "name=Gateway&location=Salotto" 
     @POST
-    @Path("{gid}/{exaNuid}")
+    @Path("{gid}/{nuid}")
     public Response insertOrUpdatePersistentInfo(@PathParam("gid") byte gid, 
-    											@PathParam("exaNuid") String exaNuid, 
+    											@PathParam("nuid") long nuid, 
     								  			@FormParam("name") String name, 
     								  			@FormParam("location") String location) {
-    	
-    	long nuid;
-    	try {
-    		nuid = Long.decode(exaNuid);
-    	} catch (NumberFormatException ex) {
-    		throw new WebApplicationException(Response.Status.BAD_REQUEST);
-    	}
     	
     	synchronized(infoLock) {
     		
@@ -96,14 +82,7 @@ public final class PersistentInfoResource {
     
     @DELETE
     @Path("{gid}/{nuid}")
-    public Response deleteInfo(@PathParam("gid") byte gid, @PathParam("exaNuid") String exaNuid) {
-
-    	long nuid;
-    	try {
-    		nuid = Long.decode(exaNuid);
-    	} catch (NumberFormatException ex) {
-    		throw new WebApplicationException(Response.Status.BAD_REQUEST);
-    	}
+    public Response deleteInfo(@PathParam("gid") byte gid, @PathParam("nuid") long nuid) {
     	
         boolean found = resEjb.removeInfo(gid, nuid);
         

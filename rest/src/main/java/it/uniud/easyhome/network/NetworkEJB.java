@@ -39,15 +39,16 @@ public class NetworkEJB {
 		
 		boolean findSpecificNode = (gatewayId > 0);
 		
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<Node> criteria = builder.createQuery(Node.class);
+        CriteriaBuilder b = em.getCriteriaBuilder();
+        CriteriaQuery<Node> criteria = b.createQuery(Node.class);
         Root<Node> node = criteria.from(Node.class);
         criteria.select(node);
         
         if (findSpecificNode)
-        	criteria.where(builder.and(
-        			builder.equal(node.get("coordinates").get("gatewayId"), gatewayId),
-        			builder.equal(node.get("coordinates").get("nuid"), nuid)));
+        	criteria.where(
+        		b.and(
+        			b.equal(node.get("coordinates").get("gatewayId"), gatewayId),
+        			b.equal(node.get("coordinates").get("nuid"), nuid)));
         
         TypedQuery<Node> query = em.createQuery(criteria);
         
@@ -61,13 +62,13 @@ public class NetworkEJB {
 
 	public List<Node> getInfrastructuralNodes() {
 		
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<Node> criteria = builder.createQuery(Node.class);
+        CriteriaBuilder b = em.getCriteriaBuilder();
+        CriteriaQuery<Node> criteria = b.createQuery(Node.class);
         Root<Node> node = criteria.from(Node.class);
         criteria.select(node).where(
-        		builder.or(
-        				builder.equal(node.get("logicalType"),NodeLogicalType.ROUTER),
-        				builder.equal(node.get("logicalType"),NodeLogicalType.COORDINATOR)));
+        			b.or(
+        				b.equal(node.get("logicalType"),NodeLogicalType.ROUTER),
+        				b.equal(node.get("logicalType"),NodeLogicalType.COORDINATOR)));
         
         TypedQuery<Node> query = em.createQuery(criteria);
         
@@ -76,11 +77,11 @@ public class NetworkEJB {
 	
 	public Node findNode(byte gid, short address) {
 		
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<Node> criteria = builder.createQuery(Node.class);
+        CriteriaBuilder b = em.getCriteriaBuilder();
+        CriteriaQuery<Node> criteria = b.createQuery(Node.class);
         Root<Node> node = criteria.from(Node.class);
-        criteria.select(node).where(builder.equal(node.get("coordinates").get("gatewayId"), gid))
-        					 .where(builder.equal(node.get("coordinates").get("address"), address));
+        criteria.select(node).where(b.equal(node.get("coordinates").get("gatewayId"), gid))
+        					 .where(b.equal(node.get("coordinates").get("address"), address));
         
         TypedQuery<Node> query = em.createQuery(criteria);
         
@@ -113,8 +114,9 @@ public class NetworkEJB {
 	public boolean insertOrUpdateNode(Node node) {
         Node persistedNode = findNode(node);
         
+        acquirePersistentInfoOn(node);
+        
         if (persistedNode == null) {
-        	acquirePersistentInfoOn(node);
             em.persist(node);
         } else {
         	
@@ -122,6 +124,10 @@ public class NetworkEJB {
         		persistedNode.setLogicalType(node.getLogicalType());
         	if (node.getManufacturer() != Manufacturer.UNDEFINED)
         		persistedNode.setManufacturer(node.getManufacturer());
+        	if (node.getLocation() != null)
+        		persistedNode.setLocation(node.getLocation());    
+        	if (node.getName() != null)
+        		persistedNode.setName(node.getName());            	
 
         	em.merge(persistedNode);
         }
@@ -163,7 +169,8 @@ public class NetworkEJB {
         try {
         	NodePersistentInfo correspondingInfo = query.getSingleResult();
         	
-        	node.setLocation(correspondingInfo.getLocation());
+        	if (correspondingInfo.getLocation() != null)
+        		node.setLocation(correspondingInfo.getLocation());
         	if (correspondingInfo.getName() != null)
         		node.setName(correspondingInfo.getName());
         	
@@ -400,14 +407,15 @@ public class NetworkEJB {
 	 */
 	private List<Node> getMissingNodes() {
 		
-		StringBuilder queryBuilder = new StringBuilder("SELECT n FROM Node n WHERE ")
-												.append("(n.manufacturer=:m1 OR n.manufacturer=:m2) ")
-												.append("AND n.logicalType <> :clt ")
-												.append("AND n.coordinates.nuid NOT IN ")
-												.append("(SELECT l1.source.nuid FROM Link l1)")
-												.append("AND n.coordinates.nuid NOT IN ")
-												.append("(SELECT l2.destination.nuid FROM Link l2)");
-
+		StringBuilder queryBuilder = new StringBuilder("SELECT n1 FROM Node n1 WHERE ")
+												.append("n1.logicalType <> :clt AND ")
+												.append("(n1.manufacturer=:m1 OR n1.manufacturer=:m2) AND ")
+												.append("n1.id NOT IN (")
+												.append("SELECT DISTINCT n2.id FROM Node n2, Link l WHERE ")
+												.append("n2.coordinates.gatewayId = l.gatewayId AND (")
+												.append("(n2.coordinates.nuid = l.source.nuid AND n2.coordinates.address = l.source.address) OR ")
+												.append("(n2.coordinates.nuid = l.destination.nuid AND n2.coordinates.address = l.destination.address)))");
+		
 		return em.createQuery(queryBuilder.toString(),Node.class)
 				 .setParameter("clt",NodeLogicalType.COORDINATOR)
 				 .setParameter("m1",Manufacturer.DIGI)

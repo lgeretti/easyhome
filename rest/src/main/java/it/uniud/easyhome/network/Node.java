@@ -96,7 +96,7 @@ public class Node {
 		this.name = name;
 	}
 	
-	public void setLocation(String location) throws InvalidNodeTypeException {
+	public void setLocation(String location) {
 		this.location = location;
 	}
 
@@ -142,6 +142,10 @@ public class Node {
         	
             return node;
         }
+
+		public void setLocation(String location) {
+			node.location = location;
+		}
     }
     
     public String getName() {
@@ -165,9 +169,6 @@ public class Node {
     }
     
 	public String getLocation() throws InvalidNodeTypeException {
-		if (this.logicalType == NodeLogicalType.END_DEVICE)
-			throw new InvalidNodeTypeException();
-		
 		return this.location;
 	}
     

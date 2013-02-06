@@ -59,14 +59,19 @@ public final class NetworkResource {
         return node;
     }
     
-    
+    /**
+     * Inserts of updates a node.
+     * Persistent info on the node supersedes the provided values.
+     */
     @POST
     @Path("insert")
-    public Response insertNode(@FormParam("gid") byte gid, 
+    public Response insertOrUpdateNode(@FormParam("gid") byte gid, 
     						   @FormParam("nuid") long nuid, 
     						   @FormParam("address") short address,
     						   @FormParam("logicalType") NodeLogicalType logicalType,
-    						   @FormParam("manufacturer") Manufacturer manufacturer) {
+    						   @FormParam("manufacturer") Manufacturer manufacturer,
+    						   @FormParam("location") String location,
+    						   @FormParam("name") String name) {
     	
     	boolean existed = false;
     	
@@ -80,6 +85,10 @@ public final class NetworkResource {
     			nodeBuilder.setLogicalType(logicalType);
     		if (manufacturer != null)
     			nodeBuilder.setManufacturer(manufacturer);
+    		if (location != null)
+    			nodeBuilder.setLocation(location);
+    		if (name != null)
+    			nodeBuilder.setName(name);
 
     		existed = resEjb.insertOrUpdateNode(nodeBuilder.build());
     		
