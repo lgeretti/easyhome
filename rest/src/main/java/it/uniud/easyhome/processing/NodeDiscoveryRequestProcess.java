@@ -56,7 +56,7 @@ public class NodeDiscoveryRequestProcess extends Process {
 		 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
 		    	getOutboundPacketsProducer().send(outboundMessage);    
 		    	println("Node " + node.getName() + " discovery request dispatched");
-		    	Thread.sleep(DISCOVERY_REQUEST_PERIOD_MS/nodes.size());
+		    	Thread.sleep(DISCOVERY_REQUEST_PERIOD_MS);
 	    	} else {
 	    		Thread.sleep(1000);
 	    	}

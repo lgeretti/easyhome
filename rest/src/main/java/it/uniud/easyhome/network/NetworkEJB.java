@@ -210,13 +210,13 @@ public class NetworkEJB {
 		em.persist(link);
 	}
 	
-	public void cleanupLinks() {
+	public void cleanupLinks(long KEEP_ALIVE_MS) {
 	
 		StringBuilder queryBuilder = new StringBuilder("DELETE FROM Link l ")
 		.append("WHERE l.timestamp<=:t ");
 		
 		TypedQuery<Link> query = em.createQuery(queryBuilder.toString(),Link.class)
-		.setParameter("t", System.currentTimeMillis()-4*NodeDiscoveryRequestProcess.DISCOVERY_REQUEST_PERIOD_MS);
+		.setParameter("t", System.currentTimeMillis()-KEEP_ALIVE_MS);
 		
 		query.executeUpdate();
 	}

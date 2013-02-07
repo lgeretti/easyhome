@@ -40,9 +40,9 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class NetworkGraphMinimizationProcess extends Process {
 	
-	private static final long MAXIMIZATION_PERIOD_MS = 10000;
-	private static final long MINIMIZATION_PERIOD_MS = NetworkUpdateProcess.JOB_TIMEOUT_MILLIS;
-	private static final short MAX_PL_SET_ISS_RETRIES = 2;
+	private static final long MAXIMIZATION_PERIOD_MS = 20000;
+	private static final long MINIMIZATION_PERIOD_MS = 2*NetworkUpdateProcess.KEEP_LINK_ALIVE_MS;
+	private static final short MAX_PL_SET_ISS_RETRIES = 3;
 	private static final short MAX_PL_SET_ACK_RETRIES = 3;
 	private static final long ACKNOWLEDGE_WAIT_GRANULARITY_MS = 1000;
 	

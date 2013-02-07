@@ -30,6 +30,8 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class NetworkUpdateProcess extends Process {
 	
+	public static long KEEP_LINK_ALIVE_MS = 4*NodeDiscoveryRequestProcess.DISCOVERY_REQUEST_PERIOD_MS;
+	
     public NetworkUpdateProcess(int pid, UriInfo uriInfo,ProcessKind kind) throws NamingException, JMSException {
         super(pid, UriBuilder.fromUri(uriInfo.getBaseUri()).build(new Object[0]),kind);
     }

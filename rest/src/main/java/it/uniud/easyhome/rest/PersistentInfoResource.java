@@ -67,7 +67,8 @@ public final class PersistentInfoResource {
                         	.path(Long.toString(nuid))
                         	.build())
                         .build();
-    		} 
+    		} else
+    			System.out.println("Found");
     		
     		if (name != null)
     			info.setName(name);

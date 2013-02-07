@@ -2,6 +2,8 @@ package it.uniud.easyhome.rest;
 
 import it.uniud.easyhome.exceptions.MultipleLinkException;
 import it.uniud.easyhome.network.*;
+import it.uniud.easyhome.processing.NetworkUpdateProcess;
+import it.uniud.easyhome.processing.NodeDiscoveryRequestProcess;
 
 import java.util.List;
 import java.util.Set;
@@ -151,7 +153,7 @@ public final class NetworkResource {
     	List<Node> cleanedNodes;
     	
     	synchronized(linkLock) {
-    		resEjb.cleanupLinks();
+    		resEjb.cleanupLinks(NetworkUpdateProcess.KEEP_LINK_ALIVE_MS);
     	}
     	synchronized(nodeLock) {
     		cleanedNodes = resEjb.cleanupNodesAndJobs();

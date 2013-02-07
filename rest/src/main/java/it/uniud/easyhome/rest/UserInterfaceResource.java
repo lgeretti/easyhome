@@ -153,6 +153,7 @@ public class UserInterfaceResource {
     @POST
     public Response up() {
     	
+    	insertPersistentInfo();
 		insertGateway(XBEE_GATEWAY_ID,XBEE_GATEWAY_PORT, ProtocolType.XBEE);
 		insertProcess(ProcessKind.NODE_ANNCE_REGISTRATION);
 		insertProcess(ProcessKind.NODE_DESCR_REQUEST);
@@ -171,6 +172,27 @@ public class UserInterfaceResource {
 		insertProcess(ProcessKind.NETWORK_GRAPH_MINIMIZATION);
 		
         return Response.ok().build();
+    }
+    
+    private void insertPersistentInfo() {
+    	
+        MultivaluedMap<String,String> formData;
+        
+        formData = new MultivaluedMapImpl();
+        formData.add("name","Gateway");
+        formData.add("location","CameraLuca");       
+    	client.resource(TARGET).path("persistentinfo").path(Byte.toString((byte)2)).path(Long.toString(5526146521827785L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        formData = new MultivaluedMapImpl();
+        formData.add("name","RouterStudio");
+        formData.add("location","Studio");       
+    	client.resource(TARGET).path("persistentinfo").path(Byte.toString((byte)2)).path(Long.toString(5526146521326115L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);    	
+        formData = new MultivaluedMapImpl();
+        formData.add("name","RouterScarpiera");
+        formData.add("location","ZonaScarpiera");       
+    	client.resource(TARGET).path("persistentinfo").path(Byte.toString((byte)2)).path(Long.toString(5526146523928181L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        formData = new MultivaluedMapImpl();
+        formData.add("name","OnOffSwitch");      
+    	client.resource(TARGET).path("persistentinfo").path(Byte.toString((byte)2)).path(Long.toString(5526146521326185L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     }
 
     @Path("/down")
