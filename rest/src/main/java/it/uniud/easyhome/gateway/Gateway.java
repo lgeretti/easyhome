@@ -288,12 +288,10 @@ public class Gateway implements Runnable {
         	NativePacket nativePkt = readFrom(is,buffer);
         	//println("Inbound packet received from " + nativePkt.getSrcCoords());
         	dispatchPacket(nativePkt,jmsSession,inboundProducer,outboundProducer);
-        } catch (NoBytesAvailableException ex) {
+        } catch (NoBytesAvailableException | IncompletePacketException ex) {
         	// Just move on
-        } catch (IncompletePacketException ex) {
-        	// Just move on
-        } catch (ChecksumException ex) {
-        	// Handled within the specific gateway
+        } catch (ChecksumException | InvalidPacketTypeException ex) {
+        	// Handled by discarding within the specific gateway
         } catch (InvalidDelimiterException ex) {
         	// Prune out the first byte
         	byte[] bufferBytes = buffer.toByteArray();

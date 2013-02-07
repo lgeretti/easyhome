@@ -4,6 +4,7 @@ import it.uniud.easyhome.common.ByteUtils;
 import it.uniud.easyhome.exceptions.ChecksumException;
 import it.uniud.easyhome.exceptions.IllegalBroadcastPortException;
 import it.uniud.easyhome.exceptions.IncompletePacketException;
+import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.exceptions.NoBytesAvailableException;
 import it.uniud.easyhome.exceptions.RoutingEntryMissingException;
 import it.uniud.easyhome.network.ModuleCoordinates;
@@ -108,7 +109,12 @@ public class XBeeGateway extends Gateway {
     		println("Discarding checksum-failing packet of " + readBytes + " bytes");
     		
     		throw ex;
-    				
+    	} catch (InvalidPacketTypeException ex) {
+
+    		readBytes = 4 + (originalBuffer[1]*256) + originalBuffer[2];
+    		println("Discarding invalid-type packet of " + readBytes + " bytes");
+    		
+    		throw ex;
     	} finally {
 
     		// Reduces the buffer to the original amount minus the bytes consumed by the packet
