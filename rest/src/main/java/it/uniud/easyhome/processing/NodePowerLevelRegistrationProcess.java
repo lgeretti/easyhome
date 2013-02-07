@@ -84,7 +84,8 @@ public class NodePowerLevelRegistrationProcess extends Process {
 				                } else
 				                	println("Node " + node.getName() + " power level information insertion failed");	
 				        
-				        	}
+				        	} else
+				        		println("Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
 		        		
 		        		}
 	        		}

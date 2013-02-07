@@ -43,7 +43,7 @@ public class NetworkUpdateProcess extends Process {
             List<Node> cleanedNodes = JsonUtils.getListFrom(cleanupResponse, Node.class);
             
             for (Node cleanedNode : cleanedNodes)
-            	println("Node " + cleanedNode.getName() + " removed due to no links being present");
+            	println("Node " + cleanedNode + " removed due to no links being present");
             
             Thread.sleep(NodeDiscoveryRequestProcess.DISCOVERY_REQUEST_PERIOD_MS/2);
             

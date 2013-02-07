@@ -48,25 +48,29 @@ public class NodePowerLevelRequestProcess extends Process {
 				 .path(Byte.toString(gatewayId)).path(Short.toString(address))
 				 .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 
-        Node node = JsonUtils.getFrom(getNodeResponse, Node.class);
+        if (getNodeResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
         
-        if (node.getLogicalType() == NodeLogicalType.ROUTER || node.getLogicalType() == NodeLogicalType.COORDINATOR) {
-    	
-	    	byte tsn = ++sequenceNumber;
-	    	
-	        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-	        formData.add("type",NetworkJobType.NODE_POWER_LEVEL_REQUEST.toString());
-	        formData.add("gid",Byte.toString(gatewayId));
-	        formData.add("address",Short.toString(address));
-	        formData.add("tsn",Byte.toString(tsn));
+	        Node node = JsonUtils.getFrom(getNodeResponse, Node.class);
 	        
-	        restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	        if (node.getLogicalType() == NodeLogicalType.ROUTER || node.getLogicalType() == NodeLogicalType.COORDINATOR) {
 	    	
-    		NodePowerLevelReqPacket packet = new NodePowerLevelReqPacket(node.getCoordinates(),sequenceNumber);
-	 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
-	    	getOutboundPacketsProducer().send(outboundMessage);    
-	        println("Node " + node.getName() + " power level request " + (isRepeated ? "re-" : "") + "dispatched");
-        }
+		    	byte tsn = ++sequenceNumber;
+		    	
+		        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+		        formData.add("type",NetworkJobType.NODE_POWER_LEVEL_REQUEST.toString());
+		        formData.add("gid",Byte.toString(gatewayId));
+		        formData.add("address",Short.toString(address));
+		        formData.add("tsn",Byte.toString(tsn));
+		        
+		        restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+		    	
+	    		NodePowerLevelReqPacket packet = new NodePowerLevelReqPacket(node.getCoordinates(),sequenceNumber);
+		 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
+		    	getOutboundPacketsProducer().send(outboundMessage);    
+		        println("Power level request for " + node + (isRepeated ? " re-" : " ") + "dispatched");
+	        }
+        } else
+        	println("Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
     }
     
     
@@ -110,7 +114,6 @@ public class NodePowerLevelRequestProcess extends Process {
         	try {
 				Thread.sleep(JOB_POLLING_TIME_MILLIS);
 			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
         }

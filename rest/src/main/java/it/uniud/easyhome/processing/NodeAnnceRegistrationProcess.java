@@ -82,7 +82,7 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                    try {
 	                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
 	                        networkEventsProducer.send(eventMessage);
-	                        println("Node " + gatewayId + ":" + Integer.toHexString(0xFFFF & address) + " announcement registered and event dispatched");
+	                        println("Node " + Node.nameFor(gatewayId,address) + " announcement registered and event dispatched");
 	                    } catch (Exception e) {
 	                    	println("Message could not be dispatched to inbound packets topic");
 	                    }
@@ -93,13 +93,13 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                    try {
 	                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
 	                        networkEventsProducer.send(eventMessage);
-	                        println("Node " + gatewayId + ":" + Integer.toHexString(0xFFFF & address) + " announcement re-registered and event dispatched");
+	                        println("Node " + Node.nameFor(gatewayId,address) + " announcement re-registered and event dispatched");
 	                    } catch (Exception e) {
 	                    	println("Message could not be dispatched to inbound packets topic");
 	                    }
 	                	
 	                } else
-	                	println("Node " + gatewayId + ":" + Integer.toHexString(0xFFFF & address) + " announcement registration failed");
+	                	println("Node " + Node.nameFor(gatewayId,address) + " announcement registration failed");
 	                
 	                
 	        	} catch (Exception ex) {

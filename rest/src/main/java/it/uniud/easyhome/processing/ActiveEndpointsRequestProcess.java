@@ -47,24 +47,29 @@ public class ActiveEndpointsRequestProcess extends Process {
 				 .path(Byte.toString(gatewayId)).path(Short.toString(address))
 				 .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 
-        Node node = JsonUtils.getFrom(getNodeResponse, Node.class);
+        if (getNodeResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
         
-        if (node.getLogicalType() == NodeLogicalType.END_DEVICE) {
-    	
-	    	byte tsn = ++sequenceNumber;
-	    	
-	        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-	        formData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
-	        formData.add("gid",Byte.toString(gatewayId));
-	        formData.add("address",Short.toString(address));
-	        formData.add("tsn",Byte.toString(tsn));
+	        Node node = JsonUtils.getFrom(getNodeResponse, Node.class);
 	        
-	        restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	        if (node.getLogicalType() == NodeLogicalType.END_DEVICE) {
 	    	
-	    	ActiveEndpointsReqPacket packet = new ActiveEndpointsReqPacket(node.getCoordinates(),tsn);
-	        ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
-	        getOutboundPacketsProducer().send(outboundMessage);    
-	        println("Node " + node.getName() + " active endpoints request " + (isRepeated ? "re-" : "") + "dispatched");
+		    	byte tsn = ++sequenceNumber;
+		    	
+		        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+		        formData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
+		        formData.add("gid",Byte.toString(gatewayId));
+		        formData.add("address",Short.toString(address));
+		        formData.add("tsn",Byte.toString(tsn));
+		        
+		        restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+		    	
+		    	ActiveEndpointsReqPacket packet = new ActiveEndpointsReqPacket(node.getCoordinates(),tsn);
+		        ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
+		        getOutboundPacketsProducer().send(outboundMessage);    
+		        println("Node " + node + " active endpoints request " + (isRepeated ? "re-" : "") + "dispatched");
+	        }
+        } else {
+        	println("Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
         }
     }
     
@@ -106,12 +111,6 @@ public class ActiveEndpointsRequestProcess extends Process {
         } catch (Exception e) {
         	e.printStackTrace();
         	println("Node active endpoints request could not be dispatched to outbound packets topic");
-        	try {
-				Thread.sleep(JOB_POLLING_TIME_MILLIS);
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
         }
     	
 		

@@ -138,7 +138,7 @@ public class Node {
         		throw new NodeConstructionException();
         	
         	if (node.name == null)
-        		node.name = node.coordinates.toString();
+        		node.name = Node.nameFor(node.coordinates.getGatewayId(),node.coordinates.getAddress());
         	
             return node;
         }
@@ -193,6 +193,18 @@ public class Node {
     		result.put(devId.getEndpoint(), devId.getDevice());
     	}    	
     	return result;
+    }
+    
+    public String toString() {
+    	return name;
+    }
+    
+    public static String nameFor(byte gatewayId, short address) {
+    	StringBuilder strb = new StringBuilder();
+    	strb.append(gatewayId)
+    		.append(":")
+    		.append(Integer.toHexString(0xFFFF & address));
+    	return strb.toString();
     }
 
     @Override

@@ -55,12 +55,15 @@ public class NodeDescrRequestProcess extends Process {
         								 .path(Byte.toString(gatewayId)).path(Short.toString(address))
         								 .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         
-    	Node node = JsonUtils.getFrom(getNodeResponse, Node.class);
-    	
-    	NodeDescrReqPacket packet = new NodeDescrReqPacket(node.getCoordinates(),tsn);
-        ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
-        getOutboundPacketsProducer().send(outboundMessage);    
-        println("Node " + node.getName() + " descriptor request " + (isRepeated ? "re-" : "") + "dispatched");
+        if (getNodeResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
+	    	Node node = JsonUtils.getFrom(getNodeResponse, Node.class);
+	    	
+	    	NodeDescrReqPacket packet = new NodeDescrReqPacket(node.getCoordinates(),tsn);
+	        ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
+	        getOutboundPacketsProducer().send(outboundMessage);    
+	        println("Node " + node + " descriptor request " + (isRepeated ? "re-" : "") + "dispatched");
+        } else
+        	println("Node" + Node.nameFor(gatewayId, address) + " not found, ignoring");
     }
     
     @Override

@@ -64,55 +64,64 @@ public class NodeDescrRegistrationProcess extends Process {
 		        		byte gid = descr.getSrcCoords().getGatewayId();
 		        		short address = descr.getAddrOfInterest();
 		        		
-		        		ClientResponse updateResponse;
-		        		Node node;
+		        		ClientResponse nodeResponse = null;
+		        		ClientResponse updateResponse = null;
+		        		Node node = null;
 		        		synchronized(nodesLock) {
-			        		ClientResponse nodeResponse = restResource.path("network").path(Byte.toString(gid)).path(Short.toString(address))
+			        		nodeResponse = restResource.path("network").path(Byte.toString(gid)).path(Short.toString(address))
 			                											   .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-			        		node = JsonUtils.getFrom(nodeResponse, Node.class);
-		
-		    				node.setLogicalType(descr.getLogicalType());
-		    				node.setManufacturer(descr.getManufacturerCode());
-		
-			                updateResponse = restResource.path("network").path("update")
-			                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
+			        		
+			        		if (nodeResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
+				        		node = JsonUtils.getFrom(nodeResponse, Node.class);
+			
+			    				node.setLogicalType(descr.getLogicalType());
+			    				node.setManufacturer(descr.getManufacturerCode());
+			
+				                updateResponse = restResource.path("network").path("update")
+				                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
+			        		}
 		        		}
-		        		// The operation may fail if the node has been removed in the meanwhile (unlikely, but still)
-		                if (updateResponse.getClientResponseStatus() == Status.OK) {
-		                	
-			                MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();
-			                queryData.add("type",NetworkJobType.NODE_DESCR_REQUEST.toString());
-			                queryData.add("gid",String.valueOf(gid));
-			                queryData.add("address",String.valueOf(address));
-			                
-			                restResource.path("network").path("jobs").queryParams(queryData).delete(ClientResponse.class);
-			                
-			                if (descr.getLogicalType() == NodeLogicalType.END_DEVICE) {
-				                MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-				                formData = new MultivaluedMapImpl();
-				                formData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
-				                formData.add("gid",Byte.toString(gid));
-				                formData.add("address",Short.toString(address));                
-	
-				                restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-			                } else if (descr.getLogicalType() == NodeLogicalType.ROUTER || descr.getLogicalType() == NodeLogicalType.COORDINATOR) {
-			                	MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-				                formData.add("type",NetworkJobType.NODE_POWER_LEVEL_REQUEST.toString());
-				                formData.add("gid",Byte.toString(gid));
-				                formData.add("address",Short.toString(address));                
-				                restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-				            }
-			                
-		                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_DESCR_ACQUIRED, 
-		                											node.getCoordinates().getGatewayId(), node.getCoordinates().getAddress());
-		                    try {
-		                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
-		                        networkEventsProducer.send(eventMessage);
-		                    } catch (JMSException ex) { }
-		                    
-		                	println("Node " + node.getName() + " updated with logical type information " + descr.getLogicalType() + " and manufacturer " + descr.getManufacturerCode());
-		                } else
-		                	println("Node " + node.getName() + " logical type information and manufacturer update failed");
+		                if (nodeResponse.getClientResponseStatus() == ClientResponse.Status.OK) { 
+		                	if (updateResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
+		                		
+				                MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();
+				                queryData.add("type",NetworkJobType.NODE_DESCR_REQUEST.toString());
+				                queryData.add("gid",String.valueOf(gid));
+				                queryData.add("address",String.valueOf(address));
+				                
+				                restResource.path("network").path("jobs").queryParams(queryData).delete(ClientResponse.class);
+				                
+				                if (descr.getLogicalType() == NodeLogicalType.END_DEVICE) {
+					                MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+					                formData = new MultivaluedMapImpl();
+					                formData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
+					                formData.add("gid",Byte.toString(gid));
+					                formData.add("address",Short.toString(address));                
+		
+					                restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+				                } else if (descr.getLogicalType() == NodeLogicalType.ROUTER || descr.getLogicalType() == NodeLogicalType.COORDINATOR) {
+				                	MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+					                formData.add("type",NetworkJobType.NODE_POWER_LEVEL_REQUEST.toString());
+					                formData.add("gid",Byte.toString(gid));
+					                formData.add("address",Short.toString(address));                
+					                restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+					            }
+				                
+			                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_DESCR_ACQUIRED, 
+			                											node.getCoordinates().getGatewayId(), node.getCoordinates().getAddress());
+			                    try {
+			                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
+			                        networkEventsProducer.send(eventMessage);
+			                    } catch (JMSException ex) { 
+			                    	println("Descriptor acquisition event dispatch failed");
+			                    }
+			                    
+			                	println("Node " + node + " updated with logical type information " + descr.getLogicalType() + " and manufacturer " + descr.getManufacturerCode());
+
+		                	} else
+			                	println("Node " + node + " logical type information and manufacturer update failed");
+	        			} else 
+		        			println("Node " + Node.nameFor(gid, address) + " not found, ignoring");
 	        		}
 	    	       
 	        	} catch (InvalidPacketTypeException e) {

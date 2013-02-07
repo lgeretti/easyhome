@@ -66,32 +66,39 @@ public class SimpleDescrRegistrationProcess extends Process {
 		        		
 		        		HomeAutomationDevice device = descr.getDevice();
 		        		
-		        		Node node;
-		        		ClientResponse updateResponse;
+		        		Node node = null;
+		        		ClientResponse nodeResponse = null;
+		        		ClientResponse updateResponse = null;
 		        		
 		        		synchronized(nodesLock) {
-			        		ClientResponse nodeResponse = restResource.path("network").path(Byte.toString(gid)).path(Short.toString(address))
+			        		nodeResponse = restResource.path("network").path(Byte.toString(gid)).path(Short.toString(address))
 			                		.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-			        		node = JsonUtils.getFrom(nodeResponse, Node.class);
-	
-		    				node.addDevice(endpoint, device);
-		    				
-			                updateResponse = restResource.path("network").path("update")
-			                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);	        			
+			        		
+			        		if (nodeResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
+				        		node = JsonUtils.getFrom(nodeResponse, Node.class);
+		
+			    				node.addDevice(endpoint, device);
+			    				
+				                updateResponse = restResource.path("network").path("update")
+				                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node); 
+			        		}
 		        		}
 		                
-		                if (updateResponse.getClientResponseStatus() == Status.OK) {
-		                	
-		                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.SIMPLE_DESCR_ACQUIRED, 
-		                								node.getCoordinates().getGatewayId(), node.getCoordinates().getAddress(), endpoint);
-		                    try {
-		                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
-		                        networkEventsProducer.send(eventMessage);
-		                    } catch (JMSException ex) { }
-		                	
-		                	println("Node '" + node.getName() + "' updated with device information for endpoint " + endpoint);
-		                } else
-		                	println("Node '" + node.getName() + "' device information update failed for endpoint " + endpoint);
+		        		if (nodeResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
+			                if (updateResponse.getClientResponseStatus() == Status.OK) {
+			                	
+			                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.SIMPLE_DESCR_ACQUIRED, 
+			                								node.getCoordinates().getGatewayId(), node.getCoordinates().getAddress(), endpoint);
+			                    try {
+			                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
+			                        networkEventsProducer.send(eventMessage);
+			                    } catch (JMSException ex) { }
+			                	
+			                	println(node + " updated with device information for endpoint " + endpoint);
+			                } else
+			                	println(node + " device information update failed for endpoint " + endpoint);		        			
+		        		} else 
+		        			println("Node " + Node.nameFor(gid, address) + " not found, ignoring");
 	        		}
 	        	} catch (InvalidPacketTypeException e) {
 	        		e.printStackTrace();

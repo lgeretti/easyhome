@@ -64,38 +64,46 @@ public class ActiveEndpointsRegistrationProcess extends Process {
 		        		byte gatewayId = activeEpPkt.getSrcCoords().getGatewayId();
 		        		short address = activeEpPkt.getAddrOfInterest();
 		                
-		        		Node node;
-		        		ClientResponse updateResponse;
+		        		Node node = null;
+		        		ClientResponse nodeResponse = null;
+		        		ClientResponse updateResponse = null;
 		        		
 		        		synchronized(nodesLock) {
-			        		node = restResource.path("network").path(Byte.toString(gatewayId)).path(Short.toString(address))
-			        								.accept(MediaType.APPLICATION_JSON).get(Node.class);
-			        		node.setEndpoints(activeEps);
-		
-			                updateResponse = restResource.path("network").path("update")
-			                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
+			        		nodeResponse = restResource.path("network").path(Byte.toString(gatewayId)).path(Short.toString(address))
+			        										.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+			        		if (nodeResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
+			        			
+			        			node = JsonUtils.getFrom(nodeResponse, Node.class);
+				        		node.setEndpoints(activeEps);
+				        		
+				                updateResponse = restResource.path("network").path("update")
+				                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);			        			
+			        		}
 		        		}
-		                if (updateResponse.getClientResponseStatus() == Status.OK) {
+		                if (nodeResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
+		                	if (updateResponse.getClientResponseStatus() == Status.OK) {
 		                	
-			                MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();
-			                queryData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
-			                queryData.add("gid",String.valueOf(gatewayId));
-			                queryData.add("address",String.valueOf(address));
-			                
-			                restResource.path("network").path("jobs").queryParams(queryData).delete(ClientResponse.class);
-		                	
-		                    try {
-		                    	if (activeEps.size() > 0) {
-		                    		NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_ENDPOINTS_ACQUIRED, gatewayId, address);
-			                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
-			                        networkEventsProducer.send(eventMessage);
-		                    	}
-		                        println("Node " + node.getName() + " updated with endpoints information (" + Arrays.toString(activeEps.toArray()) + ")");
-		                    } catch (Exception e) {
-		                    	println("Node active endpoints registration message could not be dispatched to inbound packets topic");
-		                    }
+				                MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();
+				                queryData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
+				                queryData.add("gid",String.valueOf(gatewayId));
+				                queryData.add("address",String.valueOf(address));
+				                
+				                restResource.path("network").path("jobs").queryParams(queryData).delete(ClientResponse.class);
+			                	
+			                    try {
+			                    	if (activeEps.size() > 0) {
+			                    		NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_ENDPOINTS_ACQUIRED, gatewayId, address);
+				                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
+				                        networkEventsProducer.send(eventMessage);
+			                    	}
+			                        println(node + " updated with endpoints information (" + Arrays.toString(activeEps.toArray()) + ")");
+			                    } catch (Exception e) {
+			                    	println("Active endpoints registration message for " + node + " could not be dispatched to inbound packets topic");
+			                    }
+			                } else 
+			                	println("Active endpoints information update for " + node + " failed");
 		                } else
-		                	println("Node active endpoints information update failed");
+		                	println("Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
 	        		}
 	        		
 	        	} catch (Exception e) {

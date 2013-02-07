@@ -79,10 +79,11 @@ public class NodePowerLevelSetAcknowledgmentProcess extends Process {
 				                	
 				                	cleanJobs(gatewayId,address);
 				                	
-				                    println("Node " + node.getName() + " updated with power level (" + powerLevel + ")");
+				                    println(node + " updated with power level (" + powerLevel + ")");
 				                } else
-				                	println("Node " + node.getName() + " power level information insertion failed");
-				        	}
+				                	println(node + " power level information insertion failed");
+				        	} else
+				        		println("Node" + Node.nameFor(gatewayId, address) + " not found, ignoring");
 		        		}
 	        		}
 	        		

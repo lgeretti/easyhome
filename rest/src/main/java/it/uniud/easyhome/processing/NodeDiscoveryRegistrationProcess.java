@@ -128,13 +128,10 @@ public class NodeDiscoveryRegistrationProcess extends Process {
 			                formData.add("destinationNuid",Long.toString(discNuid));
 			                formData.add("destinationAddress",Short.toString(discAddress));
 			                
-			                ClientResponse linkInsertionResponse = restResource.path("network").path("links").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+			                restResource.path("network").path("links").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 			                
-		        		} else if(ClientResponse.Status.NOT_FOUND == senderRetrievalResponse.getClientResponseStatus()) {
-		        			
-		        			println("Node " + gatewayId + ":" + senderAddress + " discovered " 
-			                		+ Long.toHexString(discNuid) + ":" + Integer.toHexString(0xFFFF & discAddress) + " of type " + discLogicalType + ", but nothing done due to missing source");
-		        		}
+		        		} else 
+		        			println("Sender node " + Node.nameFor(gatewayId, senderAddress) + " not found, hence discarding discovered node");
 	        		}
 	        	} catch (InvalidPacketTypeException e) {
 	        		e.printStackTrace();

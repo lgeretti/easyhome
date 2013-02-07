@@ -60,7 +60,7 @@ public class NetworkGraphMinimizationProcess extends Process {
     	
     	Node node = null;
     	
-		println("Trying to set power level " + powerLevel + " for node " + gatewayId + ":" + Integer.toHexString(0xFFFF & address));
+		println("Trying to set power level " + powerLevel + " for node " + Node.nameFor(gatewayId, address));
     	
     	while (issueRetryCount < MAX_PL_SET_ISS_RETRIES) {
 	        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
@@ -85,7 +85,7 @@ public class NetworkGraphMinimizationProcess extends Process {
 	        	
 	        	node = JsonUtils.getFrom(nodeResponse, Node.class);
 	        	if (node.getPowerLevel() == powerLevel) {
-	        		println("Successfully set power level for node " + node.getName());
+	        		println("Successfully set power level for node " + node);
 	        		break;
 	        	}
 	        	

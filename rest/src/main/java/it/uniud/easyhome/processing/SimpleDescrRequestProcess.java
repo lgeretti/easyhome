@@ -44,31 +44,37 @@ public class SimpleDescrRequestProcess extends Process {
     		NetworkEvent event = (NetworkEvent) msg.getObject();
     		if (event != null && event.getKind() == NetworkEvent.EventKind.NODE_ENDPOINTS_ACQUIRED) {
 
+    			byte gatewayId = event.getGatewayId();
+	        	short address = event.getAddress();
+    			
     	        try {
+    	        	
         	        ClientResponse getResponse = restResource.path("network")
-        	        								.path(Byte.toString(event.getGatewayId())).path(Short.toString(event.getAddress()))
+        	        								.path(Byte.toString(gatewayId)).path(Short.toString(address))
         	        								.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         	        
-    	        	Node node = JsonUtils.getFrom(getResponse, Node.class);
-    	        	List<Short> endpoints = node.getEndpoints();
-    	        	for (int i=0; i<endpoints.size(); i++) {
-    	        		try {
-    	    	        	SimpleDescrReqPacket packet = new SimpleDescrReqPacket(node.getCoordinates(),node.getEndpoints().get(i).byteValue(),++sequenceNumber);
-    	    	            ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
-    	    	            getOutboundPacketsProducer().send(outboundMessage);    
-    	    	            println("Simple descriptor for endpoint " + endpoints.get(i) + " of node " + node.getName() + " request dispatched");	
-    	        			Thread.sleep(WAIT_TIME_BETWEEN_REQUESTS_MILLIS);
-    	        		} catch (Exception e) {
-    	    	        	e.printStackTrace();
-    	    	        	i--;
-    	    	        	println("Simple descriptor request for endpoint " + endpoints.get(i) + " of node " + node.getName() +  
-    	    	        			" could not be dispatched, retrying");
-    	    	        }
-    	        	}
+        	        if (getResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
+	    	        	Node node = JsonUtils.getFrom(getResponse, Node.class);
+	    	        	List<Short> endpoints = node.getEndpoints();
+	    	        	for (int i=0; i<endpoints.size(); i++) {
+	    	        		try {
+	    	    	        	SimpleDescrReqPacket packet = new SimpleDescrReqPacket(node.getCoordinates(),node.getEndpoints().get(i).byteValue(),++sequenceNumber);
+	    	    	            ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
+	    	    	            getOutboundPacketsProducer().send(outboundMessage);    
+	    	    	            println("Simple descriptor for endpoint " + endpoints.get(i) + " of node " + node + " request dispatched");	
+	    	        			Thread.sleep(WAIT_TIME_BETWEEN_REQUESTS_MILLIS);
+	    	        		} catch (Exception e) {
+	    	    	        	e.printStackTrace();
+	    	    	        	i--;
+	    	    	        	println("Simple descriptor request for endpoint " + endpoints.get(i) + " of node " + node +  
+	    	    	        			" could not be dispatched, retrying");
+	    	    	        }
+	    	        	}
+        	        } else
+        	        	println("Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
     	        } catch (Exception e) {
     	        	e.printStackTrace();
-    	        	println("Simple descriptors for node cannot be recovered: issue when getting node " 
-    	        			+ Byte.toString(event.getGatewayId()) + ":" + Integer.toHexString(0xFFFF & event.getAddress()));
+    	        	println("Simple descriptors cannot be recovered: issue when getting node " + Node.nameFor(gatewayId, address));
     	        }
     		}
        	}

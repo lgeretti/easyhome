@@ -49,26 +49,30 @@ public class NodePowerLevelSetIssueProcess extends Process {
 				 .path(Byte.toString(gatewayId)).path(Short.toString(address))
 				 .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 
-        Node node = JsonUtils.getFrom(getNodeResponse, Node.class);
-        
-        if (node.getLogicalType() == NodeLogicalType.ROUTER || node.getLogicalType() == NodeLogicalType.COORDINATOR) {
-    	
-	    	byte tsn = ++sequenceNumber;
-	    	
-	        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-	        formData.add("type",NetworkJobType.NODE_POWER_LEVEL_SET_ISSUE.toString());
-	        formData.add("gid",Byte.toString(gatewayId));
-	        formData.add("address",Short.toString(address));
-	        formData.add("tsn",Byte.toString(tsn));
-	        formData.add("payload",Byte.toString(powerLevel));
+        if (getNodeResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
+	        Node node = JsonUtils.getFrom(getNodeResponse, Node.class);
 	        
-	        restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	        if (node.getLogicalType() == NodeLogicalType.ROUTER || node.getLogicalType() == NodeLogicalType.COORDINATOR) {
 	    	
-	        NodePowerLevelSetIssuePacket packet = new NodePowerLevelSetIssuePacket(node.getCoordinates(),powerLevel,sequenceNumber);
-	 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
-	    	getOutboundPacketsProducer().send(outboundMessage);    
-	        println("Node " + node.getName() + " power level set issue " + (isRepeated ? "re-" : "") + "dispatched");
-        }
+		    	byte tsn = ++sequenceNumber;
+		    	
+		        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+		        formData.add("type",NetworkJobType.NODE_POWER_LEVEL_SET_ISSUE.toString());
+		        formData.add("gid",Byte.toString(gatewayId));
+		        formData.add("address",Short.toString(address));
+		        formData.add("tsn",Byte.toString(tsn));
+		        formData.add("payload",Byte.toString(powerLevel));
+		        
+		        restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+		    	
+		        NodePowerLevelSetIssuePacket packet = new NodePowerLevelSetIssuePacket(node.getCoordinates(),powerLevel,sequenceNumber);
+		 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
+		    	getOutboundPacketsProducer().send(outboundMessage);    
+		        println(node + " power level set issue " + (isRepeated ? "re-" : "") + "dispatched");
+	        } else 
+	        	println(node + " is not a router or coordinator, cannot reliably set the power level thus ignoring");
+        } else
+        	println("Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
     }
     
     
