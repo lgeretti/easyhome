@@ -30,7 +30,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class NetworkUpdateProcess extends Process {
 	
-	public static long KEEP_LINK_ALIVE_MS = 4*NodeDiscoveryRequestProcess.DISCOVERY_REQUEST_PERIOD_MS;
+	public static long KEEP_LINK_ALIVE_MS = 6*NodeDiscoveryRequestProcess.DISCOVERY_REQUEST_PERIOD_MS;
 	
     public NetworkUpdateProcess(int pid, UriInfo uriInfo,ProcessKind kind) throws NamingException, JMSException {
         super(pid, UriBuilder.fromUri(uriInfo.getBaseUri()).build(new Object[0]),kind);
@@ -47,7 +47,7 @@ public class NetworkUpdateProcess extends Process {
             for (Node cleanedNode : cleanedNodes)
             	println("Node " + cleanedNode + " removed due to no links being present");
             
-            Thread.sleep(NodeDiscoveryRequestProcess.DISCOVERY_REQUEST_PERIOD_MS/2);
+            Thread.sleep(NodeDiscoveryRequestProcess.DISCOVERY_REQUEST_PERIOD_MS/4);
             
         } catch (Exception e) {
         	e.printStackTrace();

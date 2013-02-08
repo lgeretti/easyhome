@@ -118,7 +118,7 @@ public class NodeDiscoveryRegistrationProcess extends Process {
 			                	
 			                }
 			        		
-			                println("Node " + sender.getName() + " discovered " 
+			                println(sender + " discovered " 
 			                		+ Long.toHexString(discNuid) + ":" + Integer.toHexString(0xFFFF & discAddress) + " of type " + discLogicalType + insertionString);
 			                
 			                formData = new MultivaluedMapImpl();

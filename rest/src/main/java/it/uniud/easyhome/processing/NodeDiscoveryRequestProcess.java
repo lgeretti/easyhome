@@ -55,8 +55,8 @@ public class NodeDiscoveryRequestProcess extends Process {
 	    		NodeDiscoveryReqPacket packet = new NodeDiscoveryReqPacket(node.getCoordinates(),sequenceNumber);
 		 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
 		    	getOutboundPacketsProducer().send(outboundMessage);    
-		    	println("Node " + node.getName() + " discovery request dispatched");
-		    	Thread.sleep(DISCOVERY_REQUEST_PERIOD_MS);
+		    	println("Discovery request for " + node + " dispatched");
+		    	Thread.sleep(DISCOVERY_REQUEST_PERIOD_MS/nodes.size());
 	    	} else {
 	    		Thread.sleep(1000);
 	    	}
