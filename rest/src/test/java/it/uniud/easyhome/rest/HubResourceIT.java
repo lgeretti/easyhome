@@ -34,7 +34,7 @@ public class HubResourceIT {
     public static void setup() {
         client = Client.create();
     }
-	
+
 	@Test
 	public void noGateways() throws JSONException {
 		
@@ -54,7 +54,7 @@ public class HubResourceIT {
 		List<Gateway> gateways = JsonUtils.getListFrom(response, Gateway.class);
 		assertEquals(1,gateways.size());
 	}
-	
+
 	@Test
 	public void createTwoGateways() throws JSONException {
 		

@@ -8,6 +8,7 @@ import it.uniud.easyhome.common.Endianness;
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.gateway.ProtocolType;
+import it.uniud.easyhome.network.LocationType;
 import it.uniud.easyhome.network.Manufacturer;
 import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.NetworkJobType;
@@ -180,18 +181,21 @@ public class UserInterfaceResource {
         
         formData = new MultivaluedMapImpl();
         formData.add("name","Gateway");
-        formData.add("location","CameraLuca");       
+        formData.add("locationName","CameraLuca");
+        formData.add("locationType",LocationType.BEDROOM.toString());
     	client.resource(TARGET).path("persistentinfo").path(Byte.toString((byte)2)).path(Long.toString(5526146521827785L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         formData = new MultivaluedMapImpl();
         formData.add("name","RouterStudio");
-        formData.add("location","Studio");       
+        formData.add("locationName","Studio");
+        formData.add("locationType",LocationType.STUDYROOM.toString());
     	client.resource(TARGET).path("persistentinfo").path(Byte.toString((byte)2)).path(Long.toString(5526146521326115L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);    	
         formData = new MultivaluedMapImpl();
         formData.add("name","RouterScarpiera");
-        formData.add("location","ZonaScarpiera");       
+        formData.add("locationName","ZonaScarpiera");
+        formData.add("locationType",LocationType.LIVINGROOM.toString());
     	client.resource(TARGET).path("persistentinfo").path(Byte.toString((byte)2)).path(Long.toString(5526146523928181L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         formData = new MultivaluedMapImpl();
-        formData.add("name","OnOffSwitch");      
+        formData.add("name","OnOffSwitch");
     	client.resource(TARGET).path("persistentinfo").path(Byte.toString((byte)2)).path(Long.toString(5526146521326185L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     }
 

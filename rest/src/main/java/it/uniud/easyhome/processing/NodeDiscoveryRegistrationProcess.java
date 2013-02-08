@@ -86,8 +86,10 @@ public class NodeDiscoveryRegistrationProcess extends Process {
 			                formData.add("logicalType",discLogicalType.toString());
 			                formData.add("manufacturer",discManufacturer.toString());
 			                
-			                if (discLogicalType == NodeLogicalType.END_DEVICE && sender.getLocation() != null)
-			                	formData.add("location",sender.getLocation());
+			                if (discLogicalType == NodeLogicalType.END_DEVICE && sender.getLocation() != null) {
+			                	formData.add("locationName",sender.getLocation().getName());
+			                	formData.add("locationType",sender.getLocation().getType().toString());
+			                }
 			                
 			                ClientResponse insertionResponse = restResource.path("network").path("insert")
 			                									.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);

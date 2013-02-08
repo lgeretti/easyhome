@@ -72,7 +72,8 @@ public final class NetworkResource {
     						   @FormParam("address") short address,
     						   @FormParam("logicalType") NodeLogicalType logicalType,
     						   @FormParam("manufacturer") Manufacturer manufacturer,
-    						   @FormParam("location") String location,
+    						   @FormParam("locationName") String locationName,
+    						   @FormParam("locationType") LocationType locationType,
     						   @FormParam("name") String name) {
     	
     	boolean existed = false;
@@ -87,8 +88,8 @@ public final class NetworkResource {
     			nodeBuilder.setLogicalType(logicalType);
     		if (manufacturer != null)
     			nodeBuilder.setManufacturer(manufacturer);
-    		if (location != null)
-    			nodeBuilder.setLocation(location);
+    		if (locationName != null && locationType != null)
+    			nodeBuilder.setLocation(new Location(locationName,locationType));
     		if (name != null)
     			nodeBuilder.setName(name);
 

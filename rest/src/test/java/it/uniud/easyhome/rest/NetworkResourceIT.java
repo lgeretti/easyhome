@@ -11,6 +11,8 @@ import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.devices.HomeAutomationDevice;
 import it.uniud.easyhome.network.Link;
 import it.uniud.easyhome.network.LocalCoordinates;
+import it.uniud.easyhome.network.Location;
+import it.uniud.easyhome.network.LocationType;
 import it.uniud.easyhome.network.Manufacturer;
 import it.uniud.easyhome.network.NetworkJob;
 import it.uniud.easyhome.network.NetworkJobType;
@@ -266,7 +268,7 @@ public class NetworkResourceIT {
         
         Node recoveredNode = JsonUtils.getFrom(insertionResponse, Node.class);
         
-        recoveredNode.setLocation("Bedroom");
+        recoveredNode.setLocation(new Location("Camera",LocationType.BEDROOM));
         
         ClientResponse locationUpdateResponse = client.resource(TARGET).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,recoveredNode);
         assertEquals(ClientResponse.Status.OK,locationUpdateResponse.getClientResponseStatus());
@@ -274,9 +276,9 @@ public class NetworkResourceIT {
         ClientResponse locationUpdateNodeResponse = client.resource(TARGET).path(Byte.toString(gid)).path(Short.toString(address))
 				  .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         Node locationUpdatedNode = JsonUtils.getFrom(locationUpdateNodeResponse, Node.class);
-        assertEquals(recoveredNode.getLocation(),locationUpdatedNode.getLocation());
+        assertTrue(recoveredNode.getLocation().equals(locationUpdatedNode.getLocation()));
         
-        locationUpdatedNode.setLocation("Kitchen");
+        locationUpdatedNode.setLocation(new Location("Cucina",LocationType.KITCHEN));
         
         ClientResponse locationUpdateResponse2 = client.resource(TARGET).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,locationUpdatedNode);
         assertEquals(ClientResponse.Status.OK,locationUpdateResponse2.getClientResponseStatus());
@@ -284,7 +286,7 @@ public class NetworkResourceIT {
         ClientResponse restUpdateNodeResponse = client.resource(TARGET).path(Byte.toString(gid)).path(Short.toString(address))
 				  .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         Node restUpdateNode = JsonUtils.getFrom(restUpdateNodeResponse, Node.class);
-        assertEquals("Kitchen",restUpdateNode.getLocation());
+        assertTrue(new Location("Cucina",LocationType.KITCHEN).equals(restUpdateNode.getLocation()));
 	}
 	
 	@After

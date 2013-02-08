@@ -238,6 +238,8 @@ public class Gateway implements Runnable {
                     handleOutboundPacketsTo(ostream,outboundConsumer);
                 }
                 
+            } catch (SocketException ex) {
+            	// We do not want errors to show when close() is called during operations
             } catch (Exception ex) {
             	ex.printStackTrace();
             } finally {

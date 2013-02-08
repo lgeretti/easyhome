@@ -17,13 +17,14 @@ public class NodePersistentInfo {
     private long nuid;
     @Column
     private String name;
-    @Column
-    private String location;
+    @Embedded
+    @AttributeOverrides({@AttributeOverride(name="name", column=@Column(name="LOCATION_NAME")),@AttributeOverride(name="type", column=@Column(name="LOCATION_TYPE"))})
+    private Location location;
 
     @SuppressWarnings("unused")
 	private NodePersistentInfo() {}
     
-    public NodePersistentInfo(long id, byte gatewayId, long nuid, String name, String location) {
+    public NodePersistentInfo(long id, byte gatewayId, long nuid, String name, Location location) {
     	this.id = id;
     	this.gatewayId = gatewayId;
     	this.nuid = nuid;
@@ -35,7 +36,7 @@ public class NodePersistentInfo {
 		this.name = name;
 	}
 	
-	public void setLocation(String location) {
+	public void setLocation(Location location) {
 		this.location = location;
 	}
     
@@ -51,7 +52,7 @@ public class NodePersistentInfo {
         return this.name;
     }
     
-	public String getLocation() {
+	public Location getLocation() {
 		return this.location;
 	}
 

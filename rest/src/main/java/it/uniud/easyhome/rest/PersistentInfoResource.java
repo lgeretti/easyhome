@@ -54,12 +54,19 @@ public final class PersistentInfoResource {
     public Response insertOrUpdatePersistentInfo(@PathParam("gid") byte gid, 
     											@PathParam("nuid") long nuid, 
     								  			@FormParam("name") String name, 
-    								  			@FormParam("location") String location) {
+    								  			@FormParam("locationName") String locationName,
+    								  			@FormParam("locationType") LocationType locationType) {
     	
     	synchronized(infoLock) {
     		
+    		Location location = null;
+    		if (locationName != null && locationType != null)
+    			location = new Location(locationName,locationType);
+    		
     		NodePersistentInfo info = resEjb.getPersistentInfo(gid,nuid);
+    		
     		if (info == null) {
+    			
     			resEjb.insertPersistentInfo(new NodePersistentInfo(++nodePersistentInfoId,gid,nuid,name,location));
     			return Response.created(
                         	uriInfo.getAbsolutePathBuilder()
@@ -67,8 +74,7 @@ public final class PersistentInfoResource {
                         	.path(Long.toString(nuid))
                         	.build())
                         .build();
-    		} else
-    			System.out.println("Found");
+    		}
     		
     		if (name != null)
     			info.setName(name);

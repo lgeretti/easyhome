@@ -30,8 +30,9 @@ public class Node {
     private GlobalCoordinates coordinates;
     @Column(nullable = false)
     private NodeLogicalType logicalType;
-    @Column
-    private String location;    
+    @Embedded
+	@AttributeOverrides({@AttributeOverride(name="name", column=@Column(name="LOCATION_NAME")),@AttributeOverride(name="type", column=@Column(name="LOCATION_TYPE"))})
+    private Location location;    
     @Column
     private Manufacturer manufacturer;
     @Column
@@ -96,7 +97,7 @@ public class Node {
 		this.name = name;
 	}
 	
-	public void setLocation(String location) {
+	public void setLocation(Location location) {
 		this.location = location;
 	}
 
@@ -143,7 +144,7 @@ public class Node {
             return node;
         }
 
-		public void setLocation(String location) {
+		public void setLocation(Location location) {
 			node.location = location;
 		}
     }
@@ -168,7 +169,7 @@ public class Node {
     	return this.logicalType;
     }
     
-	public String getLocation() throws InvalidNodeTypeException {
+	public Location getLocation() {
 		return this.location;
 	}
     

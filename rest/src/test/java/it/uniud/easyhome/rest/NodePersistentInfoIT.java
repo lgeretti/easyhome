@@ -11,6 +11,8 @@ import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.devices.HomeAutomationDevice;
 import it.uniud.easyhome.network.Link;
 import it.uniud.easyhome.network.LocalCoordinates;
+import it.uniud.easyhome.network.Location;
+import it.uniud.easyhome.network.LocationType;
 import it.uniud.easyhome.network.Manufacturer;
 import it.uniud.easyhome.network.NetworkJob;
 import it.uniud.easyhome.network.NetworkJobType;
@@ -58,7 +60,7 @@ public class NodePersistentInfoIT {
     	byte gatewayId = 2;
     	long nuid = 10L;
     	String name = "Oven";
-    	String location = "Kitchen";
+    	Location location = new Location("Kitchen",LocationType.KITCHEN);
        
     	ClientResponse insertionResponse = postPersistentInfo(gatewayId,nuid,name,location);
         assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
@@ -67,15 +69,14 @@ public class NodePersistentInfoIT {
         															.accept(MediaType.APPLICATION_JSON).get(NodePersistentInfo.class);
         
         assertEquals(name,recoveredInfo.getName());
-        assertEquals(location,recoveredInfo.getLocation());
+        assertTrue(location.equals(recoveredInfo.getLocation()));
     }
-	
+
 	@Test
 	public void testDeletePersistentInfo() throws JSONException {
 		
     	byte gatewayId = 2;
     	long nuid = 10L;
-       
     	postPersistentInfo(gatewayId,nuid,null,null);
 
         ClientResponse deletionResponse = client.resource(TARGET).path(Byte.toString(gatewayId)).path(Long.toString(nuid)).delete(ClientResponse.class);
@@ -89,7 +90,7 @@ public class NodePersistentInfoIT {
     	byte gatewayId = 2;
     	long nuid = 10L;
     	String name = "Oven";
-    	String location = "Kitchen";
+    	Location location = new Location("Kitchen",LocationType.KITCHEN);
        
     	ClientResponse insertionResponse = postPersistentInfo(gatewayId,nuid,name,location);
         assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
@@ -104,12 +105,15 @@ public class NodePersistentInfoIT {
 		client.resource(TARGET).delete();
 	}
 	
-	private ClientResponse postPersistentInfo(byte gatewayId, long nuid, String name, String location) {
+	private ClientResponse postPersistentInfo(byte gatewayId, long nuid, String name, Location location) {
 		
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         formData.add("name",name);
-        formData.add("location",location);
-		
+        if (location != null) {
+        	formData.add("locationName",location.getName());
+        	formData.add("locationType",location.getType().toString());
+        }
+        
         return client.resource(TARGET).path(Byte.toString(gatewayId)).path(Long.toString(nuid))
         							.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	}
