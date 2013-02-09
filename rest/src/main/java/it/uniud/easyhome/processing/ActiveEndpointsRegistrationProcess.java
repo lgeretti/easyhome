@@ -14,6 +14,7 @@ import it.uniud.easyhome.packets.ResponseStatus;
 import it.uniud.easyhome.packets.natives.ActiveEndpointsRspPacket;
 import it.uniud.easyhome.packets.natives.NativePacket;
 import it.uniud.easyhome.packets.natives.NodeNeighRspPacket;
+import it.uniud.easyhome.rest.RestPaths;
 
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
@@ -69,14 +70,14 @@ public class ActiveEndpointsRegistrationProcess extends Process {
 		        		ClientResponse updateResponse = null;
 		        		
 		        		synchronized(nodesLock) {
-			        		nodeResponse = restResource.path("network").path(Byte.toString(gatewayId)).path(Short.toString(address))
+			        		nodeResponse = restResource.path(RestPaths.NODES).path(Byte.toString(gatewayId)).path(Short.toString(address))
 			        										.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 			        		if (nodeResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
 			        			
 			        			node = JsonUtils.getFrom(nodeResponse, Node.class);
 				        		node.setEndpoints(activeEps);
 				        		
-				                updateResponse = restResource.path("network").path("update")
+				                updateResponse = restResource.path(RestPaths.NODES).path("update")
 				                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);			        			
 			        		}
 		        		}
@@ -88,7 +89,7 @@ public class ActiveEndpointsRegistrationProcess extends Process {
 				                queryData.add("gid",String.valueOf(gatewayId));
 				                queryData.add("address",String.valueOf(address));
 				                
-				                restResource.path("network").path("jobs").queryParams(queryData).delete(ClientResponse.class);
+				                restResource.path(RestPaths.NODES).path(RestPaths.JOBS).queryParams(queryData).delete(ClientResponse.class);
 			                	
 			                    try {
 			                    	if (activeEps.size() > 0) {

@@ -13,6 +13,7 @@ import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.packets.natives.ActiveEndpointsReqPacket;
 import it.uniud.easyhome.packets.natives.NodeDescrReqPacket;
 import it.uniud.easyhome.packets.natives.SimpleDescrReqPacket;
+import it.uniud.easyhome.rest.RestPaths;
 
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
@@ -43,7 +44,7 @@ public class ActiveEndpointsRequestProcess extends Process {
     
     private void doRequest(byte gatewayId, short address, boolean isRepeated) throws JMSException, JSONException {
     	
-        ClientResponse getNodeResponse = restResource.path("network")
+        ClientResponse getNodeResponse = restResource.path(RestPaths.NODES)
 				 .path(Byte.toString(gatewayId)).path(Short.toString(address))
 				 .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 
@@ -61,7 +62,7 @@ public class ActiveEndpointsRequestProcess extends Process {
 		        formData.add("address",Short.toString(address));
 		        formData.add("tsn",Byte.toString(tsn));
 		        
-		        restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+		        restResource.path(RestPaths.NODES).path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 		    	
 		    	ActiveEndpointsReqPacket packet = new ActiveEndpointsReqPacket(node.getCoordinates(),tsn);
 		        ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
@@ -78,7 +79,7 @@ public class ActiveEndpointsRequestProcess extends Process {
 	protected void process() throws JMSException, NamingException {
     	
     	
-		ClientResponse jobListResponse = restResource.path("network").path("jobs").queryParam("type", NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString())
+		ClientResponse jobListResponse = restResource.path(RestPaths.NODES).path(RestPaths.JOBS).queryParam("type", NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString())
         		.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 		try {
 			List<NetworkJob> jobs = JsonUtils.getListFrom(jobListResponse, NetworkJob.class);

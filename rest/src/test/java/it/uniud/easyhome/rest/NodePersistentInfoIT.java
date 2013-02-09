@@ -35,7 +35,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class NodePersistentInfoIT {
 	
-	private static final String TARGET = "http://localhost:8080/easyhome/rest/persistentinfo";
+	private static final String TARGET = "http://localhost:8080/easyhome/rest/" + RestPaths.PERSISTENTINFO;
 	
 	private static Client client;
 	

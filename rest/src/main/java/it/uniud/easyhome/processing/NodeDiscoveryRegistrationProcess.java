@@ -20,6 +20,7 @@ import it.uniud.easyhome.packets.ResponseStatus;
 import it.uniud.easyhome.packets.natives.NativePacket;
 import it.uniud.easyhome.packets.natives.NodeDiscoveryRspPacket;
 import it.uniud.easyhome.packets.natives.NodeNeighRspPacket;
+import it.uniud.easyhome.rest.RestPaths;
 
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
@@ -72,7 +73,7 @@ public class NodeDiscoveryRegistrationProcess extends Process {
 		        		NodeLogicalType discLogicalType = discPkt.getLogicalType();
 		        		Manufacturer discManufacturer = discPkt.getManufacturer();
 
-		        		ClientResponse senderRetrievalResponse = restResource.path("network").path(Byte.toString(gatewayId)).path(Short.toString(senderAddress))
+		        		ClientResponse senderRetrievalResponse = restResource.path(RestPaths.NODES).path(Byte.toString(gatewayId)).path(Short.toString(senderAddress))
 		        						.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 		        		
 		        		if (senderRetrievalResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
@@ -91,7 +92,7 @@ public class NodeDiscoveryRegistrationProcess extends Process {
 			                	formData.add("locationType",sender.getLocation().getType().toString());
 			                }
 			                
-			                ClientResponse insertionResponse = restResource.path("network").path("insert")
+			                ClientResponse insertionResponse = restResource.path(RestPaths.NODES).path("insert")
 			                									.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 			                
 			                String insertionString = (ClientResponse.Status.CREATED == insertionResponse.getClientResponseStatus() ? " (inserted)" : " (updated)");
@@ -103,13 +104,13 @@ public class NodeDiscoveryRegistrationProcess extends Process {
 					                formData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
 					                formData.add("gid",Byte.toString(gatewayId));
 					                formData.add("address",Short.toString(discAddress));
-					                restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+					                restResource.path(RestPaths.NODES).path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 					            } else if (discLogicalType == NodeLogicalType.ROUTER || discLogicalType == NodeLogicalType.COORDINATOR) {
 					                formData = new MultivaluedMapImpl();
 					                formData.add("type",NetworkJobType.NODE_POWER_LEVEL_REQUEST.toString());
 					                formData.add("gid",Byte.toString(gatewayId));
 					                formData.add("address",Short.toString(discAddress));                
-					                restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+					                restResource.path(RestPaths.NODES).path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 					            }
 					                
 			                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_DESCR_ACQUIRED,gatewayId, discAddress);
@@ -130,7 +131,7 @@ public class NodeDiscoveryRegistrationProcess extends Process {
 			                formData.add("destinationNuid",Long.toString(discNuid));
 			                formData.add("destinationAddress",Short.toString(discAddress));
 			                
-			                restResource.path("network").path("links").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+			                restResource.path(RestPaths.NODES).path(RestPaths.LINKS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 			                
 		        		} else 
 		        			println("Sender node " + Node.nameFor(gatewayId, senderAddress) + " not found, hence discarding discovered node");

@@ -15,6 +15,7 @@ import it.uniud.easyhome.packets.natives.NativePacket;
 import it.uniud.easyhome.packets.natives.NodeAnncePacket;
 import it.uniud.easyhome.packets.natives.NodeDescrRspPacket;
 import it.uniud.easyhome.packets.natives.SimpleDescrRspPacket;
+import it.uniud.easyhome.rest.RestPaths;
 
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
@@ -71,7 +72,7 @@ public class SimpleDescrRegistrationProcess extends Process {
 		        		ClientResponse updateResponse = null;
 		        		
 		        		synchronized(nodesLock) {
-			        		nodeResponse = restResource.path("network").path(Byte.toString(gid)).path(Short.toString(address))
+			        		nodeResponse = restResource.path(RestPaths.NODES).path(Byte.toString(gid)).path(Short.toString(address))
 			                		.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 			        		
 			        		if (nodeResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
@@ -79,7 +80,7 @@ public class SimpleDescrRegistrationProcess extends Process {
 		
 			    				node.addDevice(endpoint, device);
 			    				
-				                updateResponse = restResource.path("network").path("update")
+				                updateResponse = restResource.path(RestPaths.NODES).path("update")
 				                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node); 
 			        		}
 		        		}

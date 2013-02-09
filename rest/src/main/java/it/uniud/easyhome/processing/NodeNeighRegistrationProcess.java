@@ -13,6 +13,7 @@ import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.packets.natives.NativePacket;
 import it.uniud.easyhome.packets.natives.NodeNeighRspPacket;
+import it.uniud.easyhome.rest.RestPaths;
 
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
@@ -66,7 +67,7 @@ public class NodeNeighRegistrationProcess extends Process {
 		                queryData.add("type",NetworkJobType.NODE_NEIGH_REQUEST.toString());
 		                queryData.add("tsn",Byte.toString(tsn));
 		                
-		                ClientResponse jobResponse = restResource.path("network").path("jobs").queryParams(queryData)
+		                ClientResponse jobResponse = restResource.path(RestPaths.NODES).path(RestPaths.JOBS).queryParams(queryData)
 		                							.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 		                List<NetworkJob> jobs = JsonUtils.getListFrom(jobResponse, NetworkJob.class);
 		                
@@ -82,13 +83,13 @@ public class NodeNeighRegistrationProcess extends Process {
 			                queryData.add("gid",String.valueOf(gatewayId));
 			                queryData.add("address",String.valueOf(address));
 			                
-			                restResource.path("network").path("jobs").queryParams(queryData).delete(ClientResponse.class);
+			                restResource.path(RestPaths.NODES).path(RestPaths.JOBS).queryParams(queryData).delete(ClientResponse.class);
 			        		
 			        		Node node;
 			        		ClientResponse updateResponse;
 			        		
 			        		synchronized(nodesLock) {
-				        		node = restResource.path("network")
+				        		node = restResource.path(RestPaths.NODES)
 				        							.path(Byte.toString(gatewayId)).path(Short.toString(address))
 				        							.accept(MediaType.APPLICATION_JSON).get(Node.class);
 				        		
@@ -96,7 +97,7 @@ public class NodeNeighRegistrationProcess extends Process {
 				        			
 				        			node.setNeighbors(newNeighbors);
 					        		
-					                updateResponse = restResource.path("network").path("update")
+					                updateResponse = restResource.path(RestPaths.NODES).path("update")
 					                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
 					                
 				                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_NEIGHBORS_CHANGED, 

@@ -14,6 +14,7 @@ import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.packets.natives.NativePacket;
 import it.uniud.easyhome.packets.natives.NodeAnncePacket;
 import it.uniud.easyhome.packets.natives.NodeDescrRspPacket;
+import it.uniud.easyhome.rest.RestPaths;
 
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
@@ -68,7 +69,7 @@ public class NodeDescrRegistrationProcess extends Process {
 		        		ClientResponse updateResponse = null;
 		        		Node node = null;
 		        		synchronized(nodesLock) {
-			        		nodeResponse = restResource.path("network").path(Byte.toString(gid)).path(Short.toString(address))
+			        		nodeResponse = restResource.path(RestPaths.NODES).path(Byte.toString(gid)).path(Short.toString(address))
 			                											   .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 			        		
 			        		if (nodeResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
@@ -77,7 +78,7 @@ public class NodeDescrRegistrationProcess extends Process {
 			    				node.setLogicalType(descr.getLogicalType());
 			    				node.setManufacturer(descr.getManufacturerCode());
 			
-				                updateResponse = restResource.path("network").path("update")
+				                updateResponse = restResource.path(RestPaths.NODES).path("update")
 				                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
 			        		}
 		        		}
@@ -89,7 +90,7 @@ public class NodeDescrRegistrationProcess extends Process {
 				                queryData.add("gid",String.valueOf(gid));
 				                queryData.add("address",String.valueOf(address));
 				                
-				                restResource.path("network").path("jobs").queryParams(queryData).delete(ClientResponse.class);
+				                restResource.path(RestPaths.NODES).path(RestPaths.JOBS).queryParams(queryData).delete(ClientResponse.class);
 				                
 				                if (descr.getLogicalType() == NodeLogicalType.END_DEVICE) {
 					                MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
@@ -98,13 +99,13 @@ public class NodeDescrRegistrationProcess extends Process {
 					                formData.add("gid",Byte.toString(gid));
 					                formData.add("address",Short.toString(address));                
 		
-					                restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+					                restResource.path(RestPaths.NODES).path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 				                } else if (descr.getLogicalType() == NodeLogicalType.ROUTER || descr.getLogicalType() == NodeLogicalType.COORDINATOR) {
 				                	MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
 					                formData.add("type",NetworkJobType.NODE_POWER_LEVEL_REQUEST.toString());
 					                formData.add("gid",Byte.toString(gid));
 					                formData.add("address",Short.toString(address));                
-					                restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+					                restResource.path(RestPaths.NODES).path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 					            }
 				                
 			                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_DESCR_ACQUIRED, 

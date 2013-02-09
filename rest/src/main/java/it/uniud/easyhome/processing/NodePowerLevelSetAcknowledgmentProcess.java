@@ -17,6 +17,7 @@ import it.uniud.easyhome.packets.natives.NativePacket;
 import it.uniud.easyhome.packets.natives.NodeNeighRspPacket;
 import it.uniud.easyhome.packets.natives.NodePowerLevelRspPacket;
 import it.uniud.easyhome.packets.natives.NodePowerLevelSetAcknowledgmentPacket;
+import it.uniud.easyhome.rest.RestPaths;
 
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
@@ -65,7 +66,7 @@ public class NodePowerLevelSetAcknowledgmentProcess extends Process {
 	        			byte powerLevel = getPowerLevel(gatewayId,address);
 		        		
 		        		synchronized(nodesLock) {
-			        		ClientResponse getResponse = restResource.path("network").path(Byte.toString(gatewayId)).path(Short.toString(address))
+			        		ClientResponse getResponse = restResource.path(RestPaths.NODES).path(Byte.toString(gatewayId)).path(Short.toString(address))
 			        												 .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 			        		
 			        		if (getResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
@@ -73,7 +74,7 @@ public class NodePowerLevelSetAcknowledgmentProcess extends Process {
 			        			Node node = JsonUtils.getFrom(getResponse, Node.class);
 			        			node.setPowerLevel(powerLevel);
 			        			
-			        			ClientResponse updateResponse = restResource.path("network").path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
+			        			ClientResponse updateResponse = restResource.path(RestPaths.NODES).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
 			        			
 				                if (updateResponse.getClientResponseStatus() == Status.OK) {
 				                	
@@ -104,7 +105,7 @@ public class NodePowerLevelSetAcknowledgmentProcess extends Process {
         queryData.add("type",NetworkJobType.NODE_POWER_LEVEL_SET_ISSUE.toString());
         queryData.add("gid",String.valueOf(gatewayId));
         queryData.add("address",String.valueOf(address));	        			
-		ClientResponse jobListResponse = restResource.path("network").path("jobs").queryParams(queryData)
+		ClientResponse jobListResponse = restResource.path(RestPaths.NODES).path(RestPaths.JOBS).queryParams(queryData)
 										.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 		List<NetworkJob> jobs = JsonUtils.getListFrom(jobListResponse, NetworkJob.class);
 
@@ -121,6 +122,6 @@ public class NodePowerLevelSetAcknowledgmentProcess extends Process {
         queryData.add("gid",String.valueOf(gatewayId));
         queryData.add("address",String.valueOf(address));
         
-        restResource.path("network").path("jobs").queryParams(queryData).delete(ClientResponse.class);
+        restResource.path(RestPaths.NODES).path(RestPaths.JOBS).queryParams(queryData).delete(ClientResponse.class);
     }
 }

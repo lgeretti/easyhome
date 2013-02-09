@@ -11,7 +11,7 @@ import java.util.List;
 import javax.ws.rs.core.*;
 import javax.ws.rs.*;
 
-@Path("/hub")
+@Path(RestPaths.GATEWAYS)
 public class HubResource {
     
     @Context
@@ -20,14 +20,13 @@ public class HubResource {
     private static HubContext networkContext = HubContext.getInstance();
     
     @GET
-    @Path("gateways")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Gateway> getGateways() { 
     	return networkContext.getGateways();
     }
     
     @GET
-    @Path("gateways/howmany")
+    @Path("howmany")
     @Produces(MediaType.TEXT_PLAIN)
     public String getHowManyGateways() {
     	return String.valueOf(networkContext.getGateways().size());
@@ -35,7 +34,6 @@ public class HubResource {
     
     // curl -X POST http://localhost:8080/easyhome/rest/hub/gateways -H "Content-Type: application/x-www-form-urlencoded" --data-binary "port=5100&protocol=XBEE" 
     @POST
-    @Path("gateways")
     public Response registerGateway(@FormParam("id") byte id, @FormParam("protocol") ProtocolType protocol,
             @FormParam("port") int port) {
 
@@ -51,7 +49,7 @@ public class HubResource {
     }
 
     @DELETE
-    @Path("gateways/{gid}")
+    @Path("{gid}")
     public Response unregisterGateway(@PathParam("gid") byte gid) {
         
         if (networkContext.hasGateway(gid)) {
@@ -62,7 +60,7 @@ public class HubResource {
     }
     
     @POST
-    @Path("gateways/{gid}/open")
+    @Path("{gid}/open")
     public Response openGateway(@PathParam("gid") byte gid) {
         
         if (networkContext.hasGateway(gid)) {
@@ -73,7 +71,7 @@ public class HubResource {
     }
     
     @POST
-    @Path("gateways/{gid}/close")
+    @Path("{gid}/close")
     public Response closeGateway(@PathParam("gid") byte gid) {
         
         if (networkContext.hasGateway(gid)) {
@@ -84,7 +82,6 @@ public class HubResource {
     }
     
     @DELETE
-    @Path("gateways")
     public Response clearAll() {
         
         networkContext.removeAllGateways();
@@ -93,14 +90,14 @@ public class HubResource {
     }
     
     @GET
-    @Path("gateways/{gid}/routing/count")
+    @Path("{gid}/routing/count")
     public String getRoutingTableCount(@PathParam("gid") byte gid) {
         Gateway gw = networkContext.getGatewayForId(gid);
         return String.valueOf(gw.getRoutingTable().size());
     }
     
     @GET
-    @Path("gateways/{srcgid}/routing/{dstgid}/{dstnuid}/{address}/{port}")
+    @Path("{srcgid}/routing/{dstgid}/{dstnuid}/{address}/{port}")
     public String getGatewayPort(@PathParam("srcgid") byte srcGid,
                                  @PathParam("dstgid") byte dstGid,
                                  @PathParam("dstnuid") long dstNuid,
@@ -128,7 +125,7 @@ public class HubResource {
      * If an entry already exists, it is updated with a new port value.
      */
     @POST
-    @Path("gateways/{srcgid}/routing")
+    @Path("{srcgid}/routing")
     public Response putRoutingEntry(@PathParam("srcgid") byte srcGid,
             @FormParam("gid") byte entryGid,
             @FormParam("nuid") long entryNuid,

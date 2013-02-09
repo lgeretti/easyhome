@@ -9,6 +9,7 @@ import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.packets.natives.NativePacket;
 import it.uniud.easyhome.packets.natives.NodeAnncePacket;
+import it.uniud.easyhome.rest.RestPaths;
 
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
@@ -65,7 +66,7 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                	formData.add("logicalType", NodeLogicalType.COORDINATOR.toString());
 	                }
 	                
-	                ClientResponse nodeInsertionResponse = restResource.path("network").path("insert")
+	                ClientResponse nodeInsertionResponse = restResource.path(RestPaths.NODES).path("insert")
 	                		.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	                
 	                formData = new MultivaluedMapImpl();
@@ -73,7 +74,7 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                formData.add("gid",Byte.toString(gatewayId));
 	                formData.add("address",Short.toString(address));
 	                
-	                ClientResponse jobInsertionResponse = restResource.path("network").path("jobs")
+	                ClientResponse jobInsertionResponse = restResource.path(RestPaths.NODES).path(RestPaths.JOBS)
 	                		.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	                
 	                formData = new MultivaluedMapImpl();
@@ -81,7 +82,7 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                formData.add("gid",Byte.toString(gatewayId));
 	                formData.add("address",Short.toString(address));
 	                
-	                ClientResponse jobInsertionResponse2 = restResource.path("network").path("jobs")
+	                ClientResponse jobInsertionResponse2 = restResource.path(RestPaths.NODES).path(RestPaths.JOBS)
 	                		.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	                
 	                boolean jobInsertionsSuccessful = (jobInsertionResponse.getClientResponseStatus() == Status.CREATED && 

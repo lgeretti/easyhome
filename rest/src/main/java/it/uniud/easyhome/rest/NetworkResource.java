@@ -112,7 +112,7 @@ public final class NetworkResource {
     }
     
     @POST
-    @Path("links")
+    @Path(RestPaths.LINKS)
     public Response insertOrUpdateLink(@FormParam("gatewayId") byte gatewayId, 
     						   @FormParam("sourceNuid") long sourceNuid, 
     						   @FormParam("sourceAddress") short sourceAddress,
@@ -194,7 +194,7 @@ public final class NetworkResource {
     }
     
     @DELETE
-    @Path("links")
+    @Path(RestPaths.LINKS)
     public Response deleteLinks() {
         
     	synchronized(linkLock) {

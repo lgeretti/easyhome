@@ -11,6 +11,7 @@ import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.packets.natives.NodeDescrReqPacket;
 import it.uniud.easyhome.packets.natives.NodeDiscoveryReqPacket;
 import it.uniud.easyhome.packets.natives.NodeNeighReqPacket;
+import it.uniud.easyhome.rest.RestPaths;
 
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
@@ -42,7 +43,7 @@ public class NodeDiscoveryRequestProcess extends Process {
 
     	try {
     		
-	    	ClientResponse getResponse = restResource.path("network").path("infrastructural").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	    	ClientResponse getResponse = restResource.path(RestPaths.NODES).path("infrastructural").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	    	List<Node> nodes = JsonUtils.getListFrom(getResponse, Node.class);
 	    
 	    	if (!nodes.isEmpty()) {

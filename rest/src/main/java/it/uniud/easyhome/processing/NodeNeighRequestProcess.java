@@ -10,6 +10,7 @@ import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.packets.natives.NodeDescrReqPacket;
 import it.uniud.easyhome.packets.natives.NodeNeighReqPacket;
+import it.uniud.easyhome.rest.RestPaths;
 
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
@@ -40,7 +41,7 @@ public class NodeNeighRequestProcess extends Process {
 	protected void process() throws JMSException, NamingException {
 
     	try {
-	    	ClientResponse getResponse = restResource.path("network").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	    	ClientResponse getResponse = restResource.path(RestPaths.NODES).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        	        
 	    	List<Node> nodes = JsonUtils.getListFrom(getResponse, Node.class);
 	    
@@ -61,7 +62,7 @@ public class NodeNeighRequestProcess extends Process {
 		            formData.add("address",Short.toString(node.getCoordinates().getAddress()));
 		            formData.add("tsn",Byte.toString(sequenceNumber));
 		            
-		            restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+		            restResource.path(RestPaths.NODES).path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 		    		
 			    	NodeNeighReqPacket packet = new NodeNeighReqPacket(node.getCoordinates(),sequenceNumber);
 			 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);

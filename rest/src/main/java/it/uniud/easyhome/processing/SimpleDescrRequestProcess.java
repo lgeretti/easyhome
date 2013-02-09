@@ -10,6 +10,7 @@ import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.packets.natives.NodeDescrReqPacket;
 import it.uniud.easyhome.packets.natives.SimpleDescrReqPacket;
+import it.uniud.easyhome.rest.RestPaths;
 
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
@@ -49,7 +50,7 @@ public class SimpleDescrRequestProcess extends Process {
     			
     	        try {
     	        	
-        	        ClientResponse getResponse = restResource.path("network")
+        	        ClientResponse getResponse = restResource.path(RestPaths.NODES)
         	        								.path(Byte.toString(gatewayId)).path(Short.toString(address))
         	        								.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         	        

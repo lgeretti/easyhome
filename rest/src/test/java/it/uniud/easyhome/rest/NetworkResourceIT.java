@@ -34,7 +34,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class NetworkResourceIT {
 	
-	private static final String TARGET = "http://localhost:8080/easyhome/rest/network";
+	private static final String TARGET = "http://localhost:8080/easyhome/rest/" + RestPaths.NODES;
 	
 	private static Client client;
 	
@@ -292,8 +292,8 @@ public class NetworkResourceIT {
 	@After
 	public void removeNodes() {
 		client.resource(TARGET).delete();
-		client.resource(TARGET).path("jobs").delete();
-		client.resource(TARGET).path("links").delete();
+		client.resource(TARGET).path(RestPaths.JOBS).delete();
+		client.resource(TARGET).path(RestPaths.LINKS).delete();
 	}
 	
 	private ClientResponse insertNewNode(GlobalCoordinates coords) {
@@ -320,7 +320,7 @@ public class NetworkResourceIT {
         String[] segments = locationPath.split("/");
         long id = Long.parseLong(segments[segments.length-1]);
 		
-        ClientResponse getResponse = client.resource(TARGET).path("links").path(Long.toString(id)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        ClientResponse getResponse = client.resource(TARGET).path(RestPaths.LINKS).path(Long.toString(id)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK,getResponse.getClientResponseStatus());
         
         Link link = JsonUtils.getFrom(getResponse, Link.class);
@@ -332,7 +332,7 @@ public class NetworkResourceIT {
 		ClientResponse updateResponse = insertLink(gatewayId,source,destination);
 		assertEquals(ClientResponse.Status.OK,updateResponse.getClientResponseStatus());
 		
-		Link updatedLink = client.resource(TARGET).path("links").path(Long.toString(id)).accept(MediaType.APPLICATION_JSON).get(Link.class);
+		Link updatedLink = client.resource(TARGET).path(RestPaths.LINKS).path(Long.toString(id)).accept(MediaType.APPLICATION_JSON).get(Link.class);
 	    assertTrue(updatedLink.getDate().after(link.getDate()));
 	}
 	
@@ -346,7 +346,7 @@ public class NetworkResourceIT {
         formData.add("destinationNuid",Long.toString(destination.getNuid()));
         formData.add("destinationAddress",Short.toString(destination.getAddress()));
         
-        return client.resource(TARGET).path("links").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);		
+        return client.resource(TARGET).path(RestPaths.LINKS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);		
 	}
 	
 	@Test
@@ -360,7 +360,7 @@ public class NetworkResourceIT {
         String[] segments = locationPath.split("/");
         String jobIdString = segments[segments.length-1];
         
-        NetworkJob recoveredJob = client.resource(TARGET).path("jobs").path(jobIdString).accept(MediaType.APPLICATION_JSON).get(NetworkJob.class);
+        NetworkJob recoveredJob = client.resource(TARGET).path(RestPaths.JOBS).path(jobIdString).accept(MediaType.APPLICATION_JSON).get(NetworkJob.class);
         
         assertEquals(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,recoveredJob.getType());        
     }
@@ -374,7 +374,7 @@ public class NetworkResourceIT {
         String[] segments = locationPath.split("/");
         String jobIdString = segments[segments.length-1];
 		
-        ClientResponse deletionResponse = client.resource(TARGET).path("jobs").path(jobIdString).delete(ClientResponse.class);
+        ClientResponse deletionResponse = client.resource(TARGET).path(RestPaths.JOBS).path(jobIdString).delete(ClientResponse.class);
         
         assertEquals(ClientResponse.Status.OK,deletionResponse.getClientResponseStatus());
 	}
@@ -390,7 +390,7 @@ public class NetworkResourceIT {
 		queryData.add("gid",String.valueOf((byte)3));
 		queryData.add("address",String.valueOf((short)11));
         
-        ClientResponse deletionResponse = client.resource(TARGET).path("jobs").queryParams(queryData).delete(ClientResponse.class);
+        ClientResponse deletionResponse = client.resource(TARGET).path(RestPaths.JOBS).queryParams(queryData).delete(ClientResponse.class);
         
         assertEquals(ClientResponse.Status.OK,deletionResponse.getClientResponseStatus());
 	}		
@@ -403,7 +403,7 @@ public class NetworkResourceIT {
 		MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();
 		queryData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
         
-        ClientResponse getResponse = client.resource(TARGET).path("jobs").queryParams(queryData).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        ClientResponse getResponse = client.resource(TARGET).path(RestPaths.JOBS).queryParams(queryData).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         List<NetworkJob> jobList = JsonUtils.getListFrom(getResponse,NetworkJob.class);
         
         assertEquals(7,jobList.size());
@@ -418,7 +418,7 @@ public class NetworkResourceIT {
 		queryData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
 		queryData.add("tsn",Byte.toString((byte)6));
         
-        ClientResponse getResponse = client.resource(TARGET).path("jobs").queryParams(queryData).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        ClientResponse getResponse = client.resource(TARGET).path(RestPaths.JOBS).queryParams(queryData).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         List<NetworkJob> jobList = JsonUtils.getListFrom(getResponse,NetworkJob.class);
         
         assertEquals(1,jobList.size());
@@ -435,7 +435,7 @@ public class NetworkResourceIT {
 		queryData.add("address",String.valueOf((short)12));
 		queryData.add("endpoint",String.valueOf((byte)7));
         
-        ClientResponse getResponse = client.resource(TARGET).path("jobs").queryParams(queryData).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        ClientResponse getResponse = client.resource(TARGET).path(RestPaths.JOBS).queryParams(queryData).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         List<NetworkJob> jobList = JsonUtils.getListFrom(getResponse,NetworkJob.class);
         
         assertEquals(1,jobList.size());
@@ -452,7 +452,7 @@ public class NetworkResourceIT {
 		queryData.add("address",String.valueOf((short)12));
 		queryData.add("endpoint",String.valueOf((byte)7));
         
-        ClientResponse getResponse = client.resource(TARGET).path("jobs").queryParams(queryData).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        ClientResponse getResponse = client.resource(TARGET).path(RestPaths.JOBS).queryParams(queryData).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         List<NetworkJob> jobList = JsonUtils.getListFrom(getResponse,NetworkJob.class);
         
         assertEquals(1,jobList.size());
@@ -486,7 +486,7 @@ public class NetworkResourceIT {
         formData.add("endpoint",Byte.toString(endpoint));
         formData.add("tsn",Byte.toString(tsn));
         
-        return client.resource(TARGET).path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        return client.resource(TARGET).path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	}
 	
 }

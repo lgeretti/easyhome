@@ -57,7 +57,7 @@ public class UserInterfaceResource {
     	formData.add("id", Byte.toString(id));
     	formData.add("port", String.valueOf(port));
     	formData.add("protocol", protocol.toString());
-    	ClientResponse response = client.resource(TARGET).path("hub").path("gateways")
+    	ClientResponse response = client.resource(TARGET).path(RestPaths.GATEWAYS)
     							  .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
     	
     	return response;
@@ -67,7 +67,7 @@ public class UserInterfaceResource {
         
     	MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
     	formData.add("kind", kind.toString());
-    	ClientResponse response = client.resource(TARGET).path("processes")
+    	ClientResponse response = client.resource(TARGET).path(RestPaths.PROCESSES)
     							  .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
     	
     	return response;
@@ -83,7 +83,7 @@ public class UserInterfaceResource {
     	if (powerLevel < 0 || powerLevel > 4)
     		throw new WebApplicationException(Response.Status.BAD_REQUEST);
     	
-    	ClientResponse nodeResponse = client.resource(TARGET).path("network").path(Byte.toString(gid)).path(Short.toString(address)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+    	ClientResponse nodeResponse = client.resource(TARGET).path(RestPaths.NODES).path(Byte.toString(gid)).path(Short.toString(address)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
     	Node node = JsonUtils.getFrom(nodeResponse, Node.class);
     	
     	if (nodeResponse.getClientResponseStatus() == ClientResponse.Status.NOT_FOUND)
@@ -95,7 +95,7 @@ public class UserInterfaceResource {
         formData.add("address",Short.toString(address));
         formData.add("tsn",Byte.toString((byte)0));
         formData.add("payload",Byte.toString(powerLevel));       
-        client.resource(TARGET).path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        client.resource(TARGET).path(RestPaths.NODES).path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         
    		jndiContext = new InitialContext();
         ConnectionFactory connectionFactory = (ConnectionFactory) jndiContext.lookup(JMSConstants.CONNECTION_FACTORY);
@@ -183,31 +183,31 @@ public class UserInterfaceResource {
         formData.add("name","Gateway");
         formData.add("locationName","CameraLuca");
         formData.add("locationType",LocationType.BEDROOM.toString());
-    	client.resource(TARGET).path("persistentinfo").path(Byte.toString((byte)2)).path(Long.toString(5526146521827785L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146521827785L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         formData = new MultivaluedMapImpl();
         formData.add("name","R1");
         formData.add("locationName","Studio");
         formData.add("locationType",LocationType.STUDYROOM.toString());
-    	client.resource(TARGET).path("persistentinfo").path(Byte.toString((byte)2)).path(Long.toString(5526146521326115L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);    	
+    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146521326115L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);    	
         formData = new MultivaluedMapImpl();
         formData.add("name","R2");
         formData.add("locationName","ZonaScarpiera");
         formData.add("locationType",LocationType.LIVINGROOM.toString());
-    	client.resource(TARGET).path("persistentinfo").path(Byte.toString((byte)2)).path(Long.toString(5526146523928181L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928181L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         formData = new MultivaluedMapImpl();
         formData.add("name","OnOffSwitch");
-    	client.resource(TARGET).path("persistentinfo").path(Byte.toString((byte)2)).path(Long.toString(5526146521326185L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146521326185L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     }
 
     @Path("/down")
     @POST
     public Response down() {
     	
-    	client.resource(TARGET).path("hub").path("gateways").delete();
-    	client.resource(TARGET).path("processes").delete();
-    	client.resource(TARGET).path("network").delete();
-    	client.resource(TARGET).path("network").path("jobs").delete();
-    	client.resource(TARGET).path("network").path("links").delete();
+    	client.resource(TARGET).path(RestPaths.GATEWAYS).delete();
+    	client.resource(TARGET).path(RestPaths.PROCESSES).delete();
+    	client.resource(TARGET).path(RestPaths.NODES).delete();
+    	client.resource(TARGET).path(RestPaths.NODES).path(RestPaths.JOBS).delete();
+    	client.resource(TARGET).path(RestPaths.NODES).path(RestPaths.LINKS).delete();
     	
         return Response.ok().build();
     }

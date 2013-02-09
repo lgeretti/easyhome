@@ -22,6 +22,7 @@ import it.uniud.easyhome.packets.natives.NodeDescrReqPacket;
 import it.uniud.easyhome.packets.natives.NodePowerLevelReqPacket;
 import it.uniud.easyhome.packets.natives.NodePowerLevelSetIssuePacket;
 import it.uniud.easyhome.packets.natives.SimpleDescrReqPacket;
+import it.uniud.easyhome.rest.RestPaths;
 
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
@@ -78,7 +79,7 @@ public class NetworkGraphMinimizationProcess extends Process {
 	        	
 	        	Thread.sleep(ACKNOWLEDGE_WAIT_GRANULARITY_MS);
 	        	
-	        	ClientResponse nodeResponse = restResource.path("network").path(Byte.toString(gatewayId)).path(Short.toString(address))
+	        	ClientResponse nodeResponse = restResource.path(RestPaths.NODES).path(Byte.toString(gatewayId)).path(Short.toString(address))
 	        									.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        	if (nodeResponse.getClientResponseStatus() == ClientResponse.Status.NOT_FOUND)
 	        		throw new NodeNotFoundException();
@@ -131,7 +132,7 @@ public class NetworkGraphMinimizationProcess extends Process {
     	
     	while(true) {
     		
-        	ClientResponse getResponse = restResource.path("network").path("infrastructural").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        	ClientResponse getResponse = restResource.path(RestPaths.NODES).path("infrastructural").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         	List<Node> nodes = JsonUtils.getListFrom(getResponse, Node.class);
     	
     		Node nodeToMaximize = null;
@@ -158,7 +159,7 @@ public class NetworkGraphMinimizationProcess extends Process {
     	
     	println("Network graph minimization phase started");
     	
-    	ClientResponse getResponse = restResource.path("network").path("infrastructural").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+    	ClientResponse getResponse = restResource.path(RestPaths.NODES).path("infrastructural").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
     	List<Node> nodes = JsonUtils.getListFrom(getResponse, Node.class);
     	
     	int numNodes = nodes.size();
@@ -178,7 +179,7 @@ public class NetworkGraphMinimizationProcess extends Process {
     		
     		Thread.sleep(MINIMIZATION_PERIOD_MS);
     		
-        	getResponse = restResource.path("network").path("infrastructural").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        	getResponse = restResource.path(RestPaths.NODES).path("infrastructural").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         	nodes = JsonUtils.getListFrom(getResponse, Node.class);
         	
         	if (nodes.size() < numNodes) {

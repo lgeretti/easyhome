@@ -12,6 +12,7 @@ import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.GlobalCoordinates;
 import it.uniud.easyhome.packets.natives.NodeDescrReqPacket;
 import it.uniud.easyhome.packets.natives.SimpleDescrReqPacket;
+import it.uniud.easyhome.rest.RestPaths;
 
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
@@ -41,7 +42,7 @@ public class NetworkUpdateProcess extends Process {
 
         try {
         	
-            ClientResponse networkCleanupResponse = restResource.path("network").path("cleanup").accept(MediaType.APPLICATION_JSON).post(ClientResponse.class);
+            ClientResponse networkCleanupResponse = restResource.path(RestPaths.NODES).path("cleanup").accept(MediaType.APPLICATION_JSON).post(ClientResponse.class);
             List<Node> cleanedNodes = JsonUtils.getListFrom(networkCleanupResponse, Node.class);
             
             for (Node cleanedNode : cleanedNodes)

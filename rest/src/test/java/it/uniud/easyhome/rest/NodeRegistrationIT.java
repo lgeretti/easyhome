@@ -53,10 +53,10 @@ public class NodeRegistrationIT {
 	
     @After
     public void clear() throws InterruptedException {
-    	client.resource(TARGET).path("hub").path("gateways").delete();
-    	client.resource(TARGET).path("processes").delete();
-    	client.resource(TARGET).path("network").delete();
-    	client.resource(TARGET).path("network").path("jobs").delete();
+    	client.resource(TARGET).path(RestPaths.GATEWAYS).delete();
+    	client.resource(TARGET).path(RestPaths.PROCESSES).delete();
+    	client.resource(TARGET).path(RestPaths.NODES).delete();
+    	client.resource(TARGET).path(RestPaths.NODES).path(RestPaths.JOBS).delete();
     }
     
     private ClientResponse insertGateway(int port, ProtocolType protocol) {
@@ -64,7 +64,7 @@ public class NodeRegistrationIT {
     	MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
     	formData.add("port", String.valueOf(port));
     	formData.add("protocol", protocol.toString());
-    	ClientResponse response = client.resource(TARGET).path("hub").path("gateways")
+    	ClientResponse response = client.resource(TARGET).path(RestPaths.GATEWAYS)
     							  .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
     	
     	return response;
@@ -74,7 +74,7 @@ public class NodeRegistrationIT {
         
     	MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
     	formData.add("kind", kind.toString());
-    	ClientResponse response = client.resource(TARGET).path("processes")
+    	ClientResponse response = client.resource(TARGET).path(RestPaths.PROCESSES)
     							  .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
     	
     	return response;
@@ -152,7 +152,7 @@ public class NodeRegistrationIT {
         			
         	passedTests = 0;
         	
-	    	ClientResponse getNodesResponse = client.resource(TARGET).path("network")
+	    	ClientResponse getNodesResponse = client.resource(TARGET).path(RestPaths.NODES)
 						.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	    	List<Node> nodes = JsonUtils.getListFrom(getNodesResponse, Node.class);
 	    	
@@ -160,15 +160,15 @@ public class NodeRegistrationIT {
 	    		System.out.print("a");
 	    		passedTests++;
 	    		
-	    		Node recoveredNode1 = client.resource(TARGET).path("network")
+	    		Node recoveredNode1 = client.resource(TARGET).path(RestPaths.NODES)
 	    									.path(Byte.toString(node1.getCoordinates().getGatewayId()))
 	    									.path(Short.toString(node1.getCoordinates().getAddress()))
 	    									.accept(MediaType.APPLICATION_JSON).get(Node.class);
-	    		Node recoveredNode2 = client.resource(TARGET).path("network")
+	    		Node recoveredNode2 = client.resource(TARGET).path(RestPaths.NODES)
 						.path(Byte.toString(node2.getCoordinates().getGatewayId()))
 						.path(Short.toString(node2.getCoordinates().getAddress()))
 						.accept(MediaType.APPLICATION_JSON).get(Node.class);
-	    		Node recoveredNode3 = client.resource(TARGET).path("network")
+	    		Node recoveredNode3 = client.resource(TARGET).path(RestPaths.NODES)
 						.path(Byte.toString(node3.getCoordinates().getGatewayId()))
 						.path(Short.toString(node3.getCoordinates().getAddress()))
 						.accept(MediaType.APPLICATION_JSON).get(Node.class);
@@ -200,7 +200,7 @@ public class NodeRegistrationIT {
 			    	passedTests++;
 		    	}
 			    	
-	        	ClientResponse getJobsResponse = client.resource(TARGET).path("network").path("jobs")
+	        	ClientResponse getJobsResponse = client.resource(TARGET).path(RestPaths.NODES).path(RestPaths.JOBS)
 	    				.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        	int numJobs = JsonUtils.getListFrom(getJobsResponse, NetworkJob.class).size();
 	        	

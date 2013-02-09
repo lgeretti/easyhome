@@ -15,6 +15,7 @@ import it.uniud.easyhome.packets.natives.ActiveEndpointsRspPacket;
 import it.uniud.easyhome.packets.natives.NativePacket;
 import it.uniud.easyhome.packets.natives.NodeNeighRspPacket;
 import it.uniud.easyhome.packets.natives.NodePowerLevelRspPacket;
+import it.uniud.easyhome.rest.RestPaths;
 
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
@@ -61,7 +62,7 @@ public class NodePowerLevelRegistrationProcess extends Process {
 	        			byte powerLevel = plPkt.getPowerLevel();
 		        		
 		        		synchronized(nodesLock) {
-			        		ClientResponse getResponse = restResource.path("network").path(Byte.toString(gatewayId)).path(Short.toString(address))
+			        		ClientResponse getResponse = restResource.path(RestPaths.NODES).path(Byte.toString(gatewayId)).path(Short.toString(address))
 			        												 .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 			        		
 			        		if (getResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
@@ -69,7 +70,7 @@ public class NodePowerLevelRegistrationProcess extends Process {
 			        			Node node = JsonUtils.getFrom(getResponse, Node.class);
 			        			node.setPowerLevel(powerLevel);
 			        			
-			        			ClientResponse updateResponse = restResource.path("network").path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
+			        			ClientResponse updateResponse = restResource.path(RestPaths.NODES).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
 			        						        			
 				                if (updateResponse.getClientResponseStatus() == Status.OK) {
 				                	
@@ -78,7 +79,7 @@ public class NodePowerLevelRegistrationProcess extends Process {
 					                queryData.add("gid",String.valueOf(gatewayId));
 					                queryData.add("address",String.valueOf(address));
 					                
-					                restResource.path("network").path("jobs").queryParams(queryData).delete(ClientResponse.class);
+					                restResource.path(RestPaths.NODES).path(RestPaths.JOBS).queryParams(queryData).delete(ClientResponse.class);
 				                	
 				                    println("Node " + node.getName() + " updated with power level (" + powerLevel + ")");
 				                } else
