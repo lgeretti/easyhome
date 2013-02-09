@@ -89,7 +89,7 @@ public class ActiveEndpointsRegistrationProcess extends Process {
 				                queryData.add("gid",String.valueOf(gatewayId));
 				                queryData.add("address",String.valueOf(address));
 				                
-				                restResource.path(RestPaths.NODES).path(RestPaths.JOBS).queryParams(queryData).delete(ClientResponse.class);
+				                restResource.path(RestPaths.JOBS).queryParams(queryData).delete(ClientResponse.class);
 			                	
 			                    try {
 			                    	if (activeEps.size() > 0) {

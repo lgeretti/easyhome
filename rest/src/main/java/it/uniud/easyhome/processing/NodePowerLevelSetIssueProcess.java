@@ -64,7 +64,7 @@ public class NodePowerLevelSetIssueProcess extends Process {
 		        formData.add("tsn",Byte.toString(tsn));
 		        formData.add("payload",Byte.toString(powerLevel));
 		        
-		        restResource.path(RestPaths.NODES).path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+		        restResource.path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 		    	
 		        NodePowerLevelSetIssuePacket packet = new NodePowerLevelSetIssuePacket(node.getCoordinates(),powerLevel,sequenceNumber);
 		 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
@@ -81,7 +81,7 @@ public class NodePowerLevelSetIssueProcess extends Process {
 	protected void process() throws JMSException, NamingException {
     	
     	
-		ClientResponse jobListResponse = restResource.path(RestPaths.NODES).path(RestPaths.JOBS).queryParam("type", NetworkJobType.NODE_POWER_LEVEL_SET_ISSUE.toString())
+		ClientResponse jobListResponse = restResource.path(RestPaths.JOBS).queryParam("type", NetworkJobType.NODE_POWER_LEVEL_SET_ISSUE.toString())
         		.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 		try {
 			List<NetworkJob> jobs = JsonUtils.getListFrom(jobListResponse, NetworkJob.class);

@@ -74,7 +74,7 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                formData.add("gid",Byte.toString(gatewayId));
 	                formData.add("address",Short.toString(address));
 	                
-	                ClientResponse jobInsertionResponse = restResource.path(RestPaths.NODES).path(RestPaths.JOBS)
+	                ClientResponse jobInsertionResponse = restResource.path(RestPaths.JOBS)
 	                		.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	                
 	                formData = new MultivaluedMapImpl();
@@ -82,7 +82,7 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                formData.add("gid",Byte.toString(gatewayId));
 	                formData.add("address",Short.toString(address));
 	                
-	                ClientResponse jobInsertionResponse2 = restResource.path(RestPaths.NODES).path(RestPaths.JOBS)
+	                ClientResponse jobInsertionResponse2 = restResource.path(RestPaths.JOBS)
 	                		.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	                
 	                boolean jobInsertionsSuccessful = (jobInsertionResponse.getClientResponseStatus() == Status.CREATED && 

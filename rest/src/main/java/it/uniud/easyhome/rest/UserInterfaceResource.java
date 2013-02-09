@@ -95,7 +95,7 @@ public class UserInterfaceResource {
         formData.add("address",Short.toString(address));
         formData.add("tsn",Byte.toString((byte)0));
         formData.add("payload",Byte.toString(powerLevel));       
-        client.resource(TARGET).path(RestPaths.NODES).path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        client.resource(TARGET).path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         
    		jndiContext = new InitialContext();
         ConnectionFactory connectionFactory = (ConnectionFactory) jndiContext.lookup(JMSConstants.CONNECTION_FACTORY);
@@ -206,7 +206,7 @@ public class UserInterfaceResource {
     	client.resource(TARGET).path(RestPaths.GATEWAYS).delete();
     	client.resource(TARGET).path(RestPaths.PROCESSES).delete();
     	client.resource(TARGET).path(RestPaths.NODES).delete();
-    	client.resource(TARGET).path(RestPaths.NODES).path(RestPaths.JOBS).delete();
+    	client.resource(TARGET).path(RestPaths.JOBS).delete();
     	client.resource(TARGET).path(RestPaths.NODES).path(RestPaths.LINKS).delete();
     	
         return Response.ok().build();

@@ -2,24 +2,10 @@ package it.uniud.easyhome.rest;
 
 import static org.junit.Assert.*;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import it.uniud.easyhome.common.JsonUtils;
-import it.uniud.easyhome.devices.HomeAutomationDevice;
-import it.uniud.easyhome.network.Link;
-import it.uniud.easyhome.network.LocalCoordinates;
-import it.uniud.easyhome.network.Location;
-import it.uniud.easyhome.network.LocationType;
-import it.uniud.easyhome.network.Manufacturer;
-import it.uniud.easyhome.network.NetworkJob;
-import it.uniud.easyhome.network.NetworkJobType;
-import it.uniud.easyhome.network.Node;
-import it.uniud.easyhome.network.GlobalCoordinates;
-import it.uniud.easyhome.network.NodeLogicalType;
-import it.uniud.easyhome.network.NodePersistentInfo;
+import it.uniud.easyhome.network.*;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;

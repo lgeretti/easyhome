@@ -104,13 +104,13 @@ public class NodeDiscoveryRegistrationProcess extends Process {
 					                formData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
 					                formData.add("gid",Byte.toString(gatewayId));
 					                formData.add("address",Short.toString(discAddress));
-					                restResource.path(RestPaths.NODES).path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+					                restResource.path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 					            } else if (discLogicalType == NodeLogicalType.ROUTER || discLogicalType == NodeLogicalType.COORDINATOR) {
 					                formData = new MultivaluedMapImpl();
 					                formData.add("type",NetworkJobType.NODE_POWER_LEVEL_REQUEST.toString());
 					                formData.add("gid",Byte.toString(gatewayId));
 					                formData.add("address",Short.toString(discAddress));                
-					                restResource.path(RestPaths.NODES).path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+					                restResource.path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 					            }
 					                
 			                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_DESCR_ACQUIRED,gatewayId, discAddress);

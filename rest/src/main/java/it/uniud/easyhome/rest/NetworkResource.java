@@ -14,7 +14,7 @@ import javax.ws.rs.core.*;
 import javax.ws.rs.*;
 
 /** Handles the access to the network of nodes */
-@Path("/network")
+@Path(RestPaths.NODES)
 public final class NetworkResource {
 	
     private NetworkEJB resEjb;

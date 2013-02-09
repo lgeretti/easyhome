@@ -105,7 +105,7 @@ public class NodePowerLevelSetAcknowledgmentProcess extends Process {
         queryData.add("type",NetworkJobType.NODE_POWER_LEVEL_SET_ISSUE.toString());
         queryData.add("gid",String.valueOf(gatewayId));
         queryData.add("address",String.valueOf(address));	        			
-		ClientResponse jobListResponse = restResource.path(RestPaths.NODES).path(RestPaths.JOBS).queryParams(queryData)
+		ClientResponse jobListResponse = restResource.path(RestPaths.JOBS).queryParams(queryData)
 										.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 		List<NetworkJob> jobs = JsonUtils.getListFrom(jobListResponse, NetworkJob.class);
 
@@ -122,6 +122,6 @@ public class NodePowerLevelSetAcknowledgmentProcess extends Process {
         queryData.add("gid",String.valueOf(gatewayId));
         queryData.add("address",String.valueOf(address));
         
-        restResource.path(RestPaths.NODES).path(RestPaths.JOBS).queryParams(queryData).delete(ClientResponse.class);
+        restResource.path(RestPaths.JOBS).queryParams(queryData).delete(ClientResponse.class);
     }
 }

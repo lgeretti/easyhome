@@ -90,7 +90,7 @@ public class NodeDescrRegistrationProcess extends Process {
 				                queryData.add("gid",String.valueOf(gid));
 				                queryData.add("address",String.valueOf(address));
 				                
-				                restResource.path(RestPaths.NODES).path(RestPaths.JOBS).queryParams(queryData).delete(ClientResponse.class);
+				                restResource.path(RestPaths.JOBS).queryParams(queryData).delete(ClientResponse.class);
 				                
 				                if (descr.getLogicalType() == NodeLogicalType.END_DEVICE) {
 					                MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
@@ -99,13 +99,13 @@ public class NodeDescrRegistrationProcess extends Process {
 					                formData.add("gid",Byte.toString(gid));
 					                formData.add("address",Short.toString(address));                
 		
-					                restResource.path(RestPaths.NODES).path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+					                restResource.path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 				                } else if (descr.getLogicalType() == NodeLogicalType.ROUTER || descr.getLogicalType() == NodeLogicalType.COORDINATOR) {
 				                	MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
 					                formData.add("type",NetworkJobType.NODE_POWER_LEVEL_REQUEST.toString());
 					                formData.add("gid",Byte.toString(gid));
 					                formData.add("address",Short.toString(address));                
-					                restResource.path(RestPaths.NODES).path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+					                restResource.path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 					            }
 				                
 			                	NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_DESCR_ACQUIRED, 

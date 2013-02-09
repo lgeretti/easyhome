@@ -2,20 +2,15 @@ package it.uniud.easyhome.processing;
 
 import java.util.List;
 
-import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.JsonUtils;
-import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
-import it.uniud.easyhome.packets.natives.NodeDescrReqPacket;
 import it.uniud.easyhome.packets.natives.NodeNeighReqPacket;
 import it.uniud.easyhome.rest.RestPaths;
 
 import javax.jms.JMSException;
-import javax.jms.MessageConsumer;
 import javax.jms.ObjectMessage;
-import javax.jms.Topic;
 import javax.naming.NamingException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -50,9 +45,7 @@ public class NodeNeighRequestProcess extends Process {
 		
 		    	Node node = nodes.get(nodeIdx);
 		    	
-		    	// NOTE: temporarily removed routers as recipients 
-		    	// node.getLogicalType() == NodeLogicalType.ROUTER ||
-		    	if (node.getLogicalType() == NodeLogicalType.COORDINATOR) {
+		    	if (node.getLogicalType() == NodeLogicalType.ROUTER || node.getLogicalType() == NodeLogicalType.COORDINATOR) {
 		    		
 		    		sequenceNumber++;
 		    		
@@ -62,7 +55,7 @@ public class NodeNeighRequestProcess extends Process {
 		            formData.add("address",Short.toString(node.getCoordinates().getAddress()));
 		            formData.add("tsn",Byte.toString(sequenceNumber));
 		            
-		            restResource.path(RestPaths.NODES).path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+		            restResource.path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 		    		
 			    	NodeNeighReqPacket packet = new NodeNeighReqPacket(node.getCoordinates(),sequenceNumber);
 			 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);

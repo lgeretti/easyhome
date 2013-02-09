@@ -1,6 +1,5 @@
 package it.uniud.easyhome.processing;
 
-import java.util.Arrays;
 import java.util.List;
 
 import it.uniud.easyhome.common.JMSConstants;
@@ -67,7 +66,7 @@ public class NodeNeighRegistrationProcess extends Process {
 		                queryData.add("type",NetworkJobType.NODE_NEIGH_REQUEST.toString());
 		                queryData.add("tsn",Byte.toString(tsn));
 		                
-		                ClientResponse jobResponse = restResource.path(RestPaths.NODES).path(RestPaths.JOBS).queryParams(queryData)
+		                ClientResponse jobResponse = restResource.path(RestPaths.JOBS).queryParams(queryData)
 		                							.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 		                List<NetworkJob> jobs = JsonUtils.getListFrom(jobResponse, NetworkJob.class);
 		                
@@ -83,7 +82,7 @@ public class NodeNeighRegistrationProcess extends Process {
 			                queryData.add("gid",String.valueOf(gatewayId));
 			                queryData.add("address",String.valueOf(address));
 			                
-			                restResource.path(RestPaths.NODES).path(RestPaths.JOBS).queryParams(queryData).delete(ClientResponse.class);
+			                restResource.path(RestPaths.JOBS).queryParams(queryData).delete(ClientResponse.class);
 			        		
 			        		Node node;
 			        		ClientResponse updateResponse;
