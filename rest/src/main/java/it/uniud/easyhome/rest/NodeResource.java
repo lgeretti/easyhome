@@ -44,11 +44,11 @@ public final class NodeResource {
     }
     
     @GET
-    @Path("{gid}/{address}")
+    @Path("{gatewayId}/{address}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Node getNode(@PathParam("gatewayId") byte gid, @PathParam("address") short address) {
+    public Node getNode(@PathParam("gatewayId") byte gatewayId, @PathParam("address") short address) {
         
-        Node node = resEjb.findNode(gid,address);
+        Node node = resEjb.findNode(gatewayId,address);
         
         if (node == null) 
             throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -62,7 +62,7 @@ public final class NodeResource {
      */
     @POST
     @Path("insert")
-    public Response insertOrUpdateNode(@FormParam("gatewayId") byte gid, 
+    public Response insertOrUpdateNode(@FormParam("gatewayId") byte gatewayId, 
     						   @FormParam("nuid") long nuid, 
     						   @FormParam("address") short address,
     						   @FormParam("logicalType") NodeLogicalType logicalType,
@@ -77,7 +77,7 @@ public final class NodeResource {
     		
     		long newNodeId = nodeId + 1;
     		
-    		Node.Builder nodeBuilder = new Node.Builder(newNodeId,gid,nuid,address);
+    		Node.Builder nodeBuilder = new Node.Builder(newNodeId,gatewayId,nuid,address);
 					   
     		if (logicalType != null)
     			nodeBuilder.setLogicalType(logicalType);
@@ -100,7 +100,7 @@ public final class NodeResource {
         
         return Response.created(
                              uriInfo.getAbsolutePathBuilder()
-                                    .path(Byte.toString(gid))
+                                    .path(Byte.toString(gatewayId))
                                     .path(Short.toString(address))
                                     .build())
                            .build();
@@ -137,12 +137,12 @@ public final class NodeResource {
     }
       
     @DELETE
-    @Path("{gid}/{address}")
-    public Response deleteNode(@PathParam("gatewayId") byte gid, @PathParam("address") short address) {
+    @Path("{gatewayId}/{address}")
+    public Response deleteNode(@PathParam("gatewayId") byte gatewayId, @PathParam("address") short address) {
         
     	boolean existed;
     	synchronized(nodeLock) {
-    		existed = resEjb.removeNode(gid,address);
+    		existed = resEjb.removeNode(gatewayId,address);
     	}
     	
         if (!existed) {

@@ -41,8 +41,8 @@ public class ModuleCoordinates implements Serializable {
         return endpoint;
     }
     
-    public ModuleCoordinates(byte gid, long nuid, short address, byte endpoint) {
-        this.nodeCoordinates = new GlobalCoordinates(gid,nuid,address);
+    public ModuleCoordinates(byte gatewayId, long nuid, short address, byte endpoint) {
+        this.nodeCoordinates = new GlobalCoordinates(gatewayId,nuid,address);
         this.endpoint = endpoint;
     }
     
@@ -53,7 +53,7 @@ public class ModuleCoordinates implements Serializable {
     
     public ModuleCoordinates(InputStream is) throws IOException {
 
-        byte gid = (byte)is.read();
+        byte gatewayId = (byte)is.read();
     	long nuid = (((long)is.read()) << 56) + 
     		   (((long)is.read()) << 48) + 
     		   (((long)is.read()) << 40) + 
@@ -63,17 +63,17 @@ public class ModuleCoordinates implements Serializable {
 			   (((long)is.read()) << 8) + 
 			   (long)is.read();
         short address = (short)((is.read()<<8)+is.read());
-        this.nodeCoordinates = new GlobalCoordinates(gid,nuid,address);
+        this.nodeCoordinates = new GlobalCoordinates(gatewayId,nuid,address);
         endpoint = (byte)is.read();
     }
     
     public void write(OutputStream os) throws IOException {
         
-    	byte gid = nodeCoordinates.getGatewayId();
+    	byte gatewayId = nodeCoordinates.getGatewayId();
     	long nuid = nodeCoordinates.getNuid();
     	short address = nodeCoordinates.getAddress();
     	
-        os.write(gid & 0xFF);
+        os.write(gatewayId & 0xFF);
         os.write((int)((nuid >>> 56) & 0xFF)); 
         os.write((int)((nuid >>> 48) & 0xFF));
         os.write((int)((nuid >>> 40) & 0xFF));

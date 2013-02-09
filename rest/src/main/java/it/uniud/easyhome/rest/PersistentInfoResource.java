@@ -35,11 +35,11 @@ public final class PersistentInfoResource {
     }
     
     @GET
-    @Path("{gid}/{nuid}")
+    @Path("{gatewayId}/{nuid}")
     @Produces(MediaType.APPLICATION_JSON)
-    public NodePersistentInfo getNodePersistentInfo(@PathParam("gatewayId") byte gid, @PathParam("nuid") long nuid) {
+    public NodePersistentInfo getNodePersistentInfo(@PathParam("gatewayId") byte gatewayId, @PathParam("nuid") long nuid) {
     	
-        NodePersistentInfo info = resEjb.getPersistentInfo(gid,nuid);
+        NodePersistentInfo info = resEjb.getPersistentInfo(gatewayId,nuid);
         
         if (info == null) 
             throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -49,8 +49,8 @@ public final class PersistentInfoResource {
     
     // curl -X POST http://localhost:8080/easyhome/rest/persistentinfo/2/0 -H "Content-Type: application/x-www-form-urlencoded" --data-binary "name=Gateway&location=Salotto" 
     @POST
-    @Path("{gid}/{nuid}")
-    public Response insertOrUpdatePersistentInfo(@PathParam("gatewayId") byte gid, 
+    @Path("{gatewayId}/{nuid}")
+    public Response insertOrUpdatePersistentInfo(@PathParam("gatewayId") byte gatewayId, 
     											@PathParam("nuid") long nuid, 
     								  			@FormParam("name") String name, 
     								  			@FormParam("locationName") String locationName,
@@ -62,14 +62,14 @@ public final class PersistentInfoResource {
     		if (locationName != null && locationType != null)
     			location = new Location(locationName,locationType);
     		
-    		NodePersistentInfo info = resEjb.getPersistentInfo(gid,nuid);
+    		NodePersistentInfo info = resEjb.getPersistentInfo(gatewayId,nuid);
     		
     		if (info == null) {
     			
-    			resEjb.insertPersistentInfo(new NodePersistentInfo(++nodePersistentInfoId,gid,nuid,name,location));
+    			resEjb.insertPersistentInfo(new NodePersistentInfo(++nodePersistentInfoId,gatewayId,nuid,name,location));
     			return Response.created(
                         	uriInfo.getAbsolutePathBuilder()
-                        	.path(Byte.toString(gid))
+                        	.path(Byte.toString(gatewayId))
                         	.path(Long.toString(nuid))
                         	.build())
                         .build();
@@ -87,10 +87,10 @@ public final class PersistentInfoResource {
     }
     
     @DELETE
-    @Path("{gid}/{nuid}")
-    public Response deleteInfo(@PathParam("gatewayId") byte gid, @PathParam("nuid") long nuid) {
+    @Path("{gatewayId}/{nuid}")
+    public Response deleteInfo(@PathParam("gatewayId") byte gatewayId, @PathParam("nuid") long nuid) {
     	
-        boolean found = resEjb.removeInfo(gid, nuid);
+        boolean found = resEjb.removeInfo(gatewayId, nuid);
         
         if (!found) 
             throw new WebApplicationException(Response.Status.NOT_FOUND);

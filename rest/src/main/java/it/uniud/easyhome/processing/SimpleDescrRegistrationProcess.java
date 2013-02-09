@@ -61,7 +61,7 @@ public class SimpleDescrRegistrationProcess extends Process {
 	        		SimpleDescrRspPacket descr = new SimpleDescrRspPacket(pkt);
 	        		
 	        		if (descr.isSuccessful()) {
-		        		byte gid = descr.getSrcCoords().getGatewayId();
+		        		byte gatewayId = descr.getSrcCoords().getGatewayId();
 		        		short address = descr.getAddrOfInterest();
 		        		byte endpoint = descr.getEndpoint();
 		        		
@@ -72,7 +72,7 @@ public class SimpleDescrRegistrationProcess extends Process {
 		        		ClientResponse updateResponse = null;
 		        		
 		        		synchronized(nodesLock) {
-			        		nodeResponse = restResource.path(RestPaths.NODES).path(Byte.toString(gid)).path(Short.toString(address))
+			        		nodeResponse = restResource.path(RestPaths.NODES).path(Byte.toString(gatewayId)).path(Short.toString(address))
 			                		.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 			        		
 			        		if (nodeResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
@@ -99,7 +99,7 @@ public class SimpleDescrRegistrationProcess extends Process {
 			                } else
 			                	println(node + " device information update failed for endpoint " + endpoint);		        			
 		        		} else 
-		        			println("Node " + Node.nameFor(gid, address) + " not found, ignoring");
+		        			println("Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
 	        		}
 	        	} catch (InvalidPacketTypeException e) {
 	        		e.printStackTrace();

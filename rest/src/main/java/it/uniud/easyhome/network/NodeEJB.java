@@ -76,12 +76,12 @@ public class NodeEJB {
         return query.getResultList();
 	}
 	
-	public Node findNode(byte gid, short address) {
+	public Node findNode(byte gatewayId, short address) {
 		
         CriteriaBuilder b = em.getCriteriaBuilder();
         CriteriaQuery<Node> criteria = b.createQuery(Node.class);
         Root<Node> node = criteria.from(Node.class);
-        criteria.select(node).where(b.equal(node.get("coordinates").get("gatewayId"), gid))
+        criteria.select(node).where(b.equal(node.get("coordinates").get("gatewayId"), gatewayId))
         					 .where(b.equal(node.get("coordinates").get("address"), address));
         
         TypedQuery<Node> query = em.createQuery(criteria);

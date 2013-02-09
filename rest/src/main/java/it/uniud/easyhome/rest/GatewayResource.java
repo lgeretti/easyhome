@@ -120,7 +120,7 @@ public class GatewayResource {
     
     
     /**
-     * Associates a new gateway port to a gid/address/port. 
+     * Associates a new gateway port to a gatewayId/address/port. 
      * If an entry already exists, it is updated with a new port value.
      */
     @POST

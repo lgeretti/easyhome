@@ -142,11 +142,11 @@ public class Gateway implements Runnable {
         routingTable.remove(coords);
     }
     
-    public final void removeRoutingEntriesForGateway(int gid) {
+    public final void removeRoutingEntriesForGateway(int gatewayId) {
         
         Iterator<Map.Entry<ModuleCoordinates,Integer>> it = routingTable.entrySet().iterator();
         while (it.hasNext())
-            if (it.next().getKey().getGatewayId() == gid)
+            if (it.next().getKey().getGatewayId() == gatewayId)
                 it.remove();
     }
     
@@ -322,10 +322,10 @@ public class Gateway implements Runnable {
                 	break;
                 }
             	NativePacket nativePkt = (NativePacket) msg.getObject();
-            	byte srcGid = nativePkt.getSrcCoords().getGatewayId();
-            	byte dstGid = nativePkt.getDstCoords().getGatewayId();
-            	if (srcGid != id) {
-	            	if (dstGid == id || dstGid == 0) {
+            	byte srcGatewayId = nativePkt.getSrcCoords().getGatewayId();
+            	byte dstGatewayId = nativePkt.getDstCoords().getGatewayId();
+            	if (srcGatewayId != id) {
+	            	if (dstGatewayId == id || dstGatewayId == 0) {
 	            		//println("Outbound packet received from " + nativePkt.getSrcCoords());
 	            		write(nativePkt,os);
 	            	}

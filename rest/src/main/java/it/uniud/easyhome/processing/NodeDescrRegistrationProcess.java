@@ -62,14 +62,14 @@ public class NodeDescrRegistrationProcess extends Process {
 	        		NodeDescrRspPacket descr = new NodeDescrRspPacket(pkt);
 	        		
 	        		if (descr.isSuccessful()) {
-		        		byte gid = descr.getSrcCoords().getGatewayId();
+		        		byte gatewayId = descr.getSrcCoords().getGatewayId();
 		        		short address = descr.getAddrOfInterest();
 		        		
 		        		ClientResponse nodeResponse = null;
 		        		ClientResponse updateResponse = null;
 		        		Node node = null;
 		        		synchronized(nodesLock) {
-			        		nodeResponse = restResource.path(RestPaths.NODES).path(Byte.toString(gid)).path(Short.toString(address))
+			        		nodeResponse = restResource.path(RestPaths.NODES).path(Byte.toString(gatewayId)).path(Short.toString(address))
 			                											   .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 			        		
 			        		if (nodeResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
@@ -87,7 +87,7 @@ public class NodeDescrRegistrationProcess extends Process {
 		                		
 				                MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();
 				                queryData.add("type",NetworkJobType.NODE_DESCR_REQUEST.toString());
-				                queryData.add("gatewayId",String.valueOf(gid));
+				                queryData.add("gatewayId",String.valueOf(gatewayId));
 				                queryData.add("address",String.valueOf(address));
 				                
 				                restResource.path(RestPaths.JOBS).queryParams(queryData).delete(ClientResponse.class);
@@ -96,14 +96,14 @@ public class NodeDescrRegistrationProcess extends Process {
 					                MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
 					                formData = new MultivaluedMapImpl();
 					                formData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
-					                formData.add("gatewayId",Byte.toString(gid));
+					                formData.add("gatewayId",Byte.toString(gatewayId));
 					                formData.add("address",Short.toString(address));                
 		
 					                restResource.path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 				                } else if (descr.getLogicalType() == NodeLogicalType.ROUTER || descr.getLogicalType() == NodeLogicalType.COORDINATOR) {
 				                	MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
 					                formData.add("type",NetworkJobType.NODE_POWER_LEVEL_REQUEST.toString());
-					                formData.add("gatewayId",Byte.toString(gid));
+					                formData.add("gatewayId",Byte.toString(gatewayId));
 					                formData.add("address",Short.toString(address));                
 					                restResource.path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 					            }
@@ -122,7 +122,7 @@ public class NodeDescrRegistrationProcess extends Process {
 		                	} else
 			                	println("Node " + node + " logical type information and manufacturer update failed");
 	        			} else 
-		        			println("Node " + Node.nameFor(gid, address) + " not found, ignoring");
+		        			println("Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
 	        		}
 	    	       
 	        	} catch (InvalidPacketTypeException e) {

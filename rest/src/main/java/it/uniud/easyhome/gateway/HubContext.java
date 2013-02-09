@@ -30,10 +30,10 @@ public class HubContext {
         return INSTANCE;
     }
     
-    public Gateway getGatewayForId(int gid) {
+    public Gateway getGatewayForId(int gatewayId) {
         
         for (Gateway gw : gateways)
-            if (gw.getId() == gid)
+            if (gw.getId() == gatewayId)
                 return gw;
 
         return null;
@@ -45,7 +45,6 @@ public class HubContext {
      * @param id The gateway id
      * @param protocol The protocol used by the gateway
      * @param port The port for the gateway (must not be already bound)
-     * @return The gid of the created gateway
      */
     public void addGateway(byte id, ProtocolType protocol, int port) {
         
@@ -78,36 +77,36 @@ public class HubContext {
         gateways.add(gw);
     }
 
-    public void openGateway(int gid) {
+    public void openGateway(int gatewayId) {
         for (Gateway gw : gateways)
-            if (gw.getId() == gid) {
+            if (gw.getId() == gatewayId) {
             	gw.open();
             }
     }
     
-    public void closeGateway(int gid) {
+    public void closeGateway(int gatewayId) {
         for (Gateway gw : gateways)
-            if (gw.getId() == gid) {
+            if (gw.getId() == gatewayId) {
             	gw.close();
             }
     }
     
-    public boolean hasGateway(int gid) {
+    public boolean hasGateway(int gatewayId) {
         for (Gateway gw : gateways)
-            if (gw.getId() == gid)
+            if (gw.getId() == gatewayId)
                 return true;
         
         return false;
     }
     
-    public void removeGateway(int gid) {
+    public void removeGateway(int gatewayId) {
         for (int i=0; i<gateways.size(); i++) 
-            if (gateways.get(i).getId() == gid) {
+            if (gateways.get(i).getId() == gatewayId) {
                 gateways.get(i).close();
                 gateways.remove(i);
                 
                 for (Gateway gw: gateways) {
-                    gw.removeRoutingEntriesForGateway(gid);
+                    gw.removeRoutingEntriesForGateway(gatewayId);
                 }
                 
                 break;

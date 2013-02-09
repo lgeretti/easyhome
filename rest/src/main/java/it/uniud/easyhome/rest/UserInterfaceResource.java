@@ -72,7 +72,7 @@ public class UserInterfaceResource {
     	return response;
     } 
     
-    // curl -X POST http://localhost:8080/easyhome/rest/ui/changePower -H "Content-Type: application/x-www-form-urlencoded" --data-binary "gid=2&address=0&powerLevel=3"
+    // curl -X POST http://localhost:8080/easyhome/rest/ui/changePower -H "Content-Type: application/x-www-form-urlencoded" --data-binary "gatewayId=2&address=0&powerLevel=3"
     @Path("/changePower") 
     @POST
     public Response changePower(@FormParam("gatewayId") byte gatewayId, 

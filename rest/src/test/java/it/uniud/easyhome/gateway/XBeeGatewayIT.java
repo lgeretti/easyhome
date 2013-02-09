@@ -51,22 +51,22 @@ public class XBeeGatewayIT {
         ClientResponse srcGwInsertionResponse = insertGateway(SRC_GATEWAY_ID,SRC_GATEWAY_PORT,SRC_GATEWAY_PROTOCOL);
         String locationPath = srcGwInsertionResponse.getLocation().getPath();
         String[] segments = locationPath.split("/");
-        int srcGid = Integer.parseInt(segments[segments.length-1]);
+        int srcgatewayId = Integer.parseInt(segments[segments.length-1]);
 
         ClientResponse dstGwInsertionResponse = insertGateway(DST_GATEWAY_ID,DST_GATEWAY_PORT,DST_GATEWAY_PROTOCOL);
         locationPath = dstGwInsertionResponse.getLocation().getPath();
         segments = locationPath.split("/");
-        int dstGid = Integer.parseInt(segments[segments.length-1]);
+        int dstgatewayId = Integer.parseInt(segments[segments.length-1]);
         
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         
-        formData.add("gatewayId",String.valueOf(dstGid));
+        formData.add("gatewayId",String.valueOf(dstgatewayId));
         formData.add("nuid",String.valueOf(dstUuid));
         formData.add("address",String.valueOf(dstAddress));
         formData.add("port",String.valueOf(dstPort));
         
         ClientResponse routingInsertionResponse = client.resource(TARGET)
-                                            .path(String.valueOf(srcGid))
+                                            .path(String.valueOf(srcgatewayId))
                                             .path("routing").post(ClientResponse.class,formData); 
         
         assertEquals(ClientResponse.Status.CREATED,routingInsertionResponse.getClientResponseStatus());

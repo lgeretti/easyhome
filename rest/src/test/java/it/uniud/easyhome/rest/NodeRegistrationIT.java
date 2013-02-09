@@ -87,7 +87,7 @@ public class NodeRegistrationIT {
 		assertEquals(ClientResponse.Status.CREATED,gatewayInsertion.getClientResponseStatus());
         String locationPath = gatewayInsertion.getLocation().getPath();
         String[] segments = locationPath.split("/");
-        int gid = Integer.parseInt(segments[segments.length-1]);
+        int gatewayId = Integer.parseInt(segments[segments.length-1]);
 		
 		ClientResponse nodeAnnceRegProcessInsertion = insertProcess(ProcessKind.NODE_ANNCE_REGISTRATION);
 		assertEquals(ClientResponse.Status.CREATED,nodeAnnceRegProcessInsertion.getClientResponseStatus());
@@ -112,15 +112,15 @@ public class NodeRegistrationIT {
 		ClientResponse nodeSimpleDescrRegProcessInsertion = insertProcess(ProcessKind.SIMPLE_DESCR_REGISTRATION);
 		assertEquals(ClientResponse.Status.CREATED,nodeSimpleDescrRegProcessInsertion.getClientResponseStatus());
 		
-        Node node1 = new Node.Builder(1,(byte)gid,0x1,(short)0x1)
+        Node node1 = new Node.Builder(1,(byte)gatewayId,0x1,(short)0x1)
         							.setLogicalType(NodeLogicalType.COORDINATOR)
         							.setManufacturer(Manufacturer.DIGI).build();
         
-        Node node2 = new Node.Builder(2,(byte)gid,0x2,(short)0x2)
+        Node node2 = new Node.Builder(2,(byte)gatewayId,0x2,(short)0x2)
 		 							.setLogicalType(NodeLogicalType.ROUTER)
 		 							.setManufacturer(Manufacturer.DIGI).build();
         
-        Node node3 = new Node.Builder(3,(byte)gid,0x3,(short)0x3)
+        Node node3 = new Node.Builder(3,(byte)gatewayId,0x3,(short)0x3)
 		 							.setLogicalType(NodeLogicalType.END_DEVICE)
 		 							.setManufacturer(Manufacturer.DIGI).build();
         

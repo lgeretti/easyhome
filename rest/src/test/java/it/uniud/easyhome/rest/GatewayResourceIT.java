@@ -82,35 +82,35 @@ public class GatewayResourceIT {
     public void putRoutingEntry() {
         
         int srcGatewayPort = 5000;
-        byte dstGid = 2;
+        byte dstgatewayId = 2;
         long dstNuid = 0x55AAAAAA;
         int dstAddress = 20;
         int dstPort = 4;
         
         ProtocolType protocol = ProtocolType.XBEE;
         
-        ClientResponse gwInsertionResponse = insertGateway(dstGid,srcGatewayPort,protocol);
+        ClientResponse gwInsertionResponse = insertGateway(dstgatewayId,srcGatewayPort,protocol);
         assertEquals(ClientResponse.Status.CREATED,gwInsertionResponse.getClientResponseStatus());
         String locationPath = gwInsertionResponse.getLocation().getPath();
         String[] segments = locationPath.split("/");
-        int gid = Integer.parseInt(segments[segments.length-1]);
+        int gatewayId = Integer.parseInt(segments[segments.length-1]);
         
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         
-        formData.add("gatewayId",String.valueOf(dstGid));
+        formData.add("gatewayId",String.valueOf(dstgatewayId));
         formData.add("nuid",String.valueOf(dstNuid));
         formData.add("address",String.valueOf(dstAddress));
         formData.add("port",String.valueOf(dstPort));
         
         ClientResponse routingInsertionResponse = client.resource(TARGET)
-                                            		.path(String.valueOf(gid))
+                                            		.path(String.valueOf(gatewayId))
                                             		.path("routing")
                                             		.post(ClientResponse.class,formData); 
         
         assertEquals(ClientResponse.Status.CREATED,routingInsertionResponse.getClientResponseStatus());
         
         String count = client.resource(TARGET)
-                       .path(String.valueOf(gid))
+                       .path(String.valueOf(gatewayId))
                        .path("routing/count")
                        .get(String.class);
         
@@ -126,10 +126,10 @@ public class GatewayResourceIT {
     	client.resource(TARGET).delete();
     }
     
-    private ClientResponse insertGateway(byte gid, int port, ProtocolType protocol) {
+    private ClientResponse insertGateway(byte gatewayId, int port, ProtocolType protocol) {
         
     	MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-    	formData.add("id", Byte.toString(gid));
+    	formData.add("id", Byte.toString(gatewayId));
     	formData.add("port", String.valueOf(port));
     	formData.add("protocol", protocol.toString());
     	ClientResponse response = client.resource(TARGET)

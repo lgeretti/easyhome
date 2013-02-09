@@ -26,7 +26,7 @@ public final class JobResource {
     @Context
     private UriInfo uriInfo;
     
-    // curl -X POST http://localhost:8080/easyhome/rest/network/jobs -H "Content-Type: application/x-www-form-urlencoded" --data-binary "type=NODE_DESCR_REQUEST&gid=1&nuid=392342391&address=24&endpoint=7"
+    // curl -X POST http://localhost:8080/easyhome/rest/network/jobs -H "Content-Type: application/x-www-form-urlencoded" --data-binary "type=NODE_DESCR_REQUEST&gatewayId=1&nuid=392342391&address=24&endpoint=7"
     @POST
     public Response addJob(@FormParam("type") NetworkJobType type,
     					   @FormParam("gatewayId") byte gatewayId,

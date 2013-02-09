@@ -24,26 +24,26 @@ public class NetworkEvent implements Serializable {
 		}; 
 	
 	private EventKind kind;
-	private byte gid;
+	private byte gatewayId;
 	private short address;
 	private byte endpoint;
 	private byte[] payload;
 	
-	public NetworkEvent(EventKind kind, byte gid, short address) {
-		this(kind,gid,address,(byte)127, new byte[0]);
+	public NetworkEvent(EventKind kind, byte gatewayId, short address) {
+		this(kind,gatewayId,address,(byte)127, new byte[0]);
 	}
 	
-	public NetworkEvent(EventKind kind, byte gid, short address, byte endpoint) {
-		this(kind,gid,address,endpoint, new byte[0]);
+	public NetworkEvent(EventKind kind, byte gatewayId, short address, byte endpoint) {
+		this(kind,gatewayId,address,endpoint, new byte[0]);
 	}
 	
-	public NetworkEvent(EventKind kind, byte gid, short address, byte[] payload) {
-		this(kind,gid,address,(byte)127, payload);
+	public NetworkEvent(EventKind kind, byte gatewayId, short address, byte[] payload) {
+		this(kind,gatewayId,address,(byte)127, payload);
 	}
 	
-	public NetworkEvent(EventKind kind, byte gid, short address, byte endpoint, byte[] payload) {
+	public NetworkEvent(EventKind kind, byte gatewayId, short address, byte endpoint, byte[] payload) {
 		this.kind = kind;
-		this.gid = gid;
+		this.gatewayId = gatewayId;
 		this.address = address;
 		this.endpoint = endpoint;
 		this.payload = payload;
@@ -54,7 +54,7 @@ public class NetworkEvent implements Serializable {
 	}
 	
 	public byte getGatewayId() {
-		return gid;
+		return gatewayId;
 	}
 
 	public short getAddress() {

@@ -21,7 +21,7 @@ public class GlobalCoordinates implements Serializable {
 	// Gateway (and consequently subnetwork) identifier (0 for broadcast, 1 for the native TCP/IP subnetwork)
 	@Column(nullable = false)
     private byte gatewayId;
-    // Node unique id (global address, like a IEEE MAC address, fixed for a node) (0x0 for a gateway node if gid!=1, or the domotic controller if gid==1, 
+    // Node unique id (global address, like a IEEE MAC address, fixed for a node) (0x0 for a gateway node if gatewayId!=1, or the domotic controller if gatewayId==1, 
     // 0x000000000000FFFF for a broadcast)
 	@Column(nullable = false)
     private long nuid;
