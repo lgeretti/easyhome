@@ -3,6 +3,7 @@ package it.uniud.easyhome.gateway;
 import static org.junit.Assert.*;
 import it.uniud.easyhome.gateway.ProtocolType;
 import it.uniud.easyhome.packets.xbee.XBeeConstants;
+import it.uniud.easyhome.rest.RestPaths;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -21,10 +22,9 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
-@Ignore
 public class XBeeGatewayIT {
    
-	private static final String TARGET = "http://localhost:8080/easyhome/rest/hub/gateways";
+	private static final String TARGET = "http://localhost:8080/easyhome/rest/" + RestPaths.GATEWAYS;
 	
 	private final static byte SRC_GATEWAY_ID = 2;
 	private final static int SRC_GATEWAY_PORT = 5050;
