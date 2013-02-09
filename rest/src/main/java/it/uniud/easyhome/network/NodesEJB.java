@@ -205,198 +205,6 @@ public class NodesEJB {
         	em.remove(node);
 	}
 	
-	public void insertLink(long id, byte gatewayId, LocalCoordinates source, LocalCoordinates destination) {
-		Link link = new Link(id, gatewayId, source, destination);
-		
-		em.persist(link);
-	}
-	
-	public void cleanupLinks(long KEEP_ALIVE_MS) {
-	
-		StringBuilder queryBuilder = new StringBuilder("DELETE FROM Link l ")
-		.append("WHERE l.timestamp<=:t ");
-		
-		TypedQuery<Link> query = em.createQuery(queryBuilder.toString(),Link.class)
-		.setParameter("t", System.currentTimeMillis()-KEEP_ALIVE_MS);
-		
-		query.executeUpdate();
-	}
-	
-	public Link findLinkById(long id) {
-		return em.find(Link.class, id);
-	}
-
-	public Link findLink(byte gatewayId, LocalCoordinates source, LocalCoordinates destination) {
-	
-		StringBuilder queryBuilder = new StringBuilder("SELECT l FROM Link l ")
-											.append("WHERE l.gatewayId=:g ")
-											.append("AND l.source=:s ")
-											.append("AND l.destination=:d");
-											
-        TypedQuery<Link> query = em.createQuery(queryBuilder.toString(),Link.class)
-        						   .setParameter("g", gatewayId)
-        						   .setParameter("s", source)
-        						   .setParameter("d", destination);
-        
-        Link result = null;
-        
-        try {
-        	result = query.getSingleResult();
-        } catch (NonUniqueResultException ex) {
-        	throw new MultipleLinkException();
-        } catch (NoResultException ex) {
-        }
-        
-        return result;	
-	}
-	
-	public List<Link> getLinks() {
-		
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<Link> criteria = builder.createQuery(Link.class);
-        Root<Link> root = criteria.from(Link.class);
-        criteria.select(root);
-        
-        TypedQuery<Link> query = em.createQuery(criteria);
-        
-        return query.getResultList();
-	}
-	
-	public void updateLink(Link link) {
-		Link retrieved = em.find(Link.class, link.getId());
-		
-		if (retrieved == null)
-			throw new RuntimeException("Missing link to update");
-		
-		retrieved.update();
-		
-		em.merge(retrieved);
-	}
-	
-	public boolean removeLink(long id) {
-		Link link = em.find(Link.class, id);
-		
-		if (link != null) {
-			em.detach(link);
-			return true;
-		} else 
-			return false;
-	}
-	
-	public void removeAllLinks() {
-        
-        List<Link> links = getLinks();
-        
-        for (Link link: links)
-        	em.remove(link);
-	}
-	
-	public void insertJob(int id, NetworkJobType type, byte gatewayId, short address, byte endpoint, byte tsn, byte payload) {
-		
-		NetworkJob job = new NetworkJob(id, type, gatewayId, address, endpoint, tsn, payload);
-		
-		em.persist(job);
-	}
-	
-	public List<NetworkJob> getJobs() {
-		
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<NetworkJob> criteria = builder.createQuery(NetworkJob.class);
-        Root<NetworkJob> root = criteria.from(NetworkJob.class);
-        criteria.select(root);
-        
-        TypedQuery<NetworkJob> query = em.createQuery(criteria);
-        
-        return query.getResultList();
-	}
-
-	public List<NetworkJob> getLatestJobs(NetworkJobType type, byte gatewayId, short address, byte endpoint, byte tsn) {
-		
-        StringBuilder queryBuilder = new StringBuilder("SELECT j FROM NetworkJob j WHERE j.id IN (SELECT MAX(j2.id) FROM NetworkJob j2");
-        
-        boolean atLeastOneClause = false;
-        
-        if (type != null || gatewayId != (byte)0 || tsn != (byte)0) {
-        	queryBuilder.append(" WHERE ");
-        }
-        if (type != null) {
-        	atLeastOneClause = true;
-        	queryBuilder.append(" j2.type=:t ");
-        }
-        if (gatewayId != (byte)0) {
-        	if (atLeastOneClause)
-        		queryBuilder.append(" AND ");
-        	atLeastOneClause = true;
-        	queryBuilder.append(" j2.gatewayId=:g AND j2.address=:a AND j2.endpoint=:e ");
-        }
-        if (tsn != (byte)0) {
-        	if (atLeastOneClause)
-        		queryBuilder.append(" AND ");
-        	queryBuilder.append(" j2.tsn=:n");
-        }
-        queryBuilder.append(" GROUP BY j2.gatewayId, j2.address, j2.endpoint)");
-        
-        TypedQuery<NetworkJob> query = em.createQuery(queryBuilder.toString(),NetworkJob.class);
-        
-        if (type != null)
-        	query.setParameter("t",type);
-        
-        if (gatewayId != (byte)0)
-        	query.setParameter("g",gatewayId)
-			  	 .setParameter("a",address)
-			  	 .setParameter("e",endpoint);
-        
-        if (tsn != (byte)0)
-        	query.setParameter("n", tsn);
-        
-        return query.getResultList();		
-	}
-	
-	public NetworkJob findJobById(int jobId) {
-		return em.find(NetworkJob.class, jobId);
-	}
-	
-	public void removeAllJobs() {
-        
-        List<NetworkJob> jobs = getJobs();
-        
-        for (NetworkJob job: jobs)
-        	em.remove(job);
-	}
-
-	public boolean removeJobById(int jobId) {
-
-        NetworkJob job = findJobById(jobId);
-        
-        boolean existed = (job != null);
-        
-        if (existed)
-        	em.remove(job);
-        
-        return existed;
-	}
-	
-	public int removeJobs(NetworkJobType type, byte gatewayId, short address, byte endpoint) {
-		
-		String queryString = "DELETE FROM NetworkJob j WHERE j.type = :t AND j.gatewayId = :g AND j.address = :a AND j.endpoint = :e";
-		return em.createQuery(queryString)
-				.setParameter("t", type)
-				.setParameter("g", gatewayId)
-				.setParameter("a",address)
-				.setParameter("e", endpoint)
-				.executeUpdate();
-	}
-	
-	public int removeJobs(NetworkJobType type, byte gatewayId, short address) {
-
-		String queryString = "DELETE FROM NetworkJob j WHERE j.type = :t AND j.gatewayId = :g AND j.address = :a";
-		return em.createQuery(queryString)
-				.setParameter("t", type)
-				.setParameter("g", gatewayId)
-				.setParameter("a",address)
-				.executeUpdate();
-	}
-	
 	/**
 	 * Get all the missing nodes.
 	 * 
@@ -431,6 +239,16 @@ public class NodesEJB {
 				 .getResultList();
 	}
 	
+	public void cleanupLinks(long KEEP_ALIVE_MS) {
+		
+		StringBuilder queryBuilder = new StringBuilder("DELETE FROM Link l ")
+		.append("WHERE l.timestamp<=:t ");
+		
+		TypedQuery<Link> query = em.createQuery(queryBuilder.toString(),Link.class)
+		.setParameter("t", System.currentTimeMillis()-KEEP_ALIVE_MS);
+		
+		query.executeUpdate();
+	}
 	
 	/**
 	 * Clean up missing nodes and their corresponding jobs. 
