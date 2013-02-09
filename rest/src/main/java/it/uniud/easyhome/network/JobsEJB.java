@@ -1,5 +1,7 @@
 package it.uniud.easyhome.network;
 
+import it.uniud.easyhome.processing.NodeAnnceRegistrationProcess;
+
 import java.util.List;
 
 import javax.ejb.Stateless;
@@ -120,5 +122,21 @@ public class JobsEJB {
 				.setParameter("g", gatewayId)
 				.setParameter("a",address)
 				.executeUpdate();
+	}
+	
+	/**
+	 * Clean up jobs for which no corresponding node exist, plus node announce grace jobs that are over grace timeout. 
+	 */
+	public void cleanupJobs(long GRACE_TIMEOUT) {
+		
+		String deleteQueryString = new StringBuilder("DELETE FROM NetworkJob j WHERE j.id NOT IN ")
+												.append("(SELECT DISTINCT j2.id FROM NetworkJob j2, Node n WHERE ")
+												.append("j2.gatewayId = n.coordinates.gatewayId AND j2.address = n.coordinates.address)").toString();
+		em.createQuery(deleteQueryString).executeUpdate();
+		
+		String deleteOvergraceQueryString = new StringBuilder("DELETE FROM NetworkJob j WHERE j.type=:type AND j.timestamp < :time").toString();
+		em.createQuery(deleteOvergraceQueryString)
+							.setParameter("type", NetworkJobType.NODE_ANNCE_GRACE)
+							.setParameter("time", System.currentTimeMillis()-GRACE_TIMEOUT).executeUpdate();
 	}
 }

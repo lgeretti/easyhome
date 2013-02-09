@@ -1,6 +1,9 @@
 package it.uniud.easyhome.rest;
 
 import it.uniud.easyhome.network.*;
+import it.uniud.easyhome.processing.NetworkUpdateProcess;
+import it.uniud.easyhome.processing.NodeAnnceRegistrationProcess;
+
 import java.util.List;
 
 import javax.naming.InitialContext;
@@ -86,6 +89,15 @@ public final class JobsResource {
         
         return Response.ok().build();
     } 
+    
+	@POST
+	@Path("cleanup")
+	public Response cleanupJobs() {
+    	synchronized(jobLock) {
+    		resEjb.cleanupJobs(NodeAnnceRegistrationProcess.GRACE_TIMEOUT_MS);
+    	}
+    	return Response.ok().build();
+	}
     
     @DELETE
     public Response deleteJobs(@QueryParam("type") NetworkJobType type, 

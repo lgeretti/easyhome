@@ -239,42 +239,18 @@ public class NodesEJB {
 				 .getResultList();
 	}
 	
-	public void cleanupLinks(long KEEP_ALIVE_MS) {
-		
-		StringBuilder queryBuilder = new StringBuilder("DELETE FROM Link l ")
-		.append("WHERE l.timestamp<=:t ");
-		
-		TypedQuery<Link> query = em.createQuery(queryBuilder.toString(),Link.class)
-		.setParameter("t", System.currentTimeMillis()-KEEP_ALIVE_MS);
-		
-		query.executeUpdate();
-	}
-	
 	/**
-	 * Clean up missing nodes and their corresponding jobs. 
-	 * 
-	 * NOTE: may still remove an end device that announced itself and for which no neighbor discovered the presence yet (acceptable).
+	 * Clean up missing nodes
 	 * 
 	 * @return The cleaned nodes
 	 */
-	public List<Node> cleanupNodesAndJobs() {
+	public List<Node> cleanupNodes() {
 		
 		List<Node> missingNodes = getMissingNodes();
 		
-		String deleteQueryString = new StringBuilder("DELETE FROM NetworkJob j WHERE j.gatewayId=:g AND j.address=:a").toString();
-		
 		for (Node node : missingNodes) {
 			em.remove(node);
-			
-			em.createQuery(deleteQueryString)
-							.setParameter("g", node.getCoordinates().getGatewayId())
-							.setParameter("a", node.getCoordinates().getAddress()).executeUpdate();
 		}
-		
-		String deleteOvergraceQueryString = new StringBuilder("DELETE FROM NetworkJob j WHERE j.type=:type AND j.timestamp < :time").toString();
-		em.createQuery(deleteOvergraceQueryString)
-							.setParameter("type", NetworkJobType.NODE_ANNCE_GRACE)
-							.setParameter("time", System.currentTimeMillis()-NodeAnnceRegistrationProcess.GRACE_TIMEOUT_MS).executeUpdate();
 		
 		return missingNodes;
 	}

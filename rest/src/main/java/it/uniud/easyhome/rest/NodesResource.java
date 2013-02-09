@@ -21,7 +21,6 @@ public final class NodesResource {
     
     private static long nodeId = 0;
     private static Object nodeLock = new Object();
-    private static Object linkLock = new Object();
 
     public NodesResource() throws NamingException {
     	resEjb = (NodesEJB) new
@@ -111,18 +110,13 @@ public final class NodesResource {
     @POST
     @Path("cleanup")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Node> cleanupLinksAndNodes() {
+    public List<Node> cleanupNodes() {
     	
     	List<Node> cleanedNodes;
     	
-    	synchronized(linkLock) {
-
-    		resEjb.cleanupLinks(NetworkUpdateProcess.KEEP_LINK_ALIVE_MS);
-    		
-    	}
     	synchronized(nodeLock) {
     		
-    		cleanedNodes = resEjb.cleanupNodesAndJobs();
+    		cleanedNodes = resEjb.cleanupNodes();
     	}
     	
     	return cleanedNodes;

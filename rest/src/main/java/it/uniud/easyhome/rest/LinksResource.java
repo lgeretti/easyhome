@@ -63,6 +63,15 @@ public final class LinksResource {
     		}
     	}
     }
+    
+	@POST
+	@Path("cleanup")
+	public Response cleanupLinks() {
+    	synchronized(linkLock) {
+    		resEjb.cleanupLinks(NetworkUpdateProcess.KEEP_LINK_ALIVE_MS);
+    	}
+    	return Response.ok().build();
+	}
 
 	@GET
     @Path("{id}")
