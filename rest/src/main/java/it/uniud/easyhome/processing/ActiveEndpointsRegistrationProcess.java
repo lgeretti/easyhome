@@ -54,7 +54,7 @@ public class ActiveEndpointsRegistrationProcess extends Process {
         	NativePacket pkt = (NativePacket) msg.getObject();
         	
         	if (ActiveEndpointsRspPacket.validates(pkt)) {
-	        	log(LogLevel.INFO,"ActiveEndpointsRspPacket received from " + pkt.getSrcCoords());
+	        	log(LogLevel.DEBUG,"ActiveEndpointsRspPacket received from " + pkt.getSrcCoords());
 	        	
 	        	try {
 	        		ActiveEndpointsRspPacket activeEpPkt = new ActiveEndpointsRspPacket(pkt);
@@ -100,12 +100,12 @@ public class ActiveEndpointsRegistrationProcess extends Process {
 			                    	}
 			                        log(LogLevel.INFO,node + " updated with endpoints information (" + Arrays.toString(activeEps.toArray()) + ")");
 			                    } catch (Exception e) {
-			                    	log(LogLevel.INFO,"Active endpoints registration message for " + node + " could not be dispatched to inbound packets topic");
+			                    	log(LogLevel.DEBUG,"Active endpoints registration message for " + node + " could not be dispatched to inbound packets topic");
 			                    }
 			                } else 
-			                	log(LogLevel.INFO,"Active endpoints information update for " + node + " failed");
+			                	log(LogLevel.DEBUG,"Active endpoints information update for " + node + " failed");
 		                } else
-		                	log(LogLevel.INFO,"Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
+		                	log(LogLevel.DEBUG,"Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
 	        		}
 	        		
 	        	} catch (Exception e) {

@@ -66,7 +66,7 @@ public class NodeDescrRequestProcess extends Process {
 	        getOutboundPacketsProducer().send(outboundMessage);    
 	        log(LogLevel.INFO, "Node " + node + " descriptor request " + (isRepeated ? "re-" : "") + "dispatched");
         } else
-        	log(LogLevel.INFO, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
+        	log(LogLevel.DEBUG, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
     }
     
     @Override
@@ -103,7 +103,7 @@ public class NodeDescrRequestProcess extends Process {
         	// Nothing to be done
         } catch (Exception e) {
         	e.printStackTrace();
-        	log(LogLevel.INFO, "Node descriptor request could not be dispatched to outbound packets topic");
+        	log(LogLevel.DEBUG, "Node descriptor request could not be dispatched to outbound packets topic");
         }
     }
     

@@ -35,7 +35,7 @@ public class NetworkUpdateProcess extends Process {
             ClientResponse nodesCleanupResponse = restResource.path(RestPaths.NODES).path("cleanup").accept(MediaType.APPLICATION_JSON).post(ClientResponse.class);
             List<Node> cleanedNodes = JsonUtils.getListFrom(nodesCleanupResponse, Node.class);
             for (Node cleanedNode : cleanedNodes)
-            	log(LogLevel.INFO, "Node " + cleanedNode + " removed due to no links being present");
+            	log(LogLevel.DEBUG, "Node " + cleanedNode + " removed due to no links being present");
             
             restResource.path(RestPaths.JOBS).path("cleanup").accept(MediaType.APPLICATION_JSON).post(ClientResponse.class);
 

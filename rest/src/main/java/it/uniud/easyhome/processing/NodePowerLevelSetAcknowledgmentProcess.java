@@ -55,7 +55,7 @@ public class NodePowerLevelSetAcknowledgmentProcess extends Process {
         	NativePacket pkt = (NativePacket) msg.getObject();
         	
         	if (NodePowerLevelSetAcknowledgmentPacket.validates(pkt)) {
-	        	log(LogLevel.INFO, "NodePowerLevelSetAcknowledgmentPacket received from " + pkt.getSrcCoords());
+	        	log(LogLevel.DEBUG, "NodePowerLevelSetAcknowledgmentPacket received from " + pkt.getSrcCoords());
 	        	
 	        	try {
 	        		NodePowerLevelSetAcknowledgmentPacket ackPkt = new NodePowerLevelSetAcknowledgmentPacket(pkt);
@@ -83,15 +83,15 @@ public class NodePowerLevelSetAcknowledgmentProcess extends Process {
 				                	
 				                    log(LogLevel.INFO, node + " updated with power level (" + powerLevel + ")");
 				                } else
-				                	log(LogLevel.INFO, node + " power level information insertion failed");
+				                	log(LogLevel.DEBUG, node + " power level information insertion failed");
 				        	} else
-				        		log(LogLevel.INFO, "Node" + Node.nameFor(gatewayId, address) + " not found, ignoring");
+				        		log(LogLevel.DEBUG, "Node" + Node.nameFor(gatewayId, address) + " not found, ignoring");
 		        		}
 	        		}
 	        		
 	        	} catch (PowerLevelSetIssueJobNotPresentException e) {
 	        		
-	        		log(LogLevel.INFO, "No corresponding power level set issue job found: acknowledgment ignored");
+	        		log(LogLevel.DEBUG, "No corresponding power level set issue job found: acknowledgment ignored");
 	        		
 	        	} catch (Exception e) {
 	        		e.printStackTrace();

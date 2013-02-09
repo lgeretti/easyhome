@@ -49,7 +49,7 @@ public class NodeAnnceRegistrationProcess extends Process {
     	if (msg != null) {
         	NativePacket pkt = (NativePacket) msg.getObject();
         	if (NodeAnncePacket.validates(pkt)) {
-	        	log(LogLevel.INFO, "NodeAnncePacket received from " + pkt.getSrcCoords());
+	        	log(LogLevel.DEBUG, "NodeAnncePacket received from " + pkt.getSrcCoords());
 	        	
 	        	try {
 	        		NodeAnncePacket announce = new NodeAnncePacket(pkt);
@@ -97,7 +97,7 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                        networkEventsProducer.send(eventMessage);
 	                        log(LogLevel.INFO, "Node " + Node.nameFor(gatewayId,address) + " announcement registered and event dispatched");
 	                    } catch (Exception e) {
-	                    	log(LogLevel.INFO, "Message could not be dispatched to inbound packets topic");
+	                    	log(LogLevel.DEBUG, "Message could not be dispatched to inbound packets topic");
 	                    }
 	                	
 	                } else if (nodeInsertionResponse.getClientResponseStatus() == Status.OK && jobInsertionsSuccessful) {
@@ -108,11 +108,11 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                        networkEventsProducer.send(eventMessage);
 	                        log(LogLevel.INFO, "Node " + Node.nameFor(gatewayId,address) + " announcement re-registered and event dispatched");
 	                    } catch (Exception e) {
-	                    	log(LogLevel.INFO, "Message could not be dispatched to inbound packets topic");
+	                    	log(LogLevel.DEBUG, "Message could not be dispatched to inbound packets topic");
 	                    }
 	                	
 	                } else
-	                	log(LogLevel.INFO, "Node " + Node.nameFor(gatewayId,address) + " announcement registration failed");
+	                	log(LogLevel.DEBUG, "Node " + Node.nameFor(gatewayId,address) + " announcement registration failed");
 	                
 	                
 	        	} catch (Exception ex) {

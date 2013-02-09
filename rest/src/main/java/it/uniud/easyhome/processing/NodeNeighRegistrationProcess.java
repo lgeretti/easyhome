@@ -53,7 +53,7 @@ public class NodeNeighRegistrationProcess extends Process {
         	NativePacket pkt = (NativePacket) msg.getObject();
         	
         	if (NodeNeighRspPacket.validates(pkt)) {
-	        	log(LogLevel.INFO, "NodeNeighRspPacket received from " + pkt.getSrcCoords());
+	        	log(LogLevel.DEBUG, "NodeNeighRspPacket received from " + pkt.getSrcCoords());
 	        	
 	        	try {
 	        		NodeNeighRspPacket neighPkt = new NodeNeighRspPacket(pkt);
@@ -110,7 +110,7 @@ public class NodeNeighRegistrationProcess extends Process {
 					                if (updateResponse.getClientResponseStatus() == Status.OK)
 					                	log(LogLevel.INFO, node + " updated with neighbors information (#" + newNeighbors.size() + ")");
 					                else
-					                	log(LogLevel.INFO, node + " neighbors information update failed");
+					                	log(LogLevel.DEBUG, node + " neighbors information update failed");
 				        		} else {
 				        			log(LogLevel.INFO, node + " has unchanged neighbor information (#" + newNeighbors.size() + ")");
 				        		}

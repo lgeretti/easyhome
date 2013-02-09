@@ -57,7 +57,7 @@ public class NodeDescrRegistrationProcess extends Process {
         	NativePacket pkt = (NativePacket) msg.getObject();
         	
         	if (NodeDescrRspPacket.validates(pkt)) {
-	        	log(LogLevel.INFO, "NodeDescrRspPacket received from " + pkt.getSrcCoords());
+	        	log(LogLevel.DEBUG, "NodeDescrRspPacket received from " + pkt.getSrcCoords());
 	        	
 	        	try {
 	        		NodeDescrRspPacket descr = new NodeDescrRspPacket(pkt);
@@ -115,15 +115,15 @@ public class NodeDescrRegistrationProcess extends Process {
 			                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
 			                        networkEventsProducer.send(eventMessage);
 			                    } catch (JMSException ex) { 
-			                    	log(LogLevel.INFO, "Descriptor acquisition event dispatch failed");
+			                    	log(LogLevel.DEBUG, "Descriptor acquisition event dispatch failed");
 			                    }
 			                    
 			                	log(LogLevel.INFO, "Node " + node + " updated with logical type information " + descr.getLogicalType() + " and manufacturer " + descr.getManufacturerCode());
 
 		                	} else
-			                	log(LogLevel.INFO, "Node " + node + " logical type information and manufacturer update failed");
+			                	log(LogLevel.DEBUG, "Node " + node + " logical type information and manufacturer update failed");
 	        			} else 
-		        			log(LogLevel.INFO, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
+		        			log(LogLevel.DEBUG, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
 	        		}
 	    	       
 	        	} catch (InvalidPacketTypeException e) {

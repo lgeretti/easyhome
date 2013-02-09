@@ -56,7 +56,7 @@ public class SimpleDescrRegistrationProcess extends Process {
         	NativePacket pkt = (NativePacket) msg.getObject();
         	
         	if (SimpleDescrRspPacket.validates(pkt)) {
-	        	log(LogLevel.INFO, "SimpleDescrRspPacket received from " + pkt.getSrcCoords());
+	        	log(LogLevel.DEBUG, "SimpleDescrRspPacket received from " + pkt.getSrcCoords());
 	        	
 	        	try {
 	        		SimpleDescrRspPacket descr = new SimpleDescrRspPacket(pkt);
@@ -98,9 +98,9 @@ public class SimpleDescrRegistrationProcess extends Process {
 			                	
 			                	log(LogLevel.INFO, node + " updated with device information for endpoint " + endpoint);
 			                } else
-			                	log(LogLevel.INFO, node + " device information update failed for endpoint " + endpoint);		        			
+			                	log(LogLevel.DEBUG, node + " device information update failed for endpoint " + endpoint);		        			
 		        		} else 
-		        			log(LogLevel.INFO, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
+		        			log(LogLevel.DEBUG, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
 	        		}
 	        	} catch (InvalidPacketTypeException e) {
 	        		e.printStackTrace();
