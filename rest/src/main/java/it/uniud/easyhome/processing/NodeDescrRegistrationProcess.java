@@ -4,6 +4,7 @@ import java.util.List;
 
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.JsonUtils;
+import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.exceptions.InvalidNodeDescException;
 import it.uniud.easyhome.exceptions.InvalidNodeLogicalTypeException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
@@ -56,7 +57,7 @@ public class NodeDescrRegistrationProcess extends Process {
         	NativePacket pkt = (NativePacket) msg.getObject();
         	
         	if (NodeDescrRspPacket.validates(pkt)) {
-	        	println("NodeDescrRspPacket received from " + pkt.getSrcCoords());
+	        	log(LogLevel.INFO, "NodeDescrRspPacket received from " + pkt.getSrcCoords());
 	        	
 	        	try {
 	        		NodeDescrRspPacket descr = new NodeDescrRspPacket(pkt);
@@ -114,15 +115,15 @@ public class NodeDescrRegistrationProcess extends Process {
 			                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
 			                        networkEventsProducer.send(eventMessage);
 			                    } catch (JMSException ex) { 
-			                    	println("Descriptor acquisition event dispatch failed");
+			                    	log(LogLevel.INFO, "Descriptor acquisition event dispatch failed");
 			                    }
 			                    
-			                	println("Node " + node + " updated with logical type information " + descr.getLogicalType() + " and manufacturer " + descr.getManufacturerCode());
+			                	log(LogLevel.INFO, "Node " + node + " updated with logical type information " + descr.getLogicalType() + " and manufacturer " + descr.getManufacturerCode());
 
 		                	} else
-			                	println("Node " + node + " logical type information and manufacturer update failed");
+			                	log(LogLevel.INFO, "Node " + node + " logical type information and manufacturer update failed");
 	        			} else 
-		        			println("Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
+		        			log(LogLevel.INFO, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
 	        		}
 	    	       
 	        	} catch (InvalidPacketTypeException e) {

@@ -5,6 +5,7 @@ import java.util.List;
 
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.JsonUtils;
+import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.NetworkJob;
 import it.uniud.easyhome.network.NetworkJobType;
@@ -63,9 +64,9 @@ public class NodeDescrRequestProcess extends Process {
 	    	NodeDescrReqPacket packet = new NodeDescrReqPacket(node.getCoordinates(),tsn);
 	        ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
 	        getOutboundPacketsProducer().send(outboundMessage);    
-	        println("Node " + node + " descriptor request " + (isRepeated ? "re-" : "") + "dispatched");
+	        log(LogLevel.INFO, "Node " + node + " descriptor request " + (isRepeated ? "re-" : "") + "dispatched");
         } else
-        	println("Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
+        	log(LogLevel.INFO, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
     }
     
     @Override
@@ -102,7 +103,7 @@ public class NodeDescrRequestProcess extends Process {
         	// Nothing to be done
         } catch (Exception e) {
         	e.printStackTrace();
-        	println("Node descriptor request could not be dispatched to outbound packets topic");
+        	log(LogLevel.INFO, "Node descriptor request could not be dispatched to outbound packets topic");
         }
     }
     

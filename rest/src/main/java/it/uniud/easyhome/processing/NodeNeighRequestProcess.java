@@ -3,6 +3,7 @@ package it.uniud.easyhome.processing;
 import java.util.List;
 
 import it.uniud.easyhome.common.JsonUtils;
+import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
@@ -60,7 +61,7 @@ public class NodeNeighRequestProcess extends Process {
 			    	NodeNeighReqPacket packet = new NodeNeighReqPacket(node.getCoordinates(),sequenceNumber);
 			 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
 			    	getOutboundPacketsProducer().send(outboundMessage);    
-			    	println("Node '" + node.getName() + "' neighbours request dispatched");
+			    	log(LogLevel.INFO, "Node '" + node.getName() + "' neighbours request dispatched");
 		    	} 
 	    	}
 			Thread.sleep(NEIGH_REQUEST_PERIOD_MS);

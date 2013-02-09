@@ -5,6 +5,7 @@ import java.util.List;
 
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.JsonUtils;
+import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.NetworkJob;
 import it.uniud.easyhome.network.NetworkJobType;
@@ -68,10 +69,10 @@ public class NodePowerLevelRequestProcess extends Process {
 	    		NodePowerLevelReqPacket packet = new NodePowerLevelReqPacket(node.getCoordinates(),sequenceNumber);
 		 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
 		    	getOutboundPacketsProducer().send(outboundMessage);    
-		        println("Power level request for " + node + (isRepeated ? " re-" : " ") + "dispatched");
+		        log(LogLevel.INFO, "Power level request for " + node + (isRepeated ? " re-" : " ") + "dispatched");
 	        }
         } else
-        	println("Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
+        	log(LogLevel.INFO, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
     }
     
     
@@ -111,7 +112,7 @@ public class NodePowerLevelRequestProcess extends Process {
         	// Nothing to be done
         } catch (Exception e) {
         	e.printStackTrace();
-        	println("Node power level request could not be dispatched to outbound packets topic");
+        	log(LogLevel.INFO, "Node power level request could not be dispatched to outbound packets topic");
         	try {
 				Thread.sleep(JOB_POLLING_TIME_MILLIS);
 			} catch (InterruptedException e1) {

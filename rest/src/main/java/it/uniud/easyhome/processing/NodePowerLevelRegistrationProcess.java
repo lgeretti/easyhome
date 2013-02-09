@@ -5,6 +5,7 @@ import java.util.List;
 
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.JsonUtils;
+import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.NetworkJob;
@@ -50,7 +51,7 @@ public class NodePowerLevelRegistrationProcess extends Process {
         	NativePacket pkt = (NativePacket) msg.getObject();
         	
         	if (NodePowerLevelRspPacket.validates(pkt)) {
-	        	println("NodePowerLevelRspPacket received from " + pkt.getSrcCoords());
+	        	log(LogLevel.INFO, "NodePowerLevelRspPacket received from " + pkt.getSrcCoords());
 	        	
 	        	try {
 	        		NodePowerLevelRspPacket plPkt = new NodePowerLevelRspPacket(pkt);
@@ -81,12 +82,12 @@ public class NodePowerLevelRegistrationProcess extends Process {
 					                
 					                restResource.path(RestPaths.JOBS).queryParams(queryData).delete(ClientResponse.class);
 				                	
-				                    println("Node " + node.getName() + " updated with power level (" + powerLevel + ")");
+				                    log(LogLevel.INFO, "Node " + node.getName() + " updated with power level (" + powerLevel + ")");
 				                } else
-				                	println("Node " + node.getName() + " power level information insertion failed");	
+				                	log(LogLevel.INFO, "Node " + node.getName() + " power level information insertion failed");	
 				        
 				        	} else
-				        		println("Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
+				        		log(LogLevel.INFO, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
 		        		
 		        		}
 	        		}

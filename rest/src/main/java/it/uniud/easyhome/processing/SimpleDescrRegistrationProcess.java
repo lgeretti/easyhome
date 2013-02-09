@@ -6,6 +6,7 @@ import java.util.Map;
 
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.JsonUtils;
+import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.devices.HomeAutomationDevice;
 import it.uniud.easyhome.exceptions.InvalidNodeDescException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
@@ -55,7 +56,7 @@ public class SimpleDescrRegistrationProcess extends Process {
         	NativePacket pkt = (NativePacket) msg.getObject();
         	
         	if (SimpleDescrRspPacket.validates(pkt)) {
-	        	println("SimpleDescrRspPacket received from " + pkt.getSrcCoords());
+	        	log(LogLevel.INFO, "SimpleDescrRspPacket received from " + pkt.getSrcCoords());
 	        	
 	        	try {
 	        		SimpleDescrRspPacket descr = new SimpleDescrRspPacket(pkt);
@@ -95,11 +96,11 @@ public class SimpleDescrRegistrationProcess extends Process {
 			                        networkEventsProducer.send(eventMessage);
 			                    } catch (JMSException ex) { }
 			                	
-			                	println(node + " updated with device information for endpoint " + endpoint);
+			                	log(LogLevel.INFO, node + " updated with device information for endpoint " + endpoint);
 			                } else
-			                	println(node + " device information update failed for endpoint " + endpoint);		        			
+			                	log(LogLevel.INFO, node + " device information update failed for endpoint " + endpoint);		        			
 		        		} else 
-		        			println("Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
+		        			log(LogLevel.INFO, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
 	        		}
 	        	} catch (InvalidPacketTypeException e) {
 	        		e.printStackTrace();

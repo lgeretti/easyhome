@@ -1,5 +1,6 @@
 package it.uniud.easyhome.gateway;
 
+import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.exceptions.GatewayIdentifierAlreadyPresentException;
 import it.uniud.easyhome.exceptions.PortAlreadyBoundException;
 
@@ -30,7 +31,7 @@ public class HubContext {
         return INSTANCE;
     }
     
-    public Gateway getGatewayForId(int gatewayId) {
+    public Gateway getGatewayForId(byte gatewayId) {
         
         for (Gateway gw : gateways)
             if (gw.getId() == gatewayId)
@@ -77,17 +78,32 @@ public class HubContext {
         gateways.add(gw);
     }
 
-    public void openGateway(int gatewayId) {
+    public void setLogLevel(LogLevel logLevel) {
+        for (Gateway gw : gateways)
+            gw.setLogLevel(logLevel);
+    }
+    
+    public void setLogLevel(byte gatewayId, LogLevel logLevel) {
+        for (Gateway gw : gateways)
+            if (gw.getId() == gatewayId) {
+            	gw.setLogLevel(logLevel);
+            	break;
+            }
+    }
+
+    public void openGateway(byte gatewayId) {
         for (Gateway gw : gateways)
             if (gw.getId() == gatewayId) {
             	gw.open();
+            	break;
             }
     }
     
-    public void closeGateway(int gatewayId) {
+    public void closeGateway(byte gatewayId) {
         for (Gateway gw : gateways)
             if (gw.getId() == gatewayId) {
             	gw.close();
+            	break;
             }
     }
     
@@ -99,7 +115,7 @@ public class HubContext {
         return false;
     }
     
-    public void removeGateway(int gatewayId) {
+    public void removeGateway(byte gatewayId) {
         for (int i=0; i<gateways.size(); i++) 
             if (gateways.get(i).getId() == gatewayId) {
                 gateways.get(i).close();

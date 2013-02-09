@@ -1,6 +1,7 @@
 package it.uniud.easyhome.processing;
 
 import it.uniud.easyhome.common.JMSConstants;
+import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.common.RunnableState;
 
 import java.net.URI;
@@ -40,6 +41,8 @@ public abstract class Process implements Runnable {
     private int pid;
     private final ProcessKind kind;
     
+    protected volatile LogLevel logLevel;
+    
     private volatile RunnableState runState = RunnableState.STOPPED;
     
     private Client restClient;
@@ -61,6 +64,7 @@ public abstract class Process implements Runnable {
         this.kind = kind;
         this.restClient = Client.create(new DefaultClientConfig());
         this.restResource = restClient.resource(restTarget);
+        this.logLevel = LogLevel.INFO;
         
     	consumers = new HashMap<Topic,MessageConsumer>();
     	producers = new HashMap<Topic,MessageProducer>();
@@ -121,6 +125,14 @@ public abstract class Process implements Runnable {
 	        thr.start();
     	}
     }
+    
+    public LogLevel getLogLevel() {
+    	return logLevel;
+    }
+    
+    public void setLogLevel(LogLevel logLevel) {
+    	this.logLevel = logLevel;
+    }
 	
 	public void stop() {
 		
@@ -128,8 +140,9 @@ public abstract class Process implements Runnable {
 		sendNullMessageToConsumers();
 	}
 	
-	protected void println(String msg) {
-    	System.out.println("Pr #" + pid + ": " + msg);
+	protected final void log(LogLevel logLevel, String msg) {
+		if (this.logLevel.acceptsLogOf(logLevel))
+			System.out.println("Pr #" + pid + ": " + msg);
     }
 	
 	private void sendNullMessageToConsumers() {
@@ -154,7 +167,7 @@ public abstract class Process implements Runnable {
     	try {
     		
     		runState = RunnableState.STARTED;
-	        println(getKind().toString() + " started");
+	        log(LogLevel.INFO, getKind().toString() + " started");
 	        
 	    	while (runState != RunnableState.STOPPING) 
 	    		process();
@@ -178,6 +191,6 @@ public abstract class Process implements Runnable {
     	}
     	
     	runState = RunnableState.STOPPED;
-    	println(getKind().toString() + " stopped");
+    	log(LogLevel.INFO, getKind().toString() + " stopped");
     }
 }

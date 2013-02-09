@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.JsonUtils;
+import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.exceptions.NodeNotFoundException;
 import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.NetworkJob;
@@ -61,7 +62,7 @@ public class NetworkGraphMinimizationProcess extends Process {
     	
     	Node node = null;
     	
-		println("Trying to set power level " + powerLevel + " for node " + Node.nameFor(gatewayId, address));
+		log(LogLevel.INFO, "Trying to set power level " + powerLevel + " for node " + Node.nameFor(gatewayId, address));
     	
     	while (issueRetryCount < MAX_PL_SET_ISS_RETRIES) {
 	        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
@@ -86,7 +87,7 @@ public class NetworkGraphMinimizationProcess extends Process {
 	        	
 	        	node = JsonUtils.getFrom(nodeResponse, Node.class);
 	        	if (node.getPowerLevel() == powerLevel) {
-	        		println("Successfully set power level for node " + node);
+	        		log(LogLevel.INFO, "Successfully set power level for node " + node);
 	        		break;
 	        	}
 	        	
@@ -115,12 +116,12 @@ public class NetworkGraphMinimizationProcess extends Process {
         		}
            	}   
         } catch (InterruptedException e) {
-        	println("Network graph minimization interrupted");
+        	log(LogLevel.INFO, "Network graph minimization interrupted");
         } catch (NodeNotFoundException e) {
-        	println("Network graph minimization aborted due to a missing node during the procedure");
+        	log(LogLevel.INFO, "Network graph minimization aborted due to a missing node during the procedure");
         } catch (Exception e) {
         	e.printStackTrace();
-        	println("Network graph minimization failure");
+        	log(LogLevel.INFO, "Network graph minimization failure");
         }
     	
 		
@@ -128,7 +129,7 @@ public class NetworkGraphMinimizationProcess extends Process {
     
     private void maximizeNetworkGraph() throws InterruptedException, JMSException, NodeNotFoundException, JSONException {
 
-    	println("Network graph maximization phase started");
+    	log(LogLevel.INFO, "Network graph maximization phase started");
     	
     	while(true) {
     		
@@ -152,12 +153,12 @@ public class NetworkGraphMinimizationProcess extends Process {
     	
     	};
     	
-    	println("Network graph maximization phase completed");
+    	log(LogLevel.INFO, "Network graph maximization phase completed");
     }
     
     private void minimizeNetworkGraph() throws InterruptedException, JMSException, NodeNotFoundException, JSONException {
     	
-    	println("Network graph minimization phase started");
+    	log(LogLevel.INFO, "Network graph minimization phase started");
     	
     	ClientResponse getResponse = restResource.path(RestPaths.NODES).path("infrastructural").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
     	List<Node> nodes = JsonUtils.getListFrom(getResponse, Node.class);
@@ -172,7 +173,7 @@ public class NetworkGraphMinimizationProcess extends Process {
     		
     		MinimizationEntry entry = entries.poll();
     		
-    		println("Trying to reduce " + entry);
+    		log(LogLevel.INFO, "Trying to reduce " + entry);
     		
     		entry.reducePowerLevel();
     		requestPowerLevelChange(entry.getGatewayId(),entry.getAddress(),entry.getPowerLevel());
@@ -184,7 +185,7 @@ public class NetworkGraphMinimizationProcess extends Process {
         	
         	if (nodes.size() < numNodes) {
         		
-        		println("Reduction resulted in reduced graph size, thus restoring power level and discarding the node");
+        		log(LogLevel.INFO, "Reduction resulted in reduced graph size, thus restoring power level and discarding the node");
         		entry.increasePowerLevel();
         		requestPowerLevelChange(entry.getGatewayId(),entry.getAddress(),entry.getPowerLevel());
         		
@@ -192,13 +193,13 @@ public class NetworkGraphMinimizationProcess extends Process {
 
             	if (entry.getPowerLevel() > 0) {
             		entries.offer(entry);
-            		println("Reduced successfully");
+            		log(LogLevel.INFO, "Reduced successfully");
             	} else
-            		println("Reduced to zero successfully, hence discarding the node");
+            		log(LogLevel.INFO, "Reduced to zero successfully, hence discarding the node");
         	}
     	}
     	
-    	println("Network graph minimization phase completed");
+    	log(LogLevel.INFO, "Network graph minimization phase completed");
     }
     
     private class MinimizationEntry {

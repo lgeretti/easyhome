@@ -1,5 +1,6 @@
 package it.uniud.easyhome.rest;
 
+import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.gateway.Gateway;
 import it.uniud.easyhome.gateway.HubContext;
 import it.uniud.easyhome.gateway.ProtocolType;
@@ -31,7 +32,7 @@ public class GatewayResource {
     	return String.valueOf(networkContext.getGateways().size());
     }
     
-    // curl -X POST http://localhost:8080/easyhome/rest/hub/gateways -H "Content-Type: application/x-www-form-urlencoded" --data-binary "port=5100&protocol=XBEE" 
+    // curl -X POST http://localhost:8080/easyhome/rest/gateways -H "Content-Type: application/x-www-form-urlencoded" --data-binary "port=5100&protocol=XBEE" 
     @POST
     public Response registerGateway(@FormParam("id") byte id, @FormParam("protocol") ProtocolType protocol,
             @FormParam("port") int port) {
@@ -79,6 +80,32 @@ public class GatewayResource {
         } else
             return Response.status(Response.Status.NOT_FOUND).build();
     }
+    
+    // curl -X POST http://localhost:8080/easyhome/rest/gateways/2/logLevel -H "Content-Type: application/x-www-form-urlencoded" --data-binary "logLevel=DEBUG" 
+    @POST
+    @Path("{gatewayId}/logLevel")
+    public Response changeLogLevel(@PathParam("gatewayId") byte gatewayId,
+    							   @FormParam("logLevel") LogLevel logLevel) {
+        
+        if (networkContext.hasGateway(gatewayId)) {
+            if (logLevel == null)
+            	return Response.status(Response.Status.BAD_REQUEST).build();
+            networkContext.setLogLevel(gatewayId,logLevel);
+            	
+            return Response.ok().build();
+        } else
+            return Response.status(Response.Status.NOT_FOUND).build();
+    }    
+    
+    // curl -X POST http://localhost:8080/easyhome/rest/gateways/logLevel -H "Content-Type: application/x-www-form-urlencoded" --data-binary "logLevel=DEBUG" 
+    @POST
+    @Path("logLevel")
+    public Response changeLogLevel(@FormParam("logLevel") LogLevel logLevel) {
+        
+    	networkContext.setLogLevel(logLevel);
+    	
+        return Response.ok().build();
+    }  
     
     @DELETE
     public Response clearAll() {

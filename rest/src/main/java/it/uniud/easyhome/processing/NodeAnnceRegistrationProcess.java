@@ -2,6 +2,7 @@ package it.uniud.easyhome.processing;
 
 import it.uniud.easyhome.common.ByteUtils;
 import it.uniud.easyhome.common.JMSConstants;
+import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.NetworkJobType;
@@ -48,7 +49,7 @@ public class NodeAnnceRegistrationProcess extends Process {
     	if (msg != null) {
         	NativePacket pkt = (NativePacket) msg.getObject();
         	if (NodeAnncePacket.validates(pkt)) {
-	        	println("NodeAnncePacket received from " + pkt.getSrcCoords());
+	        	log(LogLevel.INFO, "NodeAnncePacket received from " + pkt.getSrcCoords());
 	        	
 	        	try {
 	        		NodeAnncePacket announce = new NodeAnncePacket(pkt);
@@ -94,9 +95,9 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                    try {
 	                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
 	                        networkEventsProducer.send(eventMessage);
-	                        println("Node " + Node.nameFor(gatewayId,address) + " announcement registered and event dispatched");
+	                        log(LogLevel.INFO, "Node " + Node.nameFor(gatewayId,address) + " announcement registered and event dispatched");
 	                    } catch (Exception e) {
-	                    	println("Message could not be dispatched to inbound packets topic");
+	                    	log(LogLevel.INFO, "Message could not be dispatched to inbound packets topic");
 	                    }
 	                	
 	                } else if (nodeInsertionResponse.getClientResponseStatus() == Status.OK && jobInsertionsSuccessful) {
@@ -105,13 +106,13 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                    try {
 	                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
 	                        networkEventsProducer.send(eventMessage);
-	                        println("Node " + Node.nameFor(gatewayId,address) + " announcement re-registered and event dispatched");
+	                        log(LogLevel.INFO, "Node " + Node.nameFor(gatewayId,address) + " announcement re-registered and event dispatched");
 	                    } catch (Exception e) {
-	                    	println("Message could not be dispatched to inbound packets topic");
+	                    	log(LogLevel.INFO, "Message could not be dispatched to inbound packets topic");
 	                    }
 	                	
 	                } else
-	                	println("Node " + Node.nameFor(gatewayId,address) + " announcement registration failed");
+	                	log(LogLevel.INFO, "Node " + Node.nameFor(gatewayId,address) + " announcement registration failed");
 	                
 	                
 	        	} catch (Exception ex) {

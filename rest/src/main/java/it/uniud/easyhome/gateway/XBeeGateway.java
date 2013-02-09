@@ -1,6 +1,7 @@
 package it.uniud.easyhome.gateway;
 
 import it.uniud.easyhome.common.ByteUtils;
+import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.exceptions.ChecksumException;
 import it.uniud.easyhome.exceptions.IllegalBroadcastPortException;
 import it.uniud.easyhome.exceptions.IncompletePacketException;
@@ -39,7 +40,7 @@ public class XBeeGateway extends Gateway {
         if (receiveOptions == 0x02) {
         	if (xpkt.getProfileId() == Domain.MANAGEMENT.getCode() && (dstEndpoint == 0x00 || dstEndpoint == (byte)0xEA)) {        		
 	        	dstCoords = new ModuleCoordinates((byte)0,0xFFFFL,(short)0xFFFE,dstEndpoint);
-	        	//println("Setting destination as broadcast");
+	        	log(LogLevel.DEBUG, "Setting destination as broadcast");
         	} else {
         		throw new IllegalBroadcastPortException();
         	}
@@ -48,18 +49,16 @@ public class XBeeGateway extends Gateway {
         	// If this is the implicit EasyHome controller endpoint
         	if (xpkt.getProfileId() == Domain.MANAGEMENT.getCode() && (dstEndpoint == 0x00 || dstEndpoint == (byte)0xEA)) {
         		dstCoords = new ModuleCoordinates((byte)1,0x0L,(short)0x0,dstEndpoint);
-        		//println("Setting destination as domotic controller");
+        		log(LogLevel.DEBUG, "Setting destination as domotic controller");
         	} else {
         		dstCoords = getCoordinatesFor(dstEndpoint);
         	}
 	        
 	        if (dstCoords == null) {
-		        println("Could not find coordinates for mapped endpoint " + dstEndpoint);
+		        log(LogLevel.INFO, "Could not find coordinates for mapped endpoint " + dstEndpoint);
 		        throw new RoutingEntryMissingException();
 	        }
 	    }
-        
-        //println("XBee packet APS payload: " + ByteUtils.printBytes(xpkt.getApsPayload()));
         
         Operation op = new Operation(xpkt.getTransactionSeqNumber(),xpkt.getProfileId(),
         		xpkt.getClusterId(),(byte)0x0/*Frame control*/,xpkt.getCommand(),xpkt.getApsPayload());
@@ -88,14 +87,14 @@ public class XBeeGateway extends Gateway {
     		byte[] readBytes = new byte[is.available()];
     		is.read(readBytes);
     		
-    		//println("Read: " + ByteUtils.printBytes(readBytes));
+    		log(LogLevel.DEBUG, "Read: " + ByteUtils.printBytes(readBytes));
     		
     		buffer.write(readBytes);
     	}
     	
     	byte[] originalBuffer = buffer.toByteArray();
     	
-    	//println("Buffer: " + ByteUtils.printBytes(originalBuffer));
+    	log(LogLevel.DEBUG, "Buffer: " + ByteUtils.printBytes(originalBuffer));
     	
     	int readBytes = 0;
     	
@@ -106,13 +105,13 @@ public class XBeeGateway extends Gateway {
     	} catch (ChecksumException ex) {
 
     		readBytes = 4 + (originalBuffer[1]*256) + originalBuffer[2];
-    		println("Discarding checksum-failing packet of " + readBytes + " bytes");
+    		log(LogLevel.INFO, "Discarding checksum-failing packet of " + readBytes + " bytes");
     		
     		throw ex;
     	} catch (InvalidPacketTypeException ex) {
 
     		readBytes = 4 + (originalBuffer[1]*256) + originalBuffer[2];
-    		println("Discarding invalid-type packet of " + readBytes + " bytes");
+    		log(LogLevel.INFO, "Discarding invalid-type packet of " + readBytes + " bytes");
     		
     		throw ex;
     	} finally {
@@ -123,7 +122,7 @@ public class XBeeGateway extends Gateway {
         		buffer.write(originalBuffer, readBytes, originalBuffer.length-readBytes);
     	}
     	
-    	//println("XBee packet: " + ByteUtils.printBytes(xbeePkt.getBytes()));
+    	log(LogLevel.DEBUG, "XBee packet: " + ByteUtils.printBytes(xbeePkt.getBytes()));
     	
    		result = convertFrom(xbeePkt);
     	

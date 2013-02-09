@@ -6,6 +6,7 @@ import java.util.List;
 
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.JsonUtils;
+import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.packets.natives.NodeDescrReqPacket;
@@ -62,20 +63,20 @@ public class SimpleDescrRequestProcess extends Process {
 	    	    	        	SimpleDescrReqPacket packet = new SimpleDescrReqPacket(node.getCoordinates(),node.getEndpoints().get(i).byteValue(),++sequenceNumber);
 	    	    	            ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
 	    	    	            getOutboundPacketsProducer().send(outboundMessage);    
-	    	    	            println("Simple descriptor for endpoint " + endpoints.get(i) + " of node " + node + " request dispatched");	
+	    	    	            log(LogLevel.INFO, "Simple descriptor for endpoint " + endpoints.get(i) + " of node " + node + " request dispatched");	
 	    	        			Thread.sleep(WAIT_TIME_BETWEEN_REQUESTS_MILLIS);
 	    	        		} catch (Exception e) {
 	    	    	        	e.printStackTrace();
 	    	    	        	i--;
-	    	    	        	println("Simple descriptor request for endpoint " + endpoints.get(i) + " of node " + node +  
+	    	    	        	log(LogLevel.INFO, "Simple descriptor request for endpoint " + endpoints.get(i) + " of node " + node +  
 	    	    	        			" could not be dispatched, retrying");
 	    	    	        }
 	    	        	}
         	        } else
-        	        	println("Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
+        	        	log(LogLevel.INFO, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
     	        } catch (Exception e) {
     	        	e.printStackTrace();
-    	        	println("Simple descriptors cannot be recovered: issue when getting node " + Node.nameFor(gatewayId, address));
+    	        	log(LogLevel.INFO, "Simple descriptors cannot be recovered: issue when getting node " + Node.nameFor(gatewayId, address));
     	        }
     		}
        	}

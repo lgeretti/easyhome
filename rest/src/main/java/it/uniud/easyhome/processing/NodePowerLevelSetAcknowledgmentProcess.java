@@ -5,6 +5,7 @@ import java.util.List;
 
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.JsonUtils;
+import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.exceptions.PowerLevelSetIssueJobNotPresentException;
 import it.uniud.easyhome.network.NetworkEvent;
@@ -54,7 +55,7 @@ public class NodePowerLevelSetAcknowledgmentProcess extends Process {
         	NativePacket pkt = (NativePacket) msg.getObject();
         	
         	if (NodePowerLevelSetAcknowledgmentPacket.validates(pkt)) {
-	        	println("NodePowerLevelSetAcknowledgmentPacket received from " + pkt.getSrcCoords());
+	        	log(LogLevel.INFO, "NodePowerLevelSetAcknowledgmentPacket received from " + pkt.getSrcCoords());
 	        	
 	        	try {
 	        		NodePowerLevelSetAcknowledgmentPacket ackPkt = new NodePowerLevelSetAcknowledgmentPacket(pkt);
@@ -80,17 +81,17 @@ public class NodePowerLevelSetAcknowledgmentProcess extends Process {
 				                	
 				                	cleanJobs(gatewayId,address);
 				                	
-				                    println(node + " updated with power level (" + powerLevel + ")");
+				                    log(LogLevel.INFO, node + " updated with power level (" + powerLevel + ")");
 				                } else
-				                	println(node + " power level information insertion failed");
+				                	log(LogLevel.INFO, node + " power level information insertion failed");
 				        	} else
-				        		println("Node" + Node.nameFor(gatewayId, address) + " not found, ignoring");
+				        		log(LogLevel.INFO, "Node" + Node.nameFor(gatewayId, address) + " not found, ignoring");
 		        		}
 	        		}
 	        		
 	        	} catch (PowerLevelSetIssueJobNotPresentException e) {
 	        		
-	        		println("No corresponding power level set issue job found: acknowledgment ignored");
+	        		log(LogLevel.INFO, "No corresponding power level set issue job found: acknowledgment ignored");
 	        		
 	        	} catch (Exception e) {
 	        		e.printStackTrace();

@@ -1,5 +1,6 @@
 package it.uniud.easyhome.rest;
 
+import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.processing.*;
 import it.uniud.easyhome.processing.Process;
 
@@ -45,6 +46,33 @@ public class ProcessResource {
                 .path(String.valueOf(pid))
                 .build()).build();
     }
+    
+    // curl -X POST http://localhost:8080/easyhome/rest/processes/2/logLevel -H "Content-Type: application/x-www-form-urlencoded" --data-binary "logLevel=DEBUG" 
+    @POST
+    @Path("{pid}/logLevel")
+    public Response changeLogLevel(@PathParam("pid") int pid,
+    							   @FormParam("logLevel") LogLevel logLevel) {
+
+        for (Process process : processes) {
+            if (process.getPid() == pid) {
+            	process.setLogLevel(logLevel);
+                return Response.ok().build();
+            }
+        }
+        
+        return Response.status(Status.NOT_FOUND).build();
+    } 
+    
+    // curl -X POST http://localhost:8080/easyhome/rest/processes/logLevel -H "Content-Type: application/x-www-form-urlencoded" --data-binary "logLevel=DEBUG" 
+    @POST
+    @Path("logLevel")
+    public Response changeLogLevel(@FormParam("logLevel") LogLevel logLevel) {
+
+        for (Process process : processes)
+            process.setLogLevel(logLevel);
+        
+    	return Response.ok().build();
+    } 
 
     @DELETE
     @Path("{pid}")

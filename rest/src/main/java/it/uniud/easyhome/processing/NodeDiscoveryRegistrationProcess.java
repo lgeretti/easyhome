@@ -5,6 +5,7 @@ import java.util.List;
 
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.JsonUtils;
+import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.exceptions.InvalidNodeLogicalTypeException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
@@ -60,7 +61,7 @@ public class NodeDiscoveryRegistrationProcess extends Process {
         	NativePacket pkt = (NativePacket) msg.getObject();
         	
         	if (NodeDiscoveryRspPacket.validates(pkt)) {
-	        	println("NodeDiscoveryRspPacket received from " + pkt.getSrcCoords());
+	        	log(LogLevel.INFO, "NodeDiscoveryRspPacket received from " + pkt.getSrcCoords());
 	        	
 	        	try {
 	        		NodeDiscoveryRspPacket discPkt = new NodeDiscoveryRspPacket(pkt);
@@ -121,7 +122,7 @@ public class NodeDiscoveryRegistrationProcess extends Process {
 			                	
 			                }
 			        		
-			                println(sender + " discovered " 
+			                log(LogLevel.INFO, sender + " discovered " 
 			                		+ Long.toHexString(discNuid) + ":" + Integer.toHexString(0xFFFF & discAddress) + " of type " + discLogicalType + insertionString);
 			                
 			                formData = new MultivaluedMapImpl();
@@ -134,7 +135,7 @@ public class NodeDiscoveryRegistrationProcess extends Process {
 			                restResource.path(RestPaths.LINKS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 			                
 		        		} else 
-		        			println("Sender node " + Node.nameFor(gatewayId, senderAddress) + " not found, hence discarding discovered node");
+		        			log(LogLevel.INFO, "Sender node " + Node.nameFor(gatewayId, senderAddress) + " not found, hence discarding discovered node");
 	        		}
 	        	} catch (InvalidPacketTypeException e) {
 	        		e.printStackTrace();

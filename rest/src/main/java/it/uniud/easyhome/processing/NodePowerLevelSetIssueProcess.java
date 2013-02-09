@@ -5,6 +5,7 @@ import java.util.List;
 
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.JsonUtils;
+import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.NetworkJob;
 import it.uniud.easyhome.network.NetworkJobType;
@@ -69,11 +70,11 @@ public class NodePowerLevelSetIssueProcess extends Process {
 		        NodePowerLevelSetIssuePacket packet = new NodePowerLevelSetIssuePacket(node.getCoordinates(),powerLevel,sequenceNumber);
 		 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
 		    	getOutboundPacketsProducer().send(outboundMessage);    
-		        println(node + " power level set issue " + (isRepeated ? "re-" : "") + "dispatched");
+		        log(LogLevel.INFO, node + " power level set issue " + (isRepeated ? "re-" : "") + "dispatched");
 	        } else 
-	        	println(node + " is not a router or coordinator, cannot reliably set the power level thus ignoring");
+	        	log(LogLevel.INFO, node + " is not a router or coordinator, cannot reliably set the power level thus ignoring");
         } else
-        	println("Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
+        	log(LogLevel.INFO, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
     }
     
     
@@ -114,7 +115,7 @@ public class NodePowerLevelSetIssueProcess extends Process {
         	// Nothing to be done
         } catch (Exception e) {
         	e.printStackTrace();
-        	println("Node power level set issue could not be dispatched to outbound packets topic");
+        	log(LogLevel.INFO, "Node power level set issue could not be dispatched to outbound packets topic");
         }
     	
 		

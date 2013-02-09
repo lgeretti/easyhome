@@ -4,6 +4,7 @@ import java.util.List;
 
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.JsonUtils;
+import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.LocalCoordinates;
 import it.uniud.easyhome.network.NetworkEvent;
@@ -52,7 +53,7 @@ public class NodeNeighRegistrationProcess extends Process {
         	NativePacket pkt = (NativePacket) msg.getObject();
         	
         	if (NodeNeighRspPacket.validates(pkt)) {
-	        	println("NodeNeighRspPacket received from " + pkt.getSrcCoords());
+	        	log(LogLevel.INFO, "NodeNeighRspPacket received from " + pkt.getSrcCoords());
 	        	
 	        	try {
 	        		NodeNeighRspPacket neighPkt = new NodeNeighRspPacket(pkt);
@@ -107,11 +108,11 @@ public class NodeNeighRegistrationProcess extends Process {
 				                    } catch (JMSException ex) { }
 					                
 					                if (updateResponse.getClientResponseStatus() == Status.OK)
-					                	println(node + " updated with neighbors information (#" + newNeighbors.size() + ")");
+					                	log(LogLevel.INFO, node + " updated with neighbors information (#" + newNeighbors.size() + ")");
 					                else
-					                	println(node + " neighbors information update failed");
+					                	log(LogLevel.INFO, node + " neighbors information update failed");
 				        		} else {
-				        			println(node + " has unchanged neighbor information (#" + newNeighbors.size() + ")");
+				        			log(LogLevel.INFO, node + " has unchanged neighbor information (#" + newNeighbors.size() + ")");
 				        		}
 			        		}
 		                }

@@ -2,6 +2,7 @@ package it.uniud.easyhome.gateway;
 
 import it.uniud.easyhome.common.ByteUtils;
 import it.uniud.easyhome.common.JMSConstants;
+import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.common.RunnableState;
 import it.uniud.easyhome.exceptions.ChecksumException;
 import it.uniud.easyhome.exceptions.IllegalGatewayStateException;
@@ -98,6 +99,8 @@ public class Gateway implements Runnable {
     
     protected ServerSocket server = null;
 	
+    protected volatile LogLevel logLevel = LogLevel.INFO;
+    
 	protected volatile RunnableState state = RunnableState.STOPPED;
 	
     @SuppressWarnings("unused")
@@ -131,7 +134,7 @@ public class Gateway implements Runnable {
         
     	int mappedEndpoint = mappedEndpointCounter++;
     	
-        println("Putting routing entry (endpoint " + (mappedEndpoint) + ") for " + coords);
+        log(LogLevel.INFO, "Putting routing entry (endpoint " + (mappedEndpoint) + ") for " + coords);
     	
         routingTable.put(coords, mappedEndpoint);
         
@@ -187,9 +190,18 @@ public class Gateway implements Runnable {
     	} catch (Exception ex) { }
     }
     
-    protected final void println(String msg) {
-    	System.out.println("Gw #" + id + ": " + msg);
+    public LogLevel getLogLevel() {
+    	return this.logLevel;
     }
+    
+	protected final void log(LogLevel logLevel, String msg) {
+		if (this.logLevel.acceptsLogOf(logLevel))
+			System.out.println("Gw #" + id + ": " + msg);
+    }
+	
+	public void setLogLevel(LogLevel logLevel) {
+		this.logLevel = logLevel;
+	}
     
     @Override
     public final void run() {
@@ -203,14 +215,14 @@ public class Gateway implements Runnable {
         	
         	try {
         		
-            	println("Trying to open the socket for the gateway...");
+            	log(LogLevel.INFO, "Trying to open the socket for the gateway...");
         	
 	        	server = new ServerSocket(port, MAX_CONNECTIONS);
-	        	println("Gateway opened on port " + server.getLocalPort());
+	        	log(LogLevel.INFO, "Gateway opened on port " + server.getLocalPort());
 	            
 	            skt = server.accept();
             
-                println("Connection established with " + skt);
+                log(LogLevel.INFO, "Connection established with " + skt);
                 
                 InputStream istream = new BufferedInputStream(skt.getInputStream());
                 OutputStream ostream = new BufferedOutputStream(skt.getOutputStream());
@@ -259,7 +271,7 @@ public class Gateway implements Runnable {
             }
         }
         state = RunnableState.STOPPED;
-        println("Gateway is closed");
+        log(LogLevel.INFO, "Gateway is closed");
     }
     
     /**
@@ -271,14 +283,14 @@ public class Gateway implements Runnable {
             ObjectMessage inboundMessage = jmsSession.createObjectMessage(pkt);
             inboundProducer.send(inboundMessage);
         } catch (Exception e) {
-        	println("Message could not be dispatched to inbound packets topic");
+        	log(LogLevel.INFO, "Message could not be dispatched to inbound packets topic");
         }
 
         try {
             ObjectMessage outboundMessage = jmsSession.createObjectMessage(pkt);
             outboundProducer.send(outboundMessage);            	
         } catch (Exception e) {
-        	println("Message could not be dispatched to outbound packets topic");
+        	log(LogLevel.INFO, "Message could not be dispatched to outbound packets topic");
         }
     }
     
@@ -288,7 +300,7 @@ public class Gateway implements Runnable {
         try {
         	
         	NativePacket nativePkt = readFrom(is,buffer);
-        	//println("Inbound packet received from " + nativePkt.getSrcCoords());
+        	log(LogLevel.DEBUG, "Inbound packet received from " + nativePkt.getSrcCoords());
         	dispatchPacket(nativePkt,jmsSession,inboundProducer,outboundProducer);
         } catch (NoBytesAvailableException | IncompletePacketException ex) {
         	// Just move on
@@ -326,7 +338,7 @@ public class Gateway implements Runnable {
             	byte dstGatewayId = nativePkt.getDstCoords().getGatewayId();
             	if (srcGatewayId != id) {
 	            	if (dstGatewayId == id || dstGatewayId == 0) {
-	            		//println("Outbound packet received from " + nativePkt.getSrcCoords());
+	            		log(LogLevel.DEBUG, "Outbound packet received from " + nativePkt.getSrcCoords());
 	            		write(nativePkt,os);
 	            	}
             	}

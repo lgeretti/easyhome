@@ -5,6 +5,7 @@ import java.util.List;
 
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.JsonUtils;
+import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.NetworkJob;
@@ -53,7 +54,7 @@ public class ActiveEndpointsRegistrationProcess extends Process {
         	NativePacket pkt = (NativePacket) msg.getObject();
         	
         	if (ActiveEndpointsRspPacket.validates(pkt)) {
-	        	println("ActiveEndpointsRspPacket received from " + pkt.getSrcCoords());
+	        	log(LogLevel.INFO,"ActiveEndpointsRspPacket received from " + pkt.getSrcCoords());
 	        	
 	        	try {
 	        		ActiveEndpointsRspPacket activeEpPkt = new ActiveEndpointsRspPacket(pkt);
@@ -97,14 +98,14 @@ public class ActiveEndpointsRegistrationProcess extends Process {
 				                        ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
 				                        networkEventsProducer.send(eventMessage);
 			                    	}
-			                        println(node + " updated with endpoints information (" + Arrays.toString(activeEps.toArray()) + ")");
+			                        log(LogLevel.INFO,node + " updated with endpoints information (" + Arrays.toString(activeEps.toArray()) + ")");
 			                    } catch (Exception e) {
-			                    	println("Active endpoints registration message for " + node + " could not be dispatched to inbound packets topic");
+			                    	log(LogLevel.INFO,"Active endpoints registration message for " + node + " could not be dispatched to inbound packets topic");
 			                    }
 			                } else 
-			                	println("Active endpoints information update for " + node + " failed");
+			                	log(LogLevel.INFO,"Active endpoints information update for " + node + " failed");
 		                } else
-		                	println("Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
+		                	log(LogLevel.INFO,"Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
 	        		}
 	        		
 	        	} catch (Exception e) {
