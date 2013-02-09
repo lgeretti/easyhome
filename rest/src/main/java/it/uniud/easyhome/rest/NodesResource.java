@@ -23,8 +23,7 @@ public final class NodesResource {
     private static Object nodeLock = new Object();
 
     public NodesResource() throws NamingException {
-    	resEjb = (NodesEJB) new
-                InitialContext().lookup("java:global/easyhome/NodesEJB");
+    	resEjb = (NodesEJB) new InitialContext().lookup("java:global/easyhome/NodesEJB");
     }
     
     @Context
@@ -32,7 +31,7 @@ public final class NodesResource {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Node> getNodes(@QueryParam("gid") byte gatewayId, 
+    public List<Node> getNodes(@QueryParam("gatewayId") byte gatewayId, 
  		   					   @QueryParam("nuid") long nuid) {        
         return resEjb.getNodes(gatewayId,nuid);
     }
@@ -47,7 +46,7 @@ public final class NodesResource {
     @GET
     @Path("{gid}/{address}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Node getNode(@PathParam("gid") byte gid, @PathParam("address") short address) {
+    public Node getNode(@PathParam("gatewayId") byte gid, @PathParam("address") short address) {
         
         Node node = resEjb.findNode(gid,address);
         
@@ -63,7 +62,7 @@ public final class NodesResource {
      */
     @POST
     @Path("insert")
-    public Response insertOrUpdateNode(@FormParam("gid") byte gid, 
+    public Response insertOrUpdateNode(@FormParam("gatewayId") byte gid, 
     						   @FormParam("nuid") long nuid, 
     						   @FormParam("address") short address,
     						   @FormParam("logicalType") NodeLogicalType logicalType,
@@ -139,7 +138,7 @@ public final class NodesResource {
       
     @DELETE
     @Path("{gid}/{address}")
-    public Response deleteNode(@PathParam("gid") byte gid, @PathParam("address") short address) {
+    public Response deleteNode(@PathParam("gatewayId") byte gid, @PathParam("address") short address) {
         
     	boolean existed;
     	synchronized(nodeLock) {

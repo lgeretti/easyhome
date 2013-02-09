@@ -29,6 +29,11 @@ public class NodePersistentInfoIT {
     public static void setup() {
         client = Client.create();
     }
+	
+	@After
+	public void removeAll() {
+		client.resource(TARGET).delete();
+	}
     
 	@Test
 	public void testNoPersistentInfos() throws JSONException {
@@ -84,11 +89,6 @@ public class NodePersistentInfoIT {
         name = "Fridge";
     	ClientResponse updateResponse = postPersistentInfo(gatewayId,nuid,name,location);
         assertEquals(ClientResponse.Status.OK,updateResponse.getClientResponseStatus());        
-	}
-	
-	@After
-	public void removeInfos() {
-		client.resource(TARGET).delete();
 	}
 	
 	private ClientResponse postPersistentInfo(byte gatewayId, long nuid, String name, Location location) {

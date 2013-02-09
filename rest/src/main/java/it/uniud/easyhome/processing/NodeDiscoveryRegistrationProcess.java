@@ -81,7 +81,7 @@ public class NodeDiscoveryRegistrationProcess extends Process {
 		        			Node sender = JsonUtils.getFrom(senderRetrievalResponse, Node.class);
 		        			
 			        		MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-			                formData.add("gid",Byte.toString(gatewayId));
+			                formData.add("gatewayId",Byte.toString(gatewayId));
 			                formData.add("nuid",Long.toString(discNuid));
 			                formData.add("address",Short.toString(discAddress));
 			                formData.add("logicalType",discLogicalType.toString());
@@ -102,13 +102,13 @@ public class NodeDiscoveryRegistrationProcess extends Process {
 			                	if (discLogicalType == NodeLogicalType.END_DEVICE) {
 					                formData = new MultivaluedMapImpl();
 					                formData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
-					                formData.add("gid",Byte.toString(gatewayId));
+					                formData.add("gatewayId",Byte.toString(gatewayId));
 					                formData.add("address",Short.toString(discAddress));
 					                restResource.path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 					            } else if (discLogicalType == NodeLogicalType.ROUTER || discLogicalType == NodeLogicalType.COORDINATOR) {
 					                formData = new MultivaluedMapImpl();
 					                formData.add("type",NetworkJobType.NODE_POWER_LEVEL_REQUEST.toString());
-					                formData.add("gid",Byte.toString(gatewayId));
+					                formData.add("gatewayId",Byte.toString(gatewayId));
 					                formData.add("address",Short.toString(discAddress));                
 					                restResource.path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 					            }

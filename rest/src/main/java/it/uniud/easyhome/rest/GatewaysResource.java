@@ -49,7 +49,7 @@ public class GatewaysResource {
 
     @DELETE
     @Path("{gid}")
-    public Response unregisterGateway(@PathParam("gid") byte gid) {
+    public Response unregisterGateway(@PathParam("gatewayId") byte gid) {
         
         if (networkContext.hasGateway(gid)) {
             networkContext.removeGateway(gid);
@@ -60,7 +60,7 @@ public class GatewaysResource {
     
     @POST
     @Path("{gid}/open")
-    public Response openGateway(@PathParam("gid") byte gid) {
+    public Response openGateway(@PathParam("gatewayId") byte gid) {
         
         if (networkContext.hasGateway(gid)) {
             networkContext.openGateway(gid);
@@ -71,7 +71,7 @@ public class GatewaysResource {
     
     @POST
     @Path("{gid}/close")
-    public Response closeGateway(@PathParam("gid") byte gid) {
+    public Response closeGateway(@PathParam("gatewayId") byte gid) {
         
         if (networkContext.hasGateway(gid)) {
             networkContext.closeGateway(gid);
@@ -89,23 +89,23 @@ public class GatewaysResource {
     }
     
     @GET
-    @Path("{gid}/routing/count")
-    public String getRoutingTableCount(@PathParam("gid") byte gid) {
-        Gateway gw = networkContext.getGatewayForId(gid);
+    @Path("{gatewayId}/routing/count")
+    public String getRoutingTableCount(@PathParam("gatewayId") byte gatewayId) {
+        Gateway gw = networkContext.getGatewayForId(gatewayId);
         return String.valueOf(gw.getRoutingTable().size());
     }
     
     @GET
-    @Path("{srcgid}/routing/{dstgid}/{dstnuid}/{address}/{port}")
-    public String getGatewayPort(@PathParam("srcgid") byte srcGid,
-                                 @PathParam("dstgid") byte dstGid,
+    @Path("{srcGatewayId}/routing/{dstGatewayId}/{dstnuid}/{address}/{port}")
+    public String getGatewayPort(@PathParam("srcGatewayId") byte srcGatewayId,
+                                 @PathParam("dstGatewayId") byte dstGatewayId,
                                  @PathParam("dstnuid") long dstNuid,
                                  @PathParam("address") short address,
                                  @PathParam("port") byte port) {
         
-        ModuleCoordinates coords = new ModuleCoordinates(dstGid,dstNuid,address,port);
+        ModuleCoordinates coords = new ModuleCoordinates(dstGatewayId,dstNuid,address,port);
 
-        Gateway gw = networkContext.getGatewayForId(srcGid);
+        Gateway gw = networkContext.getGatewayForId(srcGatewayId);
         
         if (gw == null) 
             throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -124,16 +124,16 @@ public class GatewaysResource {
      * If an entry already exists, it is updated with a new port value.
      */
     @POST
-    @Path("{srcgid}/routing")
-    public Response putRoutingEntry(@PathParam("srcgid") byte srcGid,
-            @FormParam("gid") byte entryGid,
+    @Path("{srcGatewayId}/routing")
+    public Response putRoutingEntry(@PathParam("srcGatewayId") byte srcGatewayId,
+            @FormParam("gatewayId") byte entryGatewayId,
             @FormParam("nuid") long entryNuid,
             @FormParam("address") short entryAddress,
             @FormParam("port") byte entryPort) {
         
-        ModuleCoordinates coords = new ModuleCoordinates(entryGid,entryNuid,entryAddress,entryPort);
+        ModuleCoordinates coords = new ModuleCoordinates(entryGatewayId,entryNuid,entryAddress,entryPort);
         
-        Gateway gw = networkContext.getGatewayForId(srcGid);
+        Gateway gw = networkContext.getGatewayForId(srcGatewayId);
         
         if (gw == null) 
             throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -141,7 +141,7 @@ public class GatewaysResource {
         gw.addRoutingEntry(coords);
         
         return Response.created(uriInfo.getAbsolutePathBuilder()
-                                .path(String.valueOf(entryGid))
+                                .path(String.valueOf(entryGatewayId))
                                 .path(String.valueOf(entryNuid))
                                 .path(String.valueOf(entryAddress))
                                 .path(String.valueOf(entryPort))

@@ -58,7 +58,7 @@ public class NodeAnnceRegistrationProcess extends Process {
 	        		short address = announce.getAnnouncedAddress();
 
 	                MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-	                formData.add("gid",Byte.toString(gatewayId));
+	                formData.add("gatewayId",Byte.toString(gatewayId));
 	                formData.add("nuid",Long.toString(nuid));
 	                formData.add("address",Short.toString(address));
 	                
@@ -71,7 +71,7 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                
 	                formData = new MultivaluedMapImpl();
 	                formData.add("type",NetworkJobType.NODE_DESCR_REQUEST.toString());
-	                formData.add("gid",Byte.toString(gatewayId));
+	                formData.add("gatewayId",Byte.toString(gatewayId));
 	                formData.add("address",Short.toString(address));
 	                
 	                ClientResponse jobInsertionResponse = restResource.path(RestPaths.JOBS)
@@ -79,7 +79,7 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                
 	                formData = new MultivaluedMapImpl();
 	                formData.add("type",NetworkJobType.NODE_ANNCE_GRACE.toString());
-	                formData.add("gid",Byte.toString(gatewayId));
+	                formData.add("gatewayId",Byte.toString(gatewayId));
 	                formData.add("address",Short.toString(address));
 	                
 	                ClientResponse jobInsertionResponse2 = restResource.path(RestPaths.JOBS)

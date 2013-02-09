@@ -21,7 +21,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
-public class HubResourceIT {
+public class GatewayResourceIT {
 	
 	private static final String TARGET = "http://localhost:8080/easyhome/rest/" + RestPaths.GATEWAYS;
 	
@@ -97,7 +97,7 @@ public class HubResourceIT {
         
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         
-        formData.add("gid",String.valueOf(dstGid));
+        formData.add("gatewayId",String.valueOf(dstGid));
         formData.add("nuid",String.valueOf(dstNuid));
         formData.add("address",String.valueOf(dstAddress));
         formData.add("port",String.valueOf(dstPort));

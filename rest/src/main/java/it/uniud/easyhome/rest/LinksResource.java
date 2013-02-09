@@ -23,8 +23,7 @@ public final class LinksResource {
     private static Object linkLock = new Object();
 
     public LinksResource() throws NamingException {
-    	resEjb = (LinksEJB) new
-                InitialContext().lookup("java:global/easyhome/LinksEJB");
+    	resEjb = (LinksEJB) new InitialContext().lookup("java:global/easyhome/LinksEJB");
     }
     
     @Context

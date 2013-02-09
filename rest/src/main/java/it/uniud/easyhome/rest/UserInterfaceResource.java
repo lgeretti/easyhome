@@ -75,7 +75,7 @@ public class UserInterfaceResource {
     // curl -X POST http://localhost:8080/easyhome/rest/ui/changePower -H "Content-Type: application/x-www-form-urlencoded" --data-binary "gid=2&address=0&powerLevel=3"
     @Path("/changePower") 
     @POST
-    public Response changePower(@FormParam("gid") byte gid, 
+    public Response changePower(@FormParam("gatewayId") byte gid, 
     						   @FormParam("address") short address,
     						   @FormParam("powerLevel") byte powerLevel) throws JSONException, JMSException, NamingException {
     	
@@ -90,7 +90,7 @@ public class UserInterfaceResource {
     	
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         formData.add("type",NetworkJobType.NODE_POWER_LEVEL_SET_ISSUE.toString());
-        formData.add("gid",Byte.toString(gid));
+        formData.add("gatewayId",Byte.toString(gid));
         formData.add("address",Short.toString(address));
         formData.add("tsn",Byte.toString((byte)0));
         formData.add("payload",Byte.toString(powerLevel));       
@@ -138,15 +138,6 @@ public class UserInterfaceResource {
     	jmsConnection.close();
     	
         return Response.ok().build();    	
-    }
-    
-    @Path("/persistence/name")
-    @POST
-    public Response changeNodeName() throws JSONException {
-    	
-    	
-    	
-    	return Response.ok().build();
     }
     
     @Path("/up")

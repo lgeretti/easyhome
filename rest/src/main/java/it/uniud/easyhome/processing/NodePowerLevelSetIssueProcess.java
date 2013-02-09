@@ -59,7 +59,7 @@ public class NodePowerLevelSetIssueProcess extends Process {
 		    	
 		        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
 		        formData.add("type",NetworkJobType.NODE_POWER_LEVEL_SET_ISSUE.toString());
-		        formData.add("gid",Byte.toString(gatewayId));
+		        formData.add("gatewayId",Byte.toString(gatewayId));
 		        formData.add("address",Short.toString(address));
 		        formData.add("tsn",Byte.toString(tsn));
 		        formData.add("payload",Byte.toString(powerLevel));

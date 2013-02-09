@@ -29,7 +29,7 @@ public final class JobsResource {
     // curl -X POST http://localhost:8080/easyhome/rest/network/jobs -H "Content-Type: application/x-www-form-urlencoded" --data-binary "type=NODE_DESCR_REQUEST&gid=1&nuid=392342391&address=24&endpoint=7"
     @POST
     public Response addJob(@FormParam("type") NetworkJobType type,
-    					   @FormParam("gid") byte gatewayId,
+    					   @FormParam("gatewayId") byte gatewayId,
     					   @FormParam("address") short address,
     					   @DefaultValue("127") @FormParam("endpoint") byte endpoint,
     					   @DefaultValue("0") @FormParam("tsn") byte tsn,
@@ -53,7 +53,7 @@ public final class JobsResource {
     @Produces(MediaType.APPLICATION_JSON)
     public List<NetworkJob> getLatestJobs(
     		   @QueryParam("type") NetworkJobType type, 
-    		   @DefaultValue("0") @QueryParam("gid") byte gatewayId, 
+    		   @DefaultValue("0") @QueryParam("gatewayId") byte gatewayId, 
     		   @DefaultValue("0") @QueryParam("address") short address, 
 			   @DefaultValue("127") @QueryParam("endpoint") byte endpoint,
 			   @DefaultValue("0") @QueryParam("tsn") byte tsn) {
@@ -101,7 +101,7 @@ public final class JobsResource {
     
     @DELETE
     public Response deleteJobs(@QueryParam("type") NetworkJobType type, 
-    						   @QueryParam("gid") byte gatewayId, 
+    						   @QueryParam("gatewayId") byte gatewayId, 
     						   @QueryParam("address") short address, 
     						   @DefaultValue("127") @QueryParam("endpoint") byte endpoint) {
     	

@@ -21,8 +21,7 @@ public final class PersistentInfoResource {
     private static int nodePersistentInfoId = 0;
 
     public PersistentInfoResource() throws NamingException {
-    	resEjb = (PersistentInfoEJB) new
-                InitialContext().lookup("java:global/easyhome/PersistentInfoEJB");
+    	resEjb = (PersistentInfoEJB) new InitialContext().lookup("java:global/easyhome/PersistentInfoEJB");
     }
     
     @Context
@@ -38,7 +37,7 @@ public final class PersistentInfoResource {
     @GET
     @Path("{gid}/{nuid}")
     @Produces(MediaType.APPLICATION_JSON)
-    public NodePersistentInfo getNodePersistentInfo(@PathParam("gid") byte gid, @PathParam("nuid") long nuid) {
+    public NodePersistentInfo getNodePersistentInfo(@PathParam("gatewayId") byte gid, @PathParam("nuid") long nuid) {
     	
         NodePersistentInfo info = resEjb.getPersistentInfo(gid,nuid);
         
@@ -51,7 +50,7 @@ public final class PersistentInfoResource {
     // curl -X POST http://localhost:8080/easyhome/rest/persistentinfo/2/0 -H "Content-Type: application/x-www-form-urlencoded" --data-binary "name=Gateway&location=Salotto" 
     @POST
     @Path("{gid}/{nuid}")
-    public Response insertOrUpdatePersistentInfo(@PathParam("gid") byte gid, 
+    public Response insertOrUpdatePersistentInfo(@PathParam("gatewayId") byte gid, 
     											@PathParam("nuid") long nuid, 
     								  			@FormParam("name") String name, 
     								  			@FormParam("locationName") String locationName,
@@ -89,7 +88,7 @@ public final class PersistentInfoResource {
     
     @DELETE
     @Path("{gid}/{nuid}")
-    public Response deleteInfo(@PathParam("gid") byte gid, @PathParam("nuid") long nuid) {
+    public Response deleteInfo(@PathParam("gatewayId") byte gid, @PathParam("nuid") long nuid) {
     	
         boolean found = resEjb.removeInfo(gid, nuid);
         

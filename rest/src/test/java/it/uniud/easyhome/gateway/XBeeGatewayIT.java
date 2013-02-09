@@ -60,7 +60,7 @@ public class XBeeGatewayIT {
         
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         
-        formData.add("gid",String.valueOf(dstGid));
+        formData.add("gatewayId",String.valueOf(dstGid));
         formData.add("nuid",String.valueOf(dstUuid));
         formData.add("address",String.valueOf(dstAddress));
         formData.add("port",String.valueOf(dstPort));

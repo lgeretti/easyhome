@@ -58,7 +58,7 @@ public class ActiveEndpointsRequestProcess extends Process {
 		    	
 		        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
 		        formData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
-		        formData.add("gid",Byte.toString(gatewayId));
+		        formData.add("gatewayId",Byte.toString(gatewayId));
 		        formData.add("address",Short.toString(address));
 		        formData.add("tsn",Byte.toString(tsn));
 		        

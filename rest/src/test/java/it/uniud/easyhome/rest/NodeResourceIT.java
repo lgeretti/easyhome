@@ -32,7 +32,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
-public class NetworkResourceIT {
+public class NodeResourceIT {
 	
 	private static final String TARGET = "http://localhost:8080/easyhome/rest/" + RestPaths.NODES;
 	
@@ -42,6 +42,11 @@ public class NetworkResourceIT {
     public static void setup() {
         client = Client.create();
     }
+	
+	@After
+	public void removeAll() {
+		client.resource(TARGET).delete();
+	}
 	
     @Test
     public void putDevicesForNode() throws JSONException {
@@ -133,7 +138,7 @@ public class NetworkResourceIT {
     	Manufacturer manufacturer = Manufacturer.DIGI;
 		
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        formData.add("gid",Byte.toString(gid));
+        formData.add("gatewayId",Byte.toString(gid));
         formData.add("nuid",Long.toString(nuid));
         formData.add("address",Short.toString(address));
         formData.add("logicalType",logicalType.toString());
@@ -148,7 +153,7 @@ public class NetworkResourceIT {
         assertEquals(manufacturer,recoveredNode.getManufacturer());
         
         formData = new MultivaluedMapImpl();
-        formData.add("gid",Byte.toString(gid));
+        formData.add("gatewayId",Byte.toString(gid));
         formData.add("nuid",Long.toString(nuid));
         formData.add("address",Short.toString(address));
         
@@ -289,204 +294,14 @@ public class NetworkResourceIT {
         assertTrue(new Location("Cucina",LocationType.KITCHEN).equals(restUpdateNode.getLocation()));
 	}
 	
-	@After
-	public void removeNodes() {
-		client.resource(TARGET).delete();
-		client.resource(TARGET).path(RestPaths.JOBS).delete();
-		client.resource(TARGET).path(RestPaths.LINKS).delete();
-	}
-	
 	private ClientResponse insertNewNode(GlobalCoordinates coords) {
 		
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        formData.add("gid",Byte.toString(coords.getGatewayId()));
+        formData.add("gatewayId",Byte.toString(coords.getGatewayId()));
         formData.add("nuid",Long.toString(coords.getNuid()));
         formData.add("address",Short.toString(coords.getAddress()));
 		
         return client.resource(TARGET).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	}
-	
-	@Test
-	public void testInsertAndUpdateLink() throws JSONException {
-		
-		byte gatewayId = 2;
-		LocalCoordinates source = new LocalCoordinates(11L,(short)1);
-		LocalCoordinates destination = new LocalCoordinates(12L,(short)2);
-		
-		ClientResponse insertionResponse = insertLink(gatewayId,source,destination);
-		assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
-		
-        String locationPath = insertionResponse.getLocation().getPath();
-        String[] segments = locationPath.split("/");
-        long id = Long.parseLong(segments[segments.length-1]);
-		
-        ClientResponse getResponse = client.resource(TARGET).path(RestPaths.LINKS).path(Long.toString(id)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK,getResponse.getClientResponseStatus());
-        
-        Link link = JsonUtils.getFrom(getResponse, Link.class);
-        
-        assertEquals(gatewayId,link.getGatewayId());
-        assertTrue(source.equals(link.getSource()));
-        assertTrue(destination.equals(link.getDestination()));
-        
-		ClientResponse updateResponse = insertLink(gatewayId,source,destination);
-		assertEquals(ClientResponse.Status.OK,updateResponse.getClientResponseStatus());
-		
-		Link updatedLink = client.resource(TARGET).path(RestPaths.LINKS).path(Long.toString(id)).accept(MediaType.APPLICATION_JSON).get(Link.class);
-	    assertTrue(updatedLink.getDate().after(link.getDate()));
-	}
-	
-	
-	private ClientResponse insertLink(byte gatewayId, LocalCoordinates source, LocalCoordinates destination) throws JSONException {
-		
-        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        formData.add("gatewayId",Byte.toString(gatewayId));
-        formData.add("sourceNuid",Long.toString(source.getNuid()));
-        formData.add("sourceAddress",Short.toString(source.getAddress()));
-        formData.add("destinationNuid",Long.toString(destination.getNuid()));
-        formData.add("destinationAddress",Short.toString(destination.getAddress()));
-        
-        return client.resource(TARGET).path(RestPaths.LINKS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);		
-	}
-	
-	@Test
-	public void testInsertJob() throws JSONException {
-		
-        ClientResponse insertionResponse = postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,(short)11,(byte)9,(byte)1);
-        
-        assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
-
-        String locationPath = insertionResponse.getLocation().getPath();
-        String[] segments = locationPath.split("/");
-        String jobIdString = segments[segments.length-1];
-        
-        NetworkJob recoveredJob = client.resource(TARGET).path(RestPaths.JOBS).path(jobIdString).accept(MediaType.APPLICATION_JSON).get(NetworkJob.class);
-        
-        assertEquals(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,recoveredJob.getType());        
-    }
-	
-	@Test
-	public void testDeleteJobById() throws JSONException {
-		
-        ClientResponse insertionResponse = postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,(short)11,(byte)9,(byte)3);
-
-        String locationPath = insertionResponse.getLocation().getPath();
-        String[] segments = locationPath.split("/");
-        String jobIdString = segments[segments.length-1];
-		
-        ClientResponse deletionResponse = client.resource(TARGET).path(RestPaths.JOBS).path(jobIdString).delete(ClientResponse.class);
-        
-        assertEquals(ClientResponse.Status.OK,deletionResponse.getClientResponseStatus());
-	}
-	
-	
-	@Test
-	public void testDeleteJobByCoords() throws JSONException {
-		
-        postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,(short)11,(byte)9,(byte)1);
-		
-		MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();
-		queryData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
-		queryData.add("gid",String.valueOf((byte)3));
-		queryData.add("address",String.valueOf((short)11));
-        
-        ClientResponse deletionResponse = client.resource(TARGET).path(RestPaths.JOBS).queryParams(queryData).delete(ClientResponse.class);
-        
-        assertEquals(ClientResponse.Status.OK,deletionResponse.getClientResponseStatus());
-	}		
-	
-	@Test
-	public void testGetLatestJobs() throws JSONException {
-		
-		postBunchOfJobs();
-		
-		MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();
-		queryData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
-        
-        ClientResponse getResponse = client.resource(TARGET).path(RestPaths.JOBS).queryParams(queryData).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-        List<NetworkJob> jobList = JsonUtils.getListFrom(getResponse,NetworkJob.class);
-        
-        assertEquals(7,jobList.size());
-	}
-	
-	@Test
-	public void testTypeAndTransactionSpecificJob() throws JSONException {
-		
-		postBunchOfJobs();
-		
-		MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();
-		queryData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
-		queryData.add("tsn",Byte.toString((byte)6));
-        
-        ClientResponse getResponse = client.resource(TARGET).path(RestPaths.JOBS).queryParams(queryData).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-        List<NetworkJob> jobList = JsonUtils.getListFrom(getResponse,NetworkJob.class);
-        
-        assertEquals(1,jobList.size());
-	}
-	
-	@Test
-	public void testTypeNodeSpecificJob() throws JSONException {
-		
-		postBunchOfJobs();
-		
-		MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();
-		queryData.add("type",NetworkJobType.NODE_DESCR_REQUEST.toString());
-		queryData.add("gid",String.valueOf((byte)3));
-		queryData.add("address",String.valueOf((short)12));
-		queryData.add("endpoint",String.valueOf((byte)7));
-        
-        ClientResponse getResponse = client.resource(TARGET).path(RestPaths.JOBS).queryParams(queryData).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-        List<NetworkJob> jobList = JsonUtils.getListFrom(getResponse,NetworkJob.class);
-        
-        assertEquals(1,jobList.size());
-        assertEquals((byte)6,jobList.get(0).getTsn());
-	}
-	
-	@Test
-	public void testNodeSpecificJob() throws JSONException {
-		
-		postBunchOfJobs();
-		
-		MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();
-		queryData.add("gid",String.valueOf((byte)3));
-		queryData.add("address",String.valueOf((short)12));
-		queryData.add("endpoint",String.valueOf((byte)7));
-        
-        ClientResponse getResponse = client.resource(TARGET).path(RestPaths.JOBS).queryParams(queryData).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-        List<NetworkJob> jobList = JsonUtils.getListFrom(getResponse,NetworkJob.class);
-        
-        assertEquals(1,jobList.size());
-        assertEquals((byte)7,jobList.get(0).getTsn());
-	}
-	
-	private void postBunchOfJobs() {
-		
-		postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,(short)9,(byte)9,(byte)1);
-		postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,(short)9,(byte)9,(byte)2);
-		postJob(NetworkJobType.NODE_DESCR_REQUEST,           (byte)3,(short)9,(byte)9,(byte)2);
-		postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,(short)10,(byte)9,(byte)3);
-		postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,(short)11,(byte)9,(byte)4);
-		postJob(NetworkJobType.NODE_DESCR_REQUEST,           (byte)3,(short)11,(byte)9,(byte)4);
-		postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,(short)11,(byte)10,(byte)5);
-		postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,(short)12,(byte)7,(byte)6);
-		postJob(NetworkJobType.NODE_DESCR_REQUEST,           (byte)3,(short)12,(byte)7,(byte)5);
-		postJob(NetworkJobType.NODE_DESCR_REQUEST,           (byte)3,(short)12,(byte)7,(byte)6);
-		postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,(short)12,(byte)7,(byte)7);
-		postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,(short)12,(byte)9,(byte)8);
-		postJob(NetworkJobType.NODE_DESCR_REQUEST,           (byte)3,(short)12,(byte)9,(byte)8);
-		postJob(NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST,(byte)3,(short)12,(byte)15,(byte)9);
-	}
-		
-	private ClientResponse postJob(NetworkJobType type, byte gatewayId, short address, byte endpoint, byte tsn) {
-		
-		MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        formData.add("type",type.toString());
-        formData.add("gid",Byte.toString(gatewayId));
-        formData.add("address",Short.toString(address));
-        formData.add("endpoint",Byte.toString(endpoint));
-        formData.add("tsn",Byte.toString(tsn));
-        
-        return client.resource(TARGET).path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	}
 	
 }

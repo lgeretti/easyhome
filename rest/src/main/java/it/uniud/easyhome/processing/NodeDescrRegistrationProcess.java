@@ -87,7 +87,7 @@ public class NodeDescrRegistrationProcess extends Process {
 		                		
 				                MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();
 				                queryData.add("type",NetworkJobType.NODE_DESCR_REQUEST.toString());
-				                queryData.add("gid",String.valueOf(gid));
+				                queryData.add("gatewayId",String.valueOf(gid));
 				                queryData.add("address",String.valueOf(address));
 				                
 				                restResource.path(RestPaths.JOBS).queryParams(queryData).delete(ClientResponse.class);
@@ -96,14 +96,14 @@ public class NodeDescrRegistrationProcess extends Process {
 					                MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
 					                formData = new MultivaluedMapImpl();
 					                formData.add("type",NetworkJobType.NODE_ACTIVE_ENDPOINTS_REQUEST.toString());
-					                formData.add("gid",Byte.toString(gid));
+					                formData.add("gatewayId",Byte.toString(gid));
 					                formData.add("address",Short.toString(address));                
 		
 					                restResource.path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 				                } else if (descr.getLogicalType() == NodeLogicalType.ROUTER || descr.getLogicalType() == NodeLogicalType.COORDINATOR) {
 				                	MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
 					                formData.add("type",NetworkJobType.NODE_POWER_LEVEL_REQUEST.toString());
-					                formData.add("gid",Byte.toString(gid));
+					                formData.add("gatewayId",Byte.toString(gid));
 					                formData.add("address",Short.toString(address));                
 					                restResource.path(RestPaths.JOBS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 					            }

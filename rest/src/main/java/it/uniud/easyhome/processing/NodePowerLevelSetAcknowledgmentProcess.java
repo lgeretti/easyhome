@@ -103,7 +103,7 @@ public class NodePowerLevelSetAcknowledgmentProcess extends Process {
     	
     	MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();
         queryData.add("type",NetworkJobType.NODE_POWER_LEVEL_SET_ISSUE.toString());
-        queryData.add("gid",String.valueOf(gatewayId));
+        queryData.add("gatewayId",String.valueOf(gatewayId));
         queryData.add("address",String.valueOf(address));	        			
 		ClientResponse jobListResponse = restResource.path(RestPaths.JOBS).queryParams(queryData)
 										.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
@@ -119,7 +119,7 @@ public class NodePowerLevelSetAcknowledgmentProcess extends Process {
     	
         MultivaluedMap<String,String> queryData = new MultivaluedMapImpl();
         queryData.add("type",NetworkJobType.NODE_POWER_LEVEL_SET_ISSUE.toString());
-        queryData.add("gid",String.valueOf(gatewayId));
+        queryData.add("gatewayId",String.valueOf(gatewayId));
         queryData.add("address",String.valueOf(address));
         
         restResource.path(RestPaths.JOBS).queryParams(queryData).delete(ClientResponse.class);

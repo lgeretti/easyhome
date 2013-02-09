@@ -65,7 +65,7 @@ public class NetworkGraphMinimizationProcess extends Process {
     	
     	while (issueRetryCount < MAX_PL_SET_ISS_RETRIES) {
 	        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-	        formData.add("gid",Byte.toString(gatewayId));
+	        formData.add("gatewayId",Byte.toString(gatewayId));
 	        formData.add("address",Short.toString(address));
 	        formData.add("powerLevel",Byte.toString(powerLevel));
 	        ClientResponse changeIssueResponse = restResource.path("admin").path("changePower").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);

@@ -79,7 +79,7 @@ public class NodeNeighRegistrationProcess extends Process {
 		                	
 			                queryData = new MultivaluedMapImpl();
 			                queryData.add("type",NetworkJobType.NODE_NEIGH_REQUEST.toString());
-			                queryData.add("gid",String.valueOf(gatewayId));
+			                queryData.add("gatewayId",String.valueOf(gatewayId));
 			                queryData.add("address",String.valueOf(address));
 			                
 			                restResource.path(RestPaths.JOBS).queryParams(queryData).delete(ClientResponse.class);
