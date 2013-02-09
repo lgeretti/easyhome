@@ -36,7 +36,6 @@ import org.codehaus.jettison.json.JSONException;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 @Path("/admin")
@@ -207,7 +206,7 @@ public class UserInterfaceResource {
     	client.resource(TARGET).path(RestPaths.PROCESSES).delete();
     	client.resource(TARGET).path(RestPaths.NODES).delete();
     	client.resource(TARGET).path(RestPaths.JOBS).delete();
-    	client.resource(TARGET).path(RestPaths.NODES).path(RestPaths.LINKS).delete();
+    	client.resource(TARGET).path(RestPaths.LINKS).delete();
     	
         return Response.ok().build();
     }

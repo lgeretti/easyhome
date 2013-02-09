@@ -131,7 +131,7 @@ public class NodeDiscoveryRegistrationProcess extends Process {
 			                formData.add("destinationNuid",Long.toString(discNuid));
 			                formData.add("destinationAddress",Short.toString(discAddress));
 			                
-			                restResource.path(RestPaths.NODES).path(RestPaths.LINKS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+			                restResource.path(RestPaths.LINKS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 			                
 		        		} else 
 		        			println("Sender node " + Node.nameFor(gatewayId, senderAddress) + " not found, hence discarding discovered node");

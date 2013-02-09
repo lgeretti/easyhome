@@ -18,7 +18,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class ProcessResourceIT {
     
-	private static final String TARGET = "http://localhost:8080/easyhome/rest/processes";
+	private static final String TARGET = "http://localhost:8080/easyhome/rest/" + RestPaths.PROCESSES;
 	
 	private static Client client;
 	

@@ -27,7 +27,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 @Stateless
-public class NetworkEJB {
+public class NodesEJB {
 
 	@PersistenceContext(unitName = "EasyHome-JTA")
 	private EntityManager em;

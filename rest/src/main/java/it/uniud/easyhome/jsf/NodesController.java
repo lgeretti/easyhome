@@ -3,7 +3,7 @@ package it.uniud.easyhome.jsf;
 import java.util.List;
 
 import it.uniud.easyhome.common.JMSConstants;
-import it.uniud.easyhome.network.NetworkEJB;
+import it.uniud.easyhome.network.NodesEJB;
 import it.uniud.easyhome.network.Node;
 
 import javax.annotation.PostConstruct;
@@ -37,7 +37,7 @@ public class NodesController implements Runnable {
     private PortableRenderer pRenderer;
     
 	@EJB
-	private NetworkEJB networkEjb;
+	private NodesEJB networkEjb;
 	
     @PostConstruct
     public void init() {

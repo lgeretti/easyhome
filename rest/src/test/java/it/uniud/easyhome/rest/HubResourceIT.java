@@ -23,7 +23,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class HubResourceIT {
 	
-	private static final String TARGET = "http://localhost:8080/easyhome/rest/hub/gateways";
+	private static final String TARGET = "http://localhost:8080/easyhome/rest/" + RestPaths.GATEWAYS;
 	
 	private final static int GATEWAY_PORT = 5050;
 	private final static ProtocolType GATEWAY_PROTOCOL = ProtocolType.XBEE;

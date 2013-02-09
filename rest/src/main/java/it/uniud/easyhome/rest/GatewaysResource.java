@@ -1,6 +1,5 @@
 package it.uniud.easyhome.rest;
 
-import it.uniud.easyhome.exceptions.PortAlreadyBoundException;
 import it.uniud.easyhome.gateway.Gateway;
 import it.uniud.easyhome.gateway.HubContext;
 import it.uniud.easyhome.gateway.ProtocolType;
@@ -12,7 +11,7 @@ import javax.ws.rs.core.*;
 import javax.ws.rs.*;
 
 @Path(RestPaths.GATEWAYS)
-public class HubResource {
+public class GatewaysResource {
     
     @Context
     private UriInfo uriInfo;

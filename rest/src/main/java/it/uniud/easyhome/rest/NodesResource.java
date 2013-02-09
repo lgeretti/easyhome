@@ -15,9 +15,9 @@ import javax.ws.rs.*;
 
 /** Handles the access to the network of nodes */
 @Path(RestPaths.NODES)
-public final class NetworkResource {
+public final class NodesResource {
 	
-    private NetworkEJB resEjb;
+    private NodesEJB resEjb;
     
     private static long nodeId = 0;
     private static long linkId = 0;
@@ -26,9 +26,9 @@ public final class NetworkResource {
     private static Object linkLock = new Object();
     private static Object jobLock = new Object();
 
-    public NetworkResource() throws NamingException {
-    	resEjb = (NetworkEJB) new
-                InitialContext().lookup("java:global/easyhome/NetworkEJB");
+    public NodesResource() throws NamingException {
+    	resEjb = (NodesEJB) new
+                InitialContext().lookup("java:global/easyhome/NodesEJB");
     }
     
     @Context
