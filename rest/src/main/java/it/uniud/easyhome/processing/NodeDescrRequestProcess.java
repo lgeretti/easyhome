@@ -42,20 +42,21 @@ public class NodeDescrRequestProcess extends Process {
     private void doRequest(byte gatewayId, short address, boolean isRepeated) throws JMSException, JSONException {
     	
     	byte tsn = ++sequenceNumber;
-    	
-        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        formData.add("type",NetworkJobType.NODE_DESCR_REQUEST.toString());
-        formData.add("gid",Byte.toString(gatewayId));
-        formData.add("address",Short.toString(address));
-        formData.add("tsn",Byte.toString(tsn));
-        
-        restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-        
+    	        
         ClientResponse getNodeResponse = restResource.path("network")
         								 .path(Byte.toString(gatewayId)).path(Short.toString(address))
         								 .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         
         if (getNodeResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
+        	
+            MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+            formData.add("type",NetworkJobType.NODE_DESCR_REQUEST.toString());
+            formData.add("gid",Byte.toString(gatewayId));
+            formData.add("address",Short.toString(address));
+            formData.add("tsn",Byte.toString(tsn));
+            
+            restResource.path("network").path("jobs").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        	
 	    	Node node = JsonUtils.getFrom(getNodeResponse, Node.class);
 	    	
 	    	NodeDescrReqPacket packet = new NodeDescrReqPacket(node.getCoordinates(),tsn);
@@ -63,7 +64,7 @@ public class NodeDescrRequestProcess extends Process {
 	        getOutboundPacketsProducer().send(outboundMessage);    
 	        println("Node " + node + " descriptor request " + (isRepeated ? "re-" : "") + "dispatched");
         } else
-        	println("Node" + Node.nameFor(gatewayId, address) + " not found, ignoring");
+        	println("Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
     }
     
     @Override
@@ -84,12 +85,12 @@ public class NodeDescrRequestProcess extends Process {
 	           	}    		
 	    	} else {
 	    		
-	    		Date fiveSecBeforeNow = new Date(System.currentTimeMillis()-JOB_TIMEOUT_MILLIS); // Does not need to be accurate
+	    		Date timeoutSecondsBeforeNow = new Date(System.currentTimeMillis()-JOB_TIMEOUT_MILLIS); // Does not need to be accurate
 	    		
 	    		for (NetworkJob job : jobs) {
 	    			
 	    			Date jobDate = job.getDate();
-	    			if (jobDate.before(fiveSecBeforeNow) || job.isFirst()) {
+	    			if (jobDate.before(timeoutSecondsBeforeNow) || job.isFirst()) {
 	    				doRequest(job.getGatewayId(),job.getAddress(),true);
 	    			}
 	    		}

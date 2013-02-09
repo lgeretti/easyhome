@@ -2,6 +2,7 @@ package it.uniud.easyhome.network;
 
 public enum NetworkJobType {
 
+	NODE_ANNCE_GRACE,
 	NODE_DESCR_REQUEST,
 	NODE_NEIGH_REQUEST,
 	NODE_ACTIVE_ENDPOINTS_REQUEST,

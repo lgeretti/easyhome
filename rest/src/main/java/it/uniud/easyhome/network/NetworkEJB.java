@@ -4,6 +4,7 @@ package it.uniud.easyhome.network;
 import it.uniud.easyhome.exceptions.MultipleLinkException;
 import it.uniud.easyhome.exceptions.MultipleNodesFoundException;
 import it.uniud.easyhome.exceptions.NodeNotFoundException;
+import it.uniud.easyhome.processing.NodeAnnceRegistrationProcess;
 import it.uniud.easyhome.processing.NodeDiscoveryRequestProcess;
 
 import java.util.ArrayList;
@@ -404,6 +405,7 @@ public class NetworkEJB {
 	 * We accept to remove UNDEFINED-manufacturer nodes because it may happen that the node exits the network before being
 	 * able to assess its manufacturer: in that case we would have a dangling node that would never be removed. Other manufacturers
 	 * are unable to reply to the discovery protocol, hence we cannot really remove them: they will be removed manually. 
+	 * Also, we exclude those nodes that currently have an announce grace job.
 	 */
 	private List<Node> getMissingNodes() {
 		
@@ -414,12 +416,18 @@ public class NetworkEJB {
 												.append("SELECT DISTINCT n2.id FROM Node n2, Link l WHERE ")
 												.append("n2.coordinates.gatewayId = l.gatewayId AND (")
 												.append("(n2.coordinates.nuid = l.source.nuid AND n2.coordinates.address = l.source.address) OR ")
-												.append("(n2.coordinates.nuid = l.destination.nuid AND n2.coordinates.address = l.destination.address)))");
+												.append("(n2.coordinates.nuid = l.destination.nuid AND n2.coordinates.address = l.destination.address))) AND ")
+												.append("n1.id NOT IN (")
+												.append("SELECT DISTINCT n3.id FROM Node n3, NetworkJob j WHERE ")
+												.append("n3.coordinates.gatewayId = j.gatewayId AND n3.coordinates.address = j.address AND ")
+												.append("j.type = :t)");
+
 		
 		return em.createQuery(queryBuilder.toString(),Node.class)
-				 .setParameter("clt",NodeLogicalType.COORDINATOR)
-				 .setParameter("m1",Manufacturer.DIGI)
+				 .setParameter("clt", NodeLogicalType.COORDINATOR)
+				 .setParameter("m1", Manufacturer.DIGI)
 				 .setParameter("m2", Manufacturer.UNDEFINED)
+				 .setParameter("t", NetworkJobType.NODE_ANNCE_GRACE)
 				 .getResultList();
 	}
 	
@@ -444,6 +452,11 @@ public class NetworkEJB {
 							.setParameter("g", node.getCoordinates().getGatewayId())
 							.setParameter("a", node.getCoordinates().getAddress()).executeUpdate();
 		}
+		
+		String deleteOvergraceQueryString = new StringBuilder("DELETE FROM NetworkJob j WHERE j.type=:type AND j.timestamp < :time").toString();
+		em.createQuery(deleteOvergraceQueryString)
+							.setParameter("type", NetworkJobType.NODE_ANNCE_GRACE)
+							.setParameter("time", System.currentTimeMillis()-NodeAnnceRegistrationProcess.GRACE_TIMEOUT_MS).executeUpdate();
 		
 		return missingNodes;
 	}

@@ -185,12 +185,12 @@ public class UserInterfaceResource {
         formData.add("locationType",LocationType.BEDROOM.toString());
     	client.resource(TARGET).path("persistentinfo").path(Byte.toString((byte)2)).path(Long.toString(5526146521827785L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         formData = new MultivaluedMapImpl();
-        formData.add("name","RouterStudio");
+        formData.add("name","R1");
         formData.add("locationName","Studio");
         formData.add("locationType",LocationType.STUDYROOM.toString());
     	client.resource(TARGET).path("persistentinfo").path(Byte.toString((byte)2)).path(Long.toString(5526146521326115L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);    	
         formData = new MultivaluedMapImpl();
-        formData.add("name","RouterScarpiera");
+        formData.add("name","R2");
         formData.add("locationName","ZonaScarpiera");
         formData.add("locationType",LocationType.LIVINGROOM.toString());
     	client.resource(TARGET).path("persistentinfo").path(Byte.toString((byte)2)).path(Long.toString(5526146523928181L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);

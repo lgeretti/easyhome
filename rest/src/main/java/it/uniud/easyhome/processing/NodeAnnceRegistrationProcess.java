@@ -27,6 +27,8 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class NodeAnnceRegistrationProcess extends Process {
 	
+	public static long GRACE_TIMEOUT_MS = 2*Process.JOB_TIMEOUT_MILLIS;
+	
 	private MessageProducer networkEventsProducer = null;
 	
     public NodeAnnceRegistrationProcess(int pid, UriInfo uriInfo, ProcessKind kind) throws NamingException, JMSException {
@@ -74,7 +76,16 @@ public class NodeAnnceRegistrationProcess extends Process {
 	                ClientResponse jobInsertionResponse = restResource.path("network").path("jobs")
 	                		.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	                
-	                boolean jobInsertionsSuccessful = (jobInsertionResponse.getClientResponseStatus() == Status.CREATED);
+	                formData = new MultivaluedMapImpl();
+	                formData.add("type",NetworkJobType.NODE_ANNCE_GRACE.toString());
+	                formData.add("gid",Byte.toString(gatewayId));
+	                formData.add("address",Short.toString(address));
+	                
+	                ClientResponse jobInsertionResponse2 = restResource.path("network").path("jobs")
+	                		.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	                
+	                boolean jobInsertionsSuccessful = (jobInsertionResponse.getClientResponseStatus() == Status.CREATED && 
+	                								   jobInsertionResponse2.getClientResponseStatus() == Status.CREATED);
 	                
 	                if (nodeInsertionResponse.getClientResponseStatus() == Status.CREATED && jobInsertionsSuccessful) {
 	                	
