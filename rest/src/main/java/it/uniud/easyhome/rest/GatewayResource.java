@@ -11,7 +11,7 @@ import javax.ws.rs.core.*;
 import javax.ws.rs.*;
 
 @Path(RestPaths.GATEWAYS)
-public class GatewaysResource {
+public class GatewayResource {
     
     @Context
     private UriInfo uriInfo;
@@ -48,33 +48,33 @@ public class GatewaysResource {
     }
 
     @DELETE
-    @Path("{gid}")
-    public Response unregisterGateway(@PathParam("gatewayId") byte gid) {
+    @Path("{gatewayId}")
+    public Response unregisterGateway(@PathParam("gatewayId") byte gatewayId) {
         
-        if (networkContext.hasGateway(gid)) {
-            networkContext.removeGateway(gid);
+        if (networkContext.hasGateway(gatewayId)) {
+            networkContext.removeGateway(gatewayId);
             return Response.ok().build();
         } else
             return Response.status(Response.Status.NOT_FOUND).build();
     }
     
     @POST
-    @Path("{gid}/open")
-    public Response openGateway(@PathParam("gatewayId") byte gid) {
+    @Path("{gatewayId}/open")
+    public Response openGateway(@PathParam("gatewayId") byte gatewayId) {
         
-        if (networkContext.hasGateway(gid)) {
-            networkContext.openGateway(gid);
+        if (networkContext.hasGateway(gatewayId)) {
+            networkContext.openGateway(gatewayId);
             return Response.ok().build();
         } else
             return Response.status(Response.Status.NOT_FOUND).build();
     }
     
     @POST
-    @Path("{gid}/close")
-    public Response closeGateway(@PathParam("gatewayId") byte gid) {
+    @Path("{gatewayId}/close")
+    public Response closeGateway(@PathParam("gatewayId") byte gatewayId) {
         
-        if (networkContext.hasGateway(gid)) {
-            networkContext.closeGateway(gid);
+        if (networkContext.hasGateway(gatewayId)) {
+            networkContext.closeGateway(gatewayId);
             return Response.ok().build();
         } else
             return Response.status(Response.Status.NOT_FOUND).build();

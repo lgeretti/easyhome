@@ -13,17 +13,17 @@ import javax.naming.NamingException;
 import javax.ws.rs.core.*;
 import javax.ws.rs.*;
 
-/** Handles the access to the network of nodes */
+/** Handles the access to the links between nodes */
 @Path(RestPaths.LINKS)
-public final class LinksResource {
+public final class LinkResource {
 	
-    private LinksEJB resEjb;
+    private LinkEJB resEjb;
     
     private static long linkId = 0;
     private static Object linkLock = new Object();
 
-    public LinksResource() throws NamingException {
-    	resEjb = (LinksEJB) new InitialContext().lookup("java:global/easyhome/LinksEJB");
+    public LinkResource() throws NamingException {
+    	resEjb = (LinkEJB) new InitialContext().lookup("java:global/easyhome/" + LinkEJB.class.getSimpleName());
     }
     
     @Context

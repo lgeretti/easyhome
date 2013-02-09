@@ -75,22 +75,20 @@ public class UserInterfaceResource {
     // curl -X POST http://localhost:8080/easyhome/rest/ui/changePower -H "Content-Type: application/x-www-form-urlencoded" --data-binary "gid=2&address=0&powerLevel=3"
     @Path("/changePower") 
     @POST
-    public Response changePower(@FormParam("gatewayId") byte gid, 
+    public Response changePower(@FormParam("gatewayId") byte gatewayId, 
     						   @FormParam("address") short address,
     						   @FormParam("powerLevel") byte powerLevel) throws JSONException, JMSException, NamingException {
     	
     	if (powerLevel < 0 || powerLevel > 4)
     		throw new WebApplicationException(Response.Status.BAD_REQUEST);
     	
-    	ClientResponse nodeResponse = client.resource(TARGET).path(RestPaths.NODES).path(Byte.toString(gid)).path(Short.toString(address)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-    	Node node = JsonUtils.getFrom(nodeResponse, Node.class);
-    	
+    	ClientResponse nodeResponse = client.resource(TARGET).path(RestPaths.NODES).path(Byte.toString(gatewayId)).path(Short.toString(address)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
     	if (nodeResponse.getClientResponseStatus() == ClientResponse.Status.NOT_FOUND)
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
     	
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         formData.add("type",NetworkJobType.NODE_POWER_LEVEL_SET_ISSUE.toString());
-        formData.add("gatewayId",Byte.toString(gid));
+        formData.add("gatewayId",Byte.toString(gatewayId));
         formData.add("address",Short.toString(address));
         formData.add("tsn",Byte.toString((byte)0));
         formData.add("payload",Byte.toString(powerLevel));       
@@ -107,7 +105,7 @@ public class UserInterfaceResource {
             
         jmsConnection.start();
         
-        NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_POWER_LEVEL_SET_ISSUE,gid,address,new byte[]{powerLevel});
+        NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.NODE_POWER_LEVEL_SET_ISSUE,gatewayId,address,new byte[]{powerLevel});
  	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(event);
     	producer.send(outboundMessage);    
     	

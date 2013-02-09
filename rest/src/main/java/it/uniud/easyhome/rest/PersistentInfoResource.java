@@ -21,7 +21,7 @@ public final class PersistentInfoResource {
     private static int nodePersistentInfoId = 0;
 
     public PersistentInfoResource() throws NamingException {
-    	resEjb = (PersistentInfoEJB) new InitialContext().lookup("java:global/easyhome/PersistentInfoEJB");
+    	resEjb = (PersistentInfoEJB) new InitialContext().lookup("java:global/easyhome/" + PersistentInfoEJB.class.getSimpleName());
     }
     
     @Context

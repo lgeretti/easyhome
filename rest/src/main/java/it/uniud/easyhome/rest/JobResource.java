@@ -12,15 +12,15 @@ import javax.ws.rs.core.*;
 import javax.ws.rs.*;
 
 @Path(RestPaths.JOBS)
-public final class JobsResource {
+public final class JobResource {
 	
-    private JobsEJB resEjb;
+    private JobEJB resEjb;
 
     private static int jobId = 0;
     private static Object jobLock = new Object();
 
-    public JobsResource() throws NamingException {
-    	resEjb = (JobsEJB) new  InitialContext().lookup("java:global/easyhome/JobsEJB");
+    public JobResource() throws NamingException {
+    	resEjb = (JobEJB) new  InitialContext().lookup("java:global/easyhome/" + JobEJB.class.getSimpleName());
     }
     
     @Context

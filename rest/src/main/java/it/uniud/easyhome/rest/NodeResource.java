@@ -15,15 +15,15 @@ import javax.ws.rs.*;
 
 /** Handles the access to the network of nodes */
 @Path(RestPaths.NODES)
-public final class NodesResource {
+public final class NodeResource {
 	
-    private NodesEJB resEjb;
+    private NodeEJB resEjb;
     
     private static long nodeId = 0;
     private static Object nodeLock = new Object();
 
-    public NodesResource() throws NamingException {
-    	resEjb = (NodesEJB) new InitialContext().lookup("java:global/easyhome/NodesEJB");
+    public NodeResource() throws NamingException {
+    	resEjb = (NodeEJB) new InitialContext().lookup("java:global/easyhome/" + NodeEJB.class.getSimpleName());
     }
     
     @Context
