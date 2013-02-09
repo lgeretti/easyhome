@@ -40,14 +40,14 @@ public class NodeDescrRequestProcess extends Process {
     }
     
     private void doRequest(byte gatewayId, short address, boolean isRepeated) throws JMSException, JSONException {
-    	
-    	byte tsn = ++sequenceNumber;
     	        
         ClientResponse getNodeResponse = restResource.path("network")
         								 .path(Byte.toString(gatewayId)).path(Short.toString(address))
         								 .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         
         if (getNodeResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
+        	
+        	byte tsn = ++sequenceNumber;
         	
             MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
             formData.add("type",NetworkJobType.NODE_DESCR_REQUEST.toString());
