@@ -47,7 +47,7 @@ public final class PersistentInfoResource {
         return info;
     }
     
-    // curl -X POST http://localhost:8080/easyhome/rest/persistentinfo/2/0 -H "Content-Type: application/x-www-form-urlencoded" --data-binary "name=Gateway&location=Salotto" 
+    // curl -X POST http://localhost:8080/easyhome/rest/persistentinfo/2/0 -H "Content-Type: application/x-www-form-urlencoded" --data-binary "locationName=Salotto&locationType=LIVINGROOM" 
     @POST
     @Path("{gatewayId}/{nuid}")
     public Response insertOrUpdatePersistentInfo(@PathParam("gatewayId") byte gatewayId, 

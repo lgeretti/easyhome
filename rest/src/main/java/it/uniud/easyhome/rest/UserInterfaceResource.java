@@ -143,7 +143,7 @@ public class UserInterfaceResource {
     public Response up() {
     	
     	insertPersistentInfo();
-		insertGateway(XBEE_GATEWAY_ID,XBEE_GATEWAY_PORT, ProtocolType.XBEE);
+		insertGateway(XBEE_GATEWAY_ID, XBEE_GATEWAY_PORT, ProtocolType.XBEE);
 		insertProcess(ProcessKind.NODE_ANNCE_REGISTRATION);
 		insertProcess(ProcessKind.NODE_DESCR_REQUEST);
 		insertProcess(ProcessKind.NODE_DESCR_REGISTRATION);	

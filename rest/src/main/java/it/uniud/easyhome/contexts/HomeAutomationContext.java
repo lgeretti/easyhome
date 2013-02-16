@@ -1,7 +1,5 @@
 package it.uniud.easyhome.contexts;
 
-import java.util.List;
-
 import it.uniud.easyhome.exceptions.InvalidContextException;
 import it.uniud.easyhome.packets.Domain;
 

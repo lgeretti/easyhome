@@ -6,7 +6,6 @@ import java.util.Map;
 import javax.persistence.CollectionTable;
 import javax.persistence.ElementCollection;
 import javax.persistence.Embeddable;
-import javax.xml.bind.annotation.XmlRootElement;
 
 @Embeddable
 public class DevicesWrapper {

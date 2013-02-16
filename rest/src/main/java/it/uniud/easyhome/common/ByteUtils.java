@@ -1,8 +1,6 @@
 package it.uniud.easyhome.common;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 
 public class ByteUtils {
 	

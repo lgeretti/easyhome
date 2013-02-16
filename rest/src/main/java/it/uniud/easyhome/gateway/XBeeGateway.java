@@ -4,7 +4,6 @@ import it.uniud.easyhome.common.ByteUtils;
 import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.exceptions.ChecksumException;
 import it.uniud.easyhome.exceptions.IllegalBroadcastPortException;
-import it.uniud.easyhome.exceptions.IncompletePacketException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.exceptions.NoBytesAvailableException;
 import it.uniud.easyhome.exceptions.RoutingEntryMissingException;
@@ -12,12 +11,10 @@ import it.uniud.easyhome.network.ModuleCoordinates;
 import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.packets.Operation;
 import it.uniud.easyhome.packets.natives.NativePacket;
-import it.uniud.easyhome.packets.xbee.XBeeConstants;
 import it.uniud.easyhome.packets.xbee.XBeePacketToNode;
 import it.uniud.easyhome.packets.xbee.XBeePacketFromNode;
 
 import java.io.*;
-import java.util.Map;
 
 public class XBeeGateway extends Gateway {
     

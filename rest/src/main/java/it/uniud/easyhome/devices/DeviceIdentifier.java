@@ -4,8 +4,6 @@ import java.io.Serializable;
 
 import javax.persistence.Embeddable;
 
-import it.uniud.easyhome.packets.Domain;
-
 @Embeddable
 public class DeviceIdentifier implements Serializable {
 	

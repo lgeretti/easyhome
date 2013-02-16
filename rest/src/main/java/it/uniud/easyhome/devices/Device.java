@@ -1,13 +1,6 @@
 package it.uniud.easyhome.devices;
 
-import java.io.Serializable;
 import java.util.List;
-
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.contexts.Context;

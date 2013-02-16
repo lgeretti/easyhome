@@ -1,8 +1,6 @@
 package it.uniud.easyhome.devices;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import it.uniud.easyhome.packets.Domain;

@@ -1,6 +1,5 @@
 package it.uniud.easyhome.gateway;
 
-import it.uniud.easyhome.common.ByteUtils;
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.common.RunnableState;
@@ -15,7 +14,6 @@ import it.uniud.easyhome.packets.natives.NativePacket;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +21,6 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
