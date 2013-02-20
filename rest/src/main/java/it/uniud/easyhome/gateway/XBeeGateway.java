@@ -43,18 +43,23 @@ public class XBeeGateway extends Gateway {
         	}
         } else {
 	        
+        	dstCoords = new ModuleCoordinates((byte)1,0x0L,(short)0x0,dstEndpoint);
+    		log(LogLevel.DEBUG, "Setting destination as domotic controller");
+        	
         	// If this is the implicit EasyHome controller endpoint
+        	/*
         	if (xpkt.getProfileId() == Domain.MANAGEMENT.getCode() && (dstEndpoint == 0x00 || dstEndpoint == (byte)0xEA)) {
         		dstCoords = new ModuleCoordinates((byte)1,0x0L,(short)0x0,dstEndpoint);
         		log(LogLevel.DEBUG, "Setting destination as domotic controller");
         	} else {
         		dstCoords = getCoordinatesFor(dstEndpoint);
         	}
-	        
+        	
 	        if (dstCoords == null) {
 		        log(LogLevel.INFO, "Could not find coordinates for mapped endpoint " + dstEndpoint);
 		        throw new RoutingEntryMissingException();
 	        }
+	        */
 	    }
         
         Operation op = new Operation(xpkt.getTransactionSeqNumber(),xpkt.getProfileId(),

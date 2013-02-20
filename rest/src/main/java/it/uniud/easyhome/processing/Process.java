@@ -59,12 +59,12 @@ public abstract class Process implements Runnable {
 	protected Context jndiContext = null;
 	protected Session jmsSession = null;
     
-    protected Process(int pid, URI restTarget, ProcessKind kind) throws NamingException, JMSException {
+    protected Process(int pid, URI restTarget, ProcessKind kind, LogLevel logLevel) throws NamingException, JMSException {
         this.pid = pid;
         this.kind = kind;
         this.restClient = Client.create(new DefaultClientConfig());
         this.restResource = restClient.resource(restTarget);
-        this.logLevel = LogLevel.INFO;
+        this.logLevel = logLevel;
         
     	consumers = new HashMap<Topic,MessageConsumer>();
     	producers = new HashMap<Topic,MessageProducer>();

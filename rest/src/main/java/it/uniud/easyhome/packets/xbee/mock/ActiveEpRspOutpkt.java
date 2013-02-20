@@ -18,7 +18,7 @@ public final class ActiveEpRspOutpkt extends XBeePacketFromNode {
 	
 	public ActiveEpRspOutpkt(MockXBeeNode node, byte tsn) throws InvalidMockNodeException, MockXBeeNodeNotFoundException {
 		
-		List<Short> endpoints = node.getEndpoints();
+		List<Byte> endpoints = node.getEndpoints();
 		
 		final int APS_PAYLOAD_SIZE = APS_PAYLOAD_SIZE_FIXED+endpoints.size();
 		
@@ -39,8 +39,8 @@ public final class ActiveEpRspOutpkt extends XBeePacketFromNode {
 		apsPayload[3] = (byte)(endpoints.size() & 0xFF);
 		
 		int idx = 4;
-		for (Short endpoint : endpoints)
-			apsPayload[idx++] = (byte) (endpoint & 0xFF);
+		for (Byte endpoint : endpoints)
+			apsPayload[idx++] = endpoint;
 	}
 	
 }

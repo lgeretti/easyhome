@@ -62,9 +62,9 @@ public class NodeResourceIT {
         														  .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
     	Node retrievedNode = JsonUtils.getFrom(retrievalResponse,Node.class);
     	
-    	retrievedNode.setEndpoints(Arrays.asList((short)2,(short)7,(short)3,(short)5));
-    	retrievedNode.addDevice((short)5, HomeAutomationDevice.ONOFF_SWITCH);
-    	retrievedNode.addDevice((short)3, HomeAutomationDevice.DIMMABLE_LIGHT);    	
+    	retrievedNode.setEndpoints(Arrays.asList((byte)2,(byte)7,(byte)3,(byte)5));
+    	retrievedNode.addDevice((byte)5, HomeAutomationDevice.ONOFF_SWITCH);
+    	retrievedNode.addDevice((byte)3, HomeAutomationDevice.DIMMABLE_LIGHT);    	
     	
     	ClientResponse updateResponse = client.resource(TARGET).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,retrievedNode);
         assertEquals(ClientResponse.Status.OK,updateResponse.getClientResponseStatus());
@@ -73,14 +73,14 @@ public class NodeResourceIT {
 				  .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
     	retrievedNode = JsonUtils.getFrom(retrievalResponse,Node.class);
     	
-    	Map<Short,HomeAutomationDevice> retrievedDevices = retrievedNode.getMappedDevices();
+    	Map<Byte,HomeAutomationDevice> retrievedDevices = retrievedNode.getMappedDevices();
     	assertEquals(4,retrievedDevices.size());
     	assertEquals(HomeAutomationDevice.ONOFF_SWITCH,retrievedDevices.get((short)5));
     	assertEquals(HomeAutomationDevice.DIMMABLE_LIGHT,retrievedDevices.get((short)3));
     	assertEquals(HomeAutomationDevice.UNKNOWN,retrievedDevices.get((short)2));
     	assertEquals(HomeAutomationDevice.UNKNOWN,retrievedDevices.get((short)7));
     	
-    	retrievedNode.addDevice((short)7, HomeAutomationDevice.LEVEL_CONTROL_SWITCH);
+    	retrievedNode.addDevice((byte)7, HomeAutomationDevice.LEVEL_CONTROL_SWITCH);
     	updateResponse = client.resource(TARGET).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,retrievedNode);
         assertEquals(ClientResponse.Status.OK,updateResponse.getClientResponseStatus());
         

@@ -24,7 +24,7 @@ public final class SimpleDescRspOutpkt extends XBeePacketFromNode {
 	
 	public SimpleDescRspOutpkt(MockXBeeNode node, byte endpoint, byte tsn) throws InvalidMockNodeException, MockXBeeNodeNotFoundException {
 		
-		Map<Short,HomeAutomationDevice> devices = node.getDevices();
+		Map<Byte,HomeAutomationDevice> devices = node.getDevices();
 		
 		HomeAutomationDevice dev = devices.get(new Short(endpoint));
 		

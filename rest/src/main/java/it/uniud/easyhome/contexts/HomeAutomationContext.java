@@ -18,7 +18,9 @@ public enum HomeAutomationContext implements Context {
 	ALARMS((short)0x9),
 	BINARY_INPUT((short)0xF),
 	// Lighting
-	COLOR_CONTROL((short)0x300);
+	COLOR_CONTROL((short)0x300),
+	// Measurement and sensing
+	OCCUPANCY_SENSING((short)0x406);
 	
 	private short code;
 	

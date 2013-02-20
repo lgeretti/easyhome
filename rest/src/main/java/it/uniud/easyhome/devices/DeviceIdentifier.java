@@ -9,10 +9,10 @@ public class DeviceIdentifier implements Serializable {
 	
 	private static final long serialVersionUID = 2882522345532470176L;
 	
-	private short endpoint;
+	private byte endpoint;
 	private HomeAutomationDevice device;
 	
-	public DeviceIdentifier(short endpoint, HomeAutomationDevice device) {
+	public DeviceIdentifier(byte endpoint, HomeAutomationDevice device) {
 		this.endpoint = endpoint;
 		this.device = device;
 	}
@@ -20,11 +20,11 @@ public class DeviceIdentifier implements Serializable {
 	@SuppressWarnings("unused")
 	private DeviceIdentifier() { }
 
-	public short getEndpoint() {
+	public byte getEndpoint() {
 		return endpoint;
 	}
 	
-	public void setEndpoint(short endpoint) {
+	public void setEndpoint(byte endpoint) {
 		this.endpoint = endpoint;
 	}
 	

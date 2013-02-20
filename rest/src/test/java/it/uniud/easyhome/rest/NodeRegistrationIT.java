@@ -128,9 +128,9 @@ public class NodeRegistrationIT {
         
         node2.addNeighbor(node1);
         
-        node3.setEndpoints(Arrays.asList((short)18,(short)3));
-        node3.addDevice((short)18, HomeAutomationDevice.DIMMABLE_LIGHT);
-        node3.addDevice((short)3, HomeAutomationDevice.SIMPLE_SENSOR);
+        node3.setEndpoints(Arrays.asList((byte)18,(byte)3));
+        node3.addDevice((byte)18, HomeAutomationDevice.DIMMABLE_LIGHT);
+        node3.addDevice((byte)3, HomeAutomationDevice.SIMPLE_SENSOR);
         
         node2.addNeighbor(node3);
         
@@ -190,11 +190,11 @@ public class NodeRegistrationIT {
 	    			passedTests++;
 	    		}
 	    		
-		    	Map<Short,HomeAutomationDevice> devices = recoveredNode3.getMappedDevices();
+		    	Map<Byte,HomeAutomationDevice> devices = recoveredNode3.getMappedDevices();
 		    	
 		    	if (devices.size() == 2 &&
-		    		devices.get((short)18) == HomeAutomationDevice.DIMMABLE_LIGHT &&
-		    		devices.get((short)3) == HomeAutomationDevice.SIMPLE_SENSOR
+		    		devices.get((byte)18) == HomeAutomationDevice.DIMMABLE_LIGHT &&
+		    		devices.get((byte)3) == HomeAutomationDevice.SIMPLE_SENSOR
 		    		) {
 		    		System.out.print("e");
 			    	passedTests++;

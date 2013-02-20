@@ -29,8 +29,8 @@ public class NodeNeighRequestProcess extends Process {
 	
 	private byte sequenceNumber = 0;
 	
-    public NodeNeighRequestProcess(int pid, UriInfo uriInfo,ProcessKind kind) throws NamingException, JMSException {
-        super(pid, UriBuilder.fromUri(uriInfo.getBaseUri()).build(new Object[0]),kind);
+    public NodeNeighRequestProcess(int pid, UriInfo uriInfo,ProcessKind kind, LogLevel logLevel) throws NamingException, JMSException {
+        super(pid, UriBuilder.fromUri(uriInfo.getBaseUri()).build(new Object[0]),kind,logLevel);
     }
     
     @Override

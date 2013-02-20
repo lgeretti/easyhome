@@ -7,6 +7,7 @@ import it.uniud.easyhome.common.ByteUtils;
 import it.uniud.easyhome.common.Endianness;
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.JsonUtils;
+import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.gateway.ProtocolType;
 import it.uniud.easyhome.network.LocationType;
 import it.uniud.easyhome.network.Manufacturer;
@@ -62,15 +63,21 @@ public class UserInterfaceResource {
     	return response;
     }
     
-    private ClientResponse insertProcess(ProcessKind kind) {
+    private ClientResponse insertProcess(ProcessKind kind, LogLevel logLevel) {
         
     	MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
     	formData.add("kind", kind.toString());
+    	if (logLevel != null)
+    		formData.add("logLevel", logLevel.toString());
     	ClientResponse response = client.resource(TARGET).path(RestPaths.PROCESSES)
     							  .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
     	
     	return response;
-    } 
+    }
+    
+    private ClientResponse insertProcess(ProcessKind kind) {
+    	return insertProcess(kind, null);
+    }
     
     // curl -X POST http://localhost:8080/easyhome/rest/ui/changePower -H "Content-Type: application/x-www-form-urlencoded" --data-binary "gatewayId=2&address=0&powerLevel=3"
     @Path("/changePower") 
@@ -151,14 +158,17 @@ public class UserInterfaceResource {
 		insertProcess(ProcessKind.ACTIVE_ENDPOINTS_REGISTRATION);
 		insertProcess(ProcessKind.SIMPLE_DESCR_REQUEST);
 		insertProcess(ProcessKind.SIMPLE_DESCR_REGISTRATION);
-		insertProcess(ProcessKind.NODE_DISCOVERY_REQUEST);
-		insertProcess(ProcessKind.NODE_DISCOVERY_REGISTRATION);
-		insertProcess(ProcessKind.NODE_POWER_LEVEL_REQUEST);
-		insertProcess(ProcessKind.NODE_POWER_LEVEL_REGISTRATION);
-		insertProcess(ProcessKind.NODE_POWER_LEVEL_SET_ISSUE);
-		insertProcess(ProcessKind.NODE_POWER_LEVEL_SET_ACKNOWLEDGMENT);
+		//insertProcess(ProcessKind.NODE_DISCOVERY_REQUEST);
+		//insertProcess(ProcessKind.NODE_DISCOVERY_REGISTRATION);
+		insertProcess(ProcessKind.NODE_POWER_LEVEL_REQUEST,LogLevel.DEBUG);
+		insertProcess(ProcessKind.NODE_POWER_LEVEL_REGISTRATION,LogLevel.DEBUG);
+		//insertProcess(ProcessKind.NODE_POWER_LEVEL_SET_ISSUE);
+		//insertProcess(ProcessKind.NODE_POWER_LEVEL_SET_ACKNOWLEDGMENT);
+		//insertProcess(ProcessKind.NETWORK_GRAPH_MINIMIZATION);
 		insertProcess(ProcessKind.NETWORK_UPDATE);
-		insertProcess(ProcessKind.NETWORK_GRAPH_MINIMIZATION);
+		
+		insertProcess(ProcessKind.OCCUPANCY_REQUEST);
+		insertProcess(ProcessKind.OCCUPANCY_REGISTRATION);
 		
         return Response.ok().build();
     }
@@ -176,19 +186,14 @@ public class UserInterfaceResource {
         formData.add("name","R1");
         formData.add("locationName","Loc1");
         formData.add("locationType",LocationType.KITCHEN.toString());
-    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146521326115L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);    	
+    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928337L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);    	
         formData = new MultivaluedMapImpl();
         formData.add("name","R2");
         formData.add("locationName","Loc2");
         formData.add("locationType",LocationType.LIVINGROOM.toString());
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928181L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         formData = new MultivaluedMapImpl();
-        formData.add("name","R3");
-        formData.add("locationName","Loc3");
-        formData.add("locationType",LocationType.BEDROOM.toString());
-    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928337L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);    	
-        formData = new MultivaluedMapImpl();
-        formData.add("name","OnOffSwitch");
+        formData.add("name","OccSensor1");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146521326185L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     }
 

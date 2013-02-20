@@ -70,14 +70,14 @@ public class Node {
 		this.neighbors = neighbors;
 	}
     
-	public void setEndpoints(List<Short> endpoints) {
+	public void setEndpoints(List<Byte> endpoints) {
 		this.devices.clear();
-		for (Short ep : endpoints) {
+		for (Byte ep : endpoints) {
 			this.devices.add(new DeviceIdentifier(ep,HomeAutomationDevice.UNKNOWN));
 		}
 	}
 	
-	public synchronized void addDevice(short endpoint, HomeAutomationDevice device) {
+	public synchronized void addDevice(byte endpoint, HomeAutomationDevice device) {
 		short epIndex = -1;
 		for (short i=0; i<devices.size(); i++) {
 			if (devices.get(i).getEndpoint() == endpoint) {
@@ -177,8 +177,8 @@ public class Node {
     	return this.neighbors;
     }
     
-    public List<Short> getEndpoints() {
-    	List<Short> endpoints = new ArrayList<Short>();
+    public List<Byte> getEndpoints() {
+    	List<Byte> endpoints = new ArrayList<Byte>();
     	
     	for (DeviceIdentifier devId: devices) {
     		endpoints.add(devId.getEndpoint());
@@ -187,8 +187,8 @@ public class Node {
     	return endpoints;
     }    
     
-    public Map<Short,HomeAutomationDevice> getMappedDevices() {
-    	Map<Short,HomeAutomationDevice> result = new HashMap<Short,HomeAutomationDevice>(devices.size());
+    public Map<Byte,HomeAutomationDevice> getMappedDevices() {
+    	Map<Byte,HomeAutomationDevice> result = new HashMap<Byte,HomeAutomationDevice>(devices.size());
 
     	for (DeviceIdentifier devId: devices) {
     		result.put(devId.getEndpoint(), devId.getDevice());

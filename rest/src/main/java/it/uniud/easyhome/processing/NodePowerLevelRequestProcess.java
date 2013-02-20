@@ -38,8 +38,8 @@ public class NodePowerLevelRequestProcess extends Process {
 	
 	private MessageConsumer networkEventsConsumer = null;
 	
-    public NodePowerLevelRequestProcess(int pid, UriInfo uriInfo,ProcessKind kind) throws NamingException, JMSException {
-        super(pid, UriBuilder.fromUri(uriInfo.getBaseUri()).build(new Object[0]),kind);
+    public NodePowerLevelRequestProcess(int pid, UriInfo uriInfo,ProcessKind kind, LogLevel logLevel) throws NamingException, JMSException {
+        super(pid, UriBuilder.fromUri(uriInfo.getBaseUri()).build(new Object[0]),kind,logLevel);
         Topic networkEventsTopic = (Topic) jndiContext.lookup(JMSConstants.NETWORK_EVENTS_TOPIC);
         networkEventsConsumer = registerConsumerFor(networkEventsTopic);
     }

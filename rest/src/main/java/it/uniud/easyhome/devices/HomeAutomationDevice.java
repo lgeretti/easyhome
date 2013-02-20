@@ -60,6 +60,11 @@ public enum HomeAutomationDevice implements Device {
 			
 		} 
 	},
+	OCCUPANCY_SENSOR((short)0x107) { 
+		protected void populateInputOutputContexts() {
+			
+		} 
+	},
 	UNKNOWN((short)0xFFFF) {
 		protected void populateInputOutputContexts() {
 			

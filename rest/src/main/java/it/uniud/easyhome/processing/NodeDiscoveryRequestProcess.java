@@ -35,8 +35,8 @@ public class NodeDiscoveryRequestProcess extends Process {
 	
 	private byte sequenceNumber = 0;
 	
-    public NodeDiscoveryRequestProcess(int pid, UriInfo uriInfo,ProcessKind kind) throws NamingException, JMSException {
-        super(pid, UriBuilder.fromUri(uriInfo.getBaseUri()).build(new Object[0]),kind);
+    public NodeDiscoveryRequestProcess(int pid, UriInfo uriInfo,ProcessKind kind, LogLevel logLevel) throws NamingException, JMSException {
+        super(pid, UriBuilder.fromUri(uriInfo.getBaseUri()).build(new Object[0]),kind,logLevel);
     }
     
     @Override

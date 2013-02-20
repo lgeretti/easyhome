@@ -32,11 +32,13 @@ public class ProcessResource {
     
     // curl -X POST http://localhost:8080/easyhome/rest/processes -H "Content-Type: application/x-www-form-urlencoded" --data-binary "kind=NODE_ANNCE_REGISTRATION"
     @POST
-    public Response postProcess(@FormParam("kind") ProcessKind kind) throws NamingException, JMSException {
+    public Response postProcess(@FormParam("kind") ProcessKind kind, @FormParam("logLevel") LogLevel logLevel) throws NamingException, JMSException {
         
     	int pid = ++pidCounter;
     	
-    	Process process = kind.newProcess(pid, uriInfo);
+    	LogLevel levelToUse = (logLevel == null ? LogLevel.INFO : logLevel);
+    	
+    	Process process = kind.newProcess(pid, uriInfo, levelToUse);
     	
         processes.add(process);
         

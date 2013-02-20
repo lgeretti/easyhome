@@ -74,11 +74,11 @@ public class MockXBeeNode implements Runnable {
     	return neighbors;
     }
     
-    public List<Short> getEndpoints() {
+    public List<Byte> getEndpoints() {
     	return node.getEndpoints();
     }
     
-    public Map<Short,HomeAutomationDevice> getDevices() {
+    public Map<Byte,HomeAutomationDevice> getDevices() {
     	return node.getMappedDevices();
     }
     

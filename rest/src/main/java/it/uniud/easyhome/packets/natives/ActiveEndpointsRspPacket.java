@@ -45,16 +45,16 @@ public class ActiveEndpointsRspPacket extends NativePacket {
 		return ByteUtils.getShort(getOperation().getData(), 1, Endianness.LITTLE_ENDIAN); 
 	}
 	
-	public List<Short> getActiveEndpoints() {
+	public List<Byte> getActiveEndpoints() {
 		
-		List<Short> result = new ArrayList<Short>();
+		List<Byte> result = new ArrayList<Byte>();
 		
 		byte[] opData = this.getOperation().getData();
 		
 		int numEndpoints = opData[3];
 		
 		for (int i=0; i<numEndpoints;i++) 
-			result.add(new Short(opData[4+i]));
+			result.add(opData[4+i]);
 		
 		return result;
 	}

@@ -32,8 +32,8 @@ public class SimpleDescrRequestProcess extends Process {
 	
 	private MessageConsumer networkEventsConsumer = null;
 	
-    public SimpleDescrRequestProcess(int pid, UriInfo uriInfo,ProcessKind kind) throws NamingException, JMSException {
-        super(pid, UriBuilder.fromUri(uriInfo.getBaseUri()).build(new Object[0]),kind);
+    public SimpleDescrRequestProcess(int pid, UriInfo uriInfo,ProcessKind kind, LogLevel logLevel) throws NamingException, JMSException {
+        super(pid, UriBuilder.fromUri(uriInfo.getBaseUri()).build(new Object[0]),kind,logLevel);
         Topic networkEventsTopic = (Topic) jndiContext.lookup(JMSConstants.NETWORK_EVENTS_TOPIC);
         networkEventsConsumer = registerConsumerFor(networkEventsTopic);
     }
@@ -57,7 +57,7 @@ public class SimpleDescrRequestProcess extends Process {
         	        
         	        if (getResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
 	    	        	Node node = JsonUtils.getFrom(getResponse, Node.class);
-	    	        	List<Short> endpoints = node.getEndpoints();
+	    	        	List<Byte> endpoints = node.getEndpoints();
 	    	        	for (int i=0; i<endpoints.size(); i++) {
 	    	        		try {
 	    	    	        	SimpleDescrReqPacket packet = new SimpleDescrReqPacket(node.getCoordinates(),node.getEndpoints().get(i).byteValue(),++sequenceNumber);

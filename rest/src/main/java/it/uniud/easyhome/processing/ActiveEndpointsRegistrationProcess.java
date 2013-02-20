@@ -37,8 +37,8 @@ public class ActiveEndpointsRegistrationProcess extends Process {
 	
 	private MessageProducer networkEventsProducer = null;
 	
-    public ActiveEndpointsRegistrationProcess(int pid, UriInfo uriInfo,ProcessKind kind) throws NamingException, JMSException {
-        super(pid, UriBuilder.fromUri(uriInfo.getBaseUri()).build(new Object[0]),kind);
+    public ActiveEndpointsRegistrationProcess(int pid, UriInfo uriInfo,ProcessKind kind, LogLevel logLevel) throws NamingException, JMSException {
+        super(pid, UriBuilder.fromUri(uriInfo.getBaseUri()).build(new Object[0]),kind,logLevel);
         
         Topic networkEventsTopic = (Topic) jndiContext.lookup(JMSConstants.NETWORK_EVENTS_TOPIC);
         networkEventsProducer = registerProducerFor(networkEventsTopic);
@@ -61,7 +61,7 @@ public class ActiveEndpointsRegistrationProcess extends Process {
 	        		
 	        		if (activeEpPkt.getStatus() == ResponseStatus.SUCCESS) {
 	        			
-		        		List<Short> activeEps = activeEpPkt.getActiveEndpoints();
+		        		List<Byte> activeEps = activeEpPkt.getActiveEndpoints();
 		        		
 		        		byte gatewayId = activeEpPkt.getSrcCoords().getGatewayId();
 		        		short address = activeEpPkt.getAddrOfInterest();
