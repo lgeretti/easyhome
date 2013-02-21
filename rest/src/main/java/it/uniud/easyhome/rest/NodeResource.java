@@ -68,7 +68,6 @@ public final class NodeResource {
     						   @FormParam("logicalType") NodeLogicalType logicalType,
     						   @FormParam("manufacturer") Manufacturer manufacturer,
     						   @FormParam("locationName") String locationName,
-    						   @FormParam("locationType") LocationType locationType,
     						   @FormParam("name") String name) {
     	
     	boolean existed = false;
@@ -79,12 +78,19 @@ public final class NodeResource {
     		
     		Node.Builder nodeBuilder = new Node.Builder(newNodeId,gatewayId,nuid,address);
 					   
+    		if (locationName != null) {
+    			Location loc = resEjb.getLocation(locationName);
+    		
+	    		if (loc == null)
+	    			throw new WebApplicationException(Response.Status.BAD_REQUEST);
+	    		else 
+	    			nodeBuilder.setLocation(loc);
+    		}
+    		
     		if (logicalType != null)
     			nodeBuilder.setLogicalType(logicalType);
     		if (manufacturer != null)
     			nodeBuilder.setManufacturer(manufacturer);
-    		if (locationName != null && locationType != null)
-    			nodeBuilder.setLocation(new Location(locationName,locationType));
     		if (name != null)
     			nodeBuilder.setName(name);
 

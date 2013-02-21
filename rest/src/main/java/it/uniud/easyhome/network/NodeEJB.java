@@ -243,4 +243,24 @@ public class NodeEJB {
 		
 		return missingNodes;
 	}
+
+	public Location getLocation(String locationName) {
+		
+		Location result = null;
+		
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<Location> criteria = builder.createQuery(Location.class);
+        Root<Location> loc = criteria.from(Location.class);
+        criteria.select(loc).where(builder.equal(loc.get("name"), locationName));
+        
+        TypedQuery<Location> query = em.createQuery(criteria);
+        
+        try {
+        	result = query.getSingleResult();
+        } catch (NoResultException ex) {
+        	result = null;
+        }
+        
+        return result;
+	}
 }

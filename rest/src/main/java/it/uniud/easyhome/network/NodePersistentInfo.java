@@ -17,8 +17,7 @@ public class NodePersistentInfo {
     private long nuid;
     @Column
     private String name;
-    @Embedded
-    @AttributeOverrides({@AttributeOverride(name="name", column=@Column(name="LOCATION_NAME")),@AttributeOverride(name="type", column=@Column(name="LOCATION_TYPE"))})
+    @OneToOne
     private Location location;
 
     @SuppressWarnings("unused")

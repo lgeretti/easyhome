@@ -53,20 +53,23 @@ public final class PersistentInfoResource {
     public Response insertOrUpdatePersistentInfo(@PathParam("gatewayId") byte gatewayId, 
     											@PathParam("nuid") long nuid, 
     								  			@FormParam("name") String name, 
-    								  			@FormParam("locationName") String locationName,
-    								  			@FormParam("locationType") LocationType locationType) {
+    								  			@FormParam("locationName") String locationName) {
     	
     	synchronized(infoLock) {
     		
-    		Location location = null;
-    		if (locationName != null && locationType != null)
-    			location = new Location(locationName,locationType);
-    		
     		NodePersistentInfo info = resEjb.getPersistentInfo(gatewayId,nuid);
+    		
+    		Location loc = null;
+    		if (locationName != null) {
+    			loc = resEjb.getLocation(locationName);
+    		
+	    		if (loc == null)
+	    			throw new WebApplicationException(Response.Status.BAD_REQUEST);
+    		}
     		
     		if (info == null) {
     			
-    			resEjb.insertPersistentInfo(new NodePersistentInfo(++nodePersistentInfoId,gatewayId,nuid,name,location));
+    			resEjb.insertPersistentInfo(new NodePersistentInfo(++nodePersistentInfoId,gatewayId,nuid,name,loc));
     			return Response.created(
                         	uriInfo.getAbsolutePathBuilder()
                         	.path(Byte.toString(gatewayId))
@@ -77,8 +80,8 @@ public final class PersistentInfoResource {
     		
     		if (name != null)
     			info.setName(name);
-    		if (location != null)
-    			info.setLocation(location);
+    		if (loc != null)
+    			info.setLocation(loc);
     			
     		resEjb.updatedUnmanaged(info);
     	}

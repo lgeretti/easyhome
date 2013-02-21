@@ -30,8 +30,7 @@ public class Node {
     private GlobalCoordinates coordinates;
     @Column(nullable = false)
     private NodeLogicalType logicalType;
-    @Embedded
-	@AttributeOverrides({@AttributeOverride(name="name", column=@Column(name="LOCATION_NAME")),@AttributeOverride(name="type", column=@Column(name="LOCATION_TYPE"))})
+    @OneToOne
     private Location location;    
     @Column
     private Manufacturer manufacturer;

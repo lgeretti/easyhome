@@ -90,7 +90,6 @@ public class NodeDiscoveryRegistrationProcess extends Process {
 			                
 			                if (discLogicalType == NodeLogicalType.END_DEVICE && sender.getLocation() != null) {
 			                	formData.add("locationName",sender.getLocation().getName());
-			                	formData.add("locationType",sender.getLocation().getType().toString());
 			                }
 			                
 			                ClientResponse insertionResponse = restResource.path(RestPaths.NODES).path("insert")

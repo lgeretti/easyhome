@@ -34,7 +34,8 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class NodeResourceIT {
 	
-	private static final String TARGET = "http://localhost:8080/easyhome/rest/" + RestPaths.NODES;
+	private static final String NODES_TARGET = "http://localhost:8080/easyhome/rest/" + RestPaths.NODES;
+	private static final String LOC_TARGET = "http://localhost:8080/easyhome/rest/" + RestPaths.LOCATIONS;
 	
 	private static Client client;
 	
@@ -45,7 +46,8 @@ public class NodeResourceIT {
 	
 	@After
 	public void removeAll() {
-		client.resource(TARGET).delete();
+		client.resource(NODES_TARGET).delete();
+		client.resource(LOC_TARGET).delete();
 	}
 	
     @Test
@@ -58,7 +60,7 @@ public class NodeResourceIT {
         ClientResponse insertionResponse = insertNewNode(new GlobalCoordinates(gatewayId,nuid,address));
         assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
 
-        ClientResponse retrievalResponse = client.resource(TARGET).path(Byte.toString(gatewayId)).path(Short.toString(address))
+        ClientResponse retrievalResponse = client.resource(NODES_TARGET).path(Byte.toString(gatewayId)).path(Short.toString(address))
         														  .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
     	Node retrievedNode = JsonUtils.getFrom(retrievalResponse,Node.class);
     	
@@ -66,40 +68,40 @@ public class NodeResourceIT {
     	retrievedNode.addDevice((byte)5, HomeAutomationDevice.ONOFF_SWITCH);
     	retrievedNode.addDevice((byte)3, HomeAutomationDevice.DIMMABLE_LIGHT);    	
     	
-    	ClientResponse updateResponse = client.resource(TARGET).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,retrievedNode);
+    	ClientResponse updateResponse = client.resource(NODES_TARGET).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,retrievedNode);
         assertEquals(ClientResponse.Status.OK,updateResponse.getClientResponseStatus());
     	
-    	retrievalResponse = client.resource(TARGET).path(Byte.toString(gatewayId)).path(Short.toString(address))
+    	retrievalResponse = client.resource(NODES_TARGET).path(Byte.toString(gatewayId)).path(Short.toString(address))
 				  .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
     	retrievedNode = JsonUtils.getFrom(retrievalResponse,Node.class);
     	
     	Map<Byte,HomeAutomationDevice> retrievedDevices = retrievedNode.getMappedDevices();
     	assertEquals(4,retrievedDevices.size());
-    	assertEquals(HomeAutomationDevice.ONOFF_SWITCH,retrievedDevices.get((short)5));
-    	assertEquals(HomeAutomationDevice.DIMMABLE_LIGHT,retrievedDevices.get((short)3));
-    	assertEquals(HomeAutomationDevice.UNKNOWN,retrievedDevices.get((short)2));
-    	assertEquals(HomeAutomationDevice.UNKNOWN,retrievedDevices.get((short)7));
+    	assertEquals(HomeAutomationDevice.ONOFF_SWITCH,retrievedDevices.get((byte)5));
+    	assertEquals(HomeAutomationDevice.DIMMABLE_LIGHT,retrievedDevices.get((byte)3));
+    	assertEquals(HomeAutomationDevice.UNKNOWN,retrievedDevices.get((byte)2));
+    	assertEquals(HomeAutomationDevice.UNKNOWN,retrievedDevices.get((byte)7));
     	
     	retrievedNode.addDevice((byte)7, HomeAutomationDevice.LEVEL_CONTROL_SWITCH);
-    	updateResponse = client.resource(TARGET).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,retrievedNode);
+    	updateResponse = client.resource(NODES_TARGET).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,retrievedNode);
         assertEquals(ClientResponse.Status.OK,updateResponse.getClientResponseStatus());
         
-        retrievalResponse = client.resource(TARGET).path(Byte.toString(gatewayId)).path(Short.toString(address)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        retrievalResponse = client.resource(NODES_TARGET).path(Byte.toString(gatewayId)).path(Short.toString(address)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
     	retrievedNode = JsonUtils.getFrom(retrievalResponse,Node.class);
 
     	retrievedDevices = retrievedNode.getMappedDevices();
     	
     	assertEquals(4,retrievedDevices.size());
-    	assertEquals(HomeAutomationDevice.ONOFF_SWITCH,retrievedDevices.get((short)5));
-    	assertEquals(HomeAutomationDevice.DIMMABLE_LIGHT,retrievedDevices.get((short)3));
-    	assertEquals(HomeAutomationDevice.UNKNOWN,retrievedDevices.get((short)2));
-    	assertEquals(HomeAutomationDevice.LEVEL_CONTROL_SWITCH,retrievedDevices.get((short)7));           
+    	assertEquals(HomeAutomationDevice.ONOFF_SWITCH,retrievedDevices.get((byte)5));
+    	assertEquals(HomeAutomationDevice.DIMMABLE_LIGHT,retrievedDevices.get((byte)3));
+    	assertEquals(HomeAutomationDevice.UNKNOWN,retrievedDevices.get((byte)2));
+    	assertEquals(HomeAutomationDevice.LEVEL_CONTROL_SWITCH,retrievedDevices.get((byte)7));           
     }
     
 	@Test
 	public void testNoNodes() throws JSONException {
 		
-		ClientResponse getResponse = client.resource(TARGET).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+		ClientResponse getResponse = client.resource(NODES_TARGET).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 		
 		List<Node> nodeList = JsonUtils.getListFrom(getResponse,Node.class);
 		
@@ -118,11 +120,11 @@ public class NodeResourceIT {
         ClientResponse insertionResponse = insertNewNode(new GlobalCoordinates(gatewayId,nuid,address));
         assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
 
-        Node recoveredNode = client.resource(TARGET).path(Byte.toString(gatewayId)).path(Short.toString(address)).accept(MediaType.APPLICATION_JSON).get(Node.class);
+        Node recoveredNode = client.resource(NODES_TARGET).path(Byte.toString(gatewayId)).path(Short.toString(address)).accept(MediaType.APPLICATION_JSON).get(Node.class);
         
         assertEquals(node1,recoveredNode);
      
-        ClientResponse getResponse = client.resource(TARGET).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        ClientResponse getResponse = client.resource(NODES_TARGET).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         List<Node> nodeList = JsonUtils.getListFrom(getResponse,Node.class);
         assertEquals(1,nodeList.size());
         assertEquals(node1,nodeList.get(0));
@@ -144,10 +146,10 @@ public class NodeResourceIT {
         formData.add("logicalType",logicalType.toString());
         formData.add("manufacturer",manufacturer.toString());
 		
-        ClientResponse insertionResponse = client.resource(TARGET).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        ClientResponse insertionResponse = client.resource(NODES_TARGET).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());
         
-        Node recoveredNode = client.resource(TARGET).path(Byte.toString(gatewayId)).path(Short.toString(address)).accept(MediaType.APPLICATION_JSON).get(Node.class);
+        Node recoveredNode = client.resource(NODES_TARGET).path(Byte.toString(gatewayId)).path(Short.toString(address)).accept(MediaType.APPLICATION_JSON).get(Node.class);
         
         assertEquals(logicalType,recoveredNode.getLogicalType());
         assertEquals(manufacturer,recoveredNode.getManufacturer());
@@ -157,10 +159,10 @@ public class NodeResourceIT {
         formData.add("nuid",Long.toString(nuid));
         formData.add("address",Short.toString(address));
         
-        ClientResponse reInsertionResponse = client.resource(TARGET).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        ClientResponse reInsertionResponse = client.resource(NODES_TARGET).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         assertEquals(ClientResponse.Status.OK,reInsertionResponse.getClientResponseStatus());
         
-        recoveredNode = client.resource(TARGET).path(Byte.toString(gatewayId)).path(Short.toString(address)).accept(MediaType.APPLICATION_JSON).get(Node.class);
+        recoveredNode = client.resource(NODES_TARGET).path(Byte.toString(gatewayId)).path(Short.toString(address)).accept(MediaType.APPLICATION_JSON).get(Node.class);
         
         assertEquals(logicalType,recoveredNode.getLogicalType());
         assertEquals(manufacturer,recoveredNode.getManufacturer());
@@ -175,7 +177,7 @@ public class NodeResourceIT {
        
         insertNewNode(new GlobalCoordinates(gatewayId,nuid,address));
 
-        ClientResponse deletionResponse = client.resource(TARGET).path(Byte.toString(gatewayId)).path(Short.toString(address)).delete(ClientResponse.class);
+        ClientResponse deletionResponse = client.resource(NODES_TARGET).path(Byte.toString(gatewayId)).path(Short.toString(address)).delete(ClientResponse.class);
         
         assertEquals(ClientResponse.Status.OK,deletionResponse.getClientResponseStatus());
     }
@@ -195,18 +197,18 @@ public class NodeResourceIT {
         ClientResponse secondInsertionResponse = insertNewNode(new GlobalCoordinates(gatewayId,nuid2,address2));
         assertEquals(ClientResponse.Status.CREATED,secondInsertionResponse.getClientResponseStatus());
         
-        Node recoveredNode1 = client.resource(TARGET).path(Byte.toString(gatewayId)).path(Short.toString(address1)).accept(MediaType.APPLICATION_JSON).get(Node.class);
-        Node recoveredNode2 = client.resource(TARGET).path(Byte.toString(gatewayId)).path(Short.toString(address2)).accept(MediaType.APPLICATION_JSON).get(Node.class);
+        Node recoveredNode1 = client.resource(NODES_TARGET).path(Byte.toString(gatewayId)).path(Short.toString(address1)).accept(MediaType.APPLICATION_JSON).get(Node.class);
+        Node recoveredNode2 = client.resource(NODES_TARGET).path(Byte.toString(gatewayId)).path(Short.toString(address2)).accept(MediaType.APPLICATION_JSON).get(Node.class);
         
         recoveredNode1.addNeighbor(recoveredNode2);
         
-        ClientResponse updateResponse = client.resource(TARGET).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,recoveredNode1);
+        ClientResponse updateResponse = client.resource(NODES_TARGET).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,recoveredNode1);
         assertEquals(ClientResponse.Status.OK,updateResponse.getClientResponseStatus());
         
-        recoveredNode1 = client.resource(TARGET).path(Byte.toString(gatewayId)).path(Short.toString(address1)).accept(MediaType.APPLICATION_JSON).get(Node.class);
+        recoveredNode1 = client.resource(NODES_TARGET).path(Byte.toString(gatewayId)).path(Short.toString(address1)).accept(MediaType.APPLICATION_JSON).get(Node.class);
         assertEquals(1,recoveredNode1.getNeighbors().size());
         
-		ClientResponse getResponse = client.resource(TARGET).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+		ClientResponse getResponse = client.resource(NODES_TARGET).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 		List<Node> nodeList = JsonUtils.getListFrom(getResponse,Node.class);
 		
 		assertEquals(2,nodeList.size());
@@ -224,7 +226,7 @@ public class NodeResourceIT {
     	for (int i=1; i<=numNodes; i++) {
     		ClientResponse insertionResponse = insertNewNode(new GlobalCoordinates(gatewayId,i,(short)i));
             assertEquals(ClientResponse.Status.CREATED,insertionResponse.getClientResponseStatus());    		
-            nodes.put(i,client.resource(TARGET).path(Byte.toString(gatewayId)).path(Short.toString((short)i)).accept(MediaType.APPLICATION_JSON).get(Node.class));
+            nodes.put(i,client.resource(NODES_TARGET).path(Byte.toString(gatewayId)).path(Short.toString((short)i)).accept(MediaType.APPLICATION_JSON).get(Node.class));
     	}
         
     	nodes.get(1).setLogicalType(NodeLogicalType.COORDINATOR);
@@ -245,11 +247,11 @@ public class NodeResourceIT {
         nodes.get(5).addNeighbor(nodes.get(6));
 
     	for (int i=1; i<=numNodes; i++) {
-            ClientResponse updateResponse = client.resource(TARGET).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,nodes.get(i));
+            ClientResponse updateResponse = client.resource(NODES_TARGET).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,nodes.get(i));
             assertEquals(ClientResponse.Status.OK,updateResponse.getClientResponseStatus());
     	}
         
-		ClientResponse getResponse = client.resource(TARGET).path("infrastructural").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+		ClientResponse getResponse = client.resource(NODES_TARGET).path("infrastructural").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 		List<Node> infrastructuralNodesList = JsonUtils.getListFrom(getResponse,Node.class);
 		
 		assertEquals(4,infrastructuralNodesList.size());
@@ -261,6 +263,12 @@ public class NodeResourceIT {
     	byte gatewayId = 2;
     	long nuid = 10L;
     	short address = 0x00CD;
+    	
+    	Location bedroom = new Location(1,"Camera",LocationType.BEDROOM);
+    	Location kitchen = new Location(2,"Cucina",LocationType.KITCHEN);
+
+    	insertNewLocation(bedroom.getName(),bedroom.getType());
+    	insertNewLocation(kitchen.getName(),kitchen.getType());  
 		
         Node node = new Node.Builder(1,gatewayId,nuid,address)
         				.setName("test")
@@ -268,30 +276,30 @@ public class NodeResourceIT {
        
         insertNewNode(node.getCoordinates());
         
-        ClientResponse insertionResponse = client.resource(TARGET).path(Byte.toString(gatewayId)).path(Short.toString((address)))
+        ClientResponse insertionResponse = client.resource(NODES_TARGET).path(Byte.toString(gatewayId)).path(Short.toString((address)))
         											  .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         
         Node recoveredNode = JsonUtils.getFrom(insertionResponse, Node.class);
         
-        recoveredNode.setLocation(new Location("Camera",LocationType.BEDROOM));
+        recoveredNode.setLocation(bedroom);
         
-        ClientResponse locationUpdateResponse = client.resource(TARGET).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,recoveredNode);
+        ClientResponse locationUpdateResponse = client.resource(NODES_TARGET).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,recoveredNode);
         assertEquals(ClientResponse.Status.OK,locationUpdateResponse.getClientResponseStatus());
         
-        ClientResponse locationUpdateNodeResponse = client.resource(TARGET).path(Byte.toString(gatewayId)).path(Short.toString(address))
+        ClientResponse locationUpdateNodeResponse = client.resource(NODES_TARGET).path(Byte.toString(gatewayId)).path(Short.toString(address))
 				  .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         Node locationUpdatedNode = JsonUtils.getFrom(locationUpdateNodeResponse, Node.class);
         assertTrue(recoveredNode.getLocation().equals(locationUpdatedNode.getLocation()));
         
-        locationUpdatedNode.setLocation(new Location("Cucina",LocationType.KITCHEN));
+        locationUpdatedNode.setLocation(kitchen);
         
-        ClientResponse locationUpdateResponse2 = client.resource(TARGET).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,locationUpdatedNode);
+        ClientResponse locationUpdateResponse2 = client.resource(NODES_TARGET).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,locationUpdatedNode);
         assertEquals(ClientResponse.Status.OK,locationUpdateResponse2.getClientResponseStatus());
         
-        ClientResponse restUpdateNodeResponse = client.resource(TARGET).path(Byte.toString(gatewayId)).path(Short.toString(address))
+        ClientResponse restUpdateNodeResponse = client.resource(NODES_TARGET).path(Byte.toString(gatewayId)).path(Short.toString(address))
 				  .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         Node restUpdateNode = JsonUtils.getFrom(restUpdateNodeResponse, Node.class);
-        assertTrue(new Location("Cucina",LocationType.KITCHEN).equals(restUpdateNode.getLocation()));
+        assertTrue(kitchen.equals(restUpdateNode.getLocation()));
 	}
 	
 	private ClientResponse insertNewNode(GlobalCoordinates coords) {
@@ -301,7 +309,16 @@ public class NodeResourceIT {
         formData.add("nuid",Long.toString(coords.getNuid()));
         formData.add("address",Short.toString(coords.getAddress()));
 		
-        return client.resource(TARGET).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        return client.resource(NODES_TARGET).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	}
+	
+	private ClientResponse insertNewLocation(String name, LocationType type) throws JSONException {
+		
+        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+        formData.add("name",name);
+        formData.add("type",type.toString());
+        
+        return client.resource(LOC_TARGET).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	}
 	
 }

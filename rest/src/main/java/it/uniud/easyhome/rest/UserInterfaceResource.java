@@ -149,7 +149,7 @@ public class UserInterfaceResource {
     @POST
     public Response up() {
     	
-    	insertPersistentInfo();
+    	insertLocationsAndPersistentInfo();
 		insertGateway(XBEE_GATEWAY_ID, XBEE_GATEWAY_PORT, ProtocolType.XBEE);
 		insertProcess(ProcessKind.NODE_ANNCE_REGISTRATION);
 		insertProcess(ProcessKind.NODE_DESCR_REQUEST);
@@ -173,24 +173,40 @@ public class UserInterfaceResource {
         return Response.ok().build();
     }
     
-    private void insertPersistentInfo() {
+    private void insertLocationsAndPersistentInfo() {
+    	
+    	String loc0 = "Loc0";
+    	String loc1 = "Loc1";
+    	String loc2 = "Loc2";
     	
         MultivaluedMap<String,String> formData;
         
         formData = new MultivaluedMapImpl();
+        formData.add("name",loc0);
+        formData.add("type",LocationType.CORRIDOR.toString());
+        client.resource(TARGET).path(RestPaths.LOCATIONS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        
+        formData = new MultivaluedMapImpl();
+        formData.add("name",loc1);
+        formData.add("type",LocationType.KITCHEN.toString());
+        client.resource(TARGET).path(RestPaths.LOCATIONS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        
+        formData = new MultivaluedMapImpl();
+        formData.add("name",loc2);
+        formData.add("type",LocationType.BEDROOM.toString());
+        client.resource(TARGET).path(RestPaths.LOCATIONS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        
+        formData = new MultivaluedMapImpl();
         formData.add("name","Gateway");
-        formData.add("locationName","Loc0");
-        formData.add("locationType",LocationType.CORRIDOR.toString());
+        formData.add("locationName",loc0);
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146521827785L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         formData = new MultivaluedMapImpl();
         formData.add("name","R1");
-        formData.add("locationName","Loc1");
-        formData.add("locationType",LocationType.KITCHEN.toString());
+        formData.add("locationName",loc1);
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928337L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);    	
         formData = new MultivaluedMapImpl();
         formData.add("name","R2");
-        formData.add("locationName","Loc2");
-        formData.add("locationType",LocationType.LIVINGROOM.toString());
+        formData.add("locationName",loc2);
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928181L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         formData = new MultivaluedMapImpl();
         formData.add("name","OccSensor1");

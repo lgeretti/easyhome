@@ -8,4 +8,5 @@ public class RestPaths {
 	public static final String LINKS = "links";
 	public static final String GATEWAYS = "gateways";
 	public static final String PROCESSES = "processes";
+	public static final String LOCATIONS = "locations";
 }

@@ -4,28 +4,40 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@Embeddable
+@Entity
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Location implements Serializable {
 
 	private static final long serialVersionUID = -3972393244808127322L;
 
+	@Id
+	private int id;
 	@Column(nullable = false)
 	private String name;
 	@Column(nullable = false)
 	private LocationType type;
+	@Column(nullable = false)
+	private boolean occupied;
 	
     @SuppressWarnings("unused")
 	private Location() { }
     
-    public Location(String name, LocationType type) {
+    public Location(int id, String name, LocationType type) {
+    	this.id = id;
     	this.name = name;
     	this.type = type;
+    	occupied = false;
+    }
+    
+    public int getId() {
+    	return id;
     }
     
     public String getName() {
@@ -34,6 +46,14 @@ public class Location implements Serializable {
     
     public LocationType getType() {
     	return type;
+    }
+    
+    public boolean isOccupied() {
+    	return occupied;
+    }
+    
+    public void setOccupied(boolean occupied) {
+    	this.occupied = occupied;
     }
     
     @Override
@@ -58,5 +78,9 @@ public class Location implements Serializable {
         hash = hash * 31 + name.hashCode();
         hash = hash * 31 + type.hashCode();
         return hash;
+    }
+    
+    public String toString() {
+    	return name;
     }
 }

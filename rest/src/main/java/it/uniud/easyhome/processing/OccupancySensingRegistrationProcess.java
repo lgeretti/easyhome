@@ -9,6 +9,7 @@ import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.exceptions.InvalidNodeLogicalTypeException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
+import it.uniud.easyhome.network.Location;
 import it.uniud.easyhome.network.Manufacturer;
 import it.uniud.easyhome.network.LocalCoordinates;
 import it.uniud.easyhome.network.NetworkEvent;
@@ -65,7 +66,7 @@ public class OccupancySensingRegistrationProcess extends Process {
 	        		if (occupancyPkt.getStatus() == ResponseStatus.SUCCESS) {
 	        			byte gatewayId = occupancyPkt.getSrcCoords().getGatewayId();
 	        			short senderAddress = occupancyPkt.getAddrOfInterest();
-	        			boolean isOccupied = occupancyPkt.isOccupied();
+	        			boolean occupied = occupancyPkt.isOccupied();
 
 		        		ClientResponse senderRetrievalResponse = restResource.path(RestPaths.NODES).path(Byte.toString(gatewayId)).path(Short.toString(senderAddress))
 		        						.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
@@ -73,8 +74,15 @@ public class OccupancySensingRegistrationProcess extends Process {
 		        		if (senderRetrievalResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
 		                
 		        			Node sender = JsonUtils.getFrom(senderRetrievalResponse, Node.class);
-			        		
-			                log(LogLevel.INFO, sender + " is " + (isOccupied ? "" : "not ") + "occupied");
+		        			
+		        			Location location = sender.getLocation();
+		        			
+		        			if (location != null) {
+		        				
+		        				location.setOccupied(occupied);
+				                restResource.path(RestPaths.NODES).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,sender);
+				                log(LogLevel.INFO, location + " is " + (occupied ? "" : "not ") + "occupied");
+		        			}
 			                
 		        		} else 
 		        			log(LogLevel.DEBUG, "Sender node " + Node.nameFor(gatewayId, senderAddress) + " not found, hence discarding occupancy information");
