@@ -158,8 +158,8 @@ public class UserInterfaceResource {
 		insertProcess(ProcessKind.ACTIVE_ENDPOINTS_REGISTRATION);
 		insertProcess(ProcessKind.SIMPLE_DESCR_REQUEST);
 		insertProcess(ProcessKind.SIMPLE_DESCR_REGISTRATION);
-		//insertProcess(ProcessKind.NODE_DISCOVERY_REQUEST);
-		//insertProcess(ProcessKind.NODE_DISCOVERY_REGISTRATION);
+		insertProcess(ProcessKind.NODE_DISCOVERY_REQUEST);
+		insertProcess(ProcessKind.NODE_DISCOVERY_REGISTRATION);
 		insertProcess(ProcessKind.NODE_POWER_LEVEL_REQUEST,LogLevel.DEBUG);
 		insertProcess(ProcessKind.NODE_POWER_LEVEL_REGISTRATION,LogLevel.DEBUG);
 		//insertProcess(ProcessKind.NODE_POWER_LEVEL_SET_ISSUE);
