@@ -22,6 +22,7 @@ public enum HomeAutomationContext implements Context {
 	// Measurement and sensing
 	OCCUPANCY_SENSING((short)0x406);
 	
+	
 	private short code;
 	
 	private HomeAutomationContext(short code) {

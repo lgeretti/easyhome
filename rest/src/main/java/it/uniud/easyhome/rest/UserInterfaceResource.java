@@ -162,13 +162,15 @@ public class UserInterfaceResource {
 		insertProcess(ProcessKind.NODE_DISCOVERY_REGISTRATION);
 		insertProcess(ProcessKind.NODE_POWER_LEVEL_REQUEST,LogLevel.DEBUG);
 		insertProcess(ProcessKind.NODE_POWER_LEVEL_REGISTRATION,LogLevel.DEBUG);
-		//insertProcess(ProcessKind.NODE_POWER_LEVEL_SET_ISSUE);
-		//insertProcess(ProcessKind.NODE_POWER_LEVEL_SET_ACKNOWLEDGMENT);
-		//insertProcess(ProcessKind.NETWORK_GRAPH_MINIMIZATION);
+		insertProcess(ProcessKind.NODE_POWER_LEVEL_SET_ISSUE);
+		insertProcess(ProcessKind.NODE_POWER_LEVEL_SET_ACKNOWLEDGMENT);
+		insertProcess(ProcessKind.NETWORK_GRAPH_MINIMIZATION);
 		insertProcess(ProcessKind.NETWORK_UPDATE);
 		
 		insertProcess(ProcessKind.OCCUPANCY_REQUEST);
 		insertProcess(ProcessKind.OCCUPANCY_REGISTRATION);
+		
+		insertProcess(ProcessKind.LIGHT_LEVEL_CONTROL,LogLevel.DEBUG);
 		
         return Response.ok().build();
     }

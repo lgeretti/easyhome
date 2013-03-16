@@ -124,7 +124,13 @@ public enum ProcessKind {
 		public Process newProcess(int pid, UriInfo uriInfo, LogLevel logLevel) throws NamingException, JMSException {
 			return new NetworkGraphMinimizationProcess(pid,uriInfo,this,logLevel);
 		}
-	}; 
+	},
+	LIGHT_LEVEL_CONTROL {
+		@Override
+		public Process newProcess(int pid, UriInfo uriInfo, LogLevel logLevel) throws NamingException, JMSException {
+			return new LightLevelControlProcess(pid,uriInfo,this,logLevel);
+		}
+	}; 	
 	
 	public abstract Process newProcess(int pid, UriInfo uriInfo, LogLevel logLevel) throws NamingException, JMSException;
 }
