@@ -10,21 +10,8 @@
     <script type="text/javascript" src="script/jquery.icepush.js"></script>
 </h:head>
 <h:body>
-    <hr/>
-	 <h:form id="form">
-	  <ace:dataTable id="nodeTable"
-	              value="#{nodesController.nodes}"
-	              var="node"
-	              paginator="true"
-	              paginatorPosition="bottom"
-	              rows="10">
-	    <ace:column id="ID" headerText="ID" sortBy="#{node.id}"
-	                filterBy="#{node.id}" filterMatchMode="contains">
-	        <h:outputText id="nodeId" value="#{node.hexId}"/>
-	    </ace:column>
-	  </ace:dataTable>
-	 </h:form> 
-    
-    
+Event #<h:outputText id="counter" value="#{lightLevelControlController.counter}"/>:     
+<h:outputText id="change" value="#{lightLevelControlController.change}"/>
+
 </h:body>
 </html>

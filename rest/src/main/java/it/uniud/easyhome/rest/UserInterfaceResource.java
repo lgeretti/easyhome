@@ -2,6 +2,7 @@ package it.uniud.easyhome.rest;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import it.uniud.easyhome.common.ByteUtils;
 import it.uniud.easyhome.common.Endianness;
@@ -214,6 +215,25 @@ public class UserInterfaceResource {
         formData.add("name","OccSensor1");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146521326185L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     }
+    
+    private void stopEventBasedJSFProcesses() throws NamingException, JMSException {
+    	
+   		jndiContext = new InitialContext();
+        ConnectionFactory connectionFactory = (ConnectionFactory) jndiContext.lookup(JMSConstants.CONNECTION_FACTORY);
+        
+        Topic networkEventsTopic = (Topic) jndiContext.lookup(JMSConstants.NETWORK_EVENTS_TOPIC);
+        
+        jmsConnection = connectionFactory.createConnection();
+        jmsSession = jmsConnection.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
+        MessageProducer producer = jmsSession.createProducer(networkEventsTopic);
+            
+        jmsConnection.start();
+        
+ 	    ObjectMessage nullMessage = jmsSession.createObjectMessage(null);
+    	producer.send(nullMessage);    
+    	
+    	jmsConnection.close();
+    }
 
     @Path("/down")
     @POST
@@ -224,6 +244,10 @@ public class UserInterfaceResource {
     	client.resource(TARGET).path(RestPaths.NODES).delete();
     	client.resource(TARGET).path(RestPaths.JOBS).delete();
     	client.resource(TARGET).path(RestPaths.LINKS).delete();
+    	
+    	try {
+    		stopEventBasedJSFProcesses();
+    	} catch (Exception ex) { }
     	
         return Response.ok().build();
     }

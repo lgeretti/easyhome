@@ -25,11 +25,11 @@ import javax.naming.NamingException;
 import org.icefaces.application.PortableRenderer;
 import org.icefaces.application.PushRenderer;
 
-//@ManagedBean
-//@SessionScoped 
-public class NodesController implements Runnable {
+@ManagedBean
+@SessionScoped 
+public class LightLevelControlController implements Runnable {
     
-    private static final String PUSH_GROUP = "nodes";
+    private static final String PUSH_GROUP = "lightLevel";
     
     private static final long EVENT_WAIT_TIME_MILLIS = 500;
     
@@ -37,8 +37,9 @@ public class NodesController implements Runnable {
     
     private PortableRenderer pRenderer;
     
-	@EJB
-	private NodeEJB networkEjb;
+    private int change;
+    
+    private int counter;
 	
     @PostConstruct
     public void init() {
@@ -48,8 +49,12 @@ public class NodesController implements Runnable {
         pRenderer = PushRenderer.getPortableRenderer();
     }
     
-    public List<Node> getNodes() {
-    	return networkEjb.getNodes();
+    public int getChange() {
+    	return change;
+    }
+    
+    public int getCounter() {
+    	return counter;
     }
 
 	@Override
@@ -75,12 +80,16 @@ public class NodesController implements Runnable {
 
 				ObjectMessage msg = (ObjectMessage) networkEventsConsumer.receive(EVENT_WAIT_TIME_MILLIS);
 		    	if (msg != null) {
-		    		pRenderer.render(PUSH_GROUP);	
-		       	} else {
-		       		NetworkEvent event = (NetworkEvent) msg.getObject();
-		       		if (event == null)
-		       			stopped = true;
-		       	}
+		    		
+	        		NetworkEvent event = (NetworkEvent) msg.getObject();
+	        		if (event != null && event.getKind() == NetworkEvent.EventKind.LEVEL_CONTROL_VARIATION) {
+	        			change = event.getPayload()[0];
+	        			counter++;
+	        			pRenderer.render(PUSH_GROUP);	
+	        		} else if (event == null){
+	        			stopped = true;
+	        		}
+		       	} 
 			}	
 		} catch (NamingException e) {
 			// TODO Auto-generated catch block
