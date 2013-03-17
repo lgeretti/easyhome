@@ -55,6 +55,13 @@ public final class LocationResource {
     }
 
 	@GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Location> getLocations() {
+        
+        return resEjb.getLocations();
+    }
+    
+	@GET
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Location getLocation(@PathParam("id") int id) {

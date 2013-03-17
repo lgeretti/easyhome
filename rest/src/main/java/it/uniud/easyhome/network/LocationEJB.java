@@ -60,14 +60,15 @@ public class LocationEJB {
         return query.getResultList();
 	}
 	
-	public boolean removeLocation(long id) {
+	public boolean removeLocation(int id) {
 		Location loc = em.find(Location.class, id);
 		
 		if (loc != null) {
-			em.detach(loc);
+			em.remove(loc);
 			return true;
-		} else 
+		} else {
 			return false;
+		}
 	}
 	
 	public void removeAllLocations() {
