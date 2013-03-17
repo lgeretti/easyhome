@@ -33,7 +33,7 @@ public class LevelControlRspPacket extends NativePacket {
 		if (op.getContext() != HomeAutomationContext.LEVEL_CONTROL.getCode())
 			throw new InvalidContextException();
 		byte[] opData = op.getData();
-		if (opData.length != 2)
+		if (opData.length != 4)
 			throw new InvalidPayloadLengthException();
 	}
 	
@@ -44,9 +44,13 @@ public class LevelControlRspPacket extends NativePacket {
 	public ResponseStatus getStatus() {
 		return ResponseStatus.fromCode(this.getOperation().getData()[0]);
 	}
+
+	public short getAddrOfInterest() {
+		return ByteUtils.getShort(this.getOperation().getData(), 1, Endianness.LITTLE_ENDIAN);
+	}
 	
 	public int getLevelPercentage() {
-		return (0xFF & this.getOperation().getData()[1])-100;
+		return (0xFF & this.getOperation().getData()[3])-100;
 	}
 	
 	public static boolean validates(NativePacket pkt) {
@@ -66,7 +70,7 @@ public class LevelControlRspPacket extends NativePacket {
 		// Command id (fake)
 		if (op.getCommand() != (byte)0x0)
 			return false;
-		if (op.getData().length != 2) 
+		if (op.getData().length != 4) 
 			return false;
 		
 		return true;

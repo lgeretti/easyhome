@@ -45,8 +45,14 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class LightLevelControlProcess extends Process {
 
+	
+	private MessageProducer networkEventsProducer = null;
+	
     public LightLevelControlProcess(int pid, UriInfo uriInfo,ProcessKind kind, LogLevel logLevel) throws NamingException, JMSException {
         super(pid, UriBuilder.fromUri(uriInfo.getBaseUri()).build(new Object[0]),kind,logLevel);
+        
+        Topic networkEventsTopic = (Topic) jndiContext.lookup(JMSConstants.NETWORK_EVENTS_TOPIC);
+        networkEventsProducer = registerProducerFor(networkEventsTopic);
     }
     
     @Override
@@ -66,8 +72,24 @@ public class LightLevelControlProcess extends Process {
 	        		
 	        		if (levelControlPkt.getStatus() == ResponseStatus.SUCCESS) {
 	        			byte gatewayId = levelControlPkt.getSrcCoords().getGatewayId();
+	        			short address = levelControlPkt.getAddrOfInterest();
 	        			int levelPercentage = levelControlPkt.getLevelPercentage();
 	        			log(LogLevel.DEBUG, "Level percentage " + levelPercentage + "% event recognized");
+	        			
+		        		ClientResponse getResponse = restResource.path(RestPaths.NODES).path(Byte.toString(gatewayId)).path(Short.toString(address))
+								 .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+
+						if (getResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
+							
+							NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.LEVEL_CONTROL_VARIATION, 
+    								gatewayId, address,new byte[]{(byte)(levelPercentage & 0x0FF)});
+					        try {
+					            ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
+					            networkEventsProducer.send(eventMessage);
+					        } catch (JMSException ex) { }
+						
+						} else
+					    	log(LogLevel.DEBUG, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
 	        		}
 	        	} catch (InvalidPacketTypeException e) {
 	        		e.printStackTrace();
