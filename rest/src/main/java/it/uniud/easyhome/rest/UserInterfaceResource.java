@@ -180,6 +180,7 @@ public class UserInterfaceResource {
     	
     	String loc0 = "Salotto";
     	String loc1 = "Camera da letto doppia";
+    	String loc2 = "Laboratorio";
     	
         MultivaluedMap<String,String> formData;
         
@@ -192,6 +193,11 @@ public class UserInterfaceResource {
         formData.add("name",loc1);
         formData.add("type",LocationType.BEDROOM.toString());
         client.resource(TARGET).path(RestPaths.LOCATIONS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+ 
+        formData = new MultivaluedMapImpl();
+        formData.add("name",loc2);
+        formData.add("type",LocationType.BEDROOM.toString());
+        client.resource(TARGET).path(RestPaths.LOCATIONS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         
         formData = new MultivaluedMapImpl();
         formData.add("name","Gateway");
@@ -200,7 +206,10 @@ public class UserInterfaceResource {
         formData = new MultivaluedMapImpl();
         formData.add("name","Interfaccia gestuale");
         formData.add("locationName",loc1);
-    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928337L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);    	
+    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928337L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        formData.add("name","Interfaccia gestuale");
+        formData.add("locationName",loc2);
+    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928181L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     }
     
     private void stopEventBasedJSFProcesses() throws NamingException, JMSException {
