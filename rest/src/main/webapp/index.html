@@ -16,7 +16,6 @@
    .red { color: #e75c5c; }
    .orange { color: #eb7914; }
    #eh_selection_buttons_container { position: absolute; left: 12px; bottom: 15px; }
-   #eh_selection_buttons_container a div { float: left; }
    #eh_selection_buttons_container div { float: left; }
 
    #eh_help_button_container { position: absolute; right: 15px; top: 15px; }
@@ -40,6 +39,22 @@
 var hoverTimeout;
 var hoverEffectTime = 1000;
 var helpSelected = false;
+
+var devices = [ 
+
+ {   
+ 		 name: "Forno",
+ 		 image: "img/oven.svg"
+ },
+	{
+	 		name: "Frigo",
+ 		 image: "img/fridge.svg"
+	},
+	{
+	  name: "Macchina del caffè",
+	  image: "img/coffee.svg"
+	},
+];
 
 function buttonHoverEffectIn(button) {
     button.stop().animate({
@@ -98,6 +113,8 @@ function helpHoverEffectOut() {
 
 $(document).ready(function(){
 
+$("#eh_arrow_left").css('visibility','hidden');
+
 $("#eh_description_div").hide();
 
 $(".eh_button").each(
@@ -125,7 +142,8 @@ $(".selection_button,.navigation_button").hover(
 
 $(".help_button").hover(
     function() {
-        $("#eh_description_div").text($(this).find("img").attr("alt")).show();
+						 if (!helpSelected)
+          $("#eh_description_div").text($(this).find("img").attr("alt")).show();
         helpHoverEffectIn();
     }
     ,
@@ -185,31 +203,33 @@ $(".arrow_button").hover(
  
   <div id="eh_selection_buttons_container">
 
-      <div class="eh_arrow_button_positioner">
+      <div id="eh_arrow_left" class="eh_arrow_button_positioner">
         <a href="#1">
           <div class="eh_button arrow_button ui-widget-content ui-corner-all">
             <img src="img/arrowleft.svg"/>
           </div>
         </a>        
       </div>
+	
+	    <div id="eh_selection_left" class="eh_button selection_button ui-widget-content ui-corner-all">
+	      <a href="#2">
+	        <img src="img/oven.svg" alt="Forno"/>
+	      </a>
+	    </div>
+		      
+		   <div id="eh_selection_center" class="eh_button selection_button ui-widget-content ui-corner-all">
+		     <a href="#3">
+		       <img src="img/fridge.svg" alt="Frigo"/>
+		     </a>
+		   </div>
+		      
+		   <div id="eh_selection_right" class="eh_button selection_button ui-widget-content ui-corner-all">
+		      <a href="#4">
+		        <img src="img/coffee.svg" alt="Macchina del caffè"/>
+		      </a>
+		   </div>
 
-      <a href="#2">
-          <div class="eh_button selection_button ui-widget-content ui-corner-all">
-            <img src="img/oven.svg" alt="Forno"/>
-          </div>
-      </a>
-      <a href="#3">
-          <div class="eh_button selection_button ui-widget-content ui-corner-all">
-            <img src="img/fridge.svg" alt="Frigo"/>
-          </div>
-      </a>
-      <a href="#4">
-          <div class="eh_button selection_button ui-widget-content ui-corner-all">
-            <img src="img/coffee.svg" alt="Macchina del caffè"/>
-          </div>
-      </a>
-
-      <div class="eh_arrow_button_positioner">
+      <div id="eh_arrow_right" class="eh_arrow_button_positioner">
         <a href="#5">
           <div class="eh_button arrow_button ui-widget-content ui-corner-all">
             <img src="img/arrowright.svg"/>
