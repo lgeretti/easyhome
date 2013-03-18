@@ -15,7 +15,7 @@
    .blue { color: #36609f; }
    .red { color: #e75c5c; }
    .orange { color: #eb7914; }
-   #eh_selection_buttons_container { position: absolute; left: 15px; bottom: 15px; }
+   #eh_selection_buttons_container { position: absolute; left: 12px; bottom: 15px; }
    #eh_selection_buttons_container a div { float: left; }
    #eh_selection_buttons_container div { float: left; }
 
@@ -39,6 +39,7 @@
 
 var hoverTimeout;
 var hoverEffectTime = 1000;
+var helpSelected = false;
 
 function buttonHoverEffectIn(button) {
     button.stop().animate({
@@ -53,6 +54,46 @@ function buttonHoverEffectIn(button) {
 function buttonHoverEffectOut(button) {
     clearTimeout(hoverTimeout);
     button.stop().animate({backgroundColor: "#666666"}, hoverEffectTime/2 );
+}
+
+function helpHoverEffectIn() {
+    var button = $("#help_button");
+
+    if (!helpSelected) {
+        button.stop().animate({
+              backgroundColor: button.css('color')
+                }, hoverEffectTime );
+
+        hoverTimeout = setTimeout(function(){ 
+        						helpSelected = true;
+               $("#eh_selection_buttons_container").hide();  
+               $("#eh_description_div").text("Prova testo molto lungo tanto per capire come si comporta quando deve andare a capo per aver finito lo spazio disponibile").show();                                
+             },hoverEffectTime);
+    } else {
+        
+        button.stop().animate({
+              backgroundColor: "#666666"
+                }, hoverEffectTime );
+
+        hoverTimeout = setTimeout(function(){
+        						helpSelected = false; 
+               $("#eh_selection_buttons_container").show();  
+               $("#eh_description_div").hide();                                
+             },hoverEffectTime);
+    }
+}
+
+function helpHoverEffectOut() {
+
+    var button = $("#help_button");
+
+    clearTimeout(hoverTimeout);
+    
+    if (!helpSelected) {
+        button.stop().animate({backgroundColor: "#666666"}, hoverEffectTime/2 );
+    } else {
+        button.stop().animate({backgroundColor: button.css('color')}, hoverEffectTime/2 );  
+    }
 }
 
 $(document).ready(function(){
@@ -70,30 +111,28 @@ $(".eh_button").each(
 
 $(".selection_button,.navigation_button").hover(
     function() {
-        $("#eh_description_div").text($(this).find("img").attr("alt")).show();
+    				if (!helpSelected)
+          $("#eh_description_div").text($(this).find("img").attr("alt")).show();
         buttonHoverEffectIn($(this));
     }
     ,
     function() {
-        $("#eh_description_div").hide();
+        if (!helpSelected)
+          $("#eh_description_div").hide();
         buttonHoverEffectOut($(this));
     }
 );
 
- 
-
-
 $(".help_button").hover(
     function() {
         $("#eh_description_div").text($(this).find("img").attr("alt")).show();
-        $("#eh_selection_buttons_container").hide(); 
-        buttonHoverEffectIn($(this));
+        helpHoverEffectIn();
     }
     ,
     function() {
-        $("#eh_description_div").hide();
-        $("#eh_selection_buttons_container").show();
-        buttonHoverEffectOut($(this));
+    				if (!helpSelected)
+        	 $("#eh_description_div").hide();
+        helpHoverEffectOut();
     }
 );
 
@@ -132,8 +171,8 @@ $(".arrow_button").hover(
   <div id="eh_help_button_container">
 
       <a href="#6">
-          <div class="eh_button help_button ui-widget-content ui-corner-all">
-            <img src="img/help.svg" alt="Prova testo molto lungo tanto per capire come si comporta quando deve andare a capo per aver finito lo spazio disponibile"/>
+          <div id="help_button" class="eh_button help_button ui-widget-content ui-corner-all">
+            <img src="img/help.svg" alt="Aiuto contestuale"/>
           </div>
       </a>
 
