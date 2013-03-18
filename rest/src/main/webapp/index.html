@@ -7,27 +7,32 @@
 <style>
    .eh_button { padding: 0.8em; margin: 1em; background: #666666; }
    .selection_button { height: 250px; width: 250px; color: #36609f; }
+   .help_button { height: 125px; width: 125px; color: #eb7914; }
    .arrow_button { height: 100px; width: 100px; color: #61c165; }
    .navigation_button { height: 125px; width: 125px; color: #61c165; }
    .yellow { color: #e0c73d; }
    .green { color: #61c165; }
    .blue { color: #36609f; }
    .red { color: #e75c5c; }
+   .orange { color: #eb7914; }
    #eh_selection_buttons_container { position: absolute; left: 15px; bottom: 15px; }
    #eh_selection_buttons_container a div { float: left; }
    #eh_selection_buttons_container div { float: left; }
+
+   #eh_help_button_container { position: absolute; right: 15px; top: 15px; }
 
    #eh_navigation_buttons_container { position: absolute; left: 15px; top: 15px; }
    #eh_navigation_buttons_container a div { float: left; }
 
    .eh_arrow_button_positioner { position: relative; top: 75px; }
    
-   div.text { font-size: 28pt; font-weight: bold; padding: 0.3em; white-space: nowrap; }
-   #eh_description_float {position: absolute; left: 50%; top: 250px}
-   #eh_description_div { border-width: 1px; border-style: solid; border-color: #666666; color: #ffffff; position: relative; display: inline-block; left: -50%; height: 50px;"}
-
+   div.text { font-family:"Verdana"; font-size: 40pt; text-transform: uppercase; text-align: center; font-weight: bold; padding: 0.3em; } 
+   #eh_description_float {position: absolute; left: 80px; top: 290px; }
+   #eh_description_div { border-width: 1px; width: 1070px; border-style: solid; border-color: #666666; color: #ffffff; }
+   
 }
 </style>
+
 <script src="js/jquery-1.9.1.js"></script>
 <script src="js/jquery-ui-1.10.2.custom.js"></script>
 <script type='text/javascript'>
@@ -41,7 +46,7 @@ function buttonHoverEffectIn(button) {
             }, hoverEffectTime );
 
     hoverTimeout = setTimeout(function(){ 
-            button.find("img").trigger('click'); 
+            button.find("img").trigger('click');           
          },hoverEffectTime);
 }
 
@@ -75,6 +80,23 @@ $(".selection_button,.navigation_button").hover(
     }
 );
 
+ 
+
+
+$(".help_button").hover(
+    function() {
+        $("#eh_description_div").text($(this).find("img").attr("alt")).show();
+        $("#eh_selection_buttons_container").hide(); 
+        buttonHoverEffectIn($(this));
+    }
+    ,
+    function() {
+        $("#eh_description_div").hide();
+        $("#eh_selection_buttons_container").show();
+        buttonHoverEffectOut($(this));
+    }
+);
+
 $(".arrow_button").hover(
     function() {
         buttonHoverEffectIn($(this));
@@ -102,6 +124,16 @@ $(".arrow_button").hover(
       <a href="#7">
           <div class="eh_button navigation_button ui-widget-content ui-corner-all">
             <img src="img/kitchen.svg" alt="Cucina"/>
+          </div>
+      </a>
+
+  </div>
+
+  <div id="eh_help_button_container">
+
+      <a href="#6">
+          <div class="eh_button help_button ui-widget-content ui-corner-all">
+            <img src="img/help.svg" alt="Prova testo molto lungo tanto per capire come si comporta quando deve andare a capo per aver finito lo spazio disponibile"/>
           </div>
       </a>
 
