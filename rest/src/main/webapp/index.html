@@ -55,31 +55,33 @@ function arrowHoverEffectIn(button) {
     button.stop().animate({
           backgroundColor: button.css('color')
             }, hoverEffectTime );
-
-    var id = button.attr('id');
-
-    hoverTimeout = setTimeout(function(){ 
-    							
-            if (button.attr('id') == "arrow_left") {
-            		lowSelectionIndex--;
-            		highSelectionIndex--;
-            } else {
-            		lowSelectionIndex++;
-            		highSelectionIndex++;
-            }              
             
-            switch(currentState) {
+    hoverTimeoutFunc = function() {
+    
+      if (button.attr('id') == "arrow_left") {
+      		lowSelectionIndex--;
+      		highSelectionIndex--;
+      } else {
+      		lowSelectionIndex++;
+      		highSelectionIndex++;
+      }              
+      
+      switch(currentState) {
 
-												case uiState.Home:
-														showSelectionForLocations();  	
-														break;
-														
-												case uiState.Room:
+										case uiState.Home:
+												showSelectionForLocations();  	
+												break;
 												
-														break;        
-            }
-                     
-         },hoverEffectTime);
+										case uiState.Room:
+										
+												break;        
+      }    
+      
+      hoverTimeout = setTimeout(hoverTimeoutFunc,hoverEffectTime); 
+    
+    }
+
+    hoverTimeout = setTimeout(hoverTimeoutFunc,hoverEffectTime);
 }
 
 function buttonHoverEffectIn(button) {
@@ -88,7 +90,7 @@ function buttonHoverEffectIn(button) {
             }, hoverEffectTime );
 
     hoverTimeout = setTimeout(function(){ 
-            // To be done          
+            // To be done yet    
          },hoverEffectTime);
 }
 
