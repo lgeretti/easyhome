@@ -88,7 +88,7 @@ function buttonHoverEffectIn(button) {
             }, hoverEffectTime );
 
     hoverTimeout = setTimeout(function(){ 
-            button.find("img").trigger('click');           
+            // To be done          
          },hoverEffectTime);
 }
 
@@ -190,8 +190,7 @@ function showSelectionForLocations() {
 						var button = $("#eh_selection_center");
 						button.css('visibility','visible');
 						var loc = locations[0];
-       button.find('a').attr('id',0);
-		  	  	button.find('img').attr('alt',loc.help).attr('src',loc.imgPath);
+		  	  	button.find('img').attr('id',0).attr('alt',loc.help).attr('src',loc.imgPath);
 		  			break;
 		  			
 		  	case 1:
@@ -204,13 +203,11 @@ function showSelectionForLocations() {
 						
 						var button = $("#eh_selection_left");
 						var loc = locations[0];
-       button.find('a').attr('id',0);
-		  	  	button.find('img').attr('alt',loc.help).attr('src',loc.imgPath);						
+		  	  	button.find('img').attr('id',0).attr('alt',loc.help).attr('src',loc.imgPath);						
 						
 					 button = $("#eh_selection_right");
 						var loc = locations[1];
-       button.find('a').attr('id',1);
-		  	  	button.find('img').attr('alt',loc.help).attr('src',loc.imgPath);
+		  	  	button.find('img').attr('id',1).attr('alt',loc.help).attr('src',loc.imgPath);
 		  			break;		  	
 								  	
 		  	case 2:
@@ -221,18 +218,15 @@ function showSelectionForLocations() {
 						
 						var button = $("#eh_selection_left");
 						var loc = locations[lowSelectionIndex];
-       button.find('a').attr('id',lowSelectionIndex);
-		  	  	button.find('img').attr('alt',loc.name).attr('src',loc.imgPath);						
+		  	  	button.find('img').attr('id',lowSelectionIndex).attr('alt',loc.name).attr('src',loc.imgPath);						
 						
 					 button = $("#eh_selection_center");
 						var loc = locations[lowSelectionIndex+1];
-       button.find('a').attr('id',lowSelectionIndex+1);
-		  	  	button.find('img').attr('alt',loc.name).attr('src',loc.imgPath);
+		  	  	button.find('img').attr('id',lowSelectionIndex+1).attr('alt',loc.name).attr('src',loc.imgPath);
 		  	  	
 					 button = $("#eh_selection_right");
 						var loc = locations[lowSelectionIndex+2];
-       button.find('a').attr('id',lowSelectionIndex+2);
-		  	  	button.find('img').attr('alt',loc.name).attr('src',loc.imgPath);
+		  	  	button.find('img').attr('id',lowSelectionIndex+2).attr('alt',loc.name).attr('src',loc.imgPath);
 		  	  			  	  	
 		  			break;
 		}
@@ -300,77 +294,53 @@ $(".arrow_button").hover(
 
   <div id="eh_navigation_buttons_container">
 
-      <a href="">
-          <div class="eh_button navigation_button ui-widget-content ui-corner-all">
-            <img src="img/home.svg" alt="Selezione stanza"/>
-          </div>
-      </a>
-      <a href="">
-          <div class="eh_button navigation_button ui-widget-content ui-corner-all">
-            <img src="img/livingroom.svg" alt="Salotto"/>
-          </div>
-      </a>
-      <a href="">
-          <div class="eh_button navigation_button ui-widget-content ui-corner-all">
-            <img src="img/colorlight.svg" alt="Luce"/>
-          </div>
-      </a>      
-      <a href="">
-          <div class="eh_button navigation_button ui-widget-content ui-corner-all">
-            <img src="img/sun.svg" alt="Luminosità"/>
-          </div>
-      </a>            
-
+      <div class="eh_button navigation_button ui-widget-content ui-corner-all">
+        <img src="img/home.svg" alt="Selezione stanza"/>
+      </div>
+      <div class="eh_button navigation_button ui-widget-content ui-corner-all">
+        <img src="img/livingroom.svg" alt="Salotto"/>
+      </div>
+      <div class="eh_button navigation_button ui-widget-content ui-corner-all">
+        <img src="img/colorlight.svg" alt="Luce"/>
+      </div>
+      <div class="eh_button navigation_button ui-widget-content ui-corner-all">
+        <img src="img/sun.svg" alt="Luminosità"/>
+      </div>
   </div>
 
   <div id="eh_help_button_container">
-
-      <a href="#6">
-          <div id="help_button" class="eh_button help_button ui-widget-content ui-corner-all">
-            <img src="img/help.svg" alt="Aiuto contestuale"/>
-          </div>
-      </a>
-
+    <div id="help_button" class="eh_button help_button ui-widget-content ui-corner-all">
+      <img src="img/help.svg" alt="Aiuto contestuale"/>
+    </div>
   </div>
 
   <div id="eh_description_float">
-      <div id="eh_description_div" class="ui-corner-all text">
-      </div>
+      <div id="eh_description_div" class="ui-corner-all text"></div>
   </div>
  
   <div id="eh_selection_buttons_container">
 
       <div id="eh_arrow_left" class="eh_arrow_button_positioner">
         <div id="arrow_left" class="eh_button arrow_button ui-widget-content ui-corner-all">
-          <a href="">
-            <img src="img/arrowleft.svg"/>
-          </a>
+          <img src="img/arrowleft.svg"/>
         </div>
       </div>
 	
 	    <div id="eh_selection_left" class="eh_button selection_button ui-widget-content ui-corner-all">
-	      <a href="">
-	        <img />
-	      </a>
+	      <img />
 	    </div>
 		      
 		   <div id="eh_selection_center" class="eh_button selection_button ui-widget-content ui-corner-all">
-		     <a href="">
-		       <img />
-		     </a>
+		     <img />
 		   </div>
 		      
 		   <div id="eh_selection_right" class="eh_button selection_button ui-widget-content ui-corner-all">
-		      <a href="">
-		        <img />
-		      </a>
+		      <img />
 		   </div>
 
       <div id="eh_arrow_right" class="eh_arrow_button_positioner">
 				    <div id="arrow_right" class="eh_button arrow_button ui-widget-content ui-corner-all">
-				      <a href="">
-				        <img src="img/arrowright.svg"/>
-				      </a>
+				      <img src="img/arrowright.svg"/>
 				    </div>
       </div>
 
