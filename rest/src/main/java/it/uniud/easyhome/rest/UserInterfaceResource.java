@@ -233,17 +233,20 @@ public class UserInterfaceResource {
         formData.add("name","Gateway ZigBee");
         formData.add("locationName",loc0);
         formData.add("imgPath","img/accesspoint.svg");
+        formData.add("help", "Nessuna funzione correntemente disponibile");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146521827785L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     	
         formData = new MultivaluedMapImpl();
         formData.add("name","Interfaccia gestuale");
         formData.add("locationName",loc2);
         formData.add("imgPath","img/hand.svg");
+        formData.add("help", "Nessuna funzione correntemente disponibile");
         client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928337L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     	
         formData = new MultivaluedMapImpl();
         formData.add("name","Interfaccia gestuale (test)");
         formData.add("locationName",loc2);
+        formData.add("help", "Nessuna funzione correntemente disponibile");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928181L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         
     	// PowerLine
@@ -252,24 +255,28 @@ public class UserInterfaceResource {
         formData.add("name","Gateway Powerline");
         formData.add("locationName",loc0);
         formData.add("imgPath","img/accesspoint.svg");
+        formData.add("help", "Nessuna funzione correntemente disponibile");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(100L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     	
         formData = new MultivaluedMapImpl();
         formData.add("name","Lampada");
         formData.add("locationName",loc0);
         formData.add("imgPath","img/colorlight.svg");
+        formData.add("help", "E' possibile cambiare luce o colore della lampada");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(1L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     	
         formData = new MultivaluedMapImpl();
         formData.add("name","Lampada");
         formData.add("locationName",loc2);
         formData.add("imgPath","img/colorlight.svg");
+        formData.add("help", "E' possibile cambiare luce o colore della lampada");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(2L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 
         formData = new MultivaluedMapImpl();
         formData.add("name","Frigo");
         formData.add("locationName",loc1);
         formData.add("imgPath","img/fridge.svg");
+        formData.add("help", "Nessuna funzione correntemente disponibile");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(3L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     	
     	// Fake
@@ -278,42 +285,49 @@ public class UserInterfaceResource {
         formData.add("name","Forno");
         formData.add("locationName",loc1);
         formData.add("imgPath","img/oven.svg");
+        formData.add("help", "Nessuna funzione correntemente disponibile (dispositivo fasullo)");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(1L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     	
         formData = new MultivaluedMapImpl();
         formData.add("name","Macchina del caffè");
         formData.add("locationName",loc1);
         formData.add("imgPath","img/coffee.svg");
+        formData.add("help", "Nessuna funzione correntemente disponibile (dispositivo fasullo)");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(2L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 
         formData = new MultivaluedMapImpl();
         formData.add("name","Tostapane");
         formData.add("locationName",loc1);
         formData.add("imgPath","img/bread.svg");
+        formData.add("help", "Nessuna funzione correntemente disponibile (dispositivo fasullo)");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(3L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 
         formData = new MultivaluedMapImpl();
         formData.add("name","Televisore");
         formData.add("locationName",loc0);
         formData.add("imgPath","img/tv.svg");
+        formData.add("help", "Nessuna funzione correntemente disponibile (dispositivo fasullo)");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(4L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 
         formData = new MultivaluedMapImpl();
         formData.add("name","HiFi");
         formData.add("locationName",loc0);
         formData.add("imgPath","img/hifi.svg");
+        formData.add("help", "Nessuna funzione correntemente disponibile (dispositivo fasullo)");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(5L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     	
         formData = new MultivaluedMapImpl();
         formData.add("name","Termostato");
         formData.add("locationName",loc0);
         formData.add("imgPath","img/thermostat.svg");
+        formData.add("help", "Nessuna funzione correntemente disponibile (dispositivo fasullo)");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(6L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     	
         formData = new MultivaluedMapImpl();
         formData.add("name","Sveglia");
         formData.add("locationName",loc2);
         formData.add("imgPath","img/timer.svg");
+        formData.add("help", "Nessuna funzione correntemente disponibile (dispositivo fasullo)");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(7L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     	
     }

@@ -54,7 +54,8 @@ public final class PersistentInfoResource {
     											@PathParam("nuid") long nuid, 
     								  			@FormParam("name") String name, 
     								  			@FormParam("locationName") String locationName,
-    								  			@FormParam("imgPath") String imgPath) {
+    								  			@FormParam("imgPath") String imgPath,
+    								  			@FormParam("help") String help) {
     	
     	synchronized(infoLock) {
     		
@@ -70,7 +71,7 @@ public final class PersistentInfoResource {
     		
     		if (info == null) {
     			
-    			resEjb.insertPersistentInfo(new NodePersistentInfo(++nodePersistentInfoId,gatewayId,nuid,name,loc,imgPath));
+    			resEjb.insertPersistentInfo(new NodePersistentInfo(++nodePersistentInfoId,gatewayId,nuid,name,loc,imgPath,help));
     			return Response.created(
                         	uriInfo.getAbsolutePathBuilder()
                         	.path(Byte.toString(gatewayId))
