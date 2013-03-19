@@ -246,6 +246,7 @@ public class UserInterfaceResource {
         formData = new MultivaluedMapImpl();
         formData.add("name","Interfaccia gestuale (test)");
         formData.add("locationName",loc2);
+        formData.add("imgPath","img/hand.svg");
         formData.add("help", "Nessuna funzione correntemente disponibile");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928181L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         
