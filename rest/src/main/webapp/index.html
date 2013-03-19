@@ -110,7 +110,7 @@ function helpHoverEffectIn() {
         hoverTimeout = setTimeout(function(){ 
         						helpSelected = true;
                $("#eh_selection_buttons_container").hide();  
-               $("#eh_description_div").text("Prova testo molto lungo tanto per capire come si comporta quando deve andare a capo per aver finito lo spazio disponibile").show();                                
+               $("#eh_description_div").text(helpText).show();                                
              },hoverEffectTime);
     } else {
         
@@ -139,6 +139,12 @@ function helpHoverEffectOut() {
     }
 }
 
+function initialize() {
+
+  getLocations();
+
+}
+
 function getLocations() {
 
    $.ajax({ 
@@ -153,13 +159,65 @@ function getLocations() {
 									else
 											highSelectionIndex = locations.length-1;
 											
-								 showSelectionForLocations();
+          updateState(uiState.Home);
        },
        error: function(jqXHR, textStatus, errorThrown){
           alert(textStatus + ":" + errorThrown);
        }
    });	
 	
+}
+
+function updateState(newState) {
+
+  currentState = newState; 
+
+  updateHelpText(currentState);
+  
+  switch (newState) {
+  
+    case uiState.Home:
+    													
+					showSelectionForLocations();
+					break;  
+  
+  		 case uiState.Room:
+				
+						break;
+						
+				case uiState.Device:
+				
+						break;
+						
+				case uiState.Functionality:  
+  }
+
+}
+
+function updateHelpText(currentState) {
+
+  switch (currentState) {
+  
+				case uiState.Home:
+				
+				  helpText = "Seleziona una stanza per accedere ai dispositivi presenti";
+				
+						break;
+						
+				case uiState.Room:
+				
+				  helpText = "Seleziona un dispositivo per accedere alle funzionalità disponibili";
+				
+						break;
+						
+				case uiState.Device:
+				
+						break;
+						
+				case uiState.Functionality:  
+  
+  }
+
 }
 
 function showSelectionForLocations() {
@@ -236,7 +294,7 @@ function showSelectionForLocations() {
 
 $(document).ready(function(){
 
-getLocations();
+initialize();
 
 $("#eh_description_div").hide();
 
