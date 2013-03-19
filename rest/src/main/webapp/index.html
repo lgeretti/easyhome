@@ -49,7 +49,6 @@ var uiState = {Home: 1, Room: 2, Device: 3, Functionality: 4};
 var currentState = uiState.Home;
 
 var lowSelectionIndex;
-var highSelectionIndex;
 
 function arrowHoverEffectIn(button) {
     button.stop().animate({
@@ -60,10 +59,8 @@ function arrowHoverEffectIn(button) {
     
       if (button.attr('id') == "arrow_left") {
       		lowSelectionIndex--;
-      		highSelectionIndex--;
       } else {
       		lowSelectionIndex++;
-      		highSelectionIndex++;
       }              
       
       switch(currentState) {
@@ -154,10 +151,6 @@ function getLocations() {
        success: function(data){        
           locations = data.location;
           lowSelectionIndex = 0;
-          if (locations.length > 2)
-          			highSelectionIndex = 2;
-									else
-											highSelectionIndex = locations.length-1;
 											
           updateState(uiState.Home);
        },
@@ -228,14 +221,14 @@ function showSelectionForLocations() {
 			 $("#eh_arrow_left").css('visibility','hidden');
 	 else 
 	 			$("#eh_arrow_left").css('visibility','visible');
-		if (highSelectionIndex==locations.length-1)
+		if (lowSelectionIndex+2 >=locations.length-1)
 				$("#eh_arrow_right").css('visibility','hidden');
 		else
 		  $("#eh_arrow_right").css('visibility','visible');
 		  
-  var selectionIndexDiff = highSelectionIndex-lowSelectionIndex;		  
+  var selectionIndexDiff = locations.length-lowSelectionIndex;		  
 		  
-		switch (highSelectionIndex-lowSelectionIndex) {
+		switch (selectionIndexDiff) {
 		
 		  case -1:
 						$(".selection_button").each( function() {
@@ -270,7 +263,7 @@ function showSelectionForLocations() {
 		  	  	button.find('img').attr('id',1).attr('alt',loc.help).attr('src',loc.imgPath);
 		  			break;		  	
 								  	
-		  	case 2:
+		  	default:
 		
 						$(".selection_button").each( function() {
 							$(this).css('visibility','visible');
