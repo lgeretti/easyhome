@@ -110,6 +110,8 @@ function selectionButtonHoverEffectIn(button) {
 			// Functionalities have no selection buttons, only actuators
 		}
         
+        button.stop().css('backgroundColor', "#666666");
+        
         }, hoverEffectTime
     );
 }
@@ -153,7 +155,9 @@ function navigationButtonHoverEffectIn(button) {
 				  selectState(uiState.Device);
 						break;
 				default:
-		   }                       
+		   }                  
+	       
+	       button.stop().css('backgroundColor', "#666666");
 	
 	   },hoverEffectTime);
          
