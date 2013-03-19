@@ -19,8 +19,8 @@ public class LocationEJB {
 	@PersistenceContext(unitName = "EasyHome-JTA")
 	private EntityManager em;
 	
-	public void insertLocation(int id, String name, LocationType type) {
-		Location loc = new Location(id,name,type);
+	public void insertLocation(int id, String name, LocationType type, String imgPath) {
+		Location loc = new Location(id,name,type,imgPath);
 		
 		em.persist(loc);
 	}

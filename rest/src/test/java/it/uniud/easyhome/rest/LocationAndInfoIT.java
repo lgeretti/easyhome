@@ -75,7 +75,7 @@ public class LocationAndInfoIT {
     	byte gatewayId = 2;
     	long nuid = 10L;
     	String name = "Oven";
-    	Location location = new Location(1,"Kitchen",LocationType.KITCHEN);
+    	Location location = new Location(1,"Kitchen",LocationType.KITCHEN,"img/kitchen.svg");
 
     	postLocation(location.getName(),location.getType());    	
        
@@ -107,8 +107,8 @@ public class LocationAndInfoIT {
     	byte gatewayId = 2;
     	long nuid = 10L;
     	String name = "Oven";
-    	Location kitchen = new Location(1,"Kitchen",LocationType.KITCHEN);
-    	Location bathroom = new Location(2,"Bathroom",LocationType.BATHROOM);
+    	Location kitchen = new Location(1,"Kitchen",LocationType.KITCHEN,"img/kitchen.svg");
+    	Location bathroom = new Location(2,"Bathroom",LocationType.BATHROOM,"img/bathroom.svg");
 
     	postLocation(kitchen.getName(),kitchen.getType());    	
     	postLocation(bathroom.getName(),bathroom.getType());

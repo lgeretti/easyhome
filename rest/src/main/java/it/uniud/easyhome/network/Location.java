@@ -27,15 +27,18 @@ public class Location implements Serializable {
 	private LocationType type;
 	@Column(nullable = false)
 	private boolean occupied;
+	@Column(nullable = false)
+	private String imgPath;
 	
     @SuppressWarnings("unused")
 	private Location() { }
     
-    public Location(int id, String name, LocationType type) {
+    public Location(int id, String name, LocationType type, String imgPath) {
     	this.id = id;
     	this.name = name;
     	this.type = type;
-    	occupied = false;
+    	this.occupied = false;
+    	this.imgPath = imgPath;
     }
     
     public int getId() {
@@ -52,6 +55,10 @@ public class Location implements Serializable {
     
     public boolean isOccupied() {
     	return occupied;
+    }
+    
+    public String getImagePath() {
+    	return imgPath;
     }
     
     public void setOccupied(boolean occupied) {

@@ -187,16 +187,19 @@ public class UserInterfaceResource {
         formData = new MultivaluedMapImpl();
         formData.add("name",loc0);
         formData.add("type",LocationType.LIVINGROOM.toString());
+        formData.add("imgPath","img/livingroom.svg");
         client.resource(TARGET).path(RestPaths.LOCATIONS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         
         formData = new MultivaluedMapImpl();
         formData.add("name",loc1);
         formData.add("type",LocationType.BEDROOM.toString());
+        formData.add("imgPath","img/bedroom.svg");        
         client.resource(TARGET).path(RestPaths.LOCATIONS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
  
         formData = new MultivaluedMapImpl();
         formData.add("name",loc2);
         formData.add("type",LocationType.BEDROOM.toString());
+        formData.add("imgPath","img/bedroom.svg");        
         client.resource(TARGET).path(RestPaths.LOCATIONS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         
         formData = new MultivaluedMapImpl();

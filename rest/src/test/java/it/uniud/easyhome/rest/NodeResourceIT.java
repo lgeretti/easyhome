@@ -264,8 +264,8 @@ public class NodeResourceIT {
     	long nuid = 10L;
     	short address = 0x00CD;
     	
-    	Location bedroom = new Location(1,"Camera",LocationType.BEDROOM);
-    	Location kitchen = new Location(2,"Cucina",LocationType.KITCHEN);
+    	Location bedroom = new Location(1,"Camera",LocationType.BEDROOM,"img/bedroom.svg");
+    	Location kitchen = new Location(2,"Cucina",LocationType.KITCHEN,"img/kitchen.svg");
 
     	insertNewLocation(bedroom.getName(),bedroom.getType());
     	insertNewLocation(kitchen.getName(),kitchen.getType());  

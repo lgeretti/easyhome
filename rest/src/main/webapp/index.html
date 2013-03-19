@@ -39,9 +39,10 @@
 var hoverTimeout;
 var hoverEffectTime = 1000;
 var helpSelected = false;
+var helpText;
+var currentLeftLocationIndex = 0;
 
 var devices = [ 
-
  {   
  		 name: "Forno",
  		 image: "img/oven.svg"
@@ -109,6 +110,16 @@ function helpHoverEffectOut() {
     } else {
         button.stop().animate({backgroundColor: button.css('color')}, hoverEffectTime/2 );  
     }
+}
+
+function updateLocations() {
+
+  
+
+
+
+
+
 }
 
 $(document).ready(function(){

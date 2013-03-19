@@ -30,7 +30,8 @@ public final class LocationResource {
     
     @POST
     public Response insertLocation(@FormParam("name") String name, 
-    						   @FormParam("type") LocationType type) {
+    						   @FormParam("type") LocationType type,
+    						   @FormParam("imgPath") String imgPath) {
     	
     	int thisLocId;
     	
@@ -41,7 +42,7 @@ public final class LocationResource {
     		if (loc == null) {
 	    		thisLocId = ++locationId;
 	    		
-	    		resEjb.insertLocation(thisLocId,name,type);
+	    		resEjb.insertLocation(thisLocId,name,type,imgPath);
 	    		
 	            return Response.created(
                         uriInfo.getAbsolutePathBuilder()
