@@ -329,41 +329,39 @@ function showSelections(selections) {
 	else
 		$("#eh_arrow_right").css('visibility','visible');
 		  
-  	var selectionIndexDiff = selections.length-lowSelectionIndex;		  
-		  
-	switch (selectionIndexDiff) {
+	switch (selections.length) {
 	
-	  case -1:  
+	  case 0:  
 		  $(".selection_button").each( function() {
 				$(this).css('visibility','hidden');
 		  });		  
 	  	  break;
 	  			
-	  case 0:
+	  case 1:
 		  $("#eh_selection_left,#eh_selection_right").each( function() {
 				$(this).css('visibility','hidden');
 		  });
 		  var button = $("#eh_selection_center");
 		  button.css('visibility','visible');
 		  var loc = selections[0];
-	  	  button.find('img').attr('id',0).attr('alt',loc.help).attr('src',loc.imgPath);
+	  	  button.find('img').attr('id',0).attr('alt',loc.name).attr('src',loc.imgPath);
 	  	  break;
 	  			
-	  case 1:
+	  case 2:
 		  
 		  $("#eh_selection_center").css('visibility','hidden');
 
 		  $("#eh_selection_left,#eh_selection_right").each( function() {
-		 		button.css('visibility','visible');		
+			    $(this).css('visibility','visible');		
 		  });
 					
 		  var button = $("#eh_selection_left");
 		  var loc = selections[0];
-	  	  button.find('img').attr('id',0).attr('alt',loc.help).attr('src',loc.imgPath);						
+	  	  button.find('img').attr('id',0).attr('alt',loc.name).attr('src',loc.imgPath);						
 					
 		  button = $("#eh_selection_right");
 		  var loc = selections[1];
-	  	  button.find('img').attr('id',1).attr('alt',loc.help).attr('src',loc.imgPath);
+	  	  button.find('img').attr('id',1).attr('alt',loc.name).attr('src',loc.imgPath);
 	      break;		  	
 							  	
 	  default:
