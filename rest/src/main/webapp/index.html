@@ -74,7 +74,8 @@ function arrowHoverEffectIn(button) {
 												break;        
       }    
       
-      hoverTimeout = setTimeout(hoverTimeoutFunc,hoverEffectTime); 
+      if (button.css('visibility') == 'visible')
+        hoverTimeout = setTimeout(hoverTimeoutFunc,hoverEffectTime); 
     
     }
 
