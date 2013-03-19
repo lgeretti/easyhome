@@ -168,24 +168,16 @@ public class PersistentInfoEJB {
 	public Location findLocationById(int id) {
 		return em.find(Location.class, id);
 	}
-
+	
 	public List<NodePersistentInfo> getPersistentInfosByLocationId(int locationId) {
 		
-		List<NodePersistentInfo> result = new ArrayList<NodePersistentInfo>();
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<NodePersistentInfo> criteria = builder.createQuery(NodePersistentInfo.class);
+        Root<NodePersistentInfo> info = criteria.from(NodePersistentInfo.class);
+        criteria.select(info).where(builder.equal(info.get("location").get("id"), locationId));
+        
+        TypedQuery<NodePersistentInfo> query = em.createQuery(criteria);
 		
-		Location location = findLocationById(locationId);
-		
-		if (location != null) {
-			
-			List<NodePersistentInfo> allInfos = getPersistentInfos();
-			
-			for (NodePersistentInfo info : allInfos) {
-				
-				if (info.getLocation().getId() == location.getId())
-					result.add(info);
-			}
-			
-		}
-		return result;
+		return query.getResultList();
 	}
 }
