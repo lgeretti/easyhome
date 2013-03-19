@@ -158,15 +158,11 @@ public class PersistentInfoEJB {
         
         try {
         	result = query.getSingleResult();
-        } catch (NoResultException ex) {
+        } catch (NoResultException|NonUniqueResultException ex) {
         	result = null;
         }
         
         return result;
-	}
-	
-	public Location findLocationById(int id) {
-		return em.find(Location.class, id);
 	}
 	
 	public List<NodePersistentInfo> getPersistentInfosByLocationId(int locationId) {

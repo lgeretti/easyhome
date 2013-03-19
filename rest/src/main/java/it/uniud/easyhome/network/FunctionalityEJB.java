@@ -48,11 +48,6 @@ public class FunctionalityEJB {
 	public Functionality findFunctionalityById(long id) {
 		return em.find(Functionality.class, id);
 	}
-	
-	public boolean exists(Functionality func) {
-		Functionality storedFunc = findFunctionalityById(func.getId());
-        return (storedFunc != null);
-	}
 
 	public void removeUnmanaged(Functionality func) {
 		em.remove(func);
@@ -64,6 +59,10 @@ public class FunctionalityEJB {
         
         for (Functionality func: funcs)
         	em.remove(func);
+	}
+	
+	public NodePersistentInfo findPersistentInfoById(long id) {
+		return em.find(NodePersistentInfo.class, id);
 	}
 	
 	public List<Functionality> getFunctionalitiesByDeviceId(long deviceId) {

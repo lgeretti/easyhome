@@ -1,10 +1,8 @@
 package it.uniud.easyhome.rest;
 
-import it.uniud.easyhome.exceptions.MultipleLinkException;
 import it.uniud.easyhome.network.*;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;

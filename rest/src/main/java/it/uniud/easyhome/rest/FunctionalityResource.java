@@ -1,10 +1,8 @@
 package it.uniud.easyhome.rest;
 
-import it.uniud.easyhome.exceptions.MultipleLinkException;
 import it.uniud.easyhome.network.*;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -15,6 +13,10 @@ import javax.ws.rs.*;
 public final class FunctionalityResource {
 	
     private FunctionalityEJB resEjb;
+    
+    private static Object funcLock = new Object();
+    
+    private static int functionalityId = 0;
 
     public FunctionalityResource() throws NamingException {
     	resEjb = (FunctionalityEJB) new InitialContext().lookup("java:global/easyhome/" + FunctionalityEJB.class.getSimpleName());
@@ -30,5 +32,54 @@ public final class FunctionalityResource {
         return resEjb.getFunctionalitiesByDeviceId(deviceId);
     }
     
+    // curl -X POST http://localhost:8080/easyhome/rest/functionality -H "Content-Type: application/x-www-form-urlencoded" --data-binary "name=Link&deviceName=Lampada&imgPath='img/livingroom.svg'" 
+    @POST
+    public Response insertFunctionality(@PathParam("name") String name, 
+    									@PathParam("deviceId") long deviceId, 
+    								  	@FormParam("imgPath") String imgPath,
+    								  	@FormParam("help") String help) {
+    	
+    	NodePersistentInfo info = resEjb.findPersistentInfoById(deviceId);
+    		
+	    if (info == null)
+	    	throw new WebApplicationException(Response.Status.BAD_REQUEST);
+    			
+	    synchronized(funcLock) {
+	    	
+    		resEjb.insertFunctionality(new Functionality(++functionalityId,name,info,imgPath,help));
+    		
+    		return Response.created(
+                	uriInfo.getAbsolutePathBuilder()
+                	.path(Long.toString(functionalityId))
+                	.build())
+                .build();
+    	}
+    }
+    
+    @DELETE
+    @Path("{id}")
+    public Response deleteFunctionality(@PathParam("id") long id) {
+    	
+        Functionality func = resEjb.findFunctionalityById(id);
+        
+        if (func == null) 
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        
+        synchronized(funcLock) {
+        	resEjb.removeUnmanaged(func);
+        }
+        
+        return Response.ok().build();
+    }
+       
+    @DELETE
+    public Response deleteAll() {
+    	
+    	synchronized(funcLock) {
+    		resEjb.removeAllFunctionalities();
+    	}
+    	
+    	return Response.ok().build();
+    }    
     
 }

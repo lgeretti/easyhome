@@ -45,6 +45,10 @@ public class NodePersistentInfo {
 		this.location = location;
 	}
     
+	public long getId() {
+		return id;
+	}
+	
 	public byte getGatewayId() {
 		return gatewayId;
 	}
