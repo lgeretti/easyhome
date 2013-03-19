@@ -57,7 +57,7 @@ function arrowHoverEffectIn(button) {
             
     hoverTimeoutFunc = function() {
     
-      if (button.attr('id') == "arrow_left") {
+      if (button.attr('id') == "eh_arrow_left") {
       		lowSelectionIndex--;
       } else {
       		lowSelectionIndex++;
@@ -374,8 +374,8 @@ $(".arrow_button").hover(
  
   <div id="eh_selection_buttons_container">
 
-      <div id="eh_arrow_left" class="eh_arrow_button_positioner">
-        <div id="arrow_left" class="eh_button arrow_button ui-widget-content ui-corner-all">
+      <div class="eh_arrow_button_positioner">
+        <div id="eh_arrow_left" class="eh_button arrow_button ui-widget-content ui-corner-all">
           <img src="img/arrowleft.svg"/>
         </div>
       </div>
@@ -392,8 +392,8 @@ $(".arrow_button").hover(
 		      <img />
 		   </div>
 
-      <div id="eh_arrow_right" class="eh_arrow_button_positioner">
-				    <div id="arrow_right" class="eh_button arrow_button ui-widget-content ui-corner-all">
+      <div class="eh_arrow_button_positioner">
+				    <div id="eh_arrow_right" class="eh_button arrow_button ui-widget-content ui-corner-all">
 				      <img src="img/arrowright.svg"/>
 				    </div>
       </div>
