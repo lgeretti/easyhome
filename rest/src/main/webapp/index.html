@@ -120,16 +120,16 @@ function navigationButtonHoverEffectIn(button) {
     
     switch (button.attr('id')) {
 
-						case '#eh_nav_home':
+						case 'eh_nav_home':
 								isDifferentState =  (currentState != uiState.Home);
 								break;
-						case '#eh_nav_room':
+						case 'eh_nav_room':
 							 isDifferentState =  (currentState != uiState.Room);
 								break;
-						case '#eh_nav_device':
+						case 'eh_nav_device':
 						  isDifferentState = (currentState != uiState.Device);
 								break;
-						case '#eh_nav_functionality':
+						case 'eh_nav_functionality':
 								isDifferentState = false;
 			}      
 			    
@@ -143,14 +143,14 @@ function navigationButtonHoverEffectIn(button) {
                 
            switch (button.attr('id')) {
 
-												case '#eh_nav_home':
-														updateState(uiState.Home);
+												case 'eh_nav_home':
+														selectState(uiState.Home);
 														break;
-												case '#eh_nav_room':										
-												  updateState(uiState.Room);
+												case 'eh_nav_room':										
+												  selectState(uiState.Room);
 														break;
-												case '#eh_nav_device':
-												  updateState(uiState.Device);
+												case 'eh_nav_device':
+												  selectState(uiState.Device);
 														break;
 												default:
 									 }                       
@@ -207,9 +207,24 @@ function helpHoverEffectOut() {
 
 function selectRoom(room) {
 
+   currentRoom = room;
+   var roomId = room.id;
+   $("#eh_nav_room").find('img').attr('src',room.imgPath).attr('alt',room.name);
 
-
-
+   $.ajax({ 
+       type: "GET",
+       dataType: "json",
+       url: "http://localhost:8080/easyhome/rest/devices/?locationId="+roomId,
+       success: function(data){        
+          roomDevices = data.persistentinfo;
+          lowSelectionIndex = 0;
+											
+          selectState(uiState.Room);
+       },
+       error: function(jqXHR, textStatus, errorThrown){
+          alert(textStatus + ":" + errorThrown);
+       }
+   });	  
 
 }
 
@@ -219,7 +234,6 @@ function initialize() {
   currentState = uiState.Room;
 
   getHomeRooms();
-
 }
 
 function getHomeRooms() {
@@ -230,9 +244,8 @@ function getHomeRooms() {
        url: "http://localhost:8080/easyhome/rest/locations",
        success: function(data){        
           homeRooms = data.location;
-          lowSelectionIndex = 0;
 											
-          updateState(uiState.Home);
+          selectState(uiState.Home);
        },
        error: function(jqXHR, textStatus, errorThrown){
           alert(textStatus + ":" + errorThrown);
@@ -241,9 +254,10 @@ function getHomeRooms() {
 	
 }
 
-function updateState(newState) {
+function selectState(newState) {
 
-  currentState = newState; 
+  currentState = newState;
+  lowSelectionIndex = 0;
 
   updateHelpText(currentState);
   
@@ -259,6 +273,7 @@ function updateState(newState) {
 				
 				  $("#eh_nav_room").show();
 				  $("#eh_nav_device,#eh_nav_functionality").hide();
+				  //showRoomDevices();
 						break;
 						
 				case uiState.Device:
@@ -302,6 +317,78 @@ function updateHelpText(currentState) {
 }
 
 function showHomeRooms() {
+
+  var firstSelection, secondSelection, thirdSelection;
+
+		if (lowSelectionIndex == 0)
+			 $("#eh_arrow_left").css('visibility','hidden');
+	 else 
+	 			$("#eh_arrow_left").css('visibility','visible');
+		if (lowSelectionIndex+2 >=homeRooms.length-1)
+				$("#eh_arrow_right").css('visibility','hidden');
+		else
+		  $("#eh_arrow_right").css('visibility','visible');
+		  
+  var selectionIndexDiff = homeRooms.length-lowSelectionIndex;		  
+		  
+		switch (selectionIndexDiff) {
+		
+		  case -1:
+						$(".selection_button").each( function() {
+							$(this).css('visibility','hidden');
+						});		  
+		  			break;
+		  			
+		  	case 0:
+		  			$("#eh_selection_left,#eh_selection_right").each( function() {
+							$(this).css('visibility','hidden');
+						});
+						var button = $("#eh_selection_center");
+						button.css('visibility','visible');
+						var loc = homeRooms[0];
+		  	  	button.find('img').attr('id',0).attr('alt',loc.help).attr('src',loc.imgPath);
+		  			break;
+		  			
+		  	case 1:
+
+					 $("#eh_selection_center").css('visibility','hidden');
+
+		  			$("#eh_selection_left,#eh_selection_right").each( function() {
+			 			 button.css('visibility','visible');
+						});
+						
+						var button = $("#eh_selection_left");
+						var loc = homeRooms[0];
+		  	  	button.find('img').attr('id',0).attr('alt',loc.help).attr('src',loc.imgPath);						
+						
+					 button = $("#eh_selection_right");
+						var loc = homeRooms[1];
+		  	  	button.find('img').attr('id',1).attr('alt',loc.help).attr('src',loc.imgPath);
+		  			break;		  	
+								  	
+		  	default:
+		
+						$(".selection_button").each( function() {
+							$(this).css('visibility','visible');
+						});	
+						
+						var button = $("#eh_selection_left");
+						var loc = homeRooms[lowSelectionIndex];
+		  	  	button.find('img').attr('id',lowSelectionIndex).attr('alt',loc.name).attr('src',loc.imgPath);						
+						
+					 button = $("#eh_selection_center");
+						var loc = homeRooms[lowSelectionIndex+1];
+		  	  	button.find('img').attr('id',lowSelectionIndex+1).attr('alt',loc.name).attr('src',loc.imgPath);
+		  	  	
+					 button = $("#eh_selection_right");
+						var loc = homeRooms[lowSelectionIndex+2];
+		  	  	button.find('img').attr('id',lowSelectionIndex+2).attr('alt',loc.name).attr('src',loc.imgPath);
+		  	  			  	  	
+		  			break;
+		}
+}
+
+function showRoomDevices() {
 
   var firstSelection, secondSelection, thirdSelection;
 
