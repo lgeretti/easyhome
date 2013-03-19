@@ -21,7 +21,7 @@
    #eh_help_button_container { position: absolute; right: 15px; top: 15px; }
 
    #eh_navigation_buttons_container { position: absolute; left: 15px; top: 15px; }
-   #eh_navigation_buttons_container a div { float: left; }
+   #eh_navigation_buttons_container div { float: left; }
 
    .eh_arrow_button_positioner { position: relative; top: 75px; }
    
@@ -46,25 +46,41 @@ var locations;
 
 var uiState = {Home: 1, Room: 2, Device: 3, Functionality: 4};
 
-var currentState = uiState.Room;
+var currentState = uiState.Home;
 
 var lowSelectionIndex;
 var highSelectionIndex;
 
-var devices = [ 
- {   
- 		 name: "Forno",
- 		 imgPath: "img/oven.svg"
- },
-	{
-	 		name: "Frigo",
- 		 imgPath: "img/fridge.svg"
-	},
-	{
-	  name: "Macchina del caffè",
-	  imgPath: "img/coffee.svg"
-	},
-];
+function arrowHoverEffectIn(button) {
+    button.stop().animate({
+          backgroundColor: button.css('color')
+            }, hoverEffectTime );
+
+    var id = button.attr('id');
+
+    hoverTimeout = setTimeout(function(){ 
+    							
+            if (button.attr('id') == "arrow_left") {
+            		lowSelectionIndex--;
+            		highSelectionIndex--;
+            } else {
+            		lowSelectionIndex++;
+            		highSelectionIndex++;
+            }              
+            
+            switch(currentState) {
+
+												case uiState.Home:
+														showSelectionForLocations();  	
+														break;
+														
+												case uiState.Room:
+												
+														break;        
+            }
+                     
+         },hoverEffectTime);
+}
 
 function buttonHoverEffectIn(button) {
     button.stop().animate({
@@ -151,8 +167,8 @@ function showSelectionForLocations() {
 		if (lowSelectionIndex == 0)
 			 $("#eh_arrow_left").css('visibility','hidden');
 	 else 
-	 			$("#eh_arrow_left").css('visibility','hidden');
-		if (highSelectionIndex==length-1)
+	 			$("#eh_arrow_left").css('visibility','visible');
+		if (highSelectionIndex==locations.length-1)
 				$("#eh_arrow_right").css('visibility','hidden');
 		else
 		  $("#eh_arrow_right").css('visibility','visible');
@@ -267,7 +283,7 @@ $(".help_button").hover(
 
 $(".arrow_button").hover(
     function() {
-        buttonHoverEffectIn($(this));
+        arrowHoverEffectIn($(this));
     }
     ,
     function() {
@@ -284,16 +300,26 @@ $(".arrow_button").hover(
 
   <div id="eh_navigation_buttons_container">
 
-      <a href="#6">
+      <a href="">
           <div class="eh_button navigation_button ui-widget-content ui-corner-all">
             <img src="img/home.svg" alt="Selezione stanza"/>
           </div>
       </a>
-      <a href="#7">
+      <a href="">
           <div class="eh_button navigation_button ui-widget-content ui-corner-all">
-            <img src="img/kitchen.svg" alt="Cucina"/>
+            <img src="img/livingroom.svg" alt="Salotto"/>
           </div>
       </a>
+      <a href="">
+          <div class="eh_button navigation_button ui-widget-content ui-corner-all">
+            <img src="img/colorlight.svg" alt="Luce"/>
+          </div>
+      </a>      
+      <a href="">
+          <div class="eh_button navigation_button ui-widget-content ui-corner-all">
+            <img src="img/sun.svg" alt="Luminosità"/>
+          </div>
+      </a>            
 
   </div>
 
@@ -315,11 +341,11 @@ $(".arrow_button").hover(
   <div id="eh_selection_buttons_container">
 
       <div id="eh_arrow_left" class="eh_arrow_button_positioner">
-        <a href="">
-          <div class="eh_button arrow_button ui-widget-content ui-corner-all">
+        <div id="arrow_left" class="eh_button arrow_button ui-widget-content ui-corner-all">
+          <a href="">
             <img src="img/arrowleft.svg"/>
-          </div>
-        </a>        
+          </a>
+        </div>
       </div>
 	
 	    <div id="eh_selection_left" class="eh_button selection_button ui-widget-content ui-corner-all">
@@ -341,11 +367,11 @@ $(".arrow_button").hover(
 		   </div>
 
       <div id="eh_arrow_right" class="eh_arrow_button_positioner">
-        <a href="">
-          <div class="eh_button arrow_button ui-widget-content ui-corner-all">
-            <img src="img/arrowright.svg"/>
-          </div>
-        </a>
+				    <div id="arrow_right" class="eh_button arrow_button ui-widget-content ui-corner-all">
+				      <a href="">
+				        <img src="img/arrowright.svg"/>
+				      </a>
+				    </div>
       </div>
 
   </div>
