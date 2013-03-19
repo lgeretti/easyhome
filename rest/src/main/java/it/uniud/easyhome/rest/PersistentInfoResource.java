@@ -47,13 +47,14 @@ public final class PersistentInfoResource {
         return info;
     }
     
-    // curl -X POST http://localhost:8080/easyhome/rest/persistentinfo/2/0 -H "Content-Type: application/x-www-form-urlencoded" --data-binary "locationName=Salotto&locationType=LIVINGROOM" 
+    // curl -X POST http://localhost:8080/easyhome/rest/persistentinfo/2/0 -H "Content-Type: application/x-www-form-urlencoded" --data-binary "locationName=Salotto&locationType=LIVINGROOM&imgPath='img/livingroom.svg'" 
     @POST
     @Path("{gatewayId}/{nuid}")
     public Response insertOrUpdatePersistentInfo(@PathParam("gatewayId") byte gatewayId, 
     											@PathParam("nuid") long nuid, 
     								  			@FormParam("name") String name, 
-    								  			@FormParam("locationName") String locationName) {
+    								  			@FormParam("locationName") String locationName,
+    								  			@FormParam("imgPath") String imgPath) {
     	
     	synchronized(infoLock) {
     		
@@ -69,7 +70,7 @@ public final class PersistentInfoResource {
     		
     		if (info == null) {
     			
-    			resEjb.insertPersistentInfo(new NodePersistentInfo(++nodePersistentInfoId,gatewayId,nuid,name,loc));
+    			resEjb.insertPersistentInfo(new NodePersistentInfo(++nodePersistentInfoId,gatewayId,nuid,name,loc,imgPath));
     			return Response.created(
                         	uriInfo.getAbsolutePathBuilder()
                         	.path(Byte.toString(gatewayId))

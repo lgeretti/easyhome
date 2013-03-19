@@ -150,7 +150,7 @@ public class UserInterfaceResource {
     @POST
     public Response up() {
     	
-    	insertLocationsAndPersistentInfo();
+    	insertLocationsAndDevices();
 		insertGateway(XBEE_GATEWAY_ID, XBEE_GATEWAY_PORT, ProtocolType.XBEE);
 		insertProcess(ProcessKind.NODE_ANNCE_REGISTRATION);
 		insertProcess(ProcessKind.NODE_DESCR_REQUEST);
@@ -176,7 +176,7 @@ public class UserInterfaceResource {
         return Response.ok().build();
     }
     
-    private void insertLocationsAndPersistentInfo() {
+    private void insertLocationsAndDevices() {
     	
     	String loc0 = "Salotto";
     	String loc1 = "Cucina";
@@ -186,6 +186,8 @@ public class UserInterfaceResource {
     	String loc5 = "Bagno";
     	
         MultivaluedMap<String,String> formData;
+        
+        // Locations
         
         formData = new MultivaluedMapImpl();
         formData.add("name",loc0);
@@ -223,15 +225,55 @@ public class UserInterfaceResource {
         formData.add("imgPath","img/bathroom.svg");        
         client.resource(TARGET).path(RestPaths.LOCATIONS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         
+        // Devices
+        
         formData = new MultivaluedMapImpl();
-        formData.add("name","Gateway");
+        formData.add("name","Gateway ZigBee");
         formData.add("locationName",loc0);
+        formData.add("imgPath","img/accesspoint.svg");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146521827785L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+    	
         formData = new MultivaluedMapImpl();
         formData.add("name","Interfaccia gestuale");
         formData.add("locationName",loc2);
-    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928337L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-        formData = new MultivaluedMapImpl();    	    	
+        formData.add("imgPath","img/hand.svg");
+        client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928337L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+    	
+        formData = new MultivaluedMapImpl();
+        formData.add("name","Interfaccia gestuale (test)");
+        formData.add("locationName",loc2);
+    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928181L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        
+        formData = new MultivaluedMapImpl();
+        formData.add("name","Gateway ZigBee");
+        formData.add("locationName",loc0);
+        formData.add("imgPath","img/accesspoint.svg");
+    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146521827785L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+    	
+        formData = new MultivaluedMapImpl();
+        formData.add("name","Gateway Powerline");
+        formData.add("locationName",loc0);
+        formData.add("imgPath","img/accesspoint.svg");
+    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(100L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+    	
+        formData = new MultivaluedMapImpl();
+        formData.add("name","Lampada");
+        formData.add("locationName",loc0);
+        formData.add("imgPath","img/colorlight.svg");
+    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(1L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+    	
+        formData = new MultivaluedMapImpl();
+        formData.add("name","Lampada");
+        formData.add("locationName",loc2);
+        formData.add("imgPath","img/colorlight.svg");
+    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(2L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+
+        formData = new MultivaluedMapImpl();
+        formData.add("name","Frigo");
+        formData.add("locationName",loc1);
+        formData.add("imgPath","img/fridge.svg");
+    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(3L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+    	
     }
     
     private void stopEventBasedJSFProcesses() throws NamingException, JMSException {

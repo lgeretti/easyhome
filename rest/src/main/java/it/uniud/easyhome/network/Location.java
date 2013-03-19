@@ -57,7 +57,7 @@ public class Location implements Serializable {
     	return occupied;
     }
     
-    public String getImagePath() {
+    public String getImgPath() {
     	return imgPath;
     }
     

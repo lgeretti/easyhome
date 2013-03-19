@@ -19,16 +19,19 @@ public class NodePersistentInfo {
     private String name;
     @OneToOne
     private Location location;
+    @Column
+    private String imgPath;
 
     @SuppressWarnings("unused")
 	private NodePersistentInfo() {}
     
-    public NodePersistentInfo(long id, byte gatewayId, long nuid, String name, Location location) {
+    public NodePersistentInfo(long id, byte gatewayId, long nuid, String name, Location location, String imgPath) {
     	this.id = id;
     	this.gatewayId = gatewayId;
     	this.nuid = nuid;
     	this.name = name;
     	this.location = location;
+    	this.imgPath = imgPath;
     }
 
 	public void setName(String name) {
@@ -53,6 +56,10 @@ public class NodePersistentInfo {
     
 	public Location getLocation() {
 		return this.location;
+	}
+	
+	public String getImgPath() {
+		return this.imgPath;
 	}
 
     @Override
