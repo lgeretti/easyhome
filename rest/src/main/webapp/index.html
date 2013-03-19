@@ -7,7 +7,7 @@
 <style>
    .eh_button { padding: 0.8em; margin: 1em; background: #666666; }
    .selection_button { height: 250px; width: 250px; color: #36609f; }
-   .help_button { height: 125px; width: 125px; color: #eb7914; }
+   #eh_help_button { height: 125px; width: 125px; color: #eb7914; }
    .arrow_button { height: 100px; width: 100px; color: #61c165; }
    .navigation_button { height: 125px; width: 125px; color: #61c165; }
    .yellow { color: #e0c73d; }
@@ -82,7 +82,7 @@ function arrowHoverEffectIn(button) {
       if (button.css('visibility') == 'visible')
         hoverTimeout = setTimeout(hoverTimeoutFunc, hoverEffectTime); 
     
-    }
+    };
 
     hoverTimeout = setTimeout(hoverTimeoutFunc, hoverEffectTime);
 }
@@ -95,22 +95,22 @@ function selectionButtonHoverEffectIn(button) {
 
     hoverTimeout = setTimeout(function(){   
     
-		var idx = button.find('img').attr('id');    
-    
-        switch (currentState) {
-
-			case uiState.Home:
-					selectRoom(homeRooms[idx]);
-					break;
-			case uiState.Room:
-			  selectDevice(roomDevices[idx]);
-					break;
-			case uiState.Device:
-			  selectFunctionality(deviceFunctionalities[idx]);
-			// Functionalities have no selection buttons, only actuators
-		}
+    		var idx = button.find('img').attr('id');    
         
-        button.stop().css('backgroundColor', "#666666");
+            switch (currentState) {
+    
+    			case uiState.Home:
+    				selectRoom(homeRooms[idx]);
+    				break;
+    			case uiState.Room:
+    				selectDevice(roomDevices[idx]);
+    				break;
+    			case uiState.Device:
+    				selectFunctionality(deviceFunctionalities[idx]);
+    			    // Functionalities have no selection buttons, only actuators
+    		}
+            
+            button.stop().css('backgroundColor', "#666666");
         
         }, hoverEffectTime
     );
@@ -123,16 +123,16 @@ function navigationButtonHoverEffectIn(button) {
     switch (button.attr('id')) {
 
 		case 'eh_nav_home':
-				isDifferentState =  (currentState != uiState.Home);
-				break;
+			isDifferentState =  (currentState != uiState.Home);
+			break;
 		case 'eh_nav_room':
-			 isDifferentState =  (currentState != uiState.Room);
-				break;
+			isDifferentState =  (currentState != uiState.Room);
+			break;
 		case 'eh_nav_device':
-		  isDifferentState = (currentState != uiState.Device);
-				break;
+		    isDifferentState = (currentState != uiState.Device);
+			break;
 		case 'eh_nav_functionality':
-				isDifferentState = false;
+			isDifferentState = false;
 	}      
 			    
 	if (isDifferentState) {
@@ -143,23 +143,24 @@ function navigationButtonHoverEffectIn(button) {
 	
 	    hoverTimeout = setTimeout(function(){ 
 	              
-	       switch (button.attr('id')) {
+    	       switch (button.attr('id')) {
+    	
+    				case 'eh_nav_home':
+    					selectState(uiState.Home);
+    					break;
+    				case 'eh_nav_room':										
+    				    selectState(uiState.Room);
+    					break;
+    				case 'eh_nav_device':
+    				    selectState(uiState.Device);
+    					break;
+    				default:
+    		   }                  
+    	       
+    	       button.stop().css('backgroundColor', "#666666");
 	
-				case 'eh_nav_home':
-						selectState(uiState.Home);
-						break;
-				case 'eh_nav_room':										
-				  selectState(uiState.Room);
-						break;
-				case 'eh_nav_device':
-				  selectState(uiState.Device);
-						break;
-				default:
-		   }                  
-	       
-	       button.stop().css('backgroundColor', "#666666");
-	
-	   },hoverEffectTime);
+	       }, hoverEffectTime
+	   );
          
     }
 }
@@ -170,7 +171,7 @@ function buttonHoverEffectOut(button) {
 }
 
 function helpHoverEffectIn() {
-    var button = $("#help_button");
+    var button = $("#eh_help_button");
 
     if (!helpSelected) {
         button.stop().animate({
@@ -200,7 +201,7 @@ function helpHoverEffectIn() {
 
 function helpHoverEffectOut() {
 
-    var button = $("#help_button");
+    var button = $("#eh_help_button");
 
     clearTimeout(hoverTimeout);
     
@@ -265,6 +266,8 @@ function selectState(newState) {
   currentState = newState;
   lowSelectionIndex = 0;
 
+  $("#eh_description_div").hide();
+  $("#eh_help_button").css('backgroundColor','#666666');
   updateHelpText(currentState);
   
   switch (newState) {
@@ -293,6 +296,8 @@ function selectState(newState) {
 				
 		$("#eh_nav_room,#eh_nav_device,#eh_nav_functionality").show();
   }
+  
+  $("#eh_selection_buttons_container").show(); // In case you came from the help text maximization 
 
 }
 
@@ -433,7 +438,7 @@ $(".navigation_button").hover(
     }
 );
 
-$(".help_button").hover(
+$("#eh_help_button").hover(
     function() {
 		if (!helpSelected)
           $("#eh_description_div").text($(this).find("img").attr("alt")).show();
@@ -481,7 +486,7 @@ $(".arrow_button").hover(
   </div>
 
   <div id="eh_help_button_container">
-    <div id="help_button" class="eh_button help_button ui-widget-content ui-corner-all">
+    <div id="eh_help_button" class="eh_button ui-widget-content ui-corner-all">
       <img src="img/help.svg" alt="Aiuto contestuale"/>
     </div>
   </div>
