@@ -70,13 +70,13 @@ function arrowHoverEffectIn(button) {
       
       switch(currentState) {
 
-										case uiState.Home:
-												showHomeRooms();  	
-												break;
-												
-										case uiState.Room:
-										
-												break;        
+		case uiState.Home:
+			showHomeRooms();  	
+			break;
+				
+		case uiState.Room:
+		
+			break;        
       }    
       
       if (button.css('visibility') == 'visible')
@@ -95,22 +95,22 @@ function selectionButtonHoverEffectIn(button) {
 
     hoverTimeout = setTimeout(function(){   
     
-										var idx = button.find('img').attr('id');    
+		var idx = button.find('img').attr('id');    
     
-           switch (currentState) {
+        switch (currentState) {
 
-												case uiState.Home:
-														selectRoom(homeRooms[idx]);
-														break;
-												case uiState.Room:
-												  selectDevice(roomDevices[idx]);
-														break;
-												case uiState.Device:
-												  selectFunctionality(deviceFunctionalities[idx]);
-												// Functionalities have no selection buttons, only actuators
-									 }
-                
-         }, hoverEffectTime
+			case uiState.Home:
+					selectRoom(homeRooms[idx]);
+					break;
+			case uiState.Room:
+			  selectDevice(roomDevices[idx]);
+					break;
+			case uiState.Device:
+			  selectFunctionality(deviceFunctionalities[idx]);
+			// Functionalities have no selection buttons, only actuators
+		}
+        
+        }, hoverEffectTime
     );
 }
 
@@ -120,42 +120,42 @@ function navigationButtonHoverEffectIn(button) {
     
     switch (button.attr('id')) {
 
-						case 'eh_nav_home':
-								isDifferentState =  (currentState != uiState.Home);
-								break;
-						case 'eh_nav_room':
-							 isDifferentState =  (currentState != uiState.Room);
-								break;
-						case 'eh_nav_device':
-						  isDifferentState = (currentState != uiState.Device);
-								break;
-						case 'eh_nav_functionality':
-								isDifferentState = false;
-			}      
+		case 'eh_nav_home':
+				isDifferentState =  (currentState != uiState.Home);
+				break;
+		case 'eh_nav_room':
+			 isDifferentState =  (currentState != uiState.Room);
+				break;
+		case 'eh_nav_device':
+		  isDifferentState = (currentState != uiState.Device);
+				break;
+		case 'eh_nav_functionality':
+				isDifferentState = false;
+	}      
 			    
-			if (isDifferentState) {
+	if (isDifferentState) {
     
-      button.stop().animate({
-          backgroundColor: button.css('color')
-            }, hoverEffectTime );
-
-      hoverTimeout = setTimeout(function(){ 
-                
-           switch (button.attr('id')) {
-
-												case 'eh_nav_home':
-														selectState(uiState.Home);
-														break;
-												case 'eh_nav_room':										
-												  selectState(uiState.Room);
-														break;
-												case 'eh_nav_device':
-												  selectState(uiState.Device);
-														break;
-												default:
-									 }                       
-
-         },hoverEffectTime);
+	    button.stop().animate({
+	        backgroundColor: button.css('color')
+	          }, hoverEffectTime );
+	
+	    hoverTimeout = setTimeout(function(){ 
+	              
+	       switch (button.attr('id')) {
+	
+				case 'eh_nav_home':
+						selectState(uiState.Home);
+						break;
+				case 'eh_nav_room':										
+				  selectState(uiState.Room);
+						break;
+				case 'eh_nav_device':
+				  selectState(uiState.Device);
+						break;
+				default:
+		   }                       
+	
+	   },hoverEffectTime);
          
     }
 }
@@ -174,10 +174,11 @@ function helpHoverEffectIn() {
                 }, hoverEffectTime );
 
         hoverTimeout = setTimeout(function(){ 
-        						helpSelected = true;
-               $("#eh_selection_buttons_container").hide();  
-               $("#eh_description_div").text(helpText).show();                                
-             },hoverEffectTime);
+	        	   helpSelected = true;
+	               $("#eh_selection_buttons_container").hide();  
+	               $("#eh_description_div").text(helpText).show();                                
+             },hoverEffectTime
+        );
     } else {
         
         button.stop().animate({
@@ -185,10 +186,11 @@ function helpHoverEffectIn() {
                 }, hoverEffectTime );
 
         hoverTimeout = setTimeout(function(){
-        						helpSelected = false; 
-               $("#eh_selection_buttons_container").show();  
-               $("#eh_description_div").hide();                                
-             },hoverEffectTime);
+	        	helpSelected = false; 
+	            $("#eh_selection_buttons_container").show();  
+	            $("#eh_description_div").hide();                                
+            },hoverEffectTime
+        );
     }
 }
 
@@ -265,27 +267,27 @@ function selectState(newState) {
   
     case uiState.Home:
     													
-    		 $("#eh_nav_room,#eh_nav_device,#eh_nav_functionality").hide();
-					 showHomeRooms();
-					 break;  
+    	$("#eh_nav_room,#eh_nav_device,#eh_nav_functionality").hide();
+		showHomeRooms();
+		break;  
   
-  		 case uiState.Room:
+    case uiState.Room:
 				
-				  $("#eh_nav_room").show();
-				  $("#eh_nav_device,#eh_nav_functionality").hide();
-				  //showRoomDevices();
-						break;
-						
-				case uiState.Device:
+	    $("#eh_nav_room").show();
+		$("#eh_nav_device,#eh_nav_functionality").hide();
+		//showRoomDevices();
+		break;
+							
+    case uiState.Device:
 				
-				  $("#eh_nav_room,#eh_nav_device").show();
-				  $("#eh_nav_functionality").hide();				
+	    $("#eh_nav_room,#eh_nav_device").show();
+		$("#eh_nav_functionality").hide();				
 
-						break;
+		break;
 						
-				case uiState.Functionality:  
+	case uiState.Functionality:  
 				
-				  $("#eh_nav_room,#eh_nav_device,#eh_nav_functionality").show();
+		$("#eh_nav_room,#eh_nav_device,#eh_nav_functionality").show();
   }
 
 }
@@ -294,169 +296,168 @@ function updateHelpText(currentState) {
 
   switch (currentState) {
   
-				case uiState.Home:
+	case uiState.Home:
+		
+		helpText = "Seleziona una stanza per accedere ai dispositivi presenti";
+		break;
 				
-				  helpText = "Seleziona una stanza per accedere ai dispositivi presenti";
+	case uiState.Room:
+		
+		helpText = "Seleziona un dispositivo per accedere alle funzionalità disponibili";
+		break;
 				
-						break;
-						
-				case uiState.Room:
+	case uiState.Device:
+		
+		break;
 				
-				  helpText = "Seleziona un dispositivo per accedere alle funzionalità disponibili";
-				
-						break;
-						
-				case uiState.Device:
-				
-						break;
-						
-				case uiState.Functionality:  
-  
+	case uiState.Functionality:  
+
   }
 
 }
 
 function showHomeRooms() {
 
-  var firstSelection, secondSelection, thirdSelection;
+  	var firstSelection, secondSelection, thirdSelection;
 
-		if (lowSelectionIndex == 0)
-			 $("#eh_arrow_left").css('visibility','hidden');
-	 else 
-	 			$("#eh_arrow_left").css('visibility','visible');
-		if (lowSelectionIndex+2 >=homeRooms.length-1)
-				$("#eh_arrow_right").css('visibility','hidden');
-		else
-		  $("#eh_arrow_right").css('visibility','visible');
+	if (lowSelectionIndex == 0)
+		$("#eh_arrow_left").css('visibility','hidden');
+	else  			
+		$("#eh_arrow_left").css('visibility','visible');
+	if (lowSelectionIndex+2 >=homeRooms.length-1)
+		$("#eh_arrow_right").css('visibility','hidden');
+	else
+		$("#eh_arrow_right").css('visibility','visible');
 		  
-  var selectionIndexDiff = homeRooms.length-lowSelectionIndex;		  
+  	var selectionIndexDiff = homeRooms.length-lowSelectionIndex;		  
 		  
-		switch (selectionIndexDiff) {
-		
-		  case -1:
-						$(".selection_button").each( function() {
-							$(this).css('visibility','hidden');
-						});		  
-		  			break;
-		  			
-		  	case 0:
-		  			$("#eh_selection_left,#eh_selection_right").each( function() {
-							$(this).css('visibility','hidden');
-						});
-						var button = $("#eh_selection_center");
-						button.css('visibility','visible');
-						var loc = homeRooms[0];
-		  	  	button.find('img').attr('id',0).attr('alt',loc.help).attr('src',loc.imgPath);
-		  			break;
-		  			
-		  	case 1:
+	switch (selectionIndexDiff) {
+	
+	  case -1:  
+		  $(".selection_button").each( function() {
+				$(this).css('visibility','hidden');
+		  });		  
+	  	  break;
+	  			
+	  case 0:
+		  $("#eh_selection_left,#eh_selection_right").each( function() {
+				$(this).css('visibility','hidden');
+		  });
+		  var button = $("#eh_selection_center");
+		  button.css('visibility','visible');
+		  var loc = homeRooms[0];
+	  	  button.find('img').attr('id',0).attr('alt',loc.help).attr('src',loc.imgPath);
+	  	  break;
+	  			
+	  case 1:
+		  
+		  $("#eh_selection_center").css('visibility','hidden');
 
-					 $("#eh_selection_center").css('visibility','hidden');
-
-		  			$("#eh_selection_left,#eh_selection_right").each( function() {
-			 			 button.css('visibility','visible');
-						});
-						
-						var button = $("#eh_selection_left");
-						var loc = homeRooms[0];
-		  	  	button.find('img').attr('id',0).attr('alt',loc.help).attr('src',loc.imgPath);						
-						
-					 button = $("#eh_selection_right");
-						var loc = homeRooms[1];
-		  	  	button.find('img').attr('id',1).attr('alt',loc.help).attr('src',loc.imgPath);
-		  			break;		  	
-								  	
-		  	default:
-		
-						$(".selection_button").each( function() {
-							$(this).css('visibility','visible');
-						});	
-						
-						var button = $("#eh_selection_left");
-						var loc = homeRooms[lowSelectionIndex];
-		  	  	button.find('img').attr('id',lowSelectionIndex).attr('alt',loc.name).attr('src',loc.imgPath);						
-						
-					 button = $("#eh_selection_center");
-						var loc = homeRooms[lowSelectionIndex+1];
-		  	  	button.find('img').attr('id',lowSelectionIndex+1).attr('alt',loc.name).attr('src',loc.imgPath);
-		  	  	
-					 button = $("#eh_selection_right");
-						var loc = homeRooms[lowSelectionIndex+2];
-		  	  	button.find('img').attr('id',lowSelectionIndex+2).attr('alt',loc.name).attr('src',loc.imgPath);
-		  	  			  	  	
-		  			break;
-		}
+		  $("#eh_selection_left,#eh_selection_right").each( function() {
+		 		button.css('visibility','visible');		
+		  });
+					
+		  var button = $("#eh_selection_left");
+		  var loc = homeRooms[0];
+	  	  button.find('img').attr('id',0).attr('alt',loc.help).attr('src',loc.imgPath);						
+					
+		  button = $("#eh_selection_right");
+		  var loc = homeRooms[1];
+	  	  button.find('img').attr('id',1).attr('alt',loc.help).attr('src',loc.imgPath);
+	      break;		  	
+							  	
+	  default:
+		  
+		  $(".selection_button").each( function() {
+				$(this).css('visibility','visible');
+		  });	
+					
+		  var button = $("#eh_selection_left");
+		  var loc = homeRooms[lowSelectionIndex];
+	  	  button.find('img').attr('id',lowSelectionIndex).attr('alt',loc.name).attr('src',loc.imgPath);						
+					
+		  button = $("#eh_selection_center");
+		  var loc = homeRooms[lowSelectionIndex+1];
+	  	  button.find('img').attr('id',lowSelectionIndex+1).attr('alt',loc.name).attr('src',loc.imgPath);
+	  	  	
+		  button = $("#eh_selection_right");
+		  var loc = homeRooms[lowSelectionIndex+2];
+	  	  button.find('img').attr('id',lowSelectionIndex+2).attr('alt',loc.name).attr('src',loc.imgPath);
+	  	  			  	  	
+	  	  break;
+	}
 }
 
 function showRoomDevices() {
 
-  var firstSelection, secondSelection, thirdSelection;
+	var firstSelection, secondSelection, thirdSelection;
 
-		if (lowSelectionIndex == 0)
-			 $("#eh_arrow_left").css('visibility','hidden');
-	 else 
-	 			$("#eh_arrow_left").css('visibility','visible');
-		if (lowSelectionIndex+2 >=homeRooms.length-1)
-				$("#eh_arrow_right").css('visibility','hidden');
-		else
-		  $("#eh_arrow_right").css('visibility','visible');
+	if (lowSelectionIndex == 0)
+		$("#eh_arrow_left").css('visibility','hidden');
+	else 
+		$("#eh_arrow_left").css('visibility','visible');
+	if (lowSelectionIndex+2 >=homeRooms.length-1)
+		$("#eh_arrow_right").css('visibility','hidden');
+	else
+		$("#eh_arrow_right").css('visibility','visible');
 		  
-  var selectionIndexDiff = homeRooms.length-lowSelectionIndex;		  
+  	var selectionIndexDiff = homeRooms.length-lowSelectionIndex;		  
 		  
 		switch (selectionIndexDiff) {
 		
 		  case -1:
-						$(".selection_button").each( function() {
-							$(this).css('visibility','hidden');
-						});		  
-		  			break;
+			  $(".selection_button").each( function() {
+					$(this).css('visibility','hidden');
+			  });		  
+			  break;
 		  			
-		  	case 0:
-		  			$("#eh_selection_left,#eh_selection_right").each( function() {
-							$(this).css('visibility','hidden');
-						});
-						var button = $("#eh_selection_center");
-						button.css('visibility','visible');
-						var loc = homeRooms[0];
-		  	  	button.find('img').attr('id',0).attr('alt',loc.help).attr('src',loc.imgPath);
-		  			break;
+		  case 0:
+			  $("#eh_selection_left,#eh_selection_right").each( function() {
+					$(this).css('visibility','hidden');
+			  });
+			  var button = $("#eh_selection_center");
+			  button.css('visibility','visible');
+			  var loc = homeRooms[0];
+		  	  button.find('img').attr('id',0).attr('alt',loc.help).attr('src',loc.imgPath);
+		      break;
 		  			
-		  	case 1:
+		  case 1:
+			  
 
-					 $("#eh_selection_center").css('visibility','hidden');
+			  $("#eh_selection_center").css('visibility','hidden');
 
-		  			$("#eh_selection_left,#eh_selection_right").each( function() {
-			 			 button.css('visibility','visible');
-						});
+			  $("#eh_selection_left,#eh_selection_right").each( function() {
+			         button.css('visibility','visible');
+			  });
 						
-						var button = $("#eh_selection_left");
-						var loc = homeRooms[0];
-		  	  	button.find('img').attr('id',0).attr('alt',loc.help).attr('src',loc.imgPath);						
+			  var button = $("#eh_selection_left");
+			  var loc = homeRooms[0];
+		  	  button.find('img').attr('id',0).attr('alt',loc.help).attr('src',loc.imgPath);						
 						
-					 button = $("#eh_selection_right");
-						var loc = homeRooms[1];
-		  	  	button.find('img').attr('id',1).attr('alt',loc.help).attr('src',loc.imgPath);
-		  			break;		  	
+			  button = $("#eh_selection_right");
+			  var loc = homeRooms[1];
+		      button.find('img').attr('id',1).attr('alt',loc.help).attr('src',loc.imgPath);
+		  	  break;		  	
 								  	
-		  	default:
+		  default:
 		
-						$(".selection_button").each( function() {
-							$(this).css('visibility','visible');
-						});	
+			  $(".selection_button").each( function() {
+					$(this).css('visibility','visible');
+		      });	
 						
-						var button = $("#eh_selection_left");
-						var loc = homeRooms[lowSelectionIndex];
-		  	  	button.find('img').attr('id',lowSelectionIndex).attr('alt',loc.name).attr('src',loc.imgPath);						
-						
-					 button = $("#eh_selection_center");
-						var loc = homeRooms[lowSelectionIndex+1];
-		  	  	button.find('img').attr('id',lowSelectionIndex+1).attr('alt',loc.name).attr('src',loc.imgPath);
-		  	  	
-					 button = $("#eh_selection_right");
-						var loc = homeRooms[lowSelectionIndex+2];
-		  	  	button.find('img').attr('id',lowSelectionIndex+2).attr('alt',loc.name).attr('src',loc.imgPath);
-		  	  			  	  	
-		  			break;
+              var button = $("#eh_selection_left");
+              var loc = homeRooms[lowSelectionIndex];
+                	button.find('img').attr('id',lowSelectionIndex).attr('alt',loc.name).attr('src',loc.imgPath);						
+              		
+              button = $("#eh_selection_center");
+              var loc = homeRooms[lowSelectionIndex+1];
+                	button.find('img').attr('id',lowSelectionIndex+1).attr('alt',loc.name).attr('src',loc.imgPath);
+                	
+              button = $("#eh_selection_right");
+              var loc = homeRooms[lowSelectionIndex+2];
+              button.find('img').attr('id',lowSelectionIndex+2).attr('alt',loc.name).attr('src',loc.imgPath);
+                			  	  	
+              break;
 		}
 }
 
@@ -477,7 +478,7 @@ $(".eh_button").each(
 
 $(".selection_button").hover(
     function() {
-    				if (!helpSelected)
+    	if (!helpSelected)
           $("#eh_description_div").text($(this).find("img").attr("alt")).show();
         selectionButtonHoverEffectIn($(this));
     }
@@ -491,7 +492,7 @@ $(".selection_button").hover(
 
 $(".navigation_button").hover(
     function() {
-    				if (!helpSelected)
+    	if (!helpSelected)
           $("#eh_description_div").text($(this).find("img").attr("alt")).show();
         navigationButtonHoverEffectIn($(this));
     }
@@ -505,13 +506,13 @@ $(".navigation_button").hover(
 
 $(".help_button").hover(
     function() {
-						 if (!helpSelected)
+		if (!helpSelected)
           $("#eh_description_div").text($(this).find("img").attr("alt")).show();
         helpHoverEffectIn();
     }
     ,
     function() {
-    				if (!helpSelected)
+    	if (!helpSelected)
         	 $("#eh_description_div").hide();
         helpHoverEffectOut();
     }
@@ -568,24 +569,23 @@ $(".arrow_button").hover(
         </div>
       </div>
 	
-	    <div id="eh_selection_left" class="eh_button selection_button ui-widget-content ui-corner-all">
-	      <img />
-	    </div>
+	  <div id="eh_selection_left" class="eh_button selection_button ui-widget-content ui-corner-all">
+	    <img />
+	  </div>
 		      
-		   <div id="eh_selection_center" class="eh_button selection_button ui-widget-content ui-corner-all">
-		     <img />
-		   </div>
+	  <div id="eh_selection_center" class="eh_button selection_button ui-widget-content ui-corner-all">
+		<img />
+	  </div>
 		      
-		   <div id="eh_selection_right" class="eh_button selection_button ui-widget-content ui-corner-all">
-		      <img />
-		   </div>
+	  <div id="eh_selection_right" class="eh_button selection_button ui-widget-content ui-corner-all">
+		<img />
+	  </div>
 
       <div class="eh_arrow_button_positioner">
-				    <div id="eh_arrow_right" class="eh_button arrow_button ui-widget-content ui-corner-all">
-				      <img src="img/arrowright.svg"/>
-				    </div>
+		<div id="eh_arrow_right" class="eh_button arrow_button ui-widget-content ui-corner-all">
+			<img src="img/arrowright.svg"/>
+	    </div>
       </div>
-
   </div>
 
 </body>
