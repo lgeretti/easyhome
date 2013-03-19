@@ -40,7 +40,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
-@Path("/admin")
+@Path(RestPaths.ADMIN)
 public class UserInterfaceResource {
     
 	private static final String TARGET = "http://localhost:8080/easyhome/rest/";

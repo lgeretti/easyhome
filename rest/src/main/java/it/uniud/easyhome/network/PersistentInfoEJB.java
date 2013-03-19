@@ -164,4 +164,28 @@ public class PersistentInfoEJB {
         
         return result;
 	}
+	
+	public Location findLocationById(int id) {
+		return em.find(Location.class, id);
+	}
+
+	public List<NodePersistentInfo> getPersistentInfosByLocationId(int locationId) {
+		
+		List<NodePersistentInfo> result = new ArrayList<NodePersistentInfo>();
+		
+		Location location = findLocationById(locationId);
+		
+		if (location != null) {
+			
+			List<NodePersistentInfo> allInfos = getPersistentInfos();
+			
+			for (NodePersistentInfo info : allInfos) {
+				
+				if (info.getLocation().getId() == location.getId())
+					result.add(info);
+			}
+			
+		}
+		return result;
+	}
 }

@@ -13,7 +13,7 @@ import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.*;
 
-@Path("/processes")
+@Path(RestPaths.PROCESSES)
 public class ProcessResource {
     
     @Context

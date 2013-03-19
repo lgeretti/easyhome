@@ -12,7 +12,7 @@ import javax.ws.rs.core.*;
 import javax.ws.rs.*;
 
 /** Handles the access to the network of nodes */
-@Path("/persistentinfo")
+@Path(RestPaths.PERSISTENTINFO)
 public final class PersistentInfoResource {
 	
     private PersistentInfoEJB resEjb;
