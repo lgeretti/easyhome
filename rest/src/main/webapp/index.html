@@ -172,18 +172,26 @@ function updateState(newState) {
   
     case uiState.Home:
     													
-					showSelectionForLocations();
-					break;  
+    		 $("#eh_nav_room,#eh_nav_device,#eh_nav_functionality").hide();
+					 showSelectionForLocations();
+					 break;  
   
   		 case uiState.Room:
 				
+				  $("#eh_nav_room").show();
+				  $("#eh_nav_device,#eh_nav_functionality").hide();
 						break;
 						
 				case uiState.Device:
 				
+				  $("#eh_nav_room,#eh_nav_device").show();
+				  $("#eh_nav_functionality").hide();				
+
 						break;
 						
 				case uiState.Functionality:  
+				
+				  $("#eh_nav_room,#eh_nav_device,#eh_nav_functionality").show();
   }
 
 }
@@ -348,16 +356,16 @@ $(".arrow_button").hover(
 
   <div id="eh_navigation_buttons_container">
 
-      <div class="eh_button navigation_button ui-widget-content ui-corner-all">
+      <div id="eh_nav_home" class="eh_button navigation_button ui-widget-content ui-corner-all">
         <img src="img/home.svg" alt="Selezione stanza"/>
       </div>
-      <div class="eh_button navigation_button ui-widget-content ui-corner-all">
+      <div id="eh_nav_room" class="eh_button navigation_button ui-widget-content ui-corner-all">
         <img src="img/livingroom.svg" alt="Salotto"/>
       </div>
-      <div class="eh_button navigation_button ui-widget-content ui-corner-all">
+      <div id="eh_nav_device" class="eh_button navigation_button ui-widget-content ui-corner-all">
         <img src="img/colorlight.svg" alt="Luce"/>
       </div>
-      <div class="eh_button navigation_button ui-widget-content ui-corner-all">
+      <div id="eh_nav_functionality" class="eh_button navigation_button ui-widget-content ui-corner-all">
         <img src="img/sun.svg" alt="Luminosità"/>
       </div>
   </div>
