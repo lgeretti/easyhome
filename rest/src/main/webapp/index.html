@@ -40,16 +40,20 @@ var hoverTimeout;
 var hoverEffectTime = 1000;
 var helpSelected = false;
 var helpText = "";
-var currentLeftLocationIndex = 0;
+var currentLeftIndex = 0;
 
-var locations;
-var locationDevices;
+var homeRooms;
+var roomDevices;
+var deviceFunctionalities;
 
 var uiState = {Home: 1, Room: 2, Device: 3, Functionality: 4};
 
-var currentState = uiState.Home;
+var currentState;
+var currentRoom;
+var currentDevice;
+var currentFunctionality;
 
-var lowSelectionIndex = 0;
+var lowSelectionIndex;
 
 function arrowHoverEffectIn(button) {
     button.stop().animate({
@@ -67,7 +71,7 @@ function arrowHoverEffectIn(button) {
       switch(currentState) {
 
 										case uiState.Home:
-												showLocations();  	
+												showHomeRooms();  	
 												break;
 												
 										case uiState.Room:
@@ -76,45 +80,38 @@ function arrowHoverEffectIn(button) {
       }    
       
       if (button.css('visibility') == 'visible')
-        hoverTimeout = setTimeout(hoverTimeoutFunc,hoverEffectTime); 
+        hoverTimeout = setTimeout(hoverTimeoutFunc, hoverEffectTime); 
     
     }
 
-    hoverTimeout = setTimeout(hoverTimeoutFunc,hoverEffectTime);
+    hoverTimeout = setTimeout(hoverTimeoutFunc, hoverEffectTime);
 }
 
 function selectionButtonHoverEffectIn(button) {
     button.stop().animate({
           backgroundColor: button.css('color')
-            }, hoverEffectTime );
+            }, hoverEffectTime
+    );
 
-    hoverTimeout = setTimeout(function(){ 
+    hoverTimeout = setTimeout(function(){   
+    
+										var idx = button.find('img').attr('id');    
     
            switch (currentState) {
 
 												case uiState.Home:
-												
-														
+														selectRoom(homeRooms[idx]);
 														break;
-
 												case uiState.Room:
-												
-												
+												  selectDevice(roomDevices[idx]);
 														break;
-														
 												case uiState.Device:
-												
-												
-														break;
-														
-												case uiState.Functionality:
-												
-												
-														break;																												
-
+												  selectFunctionality(deviceFunctionalities[idx]);
+												// Functionalities have no selection buttons, only actuators
 									 }
                 
-         },hoverEffectTime);
+         }, hoverEffectTime
+    );
 }
 
 function navigationButtonHoverEffectIn(button) {
@@ -208,20 +205,31 @@ function helpHoverEffectOut() {
     }
 }
 
-function initialize() {
+function selectRoom(room) {
 
-  getLocations();
+
+
+
 
 }
 
-function getLocations() {
+function initialize() {
+
+  lowSelectionIndex = 0;
+  currentState = uiState.Room;
+
+  getHomeRooms();
+
+}
+
+function getHomeRooms() {
 
    $.ajax({ 
        type: "GET",
        dataType: "json",
        url: "http://localhost:8080/easyhome/rest/locations",
        success: function(data){        
-          locations = data.location;
+          homeRooms = data.location;
           lowSelectionIndex = 0;
 											
           updateState(uiState.Home);
@@ -244,7 +252,7 @@ function updateState(newState) {
     case uiState.Home:
     													
     		 $("#eh_nav_room,#eh_nav_device,#eh_nav_functionality").hide();
-					 showLocations();
+					 showHomeRooms();
 					 break;  
   
   		 case uiState.Room:
@@ -293,7 +301,7 @@ function updateHelpText(currentState) {
 
 }
 
-function showLocations() {
+function showHomeRooms() {
 
   var firstSelection, secondSelection, thirdSelection;
 
@@ -301,12 +309,12 @@ function showLocations() {
 			 $("#eh_arrow_left").css('visibility','hidden');
 	 else 
 	 			$("#eh_arrow_left").css('visibility','visible');
-		if (lowSelectionIndex+2 >=locations.length-1)
+		if (lowSelectionIndex+2 >=homeRooms.length-1)
 				$("#eh_arrow_right").css('visibility','hidden');
 		else
 		  $("#eh_arrow_right").css('visibility','visible');
 		  
-  var selectionIndexDiff = locations.length-lowSelectionIndex;		  
+  var selectionIndexDiff = homeRooms.length-lowSelectionIndex;		  
 		  
 		switch (selectionIndexDiff) {
 		
@@ -322,7 +330,7 @@ function showLocations() {
 						});
 						var button = $("#eh_selection_center");
 						button.css('visibility','visible');
-						var loc = locations[0];
+						var loc = homeRooms[0];
 		  	  	button.find('img').attr('id',0).attr('alt',loc.help).attr('src',loc.imgPath);
 		  			break;
 		  			
@@ -335,11 +343,11 @@ function showLocations() {
 						});
 						
 						var button = $("#eh_selection_left");
-						var loc = locations[0];
+						var loc = homeRooms[0];
 		  	  	button.find('img').attr('id',0).attr('alt',loc.help).attr('src',loc.imgPath);						
 						
 					 button = $("#eh_selection_right");
-						var loc = locations[1];
+						var loc = homeRooms[1];
 		  	  	button.find('img').attr('id',1).attr('alt',loc.help).attr('src',loc.imgPath);
 		  			break;		  	
 								  	
@@ -350,15 +358,15 @@ function showLocations() {
 						});	
 						
 						var button = $("#eh_selection_left");
-						var loc = locations[lowSelectionIndex];
+						var loc = homeRooms[lowSelectionIndex];
 		  	  	button.find('img').attr('id',lowSelectionIndex).attr('alt',loc.name).attr('src',loc.imgPath);						
 						
 					 button = $("#eh_selection_center");
-						var loc = locations[lowSelectionIndex+1];
+						var loc = homeRooms[lowSelectionIndex+1];
 		  	  	button.find('img').attr('id',lowSelectionIndex+1).attr('alt',loc.name).attr('src',loc.imgPath);
 		  	  	
 					 button = $("#eh_selection_right");
-						var loc = locations[lowSelectionIndex+2];
+						var loc = homeRooms[lowSelectionIndex+2];
 		  	  	button.find('img').attr('id',lowSelectionIndex+2).attr('alt',loc.name).attr('src',loc.imgPath);
 		  	  			  	  	
 		  			break;
