@@ -39,21 +39,30 @@
 var hoverTimeout;
 var hoverEffectTime = 1000;
 var helpSelected = false;
-var helpText;
+var helpText = "";
 var currentLeftLocationIndex = 0;
+
+var locations;
+
+var uiState = {Home: 1, Room: 2, Device: 3, Functionality: 4};
+
+var currentState = uiState.Room;
+
+var lowSelectionIndex;
+var highSelectionIndex;
 
 var devices = [ 
  {   
  		 name: "Forno",
- 		 image: "img/oven.svg"
+ 		 imgPath: "img/oven.svg"
  },
 	{
 	 		name: "Frigo",
- 		 image: "img/fridge.svg"
+ 		 imgPath: "img/fridge.svg"
 	},
 	{
 	  name: "Macchina del caffè",
-	  image: "img/coffee.svg"
+	  imgPath: "img/coffee.svg"
 	},
 ];
 
@@ -112,19 +121,110 @@ function helpHoverEffectOut() {
     }
 }
 
-function updateLocations() {
+function getLocations() {
 
-  
+   $.ajax({ 
+       type: "GET",
+       dataType: "json",
+       url: "http://localhost:8080/easyhome/rest/locations",
+       success: function(data){        
+          locations = data.location;
+          lowSelectionIndex = 0;
+          if (locations.length > 2)
+          			highSelectionIndex = 2;
+									else
+											highSelectionIndex = locations.length-1;
+											
+								 showSelectionForLocations();
+       },
+       error: function(jqXHR, textStatus, errorThrown){
+          alert(textStatus + ":" + errorThrown);
+       }
+   });	
+	
+}
 
+function showSelectionForLocations() {
 
+  var firstSelection, secondSelection, thirdSelection;
 
+		if (lowSelectionIndex == 0)
+			 $("#eh_arrow_left").css('visibility','hidden');
+	 else 
+	 			$("#eh_arrow_left").css('visibility','hidden');
+		if (highSelectionIndex==length-1)
+				$("#eh_arrow_right").css('visibility','hidden');
+		else
+		  $("#eh_arrow_right").css('visibility','visible');
+		  
+  var selectionIndexDiff = highSelectionIndex-lowSelectionIndex;		  
+		  
+		switch (highSelectionIndex-lowSelectionIndex) {
+		
+		  case -1:
+						$(".selection_button").each( function() {
+							$(this).css('visibility','hidden');
+						});		  
+		  			break;
+		  			
+		  	case 0:
+		  			$("#eh_selection_left,#eh_selection_right").each( function() {
+							$(this).css('visibility','hidden');
+						});
+						var button = $("#eh_selection_center");
+						button.css('visibility','visible');
+						var loc = locations[0];
+       button.find('a').attr('id',0);
+		  	  	button.find('img').attr('alt',loc.help).attr('src',loc.imgPath);
+		  			break;
+		  			
+		  	case 1:
 
+					 $("#eh_selection_center").css('visibility','hidden')
 
+		  			$("#eh_selection_left,#eh_selection_right").each( function() {
+			 			 button.css('visibility','visible');
+						});
+						
+						var button = $("#eh_selection_left");
+						var loc = locations[0];
+       button.find('a').attr('id',0);
+		  	  	button.find('img').attr('alt',loc.help).attr('src',loc.imgPath);						
+						
+					 button = $("#eh_selection_right");
+						var loc = locations[1];
+       button.find('a').attr('id',1);
+		  	  	button.find('img').attr('alt',loc.help).attr('src',loc.imgPath);
+		  			break;		  	
+								  	
+		  	case 2:
+		
+						$(".selection_button").each( function() {
+							$(this).css('visibility','visible');
+						});	
+						
+						var button = $("#eh_selection_left");
+						var loc = locations[lowSelectionIndex];
+       button.find('a').attr('id',lowSelectionIndex);
+		  	  	button.find('img').attr('alt',loc.name).attr('src',loc.imgPath);						
+						
+					 button = $("#eh_selection_center");
+						var loc = locations[lowSelectionIndex+1];
+       button.find('a').attr('id',lowSelectionIndex+1);
+		  	  	button.find('img').attr('alt',loc.name).attr('src',loc.imgPath);
+		  	  	
+					 button = $("#eh_selection_right");
+						var loc = locations[lowSelectionIndex+2];
+       button.find('a').attr('id',lowSelectionIndex+2);
+		  	  	button.find('img').attr('alt',loc.name).attr('src',loc.imgPath);
+		  	  			  	  	
+		  			break;
+		}
 }
 
 $(document).ready(function(){
 
-$("#eh_arrow_left").css('visibility','hidden');
+getLocations();
 
 $("#eh_description_div").hide();
 
@@ -215,7 +315,7 @@ $(".arrow_button").hover(
   <div id="eh_selection_buttons_container">
 
       <div id="eh_arrow_left" class="eh_arrow_button_positioner">
-        <a href="#1">
+        <a href="">
           <div class="eh_button arrow_button ui-widget-content ui-corner-all">
             <img src="img/arrowleft.svg"/>
           </div>
@@ -223,25 +323,25 @@ $(".arrow_button").hover(
       </div>
 	
 	    <div id="eh_selection_left" class="eh_button selection_button ui-widget-content ui-corner-all">
-	      <a href="#2">
-	        <img src="img/oven.svg" alt="Forno"/>
+	      <a href="">
+	        <img />
 	      </a>
 	    </div>
 		      
 		   <div id="eh_selection_center" class="eh_button selection_button ui-widget-content ui-corner-all">
-		     <a href="#3">
-		       <img src="img/fridge.svg" alt="Frigo"/>
+		     <a href="">
+		       <img />
 		     </a>
 		   </div>
 		      
 		   <div id="eh_selection_right" class="eh_button selection_button ui-widget-content ui-corner-all">
-		      <a href="#4">
-		        <img src="img/coffee.svg" alt="Macchina del caffè"/>
+		      <a href="">
+		        <img />
 		      </a>
 		   </div>
 
       <div id="eh_arrow_right" class="eh_arrow_button_positioner">
-        <a href="#5">
+        <a href="">
           <div class="eh_button arrow_button ui-widget-content ui-corner-all">
             <img src="img/arrowright.svg"/>
           </div>
