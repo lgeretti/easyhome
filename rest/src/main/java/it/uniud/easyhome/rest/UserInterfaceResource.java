@@ -179,8 +179,11 @@ public class UserInterfaceResource {
     private void insertLocationsAndPersistentInfo() {
     	
     	String loc0 = "Salotto";
-    	String loc1 = "Camera da letto doppia";
-    	String loc2 = "Laboratorio";
+    	String loc1 = "Cucina";
+    	String loc2 = "Camera da letto doppia";
+    	String loc3 = "Camera da letto singola";
+    	String loc4 = "Lavanderia";
+    	String loc5 = "Bagno";
     	
         MultivaluedMap<String,String> formData;
         
@@ -189,17 +192,35 @@ public class UserInterfaceResource {
         formData.add("type",LocationType.LIVINGROOM.toString());
         formData.add("imgPath","img/livingroom.svg");
         client.resource(TARGET).path(RestPaths.LOCATIONS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-        
+
         formData = new MultivaluedMapImpl();
         formData.add("name",loc1);
-        formData.add("type",LocationType.BEDROOM.toString());
-        formData.add("imgPath","img/bedroom.svg");        
+        formData.add("type",LocationType.KITCHEN.toString());
+        formData.add("imgPath","img/kitchen.svg");
         client.resource(TARGET).path(RestPaths.LOCATIONS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
- 
+        
         formData = new MultivaluedMapImpl();
         formData.add("name",loc2);
         formData.add("type",LocationType.BEDROOM.toString());
+        formData.add("imgPath","img/doublebedroom.svg");        
+        client.resource(TARGET).path(RestPaths.LOCATIONS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+ 
+        formData = new MultivaluedMapImpl();
+        formData.add("name",loc3);
+        formData.add("type",LocationType.BEDROOM.toString());
         formData.add("imgPath","img/bedroom.svg");        
+        client.resource(TARGET).path(RestPaths.LOCATIONS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        
+        formData = new MultivaluedMapImpl();
+        formData.add("name",loc4);
+        formData.add("type",LocationType.BATHROOM.toString());
+        formData.add("imgPath","img/washer.svg");
+        client.resource(TARGET).path(RestPaths.LOCATIONS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        
+        formData = new MultivaluedMapImpl();
+        formData.add("name",loc5);
+        formData.add("type",LocationType.BATHROOM.toString());
+        formData.add("imgPath","img/bathroom.svg");        
         client.resource(TARGET).path(RestPaths.LOCATIONS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         
         formData = new MultivaluedMapImpl();
@@ -208,11 +229,9 @@ public class UserInterfaceResource {
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146521827785L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         formData = new MultivaluedMapImpl();
         formData.add("name","Interfaccia gestuale");
-        formData.add("locationName",loc1);
-    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928337L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-        formData.add("name","Interfaccia gestuale");
         formData.add("locationName",loc2);
-    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928181L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928337L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        formData = new MultivaluedMapImpl();    	    	
     }
     
     private void stopEventBasedJSFProcesses() throws NamingException, JMSException {
