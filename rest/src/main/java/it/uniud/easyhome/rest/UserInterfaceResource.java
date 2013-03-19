@@ -227,6 +227,8 @@ public class UserInterfaceResource {
         
         // Devices
         
+        // ZigBee
+        
         formData = new MultivaluedMapImpl();
         formData.add("name","Gateway ZigBee");
         formData.add("locationName",loc0);
@@ -244,11 +246,7 @@ public class UserInterfaceResource {
         formData.add("locationName",loc2);
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928181L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         
-        formData = new MultivaluedMapImpl();
-        formData.add("name","Gateway ZigBee");
-        formData.add("locationName",loc0);
-        formData.add("imgPath","img/accesspoint.svg");
-    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146521827785L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+    	// PowerLine
     	
         formData = new MultivaluedMapImpl();
         formData.add("name","Gateway Powerline");
@@ -273,6 +271,50 @@ public class UserInterfaceResource {
         formData.add("locationName",loc1);
         formData.add("imgPath","img/fridge.svg");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(3L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+    	
+    	// Fake
+    	
+        formData = new MultivaluedMapImpl();
+        formData.add("name","Forno");
+        formData.add("locationName",loc1);
+        formData.add("imgPath","img/oven.svg");
+    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(1L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+    	
+        formData = new MultivaluedMapImpl();
+        formData.add("name","Macchina del caffè");
+        formData.add("locationName",loc1);
+        formData.add("imgPath","img/coffee.svg");
+    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(2L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+
+        formData = new MultivaluedMapImpl();
+        formData.add("name","Tostapane");
+        formData.add("locationName",loc1);
+        formData.add("imgPath","img/bread.svg");
+    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(3L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+
+        formData = new MultivaluedMapImpl();
+        formData.add("name","Televisore");
+        formData.add("locationName",loc0);
+        formData.add("imgPath","img/tv.svg");
+    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(4L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+
+        formData = new MultivaluedMapImpl();
+        formData.add("name","HiFi");
+        formData.add("locationName",loc0);
+        formData.add("imgPath","img/hifi.svg");
+    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(5L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+    	
+        formData = new MultivaluedMapImpl();
+        formData.add("name","Termostato");
+        formData.add("locationName",loc0);
+        formData.add("imgPath","img/thermostat.svg");
+    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(6L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+    	
+        formData = new MultivaluedMapImpl();
+        formData.add("name","Sveglia");
+        formData.add("locationName",loc2);
+        formData.add("imgPath","img/timer.svg");
+    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(7L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     	
     }
     
