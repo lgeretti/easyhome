@@ -1,6 +1,7 @@
 package it.uniud.easyhome.rest;
 
 import it.uniud.easyhome.gateway.Gateway;
+import it.uniud.easyhome.network.Functionality;
 import it.uniud.easyhome.network.Link;
 import it.uniud.easyhome.network.Location;
 import it.uniud.easyhome.network.NetworkJob;
@@ -33,7 +34,8 @@ public final class JsonJaxbContextResolver implements ContextResolver<JAXBContex
             GlobalCoordinates.class,
             Link.class,
             Location.class,
-            NodePersistentInfo.class
+            NodePersistentInfo.class,
+            Functionality.class
         };
         context = new JSONJAXBContext(JSONConfiguration.natural().build(), types);
     }

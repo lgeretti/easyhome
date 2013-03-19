@@ -11,7 +11,6 @@ import javax.naming.NamingException;
 import javax.ws.rs.core.*;
 import javax.ws.rs.*;
 
-/** Handles the access to the network of nodes */
 @Path(RestPaths.PERSISTENTINFO)
 public final class PersistentInfoResource {
 	
