@@ -43,12 +43,13 @@ var helpText = "";
 var currentLeftLocationIndex = 0;
 
 var locations;
+var locationDevices;
 
 var uiState = {Home: 1, Room: 2, Device: 3, Functionality: 4};
 
 var currentState = uiState.Home;
 
-var lowSelectionIndex;
+var lowSelectionIndex = 0;
 
 function arrowHoverEffectIn(button) {
     button.stop().animate({
@@ -66,7 +67,7 @@ function arrowHoverEffectIn(button) {
       switch(currentState) {
 
 										case uiState.Home:
-												showSelectionForLocations();  	
+												showLocations();  	
 												break;
 												
 										case uiState.Room:
@@ -82,14 +83,84 @@ function arrowHoverEffectIn(button) {
     hoverTimeout = setTimeout(hoverTimeoutFunc,hoverEffectTime);
 }
 
-function buttonHoverEffectIn(button) {
+function selectionButtonHoverEffectIn(button) {
     button.stop().animate({
           backgroundColor: button.css('color')
             }, hoverEffectTime );
 
     hoverTimeout = setTimeout(function(){ 
-            // To be done yet    
+    
+           switch (currentState) {
+
+												case uiState.Home:
+												
+														
+														break;
+
+												case uiState.Room:
+												
+												
+														break;
+														
+												case uiState.Device:
+												
+												
+														break;
+														
+												case uiState.Functionality:
+												
+												
+														break;																												
+
+									 }
+                
          },hoverEffectTime);
+}
+
+function navigationButtonHoverEffectIn(button) {
+
+    var isDifferentState;
+    
+    switch (button.attr('id')) {
+
+						case '#eh_nav_home':
+								isDifferentState =  (currentState != uiState.Home);
+								break;
+						case '#eh_nav_room':
+							 isDifferentState =  (currentState != uiState.Room);
+								break;
+						case '#eh_nav_device':
+						  isDifferentState = (currentState != uiState.Device);
+								break;
+						case '#eh_nav_functionality':
+								isDifferentState = false;
+			}      
+			    
+			if (isDifferentState) {
+    
+      button.stop().animate({
+          backgroundColor: button.css('color')
+            }, hoverEffectTime );
+
+      hoverTimeout = setTimeout(function(){ 
+                
+           switch (button.attr('id')) {
+
+												case '#eh_nav_home':
+														updateState(uiState.Home);
+														break;
+												case '#eh_nav_room':										
+												  updateState(uiState.Room);
+														break;
+												case '#eh_nav_device':
+												  updateState(uiState.Device);
+														break;
+												default:
+									 }                       
+
+         },hoverEffectTime);
+         
+    }
 }
 
 function buttonHoverEffectOut(button) {
@@ -173,7 +244,7 @@ function updateState(newState) {
     case uiState.Home:
     													
     		 $("#eh_nav_room,#eh_nav_device,#eh_nav_functionality").hide();
-					 showSelectionForLocations();
+					 showLocations();
 					 break;  
   
   		 case uiState.Room:
@@ -222,7 +293,7 @@ function updateHelpText(currentState) {
 
 }
 
-function showSelectionForLocations() {
+function showLocations() {
 
   var firstSelection, secondSelection, thirdSelection;
 
@@ -257,7 +328,7 @@ function showSelectionForLocations() {
 		  			
 		  	case 1:
 
-					 $("#eh_selection_center").css('visibility','hidden')
+					 $("#eh_selection_center").css('visibility','hidden');
 
 		  			$("#eh_selection_left,#eh_selection_right").each( function() {
 			 			 button.css('visibility','visible');
@@ -309,11 +380,25 @@ $(".eh_button").each(
     }
 );
 
-$(".selection_button,.navigation_button").hover(
+$(".selection_button").hover(
     function() {
     				if (!helpSelected)
           $("#eh_description_div").text($(this).find("img").attr("alt")).show();
-        buttonHoverEffectIn($(this));
+        selectionButtonHoverEffectIn($(this));
+    }
+    ,
+    function() {
+        if (!helpSelected)
+          $("#eh_description_div").hide();
+        buttonHoverEffectOut($(this));
+    }
+);
+
+$(".navigation_button").hover(
+    function() {
+    				if (!helpSelected)
+          $("#eh_description_div").text($(this).find("img").attr("alt")).show();
+        navigationButtonHoverEffectIn($(this));
     }
     ,
     function() {
@@ -360,13 +445,13 @@ $(".arrow_button").hover(
         <img src="img/home.svg" alt="Selezione stanza"/>
       </div>
       <div id="eh_nav_room" class="eh_button navigation_button ui-widget-content ui-corner-all">
-        <img src="img/livingroom.svg" alt="Salotto"/>
+        <img />
       </div>
       <div id="eh_nav_device" class="eh_button navigation_button ui-widget-content ui-corner-all">
-        <img src="img/colorlight.svg" alt="Luce"/>
+        <img />
       </div>
       <div id="eh_nav_functionality" class="eh_button navigation_button ui-widget-content ui-corner-all">
-        <img src="img/sun.svg" alt="Luminosità"/>
+        <img />
       </div>
   </div>
 
