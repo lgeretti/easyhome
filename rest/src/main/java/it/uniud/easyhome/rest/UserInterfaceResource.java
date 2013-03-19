@@ -182,8 +182,8 @@ public class UserInterfaceResource {
     	String loc1 = "Cucina";
     	String loc2 = "Camera da letto doppia";
     	String loc3 = "Camera da letto singola";
-    	String loc4 = "Lavanderia";
-    	String loc5 = "Bagno";
+    	String loc4 = "Bagno piccolo";
+    	String loc5 = "Bagno grande";
     	
         MultivaluedMap<String,String> formData;
         
@@ -216,7 +216,7 @@ public class UserInterfaceResource {
         formData = new MultivaluedMapImpl();
         formData.add("name",loc4);
         formData.add("type",LocationType.BATHROOM.toString());
-        formData.add("imgPath","img/washer.svg");
+        formData.add("imgPath","img/wc.svg");
         client.resource(TARGET).path(RestPaths.LOCATIONS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         
         formData = new MultivaluedMapImpl();
@@ -236,13 +236,14 @@ public class UserInterfaceResource {
         formData.add("help", "Nessuna funzione correntemente disponibile");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146521827785L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     	
+    	/*
         formData = new MultivaluedMapImpl();
         formData.add("name","Interfaccia gestuale");
         formData.add("locationName",loc2);
         formData.add("imgPath","img/hand.svg");
         formData.add("help", "Nessuna funzione correntemente disponibile");
         client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928337L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-    	
+    	*/
         formData = new MultivaluedMapImpl();
         formData.add("name","Interfaccia gestuale (test)");
         formData.add("locationName",loc2);
@@ -326,11 +327,17 @@ public class UserInterfaceResource {
     	
         formData = new MultivaluedMapImpl();
         formData.add("name","Sveglia");
-        formData.add("locationName",loc2);
+        formData.add("locationName",loc3);
         formData.add("imgPath","img/timer.svg");
         formData.add("help", "Nessuna funzione correntemente disponibile (dispositivo fasullo)");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(7L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-    	
+
+        formData = new MultivaluedMapImpl();
+        formData.add("name","Lavatrice");
+        formData.add("locationName",loc5);
+        formData.add("imgPath","img/washer.svg");
+        formData.add("help", "Nessuna funzione correntemente disponibile (dispositivo fasullo)");
+    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(8L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     }
     
     private void stopEventBasedJSFProcesses() throws NamingException, JMSException {
