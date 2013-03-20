@@ -87,7 +87,7 @@ function arrowHoverEffectIn(button) {
 		case uiState.Functionality:
 			
 			if (currentFunctionality.type == 'MOVE_ROOM') {
-				showSelections(homeRooms);
+				showSelections(functionalityOptions);
 			}
       }    
 
@@ -102,14 +102,6 @@ function arrowHoverEffectIn(button) {
 }
 
 function selectionButtonHoverEffectIn(button) {
-
-    if (!(currentState == uiState.Functionality && 
-    	currentFunctionality.type == 'MOVE_ROOM' && 
-    	homeRooms[button.find('img').attr('id')].id == currentRoom.id)) {
-            button.stop().animate({
-                backgroundColor: button.css('color')
-                }, hoverEffectTime );               	
-    }
 	
     hoverTimeoutFunc = function(state) {
     	
@@ -130,8 +122,8 @@ function selectionButtonHoverEffectIn(button) {
                     selectFunctionality(deviceFunctionalities[idx]);
                     break;
                 case uiState.Functionality:
-                    if (currentFunctionality.type == 'MOVE_ROOM' && homeRooms[idx].id != currentRoom.id) {
-                        moveCurrentDeviceTo(homeRooms[idx]);
+                    if (currentFunctionality.type == 'MOVE_ROOM' && functionalityOptions[idx].id != currentRoom.id) {
+                        moveCurrentDeviceTo(functionalityOptions[idx]);
                     }
             }
         	
@@ -509,7 +501,14 @@ function showFunctionality(functionality) {
     	
     	$("#eh_selection_buttons_container").show();
     	lowSelectionIndex = 0;
-    	showSelections(homeRooms);
+    	delete functionalityOptions;
+    	functionalityOptions = [];
+    	for (var room in homeRooms) {
+    	    if (homeRooms[room].id != currentRoom.id)	
+    	       functionalityOptions.push(homeRooms[room]); 
+    	}
+    	
+    	showSelections(functionalityOptions);
     	
         break;
     

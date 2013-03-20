@@ -375,7 +375,6 @@ public class UserInterfaceResource {
 	    	//formData.putSingle("deviceId",Long.toString(gestualId));
 	    	//client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	    	
-	        
 	    	formData = new MultivaluedMapImpl();
 	        formData.add("name","Luminosità");
 	        formData.add("type",FunctionalityType.LUMINOSITY_CONTROL.toString());
