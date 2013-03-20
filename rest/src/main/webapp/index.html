@@ -258,6 +258,13 @@ function selectDevice(device) {
    });    
 }
 
+function selectFunctionality(functionality) {
+
+   currentFunctionality = functionality;
+   $("#eh_nav_functionality").find('img').attr('src',functionality.imgPath).attr('alt',functionality.name); 
+   selectState(uiState.Functionality);
+}
+
 function initialize() {
 
   lowSelectionIndex = 0;
@@ -300,6 +307,7 @@ function selectState(newState) {
     case uiState.Home:
     													
     	$("#eh_nav_room,#eh_nav_device,#eh_nav_functionality").hide();
+    	$("#eh_selection_buttons_container").show();
 		showSelections(homeRooms);
 		break;  
   
@@ -307,13 +315,15 @@ function selectState(newState) {
 				
 	    $("#eh_nav_room").show();
 		$("#eh_nav_device,#eh_nav_functionality").hide();
+		$("#eh_selection_buttons_container").show();
 	    showSelections(roomDevices);
 		break;
 							
     case uiState.Device:
 				
 	    $("#eh_nav_room,#eh_nav_device").show();
-		$("#eh_nav_functionality").hide();				
+		$("#eh_nav_functionality").hide();			
+		$("#eh_selection_buttons_container").show();
 	    showSelections(deviceFunctionalities);
 		  
 		break;
@@ -321,10 +331,10 @@ function selectState(newState) {
 	case uiState.Functionality:  
 				
 		$("#eh_nav_room,#eh_nav_device,#eh_nav_functionality").show();
+		$("#eh_selection_buttons_container").hide();
+		
+		showFunctionality(currentFunctionality);
   }
-  
-  $("#eh_selection_buttons_container").show(); // In case you came from the help text maximization 
-
 }
 
 function updateHelpText(currentState) {
