@@ -48,6 +48,10 @@ public class LocationEJB {
         return result;
 	}
 	
+	public void updateUnmanaged(Location loc) {
+		em.merge(loc);
+	}
+	
 	public List<Location> getLocations() {
 		
         CriteriaBuilder builder = em.getCriteriaBuilder();

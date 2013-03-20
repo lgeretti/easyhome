@@ -74,6 +74,40 @@ public final class LocationResource {
         
         return loc;
     }
+	
+	@POST
+    @Path("{id}/occupied")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response setOccupied(@PathParam("id") int id) {
+        
+        Location loc = resEjb.findLocationById(id);
+        
+        if (loc == null) 
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        
+        loc.setOccupied(true);
+        
+        resEjb.updateUnmanaged(loc);
+        
+        return Response.ok().build();
+    }
+	
+	@POST
+    @Path("{id}/unoccupied")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response setUnoccupied(@PathParam("id") int id) {
+        
+        Location loc = resEjb.findLocationById(id);
+        
+        if (loc == null) 
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        
+        loc.setOccupied(false);
+        
+        resEjb.updateUnmanaged(loc);
+        
+        return Response.ok().build();
+    }
     
     @DELETE
     @Path("{id}")
