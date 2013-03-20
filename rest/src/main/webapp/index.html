@@ -365,12 +365,11 @@ function updateHelpText(currentState) {
 function getAltMessage(selection) {
 	
     var altString = selection.name;
-    if (currentState = uiState.Home) {
+    if (currentState == uiState.Home) {
         
         if (selection.occupied)
             altString += " (occupied)";
     }
-	
 	return altString;
 }
 
