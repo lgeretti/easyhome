@@ -28,26 +28,26 @@ public class PersistentInfoEJB {
 	@PersistenceContext(unitName = "EasyHome-JTA")
 	private EntityManager em;
 	
-	public List<NodePersistentInfo> getPersistentInfos() {
+	public List<PersistentInfo> getPersistentInfos() {
 	
 		
         CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<NodePersistentInfo> criteria = builder.createQuery(NodePersistentInfo.class);
-        Root<NodePersistentInfo> info = criteria.from(NodePersistentInfo.class);
+        CriteriaQuery<PersistentInfo> criteria = builder.createQuery(PersistentInfo.class);
+        Root<PersistentInfo> info = criteria.from(PersistentInfo.class);
         criteria.select(info);
         
-        TypedQuery<NodePersistentInfo> query = em.createQuery(criteria);
+        TypedQuery<PersistentInfo> query = em.createQuery(criteria);
         
         return query.getResultList();
 	}
 	
-	public NodePersistentInfo getPersistentInfo(byte gatewayId, long nuid) {
+	public PersistentInfo getPersistentInfo(byte gatewayId, long nuid) {
 		
 		boolean findSpecificNode = (gatewayId > 0);
 		
         CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<NodePersistentInfo> criteria = builder.createQuery(NodePersistentInfo.class);
-        Root<NodePersistentInfo> info = criteria.from(NodePersistentInfo.class);
+        CriteriaQuery<PersistentInfo> criteria = builder.createQuery(PersistentInfo.class);
+        Root<PersistentInfo> info = criteria.from(PersistentInfo.class);
         criteria.select(info);
         
         if (findSpecificNode)
@@ -55,9 +55,9 @@ public class PersistentInfoEJB {
         			builder.equal(info.get("gatewayId"), gatewayId),
         			builder.equal(info.get("nuid"), nuid)));
         
-        TypedQuery<NodePersistentInfo> query = em.createQuery(criteria);
+        TypedQuery<PersistentInfo> query = em.createQuery(criteria);
         
-        NodePersistentInfo result = null;
+        PersistentInfo result = null;
         
         try {
         	result = query.getSingleResult();
@@ -66,7 +66,11 @@ public class PersistentInfoEJB {
         return result;
 	}
 	
-	public NodePersistentInfo findPersistentInfo(NodePersistentInfo info) {
+	public PersistentInfo findPersistentInfoById(long id) {
+		return em.find(PersistentInfo.class, id);
+	}
+	
+	public PersistentInfo findPersistentInfo(PersistentInfo info) {
         return getPersistentInfo(info.getGatewayId(),info.getNuid());
 	}	
 	
@@ -76,22 +80,22 @@ public class PersistentInfoEJB {
 				   .getResultList();
 	}
 	
-	public void insertPersistentInfo(NodePersistentInfo info) {
+	public void insertPersistentInfo(PersistentInfo info) {
         em.persist(info);
         updateNodeFor(info);
 	}
 	
-	public boolean exists(NodePersistentInfo info) {
-		NodePersistentInfo storedInfo = findPersistentInfo(info);
+	public boolean exists(PersistentInfo info) {
+		PersistentInfo storedInfo = findPersistentInfo(info);
         return (storedInfo != null);
 	}
 	
-	public void updatedUnmanaged(NodePersistentInfo info) {
+	public void updatedUnmanaged(PersistentInfo info) {
 		em.merge(info);
 		updateNodeFor(info);
 	}
 
-	public void removeUnmanaged(NodePersistentInfo info) {
+	public void removeUnmanaged(PersistentInfo info) {
 		em.remove(info);
 	}
 	
@@ -102,7 +106,7 @@ public class PersistentInfoEJB {
 	 */
 	public boolean removeInfo(byte gatewayId, long nuid) {
 		
-        NodePersistentInfo info = getPersistentInfo(gatewayId,nuid);
+        PersistentInfo info = getPersistentInfo(gatewayId,nuid);
         
         boolean existed = (info != null);
         
@@ -114,13 +118,13 @@ public class PersistentInfoEJB {
 	
 	public void removeAllPersistedInfos() {
         
-        List<NodePersistentInfo> infos = getPersistentInfos();
+        List<PersistentInfo> infos = getPersistentInfos();
         
-        for (NodePersistentInfo info: infos)
+        for (PersistentInfo info: infos)
         	em.remove(info);
 	}
 	
-	private void updateNodeFor(NodePersistentInfo info) {
+	private void updateNodeFor(PersistentInfo info) {
 			
 	        CriteriaBuilder builder = em.getCriteriaBuilder();
 	        CriteriaQuery<Node> criteria = builder.createQuery(Node.class);
@@ -165,14 +169,14 @@ public class PersistentInfoEJB {
         return result;
 	}
 	
-	public List<NodePersistentInfo> getPersistentInfosByLocationId(int locationId) {
+	public List<PersistentInfo> getPersistentInfosByLocationId(int locationId) {
 		
         CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<NodePersistentInfo> criteria = builder.createQuery(NodePersistentInfo.class);
-        Root<NodePersistentInfo> info = criteria.from(NodePersistentInfo.class);
+        CriteriaQuery<PersistentInfo> criteria = builder.createQuery(PersistentInfo.class);
+        Root<PersistentInfo> info = criteria.from(PersistentInfo.class);
         criteria.select(info).where(builder.equal(info.get("location").get("id"), locationId));
         
-        TypedQuery<NodePersistentInfo> query = em.createQuery(criteria);
+        TypedQuery<PersistentInfo> query = em.createQuery(criteria);
 		
 		return query.getResultList();
 	}

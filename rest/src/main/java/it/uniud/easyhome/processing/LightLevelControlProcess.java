@@ -17,7 +17,7 @@ import it.uniud.easyhome.network.NetworkJob;
 import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
-import it.uniud.easyhome.network.NodePersistentInfo;
+import it.uniud.easyhome.network.PersistentInfo;
 import it.uniud.easyhome.packets.ResponseStatus;
 import it.uniud.easyhome.packets.natives.LevelControlRspPacket;
 import it.uniud.easyhome.packets.natives.NativePacket;

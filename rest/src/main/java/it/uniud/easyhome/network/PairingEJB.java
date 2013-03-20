@@ -32,7 +32,12 @@ public class PairingEJB {
 	@PersistenceContext(unitName = "EasyHome-JTA")
 	private EntityManager em;
 	
-	public void insertPairing(long id, NodePersistentInfo source, NodePersistentInfo destination) {
+	
+	public PersistentInfo findPersistentInfoById(long id) {
+		return em.find(PersistentInfo.class, id);
+	}
+	
+	public void insertPairing(long id, PersistentInfo source, PersistentInfo destination) {
 		Pairing pairing = new Pairing(id, source, destination);
 		
 		em.persist(pairing);
@@ -64,7 +69,7 @@ public class PairingEJB {
 			return false;
 	}
 	
-	public void removeAllPairing() {
+	public void removeAllPairings() {
         
         List<Pairing> pairings = getPairings();
         

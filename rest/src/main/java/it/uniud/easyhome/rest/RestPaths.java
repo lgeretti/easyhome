@@ -11,5 +11,6 @@ public class RestPaths {
 	public static final String LOCATIONS = "locations";
 	public static final String DEVICES = "devices";
 	public static final String FUNCTIONALITIES = "functionalities";
+	public static final String PAIRINGS = "pairings";
 	public static final String ADMIN = "admin";
 }

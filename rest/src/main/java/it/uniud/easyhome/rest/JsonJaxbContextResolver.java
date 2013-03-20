@@ -28,7 +28,7 @@ public final class JsonJaxbContextResolver implements ContextResolver<JAXBContex
             GlobalCoordinates.class,
             Link.class,
             Location.class,
-            NodePersistentInfo.class,
+            PersistentInfo.class,
             Functionality.class,
             Pairing.class
         };

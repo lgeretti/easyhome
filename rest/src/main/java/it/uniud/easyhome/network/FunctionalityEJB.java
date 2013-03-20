@@ -61,8 +61,8 @@ public class FunctionalityEJB {
         	em.remove(func);
 	}
 	
-	public NodePersistentInfo findPersistentInfoById(long id) {
-		return em.find(NodePersistentInfo.class, id);
+	public PersistentInfo findPersistentInfoById(long id) {
+		return em.find(PersistentInfo.class, id);
 	}
 	
 	public List<Functionality> getFunctionalitiesByDeviceId(long deviceId) {

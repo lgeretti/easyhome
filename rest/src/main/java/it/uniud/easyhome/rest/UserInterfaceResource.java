@@ -18,7 +18,7 @@ import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
-import it.uniud.easyhome.network.NodePersistentInfo;
+import it.uniud.easyhome.network.PersistentInfo;
 import it.uniud.easyhome.packets.natives.NodeNeighReqPacket;
 import it.uniud.easyhome.packets.natives.NodePowerLevelSetIssuePacket;
 import it.uniud.easyhome.processing.*;
@@ -242,7 +242,7 @@ public class UserInterfaceResource {
 	        formData.add("help", "E' possibile spostare il dispositivo in un'altra stanza");
 	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146521827785L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146521827785L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-	        long zigbeeGatewayId = JsonUtils.getFrom(response, NodePersistentInfo.class).getId();
+	        long zigbeeGatewayId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
 	    	
 	    	/*
 	        formData = new MultivaluedMapImpl();
@@ -263,7 +263,7 @@ public class UserInterfaceResource {
 	        formData.add("help", "E' possibile cambiare la lampada associata all'interfaccia e spostare il dispositivo in un'altra stanza");
 	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928181L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928181L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-	        long testGestualId = JsonUtils.getFrom(response, NodePersistentInfo.class).getId();
+	        long testGestualId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
 	    	
 	    	// PowerLine
 	    	
@@ -274,7 +274,7 @@ public class UserInterfaceResource {
 	        formData.add("help", "E' possibile spostare il dispositivo in un'altra stanza");
 	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(100L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(100L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-	        long plGatewayId = JsonUtils.getFrom(response, NodePersistentInfo.class).getId();
+	        long plGatewayId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
 	    	
 	        formData = new MultivaluedMapImpl();
 	        formData.add("name","Lampada");
@@ -284,7 +284,7 @@ public class UserInterfaceResource {
 	        formData.add("help", "E' possibile cambiare luce o colore della lampada");
 	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(1L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(1L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-	        long lampadaSalottoId = JsonUtils.getFrom(response, NodePersistentInfo.class).getId();
+	        long lampadaSalottoId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
 	    	
 	        formData = new MultivaluedMapImpl();
 	        formData.add("name","Lampada");
@@ -294,7 +294,7 @@ public class UserInterfaceResource {
 	        formData.add("help", "E' possibile cambiare luce o colore della lampada");
 	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(2L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(2L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-	        long lampadaCameraId = JsonUtils.getFrom(response, NodePersistentInfo.class).getId();
+	        long lampadaCameraId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
 	
 	        formData = new MultivaluedMapImpl();
 	        formData.add("name","Frigo");
@@ -354,7 +354,7 @@ public class UserInterfaceResource {
 	        formData.add("help", "E' possibile spostare il dispositivo in un'altra stanza (dispositivo fittizio)");
 	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(7L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(7L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-	        long timerId = JsonUtils.getFrom(response, NodePersistentInfo.class).getId();
+	        long timerId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
 	    	
 	        formData = new MultivaluedMapImpl();
 	        formData.add("name","Lavatrice");

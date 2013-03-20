@@ -42,7 +42,7 @@ public class LocationAndInfoIT {
 		
 		ClientResponse getResponse = client.resource(INFO_TARGET).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 		
-		List<NodePersistentInfo> infoList = JsonUtils.getListFrom(getResponse,NodePersistentInfo.class);
+		List<PersistentInfo> infoList = JsonUtils.getListFrom(getResponse,PersistentInfo.class);
 		
 		assertEquals(0,infoList.size());
 	}
@@ -82,8 +82,8 @@ public class LocationAndInfoIT {
     	ClientResponse infoInsertionResponse = postPersistentInfo(gatewayId,nuid,name,location);
         assertEquals(ClientResponse.Status.CREATED,infoInsertionResponse.getClientResponseStatus());
 
-        NodePersistentInfo recoveredInfo = client.resource(INFO_TARGET).path(Byte.toString(gatewayId)).path(Long.toString(nuid))
-        															.accept(MediaType.APPLICATION_JSON).get(NodePersistentInfo.class);
+        PersistentInfo recoveredInfo = client.resource(INFO_TARGET).path(Byte.toString(gatewayId)).path(Long.toString(nuid))
+        															.accept(MediaType.APPLICATION_JSON).get(PersistentInfo.class);
         
         assertEquals(name,recoveredInfo.getName());
         assertTrue(location.equals(recoveredInfo.getLocation()));
@@ -121,8 +121,8 @@ public class LocationAndInfoIT {
     	ClientResponse updateResponse = postPersistentInfo(gatewayId,nuid,name,bathroom);
         assertEquals(ClientResponse.Status.OK,updateResponse.getClientResponseStatus());   
         
-        NodePersistentInfo recoveredInfo = client.resource(INFO_TARGET).path(Byte.toString(gatewayId)).path(Long.toString(nuid))
-				.accept(MediaType.APPLICATION_JSON).get(NodePersistentInfo.class);
+        PersistentInfo recoveredInfo = client.resource(INFO_TARGET).path(Byte.toString(gatewayId)).path(Long.toString(nuid))
+				.accept(MediaType.APPLICATION_JSON).get(PersistentInfo.class);
         
         assertEquals(name,recoveredInfo.getName());
         assertTrue(bathroom.equals(recoveredInfo.getLocation()));

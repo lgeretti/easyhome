@@ -4,10 +4,10 @@ import javax.persistence.*;
 import javax.xml.bind.annotation.*;
 
 @Entity
-@Table(name = "NodePersistentInfo")
+@Table(name = "PersistentInfo")
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class NodePersistentInfo {
+public class PersistentInfo {
 	
 	@Id
 	private long id;
@@ -27,9 +27,9 @@ public class NodePersistentInfo {
     private String help;
 
     @SuppressWarnings("unused")
-	private NodePersistentInfo() {}
+	private PersistentInfo() {}
     
-    public NodePersistentInfo(long id, byte gatewayId, long nuid, String name, Location location, FunctionalityContainerType funcContainerType, String imgPath, String help) {
+    public PersistentInfo(long id, byte gatewayId, long nuid, String name, Location location, FunctionalityContainerType funcContainerType, String imgPath, String help) {
     	this.id = id;
     	this.gatewayId = gatewayId;
     	this.nuid = nuid;
@@ -83,9 +83,9 @@ public class NodePersistentInfo {
     @Override
     public boolean equals(Object other) {
         
-        if (!(other instanceof NodePersistentInfo))
+        if (!(other instanceof PersistentInfo))
             throw new IllegalArgumentException();
-        NodePersistentInfo otherNode = (NodePersistentInfo) other;
+        PersistentInfo otherNode = (PersistentInfo) other;
         
         if (this.gatewayId != otherNode.gatewayId) return false;
         if (this.nuid != otherNode.nuid) return false;

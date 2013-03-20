@@ -16,7 +16,7 @@ public class Functionality {
     @Column
     private FunctionalityType type;
     @OneToOne
-    private NodePersistentInfo device;
+    private PersistentInfo device;
     @Column
     private String imgPath;
     @Column
@@ -25,7 +25,7 @@ public class Functionality {
     @SuppressWarnings("unused")
 	private Functionality() {}
     
-    public Functionality(long id,  String name, FunctionalityType type, NodePersistentInfo device, String imgPath, String help) {
+    public Functionality(long id,  String name, FunctionalityType type, PersistentInfo device, String imgPath, String help) {
     	this.id = id;
     	this.name = name;
     	this.type = type;
@@ -50,7 +50,7 @@ public class Functionality {
     	return this.type;
     }
     
-	public NodePersistentInfo getDevice() {
+	public PersistentInfo getDevice() {
 		return this.device;
 	}
 	

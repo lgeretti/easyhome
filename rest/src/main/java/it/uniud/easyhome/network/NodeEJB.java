@@ -148,16 +148,16 @@ public class NodeEJB {
 	private void acquirePersistentInfoOn(Node node) {
 		
         CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<NodePersistentInfo> criteria = builder.createQuery(NodePersistentInfo.class);
-        Root<NodePersistentInfo> info = criteria.from(NodePersistentInfo.class);
+        CriteriaQuery<PersistentInfo> criteria = builder.createQuery(PersistentInfo.class);
+        Root<PersistentInfo> info = criteria.from(PersistentInfo.class);
         criteria.select(info).where(builder.and(
         			builder.equal(info.get("gatewayId"), node.getCoordinates().getGatewayId()),
         			builder.equal(info.get("nuid"), node.getCoordinates().getNuid())));
         
-        TypedQuery<NodePersistentInfo> query = em.createQuery(criteria);
+        TypedQuery<PersistentInfo> query = em.createQuery(criteria);
         
         try {
-        	NodePersistentInfo correspondingInfo = query.getSingleResult();
+        	PersistentInfo correspondingInfo = query.getSingleResult();
         	
         	if (correspondingInfo.getLocation() != null)
         		node.setLocation(correspondingInfo.getLocation());

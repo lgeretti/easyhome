@@ -26,7 +26,7 @@ public final class PersistentInfoResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<NodePersistentInfo> getNodePersistentInfos() {
+    public List<PersistentInfo> getNodePersistentInfos() {
         
         return resEjb.getPersistentInfos();
     }
@@ -34,9 +34,9 @@ public final class PersistentInfoResource {
     @GET
     @Path("{gatewayId}/{nuid}")
     @Produces(MediaType.APPLICATION_JSON)
-    public NodePersistentInfo getNodePersistentInfo(@PathParam("gatewayId") byte gatewayId, @PathParam("nuid") long nuid) {
+    public PersistentInfo getNodePersistentInfo(@PathParam("gatewayId") byte gatewayId, @PathParam("nuid") long nuid) {
     	
-        NodePersistentInfo info = resEjb.getPersistentInfo(gatewayId,nuid);
+        PersistentInfo info = resEjb.getPersistentInfo(gatewayId,nuid);
         
         if (info == null) 
             throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -60,7 +60,7 @@ public final class PersistentInfoResource {
     	
     	synchronized(infoLock) {
     		
-    		NodePersistentInfo info = resEjb.getPersistentInfo(gatewayId,nuid);
+    		PersistentInfo info = resEjb.getPersistentInfo(gatewayId,nuid);
     		
     		Location loc = null;
     		if (locationName != null) {
@@ -72,7 +72,7 @@ public final class PersistentInfoResource {
     		
     		if (info == null) {
     			
-    			resEjb.insertPersistentInfo(new NodePersistentInfo(++nodePersistentInfoId,gatewayId,nuid,name,loc,funcContainerType,imgPath,help));
+    			resEjb.insertPersistentInfo(new PersistentInfo(++nodePersistentInfoId,gatewayId,nuid,name,loc,funcContainerType,imgPath,help));
     			return Response.created(
                         	uriInfo.getAbsolutePathBuilder()
                         	.path(Byte.toString(gatewayId))
@@ -100,7 +100,7 @@ public final class PersistentInfoResource {
 	
     	synchronized(infoLock) {
     		
-    		NodePersistentInfo info = resEjb.getPersistentInfo(gatewayId,nuid);
+    		PersistentInfo info = resEjb.getPersistentInfo(gatewayId,nuid);
     		
     		Location loc = null;
     		if (locationName != null) {

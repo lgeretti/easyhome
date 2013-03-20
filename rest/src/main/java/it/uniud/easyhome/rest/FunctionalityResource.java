@@ -40,7 +40,7 @@ public final class FunctionalityResource {
     								  	@FormParam("imgPath") String imgPath,
     								  	@FormParam("help") String help) {
     	
-    	NodePersistentInfo info = resEjb.findPersistentInfoById(deviceId);
+    	PersistentInfo info = resEjb.findPersistentInfoById(deviceId);
     		
 	    if (info == null)
 	    	throw new WebApplicationException(Response.Status.BAD_REQUEST);

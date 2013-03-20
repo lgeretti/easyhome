@@ -26,7 +26,7 @@ public final class DeviceResource {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<NodePersistentInfo> getDevicesByLocation(@QueryParam("locationId") int locationId) {
+    public List<PersistentInfo> getDevicesByLocation(@QueryParam("locationId") int locationId) {
     	
         return resEjb.getPersistentInfosByLocationId(locationId);
     }

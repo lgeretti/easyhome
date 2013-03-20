@@ -3,6 +3,7 @@ package it.uniud.easyhome.network;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -16,15 +17,15 @@ public class Pairing {
 	
 	@Id
 	private long id;
-	@Column(nullable = false)
-	private NodePersistentInfo source;
-	@Column(nullable = false)
-	private NodePersistentInfo destination;
+	@OneToOne
+	private PersistentInfo source;
+	@OneToOne
+	private PersistentInfo destination;
 	
     @SuppressWarnings("unused")
 	private Pairing() { }
     
-    public Pairing(long id, NodePersistentInfo source, NodePersistentInfo destination) {
+    public Pairing(long id, PersistentInfo source, PersistentInfo destination) {
         this.id = id;
         this.source = source;
         this.destination = destination;
@@ -34,11 +35,11 @@ public class Pairing {
 		return id;
 	}
 
-    public NodePersistentInfo getSource() {
+    public PersistentInfo getSource() {
     	return source;
     }
 
-    public NodePersistentInfo getDestination() {
+    public PersistentInfo getDestination() {
     	return destination;
     }
     
