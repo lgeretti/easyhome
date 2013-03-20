@@ -19,15 +19,17 @@
    #eh_selection_buttons_container div { float: left; }
 
    #eh_help_button_container { position: absolute; right: 15px; top: 15px; }
+   
+   #eh_functionality_container { position: absolute; left: 200px; top: 200px; }
 
    #eh_navigation_buttons_container { position: absolute; left: 15px; top: 15px; }
    #eh_navigation_buttons_container div { float: left; }
 
    .eh_arrow_button_positioner { position: relative; top: 75px; }
    
-   div.text { font-family:"Verdana"; font-size: 40pt; text-transform: uppercase; text-align: center; font-weight: bold; padding: 0.3em; } 
+   div.text { font-family:"Verdana"; font-size: 40pt; text-transform: uppercase; text-align: center; font-weight: bold; padding: 0.3em; color: #ffffff; } 
    #eh_description_float {position: absolute; left: 80px; top: 290px; }
-   #eh_description_div { border-width: 1px; width: 1070px; border-style: solid; border-color: #666666; color: #ffffff; }
+   #eh_description_div { border-width: 1px; width: 1070px; border-style: solid; border-color: #666666; }
    
 }
 </style>
@@ -471,14 +473,18 @@ function showFunctionality(functionality) {
     
     case 'LUMINOSITY_CONTROL':
     	
+    	$("#eh_functionality_container").html("<div class='ui-corner-all text'>Controllo luminosità</div>");
+    	
     	break;
     	
     case 'COLOR_CONTROL':
     	
+    	$("#eh_functionality_container").html("<div class='ui-corner-all text'>Controllo colore</div>");
         break;
         
     case 'PAIRING':
     	
+    	$("#eh_functionality_container").html("<div class='ui-corner-all text'>Accoppiamento</div>");
     	break;
     }
 }
