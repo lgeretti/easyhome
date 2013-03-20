@@ -240,7 +240,6 @@ function selectRoom(room,isEntryPoint) {
        url: "http://localhost:8080/easyhome/rest/devices/?locationId="+roomId,
        success: function(data){        
           roomDevices = data;
-          lowSelectionIndex = 0;
 											
           if (isEntryPoint)
               selectState(uiState.Room);
@@ -264,7 +263,6 @@ function selectDevice(device) {
        url: "http://localhost:8080/easyhome/rest/functionalities/?deviceId="+deviceId,
        success: function(data){        
           deviceFunctionalities = data;
-          lowSelectionIndex = 0;
                                             
           selectState(uiState.Device);
        },
