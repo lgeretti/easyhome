@@ -102,7 +102,7 @@ function arrowHoverEffectIn(button) {
 }
 
 function selectionButtonHoverEffectIn(button) {
-	
+
     if (!(currentState == uiState.Functionality && 
     	currentFunctionality.type == 'MOVE_ROOM' && 
     	homeRooms[button.find('img').attr('id')].id == currentRoom.id)) {
@@ -113,26 +113,31 @@ function selectionButtonHoverEffectIn(button) {
 	
     hoverTimeoutFunc = function(state) {
     	
-    	var idx = button.find('img').attr('id');    
-        
-        switch (state) {
-
-            case uiState.Home:
-                selectRoom(homeRooms[idx],true);
-                break;
-            case uiState.Room:
-                selectDevice(roomDevices[idx]);
-                break;
-            case uiState.Device:
-                selectFunctionality(deviceFunctionalities[idx]);
-                break;
-            case uiState.Functionality:
-                if (currentFunctionality.type == 'MOVE_ROOM' && homeRooms[idx].id != currentRoom.id) {
-                    moveCurrentDeviceTo(homeRooms[idx]);
-                }
-        }
+    	// Shields against timeout being started prematurely, while Ajax callback hasn't updated visibility yet
+    	if (button.css('visibility') == 'visible') {
     	
-        button.stop().css('backgroundColor', "#666666");
+        	var idx = button.find('img').attr('id');    
+            
+            switch (state) {
+    
+                case uiState.Home:
+                    selectRoom(homeRooms[idx],true);
+                    break;
+                case uiState.Room:
+                    selectDevice(roomDevices[idx]);
+                    break;
+                case uiState.Device:
+                    selectFunctionality(deviceFunctionalities[idx]);
+                    break;
+                case uiState.Functionality:
+                    if (currentFunctionality.type == 'MOVE_ROOM' && homeRooms[idx].id != currentRoom.id) {
+                        moveCurrentDeviceTo(homeRooms[idx]);
+                    }
+            }
+        	
+            button.stop().css('backgroundColor', "#666666");
+        
+    	}
         
         if (button.css('visibility') == 'visible')
             selectionButtonHoverEffectIn(button);
