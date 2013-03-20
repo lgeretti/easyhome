@@ -36,6 +36,8 @@
 <script src="js/jquery-ui-1.10.2.custom.js"></script>
 <script type='text/javascript'>
 
+var roomsLoaded = false;
+
 var hoverTimeout;
 var hoverEffectTime = 1000;
 var helpSelected = false;
@@ -272,14 +274,25 @@ function getHomeRooms() {
        url: "http://localhost:8080/easyhome/rest/locations",
        success: function(data){        
           homeRooms = data;
-											
+          
           selectState(uiState.Home);
-       },
-       error: function(jqXHR, textStatus, errorThrown){
-          alert(textStatus + ":" + errorThrown);
+          setTimeout(getHomeRoomsPeriodically,500);
        }
    });	
 	
+}
+
+function getHomeRoomsPeriodically() {
+
+	   $.ajax({ 
+	       type: "GET",
+	       dataType: "json",
+	       url: "http://localhost:8080/easyhome/rest/locations",
+	       success: function(data){        
+	          homeRooms = data;
+	          setTimeout(getHomeRoomsPeriodically,500);
+	       }
+	   });
 }
 
 function selectState(newState) {
@@ -349,6 +362,18 @@ function updateHelpText(currentState) {
 
 }
 
+function getAltMessage(selection) {
+	
+    var altString = selection.name;
+    if (currentState = uiState.Home) {
+        
+        if (selection.occupied)
+            altString += " (occupied)";
+    }
+	
+	return altString;
+}
+
 function showSelections(selections) {
 
   	var firstSelection, secondSelection, thirdSelection;
@@ -377,7 +402,7 @@ function showSelections(selections) {
 		  var button = $("#eh_selection_center");
 		  button.css('visibility','visible');
 		  var loc = selections[0];
-	  	  button.find('img').attr('id',0).attr('alt',loc.name).attr('src',loc.imgPath);
+	  	  button.find('img').attr('id',0).attr('alt',getAltMessage(loc)).attr('src',loc.imgPath);
 	  	  break;
 	  			
 	  case 2:
@@ -390,11 +415,11 @@ function showSelections(selections) {
 					
 		  var button = $("#eh_selection_left");
 		  var loc = selections[0];
-	  	  button.find('img').attr('id',0).attr('alt',loc.name).attr('src',loc.imgPath);						
+	  	  button.find('img').attr('id',0).attr('alt',getAltMessage(loc)).attr('src',loc.imgPath);						
 					
 		  button = $("#eh_selection_right");
 		  var loc = selections[1];
-	  	  button.find('img').attr('id',1).attr('alt',loc.name).attr('src',loc.imgPath);
+	  	  button.find('img').attr('id',1).attr('alt',getAltMessage(loc)).attr('src',loc.imgPath);
 	      break;		  	
 							  	
 	  default:
@@ -405,15 +430,15 @@ function showSelections(selections) {
 					
 		  var button = $("#eh_selection_left");
 		  var loc = selections[lowSelectionIndex];
-	  	  button.find('img').attr('id',lowSelectionIndex).attr('alt',loc.name).attr('src',loc.imgPath);						
+	  	  button.find('img').attr('id',lowSelectionIndex).attr('alt',getAltMessage(loc)).attr('src',loc.imgPath);						
 					
 		  button = $("#eh_selection_center");
 		  var loc = selections[lowSelectionIndex+1];
-	  	  button.find('img').attr('id',lowSelectionIndex+1).attr('alt',loc.name).attr('src',loc.imgPath);
+	  	  button.find('img').attr('id',lowSelectionIndex+1).attr('alt',getAltMessage(loc)).attr('src',loc.imgPath);
 	  	  	
 		  button = $("#eh_selection_right");
 		  var loc = selections[lowSelectionIndex+2];
-	  	  button.find('img').attr('id',lowSelectionIndex+2).attr('alt',loc.name).attr('src',loc.imgPath);
+	  	  button.find('img').attr('id',lowSelectionIndex+2).attr('alt',getAltMessage(loc)).attr('src',loc.imgPath);
 	  	  			  	  	
 	  	  break;
 	}
