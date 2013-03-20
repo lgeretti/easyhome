@@ -182,7 +182,10 @@ function helpHoverEffectIn() {
 
         hoverTimeout = setTimeout(function(){ 
 	        	   helpSelected = true;
-	               $("#eh_selection_buttons_container").hide();  
+	        	   if (currentState != uiState.Functionality)
+	        		   $("#eh_selection_buttons_container").hide();
+	        	   else
+	        		   $("#eh_functionality_container").hide();
 	               $("#eh_description_div").text(helpText).show();                                
              },hoverEffectTime
         );
@@ -193,8 +196,11 @@ function helpHoverEffectIn() {
                 }, hoverEffectTime );
 
         hoverTimeout = setTimeout(function(){
-	        	helpSelected = false; 
-	            $("#eh_selection_buttons_container").show();  
+	        	helpSelected = false;
+                if (currentState != uiState.Functionality)
+                    $("#eh_selection_buttons_container").show();
+                else
+                    $("#eh_functionality_container").show();  
 	            $("#eh_description_div").hide();                                
             },hoverEffectTime
         );
@@ -273,7 +279,7 @@ function initialize() {
   getHomeRoomsPeriodically(true);
 }
 
-function getHomeRoomsPeriodically(entry) {
+function getHomeRoomsPeriodically(isEntryPoint) {
 
    $.ajax({ 
        type: "GET",
@@ -282,7 +288,7 @@ function getHomeRoomsPeriodically(entry) {
        success: function(data){        
           homeRooms = data;
 
-          if (entry)
+          if (isEntryPoint)
         	  selectState(uiState.Home);
           else if (currentState == uiState.Home)
               showSelections(homeRooms);
@@ -307,6 +313,7 @@ function selectState(newState) {
     case uiState.Home:
     													
     	$("#eh_nav_room,#eh_nav_device,#eh_nav_functionality").hide();
+    	$("#eh_functionality_container").hide();
     	$("#eh_selection_buttons_container").show();
 		showSelections(homeRooms);
 		break;  
@@ -315,6 +322,7 @@ function selectState(newState) {
 				
 	    $("#eh_nav_room").show();
 		$("#eh_nav_device,#eh_nav_functionality").hide();
+		$("#eh_functionality_container").hide();
 		$("#eh_selection_buttons_container").show();
 	    showSelections(roomDevices);
 		break;
@@ -323,6 +331,7 @@ function selectState(newState) {
 				
 	    $("#eh_nav_room,#eh_nav_device").show();
 		$("#eh_nav_functionality").hide();			
+		$("#eh_functionality_container").hide();
 		$("#eh_selection_buttons_container").show();
 	    showSelections(deviceFunctionalities);
 		  
@@ -332,8 +341,8 @@ function selectState(newState) {
 				
 		$("#eh_nav_room,#eh_nav_device,#eh_nav_functionality").show();
 		$("#eh_selection_buttons_container").hide();
-		
 		showFunctionality(currentFunctionality);
+		$("#eh_functionality_container").show();
   }
 }
 
@@ -450,6 +459,24 @@ function showSelections(selections) {
 	  	  			  	  	
 	  	  break;
 	}
+}
+
+function showFunctionality(functionality) {
+	
+    switch (functionality.type) {
+    
+    case 'LUMINOSITY_CONTROL':
+    	
+    	break;
+    	
+    case 'COLOR_CONTROL':
+    	
+        break;
+        
+    case 'PAIRING':
+    	
+    	break;
+    }
 }
 
 $(document).ready(function(){
@@ -578,6 +605,8 @@ $(".arrow_button").hover(
 	    </div>
       </div>
   </div>
+  
+  <div id="eh_functionality_container"></div>
 
 </body>
 </html>
