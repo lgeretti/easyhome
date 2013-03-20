@@ -106,7 +106,7 @@ function selectionButtonHoverEffectIn(button) {
         switch (state) {
 
             case uiState.Home:
-                selectRoom(homeRooms[idx]);
+                selectRoom(homeRooms[idx],true);
                 break;
             case uiState.Room:
                 selectDevice(roomDevices[idx]);
@@ -226,7 +226,7 @@ function helpHoverEffectOut() {
     }
 }
 
-function selectRoom(room) {
+function selectRoom(room,isEntryPoint) {
 
    currentRoom = room;
    var roomId = room.id;
@@ -240,7 +240,12 @@ function selectRoom(room) {
           roomDevices = data;
           lowSelectionIndex = 0;
 											
-          selectState(uiState.Room);
+          if (isEntryPoint)
+              selectState(uiState.Room);
+          else if (currentState == uiState.Room)
+              showSelections(roomDevices);
+              
+          setTimeout(function() { selectRoom(currentRoom,false); },500);
        },
        error: function(jqXHR, textStatus, errorThrown){
           alert(textStatus + ":" + errorThrown);
