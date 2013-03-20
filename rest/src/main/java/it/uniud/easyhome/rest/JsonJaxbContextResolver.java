@@ -1,13 +1,7 @@
 package it.uniud.easyhome.rest;
 
 import it.uniud.easyhome.gateway.Gateway;
-import it.uniud.easyhome.network.Functionality;
-import it.uniud.easyhome.network.Link;
-import it.uniud.easyhome.network.Location;
-import it.uniud.easyhome.network.NetworkJob;
-import it.uniud.easyhome.network.Node;
-import it.uniud.easyhome.network.GlobalCoordinates;
-import it.uniud.easyhome.network.NodePersistentInfo;
+import it.uniud.easyhome.network.*;
 
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
@@ -35,7 +29,8 @@ public final class JsonJaxbContextResolver implements ContextResolver<JAXBContex
             Link.class,
             Location.class,
             NodePersistentInfo.class,
-            Functionality.class
+            Functionality.class,
+            Pairing.class
         };
         context = new JSONJAXBContext(JSONConfiguration.natural().build(), types);
     }

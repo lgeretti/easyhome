@@ -76,7 +76,8 @@ public class Link {
     		.append(": ")
     		.append(source.toString())
     		.append("->")
-    		.append(destination.toString());
+    		.append(destination.toString())
+    	    .append(")");
     	
     	return strb.toString();
     }
@@ -87,13 +88,13 @@ public class Link {
         if (!(other instanceof Link))
             return false;
         
-        Link otherCoords = (Link) other;
+        Link otherLink = (Link) other;
 
-        if (otherCoords.getGatewayId() != this.getGatewayId())
+        if (otherLink.getGatewayId() != this.getGatewayId())
             return false;
-        if (!otherCoords.getSource().equals(this.getSource()))
+        if (!otherLink.getSource().equals(this.getSource()))
             return false;
-        if (!otherCoords.getDestination().equals(this.getDestination()))
+        if (!otherLink.getDestination().equals(this.getDestination()))
             return false;
         
         return true;
