@@ -263,10 +263,10 @@ function initialize() {
   lowSelectionIndex = 0;
   currentState = uiState.Room;
 
-  getHomeRooms();
+  getHomeRoomsPeriodically(true);
 }
 
-function getHomeRooms() {
+function getHomeRoomsPeriodically(entry) {
 
    $.ajax({ 
        type: "GET",
@@ -274,27 +274,16 @@ function getHomeRooms() {
        url: "http://localhost:8080/easyhome/rest/locations",
        success: function(data){        
           homeRooms = data;
-          
-          selectState(uiState.Home);
-          setTimeout(getHomeRoomsPeriodically,500);
+
+          if (entry)
+        	  selectState(uiState.Home);
+          else if (currentState == uiState.Home)
+              showSelections(homeRooms);
+        	  
+          setTimeout(function() { getHomeRoomsPeriodically(false); },500);
        }
    });	
 	
-}
-
-function getHomeRoomsPeriodically() {
-
-	   $.ajax({ 
-	       type: "GET",
-	       dataType: "json",
-	       url: "http://localhost:8080/easyhome/rest/locations",
-	       success: function(data){        
-	          homeRooms = data;
-	          if (currentState == uiState.Home)
-	        	  showSelections(homeRooms);
-	          setTimeout(getHomeRoomsPeriodically,500);
-	       }
-	   });
 }
 
 function selectState(newState) {
