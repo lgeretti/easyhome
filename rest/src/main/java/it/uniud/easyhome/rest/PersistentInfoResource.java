@@ -92,6 +92,32 @@ public final class PersistentInfoResource {
     	return Response.ok().build();
     }
     
+    @POST
+    @Path("{gatewayId}/{nuid}/changeLocation")
+    public Response changeLocation(@PathParam("gatewayId") byte gatewayId, 
+								   @PathParam("nuid") long nuid,
+								   @FormParam("locationName") String locationName) {
+	
+    	synchronized(infoLock) {
+    		
+    		NodePersistentInfo info = resEjb.getPersistentInfo(gatewayId,nuid);
+    		
+    		Location loc = null;
+    		if (locationName != null) {
+    			loc = resEjb.getLocation(locationName);
+    		
+	    		if (loc == null)
+	    			throw new WebApplicationException(Response.Status.BAD_REQUEST);
+    		}
+    		
+    		info.setLocation(loc);
+    			
+    		resEjb.updatedUnmanaged(info);
+    	}
+        
+    	return Response.ok().build();
+    }
+    
     @DELETE
     @Path("{gatewayId}/{nuid}")
     public Response deleteInfo(@PathParam("gatewayId") byte gatewayId, @PathParam("nuid") long nuid) {
