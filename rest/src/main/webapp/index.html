@@ -232,7 +232,28 @@ function selectRoom(room) {
           alert(textStatus + ":" + errorThrown);
        }
    });	  
+}
 
+function selectDevice(device) {
+
+   currentDevice = device;
+   var deviceId = device.id;
+   $("#eh_nav_device").find('img').attr('src',device.imgPath).attr('alt',device.name);
+  
+   $.ajax({ 
+       type: "GET",
+       dataType: "json",
+       url: "http://localhost:8080/easyhome/rest/functionalities/?deviceId="+deviceId,
+       success: function(data){        
+          deviceFunctionalities = data;
+          lowSelectionIndex = 0;
+                                            
+          selectState(uiState.Device);
+       },
+       error: function(jqXHR, textStatus, errorThrown){
+          alert(textStatus + ":" + errorThrown);
+       }
+   });    
 }
 
 function initialize() {
@@ -289,7 +310,8 @@ function selectState(newState) {
 				
 	    $("#eh_nav_room,#eh_nav_device").show();
 		$("#eh_nav_functionality").hide();				
-
+	    showSelections(deviceFunctionalities);
+		  
 		break;
 						
 	case uiState.Functionality:  
@@ -317,10 +339,12 @@ function updateHelpText(currentState) {
 				
 	case uiState.Device:
 		
+		helpText = currentDevice.help;
 		break;
 				
 	case uiState.Functionality:  
 
+		helpText = currentFunctionality.help;
   }
 
 }
