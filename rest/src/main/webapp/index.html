@@ -82,7 +82,13 @@ function arrowHoverEffectIn(button) {
 				
 		case uiState.Room:
 			showSelections(roomDevices);
-			break;        
+			break;    
+			
+		case uiState.Functionality:
+			
+			if (currentFunctionality.type == 'MOVE_ROOM') {
+				showSelections(homeRooms);
+			}
       }    
 
       button.stop().css('backgroundColor', "#666666");
@@ -115,6 +121,11 @@ function selectionButtonHoverEffectIn(button) {
                 break;
             case uiState.Device:
                 selectFunctionality(deviceFunctionalities[idx]);
+                break;
+            case uiState.Functionality:
+                if (currentFunctionality.type == 'MOVE_ROOM' && homeRooms[idx].id != currentRoom.id) {
+                    moveCurrentDeviceTo(homeRooms[idx]);
+                }
         }
     	
         button.stop().css('backgroundColor', "#666666");
@@ -313,6 +324,7 @@ function selectState(newState) {
   lowSelectionIndex = 0;
 
   $("#eh_description_div").hide();
+  $("#eh_functionality_container").hide();
   $("#eh_help_button").css('backgroundColor','#666666');
   updateHelpText(currentState);
   
@@ -321,7 +333,6 @@ function selectState(newState) {
     case uiState.Home:
     													
     	$("#eh_nav_room,#eh_nav_device,#eh_nav_functionality").hide();
-    	$("#eh_functionality_container").hide();
     	$("#eh_selection_buttons_container").show();
 		showSelections(homeRooms);
 		break;  
@@ -330,7 +341,6 @@ function selectState(newState) {
 				
 	    $("#eh_nav_room").show();
 		$("#eh_nav_device,#eh_nav_functionality").hide();
-		$("#eh_functionality_container").hide();
 		$("#eh_selection_buttons_container").show();
 	    showSelections(roomDevices);
 		break;
@@ -338,8 +348,7 @@ function selectState(newState) {
     case uiState.Device:
 				
 	    $("#eh_nav_room,#eh_nav_device").show();
-		$("#eh_nav_functionality").hide();			
-		$("#eh_functionality_container").hide();
+		$("#eh_nav_functionality").hide();		
 		$("#eh_selection_buttons_container").show();
 	    showSelections(deviceFunctionalities);
 		  
@@ -350,7 +359,6 @@ function selectState(newState) {
 		$("#eh_nav_room,#eh_nav_device,#eh_nav_functionality").show();
 		$("#eh_selection_buttons_container").hide();
 		showFunctionality(currentFunctionality);
-		$("#eh_functionality_container").show();
   }
 }
 
@@ -469,26 +477,53 @@ function showSelections(selections) {
 	}
 }
 
+function moveCurrentDeviceTo(room) {
+	
+	currentRoom = room;
+	
+	$("#eh_nav_room").find('img').attr('src',room.imgPath).attr('alt',room.name);
+	
+	   $.ajax({ 
+	       type: "POST",
+	       data: "locationName="+room.name,
+	       url: "http://localhost:8080/easyhome/rest/persistentinfo/"+currentDevice.gatewayId+"/"+currentDevice.nuid+"/changeLocation"
+	   });  
+	
+	selectState(uiState.Device);
+}
+
 function showFunctionality(functionality) {
 	
     switch (functionality.type) {
     
+    case 'MOVE_ROOM':
+    	
+    	$("#eh_selection_buttons_container").show();
+    	lowSelectionIndex = 0;
+    	showSelections(homeRooms);
+    	
+        break;
+    
     case 'LUMINOSITY_CONTROL':
     	
     	$("#eh_functionality_container").html("<div class='ui-corner-all text'>Controllo luminosità</div>");
-    	
+    	$('#eh_functionality_container').show();
     	break;
     	
     case 'COLOR_CONTROL':
     	
     	$("#eh_functionality_container").html("<div class='ui-corner-all text'>Controllo colore</div>");
+    	$('#eh_functionality_container').show();
         break;
         
     case 'PAIRING':
     	
     	$("#eh_functionality_container").html("<div class='ui-corner-all text'>Accoppiamento</div>");
+    	$('#eh_functionality_container').show();
     	break;
     }
+    
+    
 }
 
 $(document).ready(function(){
