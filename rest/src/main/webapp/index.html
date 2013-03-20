@@ -49,6 +49,7 @@ var currentLeftIndex = 0;
 var homeRooms;
 var roomDevices;
 var deviceFunctionalities;
+var functionalityOptions;
 
 var uiState = {Home: 1, Room: 2, Device: 3, Functionality: 4};
 
@@ -56,6 +57,7 @@ var currentState;
 var currentRoom;
 var currentDevice;
 var currentFunctionality;
+var currentOption;
 
 var lowSelectionIndex;
 
@@ -246,9 +248,6 @@ function selectRoom(room,isEntryPoint) {
               showSelections(roomDevices);
               
           setTimeout(function() { selectRoom(currentRoom,false); },500);
-       },
-       error: function(jqXHR, textStatus, errorThrown){
-          alert(textStatus + ":" + errorThrown);
        }
    });	  
 }
@@ -284,10 +283,10 @@ function selectFunctionality(functionality) {
 
 function initialize() {
 
-  lowSelectionIndex = 0;
-  currentState = uiState.Room;
-
-  getHomeRoomsPeriodically(true);
+   lowSelectionIndex = 0;
+   currentState = uiState.Room;
+   
+   getHomeRoomsPeriodically(true);
 }
 
 function getHomeRoomsPeriodically(isEntryPoint) {
