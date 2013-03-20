@@ -102,11 +102,15 @@ function arrowHoverEffectIn(button) {
 }
 
 function selectionButtonHoverEffectIn(button) {
-    button.stop().animate({
-          backgroundColor: button.css('color')
-            }, hoverEffectTime
-    );
-
+	
+    if (!(currentState == uiState.Functionality && 
+    	currentFunctionality.type == 'MOVE_ROOM' && 
+    	homeRooms[button.find('img').attr('id')].id == currentRoom.id)) {
+            button.stop().animate({
+                backgroundColor: button.css('color')
+                }, hoverEffectTime );               	
+    }
+	
     hoverTimeoutFunc = function(state) {
     	
     	var idx = button.find('img').attr('id');    
