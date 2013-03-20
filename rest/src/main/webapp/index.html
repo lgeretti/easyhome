@@ -97,11 +97,11 @@ function selectionButtonHoverEffectIn(button) {
             }, hoverEffectTime
     );
 
-    hoverTimeoutFunc = function() {
+    hoverTimeoutFunc = function(state) {
     	
     	var idx = button.find('img').attr('id');    
         
-        switch (currentState) {
+        switch (state) {
 
             case uiState.Home:
                 selectRoom(homeRooms[idx]);
@@ -114,10 +114,12 @@ function selectionButtonHoverEffectIn(button) {
         }
     	
         button.stop().css('backgroundColor', "#666666");
+        
+        if (button.css('visibility') == 'visible')
+            selectionButtonHoverEffectIn(button);
     }
     
-    hoverTimeout = setTimeout(hoverTimeoutFunc, hoverEffectTime);
-    
+    hoverTimeout = setTimeout(function() { hoverTimeoutFunc(currentState); }, hoverEffectTime);
 }
 
 function navigationButtonHoverEffectIn(button) {
