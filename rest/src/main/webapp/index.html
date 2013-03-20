@@ -103,6 +103,10 @@ function arrowHoverEffectIn(button) {
 
 function selectionButtonHoverEffectIn(button) {
 	
+	button.stop().animate({
+        backgroundColor: button.css('color')
+        }, hoverEffectTime );  
+	
     hoverTimeoutFunc = function(state) {
     	
     	// Shields against timeout being started prematurely, while Ajax callback hasn't updated visibility yet
