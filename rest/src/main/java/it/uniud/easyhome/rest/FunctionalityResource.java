@@ -35,6 +35,7 @@ public final class FunctionalityResource {
     // curl -X POST http://localhost:8080/easyhome/rest/functionalities -H "Content-Type: application/x-www-form-urlencoded" --data-binary "name=Link&deviceId=2&imgPath='img/link.svg'&help='Seleziona il dispositivo da linkare alla lampada'" 
     @POST
     public Response insertFunctionality(@FormParam("name") String name, 
+    									@FormParam("type") FunctionalityType type,
     									@FormParam("deviceId") long deviceId, 
     								  	@FormParam("imgPath") String imgPath,
     								  	@FormParam("help") String help) {
@@ -46,7 +47,7 @@ public final class FunctionalityResource {
     			
 	    synchronized(funcLock) {
 	    	
-    		resEjb.insertFunctionality(new Functionality(++functionalityId,name,info,imgPath,help));
+    		resEjb.insertFunctionality(new Functionality(++functionalityId,name,type,info,imgPath,help));
     		
     		return Response.created(
                 	uriInfo.getAbsolutePathBuilder()

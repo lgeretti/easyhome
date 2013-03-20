@@ -20,6 +20,8 @@ public class NodePersistentInfo {
     @OneToOne
     private Location location;
     @Column
+    private FunctionalityContainerType funcContainerType;
+    @Column
     private String imgPath;
     @Column
     private String help;
@@ -27,12 +29,13 @@ public class NodePersistentInfo {
     @SuppressWarnings("unused")
 	private NodePersistentInfo() {}
     
-    public NodePersistentInfo(long id, byte gatewayId, long nuid, String name, Location location, String imgPath, String help) {
+    public NodePersistentInfo(long id, byte gatewayId, long nuid, String name, Location location, FunctionalityContainerType funcContainerType, String imgPath, String help) {
     	this.id = id;
     	this.gatewayId = gatewayId;
     	this.nuid = nuid;
     	this.name = name;
     	this.location = location;
+    	this.funcContainerType = funcContainerType;
     	this.imgPath = imgPath;
     	this.help = help;
     }
@@ -63,6 +66,10 @@ public class NodePersistentInfo {
     
 	public Location getLocation() {
 		return this.location;
+	}
+	
+	public FunctionalityContainerType getDeviceType() {
+		return this.funcContainerType;
 	}
 	
 	public String getImgPath() {

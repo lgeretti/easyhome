@@ -13,6 +13,8 @@ public class Functionality {
 	private long id;
     @Column
     private String name;
+    @Column
+    private FunctionalityType type;
     @OneToOne
     private NodePersistentInfo device;
     @Column
@@ -23,9 +25,10 @@ public class Functionality {
     @SuppressWarnings("unused")
 	private Functionality() {}
     
-    public Functionality(long id,  String name, NodePersistentInfo device, String imgPath, String help) {
+    public Functionality(long id,  String name, FunctionalityType type, NodePersistentInfo device, String imgPath, String help) {
     	this.id = id;
     	this.name = name;
+    	this.type = type;
     	this.device = device;
     	this.imgPath = imgPath;
     	this.help = help;
@@ -41,6 +44,10 @@ public class Functionality {
 	
     public String getName() {
         return this.name;
+    }
+    
+    public FunctionalityType getType() {
+    	return this.type;
     }
     
 	public NodePersistentInfo getDevice() {
