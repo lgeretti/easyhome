@@ -80,9 +80,11 @@ function arrowHoverEffectIn(button) {
 			showSelections(roomDevices);
 			break;        
       }    
+
+      button.stop().css('backgroundColor', "#666666");
       
-      if (button.css('visibility') == 'visible')
-        hoverTimeout = setTimeout(hoverTimeoutFunc, hoverEffectTime); 
+      if (button.css('visibility') == 'visible') 
+    	  arrowHoverEffectIn(button);
     
     };
 
@@ -95,27 +97,27 @@ function selectionButtonHoverEffectIn(button) {
             }, hoverEffectTime
     );
 
-    hoverTimeout = setTimeout(function(){   
-    
-    		var idx = button.find('img').attr('id');    
+    hoverTimeoutFunc = function() {
+    	
+    	var idx = button.find('img').attr('id');    
         
-            switch (currentState) {
+        switch (currentState) {
+
+            case uiState.Home:
+                selectRoom(homeRooms[idx]);
+                break;
+            case uiState.Room:
+                selectDevice(roomDevices[idx]);
+                break;
+            case uiState.Device:
+                selectFunctionality(deviceFunctionalities[idx]);
+        }
+    	
+        button.stop().css('backgroundColor', "#666666");
+    }
     
-    			case uiState.Home:
-    				selectRoom(homeRooms[idx]);
-    				break;
-    			case uiState.Room:
-    				selectDevice(roomDevices[idx]);
-    				break;
-    			case uiState.Device:
-    				selectFunctionality(deviceFunctionalities[idx]);
-    			    // Functionalities have no selection buttons, only actuators
-    		}
-            
-            button.stop().css('backgroundColor', "#666666");
-        
-        }, hoverEffectTime
-    );
+    hoverTimeout = setTimeout(hoverTimeoutFunc, hoverEffectTime);
+    
 }
 
 function navigationButtonHoverEffectIn(button) {
