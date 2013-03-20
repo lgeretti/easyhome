@@ -290,6 +290,8 @@ function getHomeRoomsPeriodically() {
 	       url: "http://localhost:8080/easyhome/rest/locations",
 	       success: function(data){        
 	          homeRooms = data;
+	          if (currentState == uiState.Home)
+	        	  showSelections(homeRooms);
 	          setTimeout(getHomeRoomsPeriodically,500);
 	       }
 	   });
@@ -368,7 +370,7 @@ function getAltMessage(selection) {
     if (currentState == uiState.Home) {
         
         if (selection.occupied)
-            altString += " (occupied)";
+            altString += " (occupata)";
     }
 	return altString;
 }
