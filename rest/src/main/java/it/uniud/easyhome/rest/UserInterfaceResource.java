@@ -379,7 +379,7 @@ public class UserInterfaceResource {
 	        formData.add("name","Luminosità");
 	        formData.add("type",FunctionalityType.LUMINOSITY_CONTROL.toString());
 	        formData.add("imgPath","img/sun.svg");
-	        formData.add("help", "Seleziona il livello di luminosità preferito");
+	        formData.add("help", "Seleziona il livello di luminosità preferito, da 1 tacca (0%) a 9 tacche (100%)");
 	        formData.putSingle("deviceId",Long.toString(lampadaCameraId));
 	    	client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	    	formData.putSingle("deviceId",Long.toString(lampadaSalottoId));
