@@ -10,9 +10,8 @@ import javax.xml.bind.annotation.*;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class FridgeState {
-	
+
 	@Id
-	private long id;
     @OneToOne
     private PersistentInfo device;
     @Column
@@ -21,8 +20,7 @@ public class FridgeState {
     @SuppressWarnings("unused")
 	private FridgeState() {}
     
-    public FridgeState(long id, PersistentInfo device) {
-    	this.id = id;
+    public FridgeState(PersistentInfo device) {
     	this.device = device;
     }
 
