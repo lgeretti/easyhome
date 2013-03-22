@@ -57,6 +57,18 @@ public final class StateResource {
     	return resEjb.findFridgeStateByInfoId(id);
     }   
     
+    @PUT
+    @Path("lamps/{id}")
+    public Response insertLampState(@PathParam("id") long infoId) {
+    		
+    	boolean infoFound = resEjb.insertLampStateFrom(infoId);
+    	
+    	if (!infoFound)
+        	throw new WebApplicationException(Response.Status.BAD_REQUEST);
+    	
+        return Response.ok().build();
+    } 
+    
     @POST
     @Path("lamps/{id}")
     public Response updateLampState(@PathParam("id") long id,
@@ -83,6 +95,18 @@ public final class StateResource {
     	
     	return Response.ok().build();
     }    
+    
+    @PUT
+    @Path("fridges/{id}")
+    public Response insertFridgeState(@PathParam("id") long infoId) {
+    		
+    	boolean infoFound = resEjb.insertFridgeStateFrom(infoId);
+    	
+    	if (!infoFound)
+        	throw new WebApplicationException(Response.Status.BAD_REQUEST);
+    	
+        return Response.ok().build();
+    } 
     
     @POST
     @Path("fridges/{id}")

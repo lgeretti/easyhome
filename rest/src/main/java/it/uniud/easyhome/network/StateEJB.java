@@ -100,4 +100,34 @@ public class StateEJB {
 	public void updateManagedFridge(FridgeState fridge) {
 		em.merge(fridge);
 	}
+
+	public boolean insertLampStateFrom(long infoId) {
+		
+		PersistentInfo info = findPersistentInfoById(infoId);
+		
+		if (info == null)
+			return false;
+		
+		// We accept trying to create an already existing lamp, but we do not do anything (PUT semantics)
+		if (em.find(LampState.class, info) != null) {
+			em.persist(new LampState(info));
+		}
+		
+		return true;
+	}
+	
+	public boolean insertFridgeStateFrom(long infoId) {
+		
+		PersistentInfo info = findPersistentInfoById(infoId);
+		
+		if (info == null)
+			return false;
+		
+		// We accept trying to create an already existing fridge, but we do not do anything (PUT semantics)
+		if (em.find(FridgeState.class, info) != null) {
+			em.persist(new FridgeState(info));
+		}
+		
+		return true;
+	}
 }
