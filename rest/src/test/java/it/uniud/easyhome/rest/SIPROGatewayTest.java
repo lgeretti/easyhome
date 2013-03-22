@@ -25,7 +25,6 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 public class SIPROGatewayTest {
 	
 	private static final String TARGET = "http://localhost:5000/";
-	private static final String TARGET_GET = "http://localhost:5000/?method=getData&params=actuators";
 	
 	private static Client client;
 	
