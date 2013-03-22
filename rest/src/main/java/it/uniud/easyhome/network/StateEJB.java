@@ -82,7 +82,7 @@ public class StateEJB {
 		List<LampState> lampStates = getLampStates();
 		
 		for (LampState st : lampStates)
-			em.detach(st);
+			em.remove(st);
 	}
 	
 	private void removeFridgeStates() {
@@ -90,7 +90,7 @@ public class StateEJB {
 		List<FridgeState> fridgeStates = getFridgeStates();
 		
 		for (FridgeState st : fridgeStates)
-			em.detach(st);
+			em.remove(st);
 	}
 
 	public void updateManagedLamp(LampState lamp) {
@@ -109,7 +109,7 @@ public class StateEJB {
 			return false;
 		
 		// We accept trying to create an already existing lamp, but we do not do anything (PUT semantics)
-		if (em.find(LampState.class, info) != null) {
+		if (em.find(LampState.class, info.getId()) == null) {
 			em.persist(new LampState(info));
 		}
 		
@@ -124,7 +124,7 @@ public class StateEJB {
 			return false;
 		
 		// We accept trying to create an already existing fridge, but we do not do anything (PUT semantics)
-		if (em.find(FridgeState.class, info) != null) {
+		if (em.find(FridgeState.class, info.getId()) == null) {
 			em.persist(new FridgeState(info));
 		}
 		
