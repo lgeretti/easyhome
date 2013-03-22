@@ -15,7 +15,7 @@ public class LampState {
     @OneToOne
     private PersistentInfo device;
 	@Column
-	private boolean on;
+	private boolean online;
     @Column
     private byte red;
     @Column
@@ -39,8 +39,8 @@ public class LampState {
 		return this.device;
 	}
 	
-	public boolean isOn() {
-		return this.on;
+	public boolean isOnline() {
+		return this.online;
 	}
 	
 	public byte getRed() {
@@ -63,8 +63,8 @@ public class LampState {
 		return alarm;
 	}
 	
-    public LampState setOn(boolean val) {
-    	this.on = val;
+    public LampState setOnline(boolean val) {
+    	this.online = val;
     	return this;
     }
 	

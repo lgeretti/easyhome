@@ -84,7 +84,7 @@ public final class StateResource {
     	if (thisLamp == null)
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
     	
-    	thisLamp.setOn(on)
+    	thisLamp.setOnline(on)
     			.setRed(red)
     			.setGreen(green)
     			.setBlue(blue)

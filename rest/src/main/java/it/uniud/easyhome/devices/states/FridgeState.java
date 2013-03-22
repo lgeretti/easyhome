@@ -17,7 +17,7 @@ public class FridgeState {
     @Column
     private FridgeCode lastCode;
     @Column
-    private boolean on;
+    private boolean online;
 
     @SuppressWarnings("unused")
 	private FridgeState() {}
@@ -35,8 +35,8 @@ public class FridgeState {
 		return this.lastCode;
 	}
 	
-	public boolean isOn() {
-		return this.on;
+	public boolean isOnline() {
+		return this.online;
 	}
 	
     @Override
@@ -56,8 +56,8 @@ public class FridgeState {
     	return this;
     }
     
-    public FridgeState setOn(boolean val) {
-    	this.on = val;
+    public FridgeState setOnline(boolean val) {
+    	this.online = val;
     	return this;
     }
     
