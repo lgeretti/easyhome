@@ -24,6 +24,7 @@ public class FridgeState {
     
     public FridgeState(PersistentInfo device) {
     	this.device = device;
+    	lastCode = FridgeCode.UNKNOWN;
     }
 
 	public PersistentInfo getDevice() {

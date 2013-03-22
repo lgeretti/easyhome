@@ -26,14 +26,13 @@ public class LampState {
     private byte white;
     @Column
     private ColoredAlarm alarm;
-    @Column
-    private boolean occupied;
-
+    
     @SuppressWarnings("unused")
 	private LampState() {}
     
     public LampState(PersistentInfo device) {
     	this.device = device;
+    	this.alarm = ColoredAlarm.NONE;
     }
     
 	public PersistentInfo getDevice() {
@@ -64,10 +63,6 @@ public class LampState {
 		return alarm;
 	}
 	
-	public boolean isOccupied() {
-		return occupied;
-	}
-	
     public LampState setOn(boolean val) {
     	this.on = val;
     	return this;
@@ -95,11 +90,6 @@ public class LampState {
 	
 	public LampState setAlarm(ColoredAlarm val) {
 		alarm = val;
-		return this;
-	}
-
-	public LampState setOccupied(boolean val) {
-		occupied = val;
 		return this;
 	}
 	

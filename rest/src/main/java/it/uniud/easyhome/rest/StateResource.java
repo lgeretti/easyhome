@@ -85,38 +85,6 @@ public final class StateResource {
     }    
     
     @POST
-    @Path("lamps/{id}/occupied")
-    public Response setLampOccupied(@PathParam("id") long id) {
-    	
-    	LampState thisLamp = resEjb.findLampStateByInfoId(id);
-    	
-    	if (thisLamp == null)
-    		throw new WebApplicationException(Response.Status.NOT_FOUND);
-    	
-    	thisLamp.setOccupied(true);
-    	
-    	resEjb.updateManagedLamp(thisLamp);
-    	
-    	return Response.ok().build();    	
-    }
-    
-    @POST
-    @Path("lamps/{id}/unoccupied")
-    public Response setLampUnoccupied(@PathParam("id") long id) {
-    	
-    	LampState thisLamp = resEjb.findLampStateByInfoId(id);
-    	
-    	if (thisLamp == null)
-    		throw new WebApplicationException(Response.Status.NOT_FOUND);
-    	
-    	thisLamp.setOccupied(false);
-    	
-    	resEjb.updateManagedLamp(thisLamp);
-    	
-    	return Response.ok().build();    	
-    }
-    
-    @POST
     @Path("fridges/{id}")
     public Response updateFridgeLastCode(@PathParam("id") long id,
     								@FormParam("lastCode") FridgeCode lastCode) {
