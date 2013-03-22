@@ -302,7 +302,8 @@ public class UserInterfaceResource {
 	        formData.add("imgPath","img/fridge.svg");
 	        formData.add("help", "Nessuna funzione correntemente disponibile");
 	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(101010L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	    	
+	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(101010L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	    	long frigoId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
 	    	// Fake
 	    	
 	        formData = new MultivaluedMapImpl();
@@ -410,6 +411,11 @@ public class UserInterfaceResource {
 	        //client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        formData.putSingle("deviceId",Long.toString(timerId));
 	        client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	        
+	        // States
+	        client.resource(TARGET).path(RestPaths.STATES).path(Long.toString(lampadaSalottoId)).put(ClientResponse.class);
+	        client.resource(TARGET).path(RestPaths.STATES).path(Long.toString(lampadaCameraId)).put(ClientResponse.class);
+	        client.resource(TARGET).path(RestPaths.STATES).path(Long.toString(frigoId)).put(ClientResponse.class);
 	        
 	    	
     	} catch (JSONException ex) {
