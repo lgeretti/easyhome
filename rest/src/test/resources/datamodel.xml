@@ -1,0 +1,75 @@
+<datamodel>
+<data id="actuators">
+<output1>
+<state>ON</state>
+<value-3>42</value-3>
+<value-2>47</value-2>
+<value-1>52</value-1>
+<value0>0</value0>
+<value1>32</value1>
+<value2>0</value2>
+<value3>0</value3>
+<value4>0</value4>
+<descriptor>
+<type>Intelligent Lamp</type>
+<app_area>Communication with Light</app_area>
+<name>Change Color</name>
+</descriptor>
+</output1>
+<output2>
+<state>ON</state>
+<value-3>52</value-3>
+<value-2>47</value-2>
+<value-1>42</value-1>
+<value0>0</value0>
+<value1>32</value1>
+<value2>0</value2>
+<value3>0</value3>
+<value4>0</value4>
+<descriptor>
+<type>Intelligent Lamp</type>
+<app_area>Communication with Light</app_area>
+<name>Change Color</name>
+</descriptor>
+</output2>
+</data>
+<data id="sensors">
+<input1>
+<value-3>42</value-3>
+<value-2>47</value-2>
+<value-1>52</value-1>
+<value0>50</value0>
+<value1>31</value1>
+<descriptor>
+<type>Intelligent Lamp</type>
+<app_area>Motion Detection</app_area>
+<name>PIR</name>
+</descriptor>
+</input1>
+<input2>
+<value-3>52</value-3>
+<value-2>47</value-2>
+<value-1>42</value-1>
+<value0>50</value0>
+<value1>31</value1>
+<descriptor>
+<type>Intelligent Lamp</type>
+<app_area>Motion Detection</app_area>
+<name>PIR</name>
+</descriptor>
+</input2>
+<input3>
+<value-3>10</value-3>
+<value-2>10</value-2>
+<value-1>10</value-1>
+<value0>2</value0>
+<value1>5</value1>
+<value2>1</value2>
+<descriptor>
+<type>Intelligent Fridge</type>
+<app_area>Communication with Light</app_area>
+<name>Fridge Alarm Light</name>
+</descriptor>
+</input3>
+</data>
+</datamodel>

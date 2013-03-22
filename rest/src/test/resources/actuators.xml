@@ -1,0 +1,34 @@
+<data>
+<output1>
+<state>ON</state>
+<value-3>42</value-3>
+<value-2>47</value-2>
+<value-1>52</value-1>
+<value0>0</value0>
+<value1>32</value1>
+<value2>0</value2>
+<value3>0</value3>
+<value4>0</value4>
+<descriptor>
+<type>Intelligent Lamp</type>
+<app_area>Communication with Light</app_area>
+<name>Change Color</name>
+</descriptor>
+</output1>
+<output2>
+<state>ON</state>
+<value-3>52</value-3>
+<value-2>47</value-2>
+<value-1>42</value-1>
+<value0>0</value0>
+<value1>32</value1>
+<value2>0</value2>
+<value3>0</value3>
+<value4>0</value4>
+<descriptor>
+<type>Intelligent Lamp</type>
+<app_area>Communication with Light</app_area>
+<name>Change Color</name>
+</descriptor>
+</output2>
+</data>
