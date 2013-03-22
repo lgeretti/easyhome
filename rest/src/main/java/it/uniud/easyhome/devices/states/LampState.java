@@ -12,6 +12,7 @@ import javax.xml.bind.annotation.*;
 public class LampState {
 	
 	@Id
+	private long id;
     @OneToOne
     private PersistentInfo device;
     @Column
@@ -30,7 +31,8 @@ public class LampState {
     @SuppressWarnings("unused")
 	private LampState() {}
     
-    public LampState(PersistentInfo device) {
+    public LampState(long id, PersistentInfo device) {
+    	this.id = id;
     	this.device = device;
     }
     
