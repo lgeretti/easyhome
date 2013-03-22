@@ -23,12 +23,15 @@ public final class PersistentInfoResource {
     
     @Context
     private UriInfo uriInfo;
-
+    
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<PersistentInfo> getNodePersistentInfos() {
-        
-        return resEjb.getPersistentInfos();
+    public List<PersistentInfo> getInfosByLocation(@QueryParam("locationId") int locationId) {
+    	
+    	if (locationId == 0)
+    		return resEjb.getPersistentInfos();
+    	
+        return resEjb.getPersistentInfosByLocationId(locationId);
     }
     
     @GET
@@ -116,13 +119,6 @@ public final class PersistentInfoResource {
     	}
         
     	return Response.ok().build();
-    }
-    
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<PersistentInfo> getInfosByLocation(@QueryParam("locationId") int locationId) {
-    	
-        return resEjb.getPersistentInfosByLocationId(locationId);
     }
     
     @DELETE
