@@ -256,7 +256,7 @@ function selectRoom(room,isEntryPoint) {
    $.ajax({ 
        type: "GET",
        dataType: "json",
-       url: "http://"+host+":8080/easyhome/rest/devices/?locationId="+roomId,
+       url: "http://"+host+":8080/easyhome/rest/persistentinfo/?locationId="+roomId,
        success: function(data){        
           roomDevices = data;
 											

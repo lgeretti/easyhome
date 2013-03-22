@@ -25,7 +25,37 @@ public final class StateResource {
     
     @Context
     private UriInfo uriInfo;
-   
+    
+    @GET
+    @Path("lamps")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<LampState> getLampStates() {
+    	
+    	return resEjb.getLampStates();
+    }
+    
+    @GET
+    @Path("lamps/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public LampState getLampStateByInfoId(@PathParam("id") long id) {
+    	
+    	return resEjb.findLampStateByInfoId(id);
+    }    
+    
+    @GET
+    @Path("fridges")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<FridgeState> getFridgeStates() {
+    	return resEjb.getFridgeStates();
+    }
+    
+    @GET
+    @Path("fridges/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public FridgeState getFridgeStateByInfoId(@PathParam("id") long id) {
+    	
+    	return resEjb.findFridgeStateByInfoId(id);
+    }   
     
     @DELETE
     public Response deleteStates() {
@@ -36,20 +66,4 @@ public final class StateResource {
         
         return Response.ok().build();
     }
-    
-    @GET
-    @Path("lamps")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<LampState> getLampStates() {
-    	return resEjb.getLampStates();
-    }
-    
-    @GET
-    @Path("fridges")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<FridgeState> getFridgeStates() {
-    	return resEjb.getFridgeStates();
-    }
-    
-    
 }
