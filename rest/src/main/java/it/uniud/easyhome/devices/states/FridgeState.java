@@ -12,7 +12,6 @@ import javax.xml.bind.annotation.*;
 public class FridgeState {
 	
 	@Id
-	private long id;
     @OneToOne
     private PersistentInfo device;
     @Column
@@ -21,14 +20,9 @@ public class FridgeState {
     @SuppressWarnings("unused")
 	private FridgeState() {}
     
-    public FridgeState(long id,  PersistentInfo device) {
-    	this.id = id;
+    public FridgeState(PersistentInfo device) {
     	this.device = device;
     }
-	
-	public long getId() {
-		return this.id;
-	}
 
 	public PersistentInfo getDevice() {
 		return this.device;

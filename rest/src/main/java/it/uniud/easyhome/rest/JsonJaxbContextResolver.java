@@ -1,6 +1,7 @@
 package it.uniud.easyhome.rest;
 
 import it.uniud.easyhome.gateway.Gateway;
+import it.uniud.easyhome.devices.states.*;
 import it.uniud.easyhome.network.*;
 
 import javax.ws.rs.ext.ContextResolver;
@@ -30,7 +31,9 @@ public final class JsonJaxbContextResolver implements ContextResolver<JAXBContex
             Location.class,
             PersistentInfo.class,
             Functionality.class,
-            Pairing.class
+            Pairing.class,
+            LampState.class,
+            FridgeState.class
         };
         context = new JSONJAXBContext(JSONConfiguration.natural().build(), types);
     }
