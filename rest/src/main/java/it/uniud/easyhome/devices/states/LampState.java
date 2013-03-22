@@ -14,6 +14,8 @@ public class LampState {
 	@Id
     @OneToOne
     private PersistentInfo device;
+	@Column
+	private boolean on;
     @Column
     private byte red;
     @Column
@@ -36,6 +38,10 @@ public class LampState {
     
 	public PersistentInfo getDevice() {
 		return this.device;
+	}
+	
+	public boolean isOn() {
+		return this.on;
 	}
 	
 	public byte getRed() {
@@ -61,6 +67,11 @@ public class LampState {
 	public boolean isOccupied() {
 		return occupied;
 	}
+	
+    public LampState setOn(boolean val) {
+    	this.on = val;
+    	return this;
+    }
 	
 	public LampState setRed(byte val) {
 		red = val;

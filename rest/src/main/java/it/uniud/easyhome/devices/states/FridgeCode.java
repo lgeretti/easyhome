@@ -1,14 +1,12 @@
 package it.uniud.easyhome.devices.states;
 
-import it.uniud.easyhome.exceptions.InvalidColoredAlarmException;
-import it.uniud.easyhome.exceptions.InvalidFridgeCodeException;
-
 public enum FridgeCode {
 
 	STANDBY((short)222),
     ALARM1((short)251),
     ALARM2((short)252),
-    SHUTDOWN((short)999);
+    SHUTDOWN((short)999),
+	UNKNOWN((short)-1);
     
 	private short code;
 	
@@ -29,7 +27,7 @@ public enum FridgeCode {
 		}
 		
 		if (result == null)
-			throw new InvalidFridgeCodeException();
+			return UNKNOWN;
 		
 		return result;
 	}

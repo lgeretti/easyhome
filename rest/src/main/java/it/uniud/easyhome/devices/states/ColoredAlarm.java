@@ -1,30 +1,28 @@
 package it.uniud.easyhome.devices.states;
 
-import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.exceptions.InvalidColoredAlarmException;
-import it.uniud.easyhome.exceptions.InvalidContextException;
-import it.uniud.easyhome.packets.Domain;
 
 public enum ColoredAlarm {
 
-	RED_FIXED((short)0x64),
-    RED_BLINK((short)0x5A),
-    GREEN_FIXED((short)0x50),
-    GREEN_BLINK((short)0x46),
-    BLUE_FIXED((short)0x3C),
-    BLUE_BLINK((short)0x32);
+	RED_FIXED((byte)0x64),
+    RED_BLINK((byte)0x5A),
+    GREEN_FIXED((byte)0x50),
+    GREEN_BLINK((byte)0x46),
+    BLUE_FIXED((byte)0x3C),
+    BLUE_BLINK((byte)0x32),
+	NONE((byte)0x0);
     
-	private short code;
+	private byte code;
 	
-	private ColoredAlarm(short code) {
+	private ColoredAlarm(byte code) {
 		this.code = code;
 	}
 	
-	public short getCode() {
+	public byte getCode() {
 		return code;
 	}
 
-	public static ColoredAlarm fromCode(short code) {
+	public static ColoredAlarm fromCode(byte code) {
 		
 		ColoredAlarm result = null;
 		for (ColoredAlarm alarm: ColoredAlarm.values()) {
@@ -33,7 +31,7 @@ public enum ColoredAlarm {
 		}
 		
 		if (result == null)
-			throw new InvalidColoredAlarmException();
+			return NONE;
 		
 		return result;
 	}

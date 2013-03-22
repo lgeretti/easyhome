@@ -92,4 +92,12 @@ public class StateEJB {
 		for (FridgeState st : fridgeStates)
 			em.detach(st);
 	}
+
+	public void updateManagedLamp(LampState lamp) {
+		em.merge(lamp);
+	}
+	
+	public void updateManagedFridge(FridgeState fridge) {
+		em.merge(fridge);
+	}
 }

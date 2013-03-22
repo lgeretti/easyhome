@@ -10,12 +10,14 @@ import javax.xml.bind.annotation.*;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class FridgeState {
-
+	
 	@Id
     @OneToOne
     private PersistentInfo device;
     @Column
     private FridgeCode lastCode;
+    @Column
+    private boolean on;
 
     @SuppressWarnings("unused")
 	private FridgeState() {}
@@ -32,6 +34,10 @@ public class FridgeState {
 		return this.lastCode;
 	}
 	
+	public boolean isOn() {
+		return this.on;
+	}
+	
     @Override
     public boolean equals(Object other) {
         
@@ -42,6 +48,16 @@ public class FridgeState {
         if (!this.device.equals(otherFunctionality.device)) return false;
         
         return true;
+    }
+    
+    public FridgeState setLastCode(FridgeCode val) {
+    	this.lastCode = val;
+    	return this;
+    }
+    
+    public FridgeState setOn(boolean val) {
+    	this.on = val;
+    	return this;
     }
     
     @Override

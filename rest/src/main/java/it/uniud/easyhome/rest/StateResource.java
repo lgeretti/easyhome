@@ -57,6 +57,82 @@ public final class StateResource {
     	return resEjb.findFridgeStateByInfoId(id);
     }   
     
+    @POST
+    @Path("lamps/{id}")
+    public Response updateLampState(@PathParam("id") long id,
+    								@FormParam("on") boolean on,
+    								@FormParam("red") byte red,
+    								@FormParam("green") byte green,
+    								@FormParam("blue") byte blue,
+    								@FormParam("white") byte white,
+    								@FormParam("alarm") ColoredAlarm alarm) {
+    		
+    	LampState thisLamp = resEjb.findLampStateByInfoId(id);
+    	
+    	if (thisLamp == null)
+    		throw new WebApplicationException(Response.Status.NOT_FOUND);
+    	
+    	thisLamp.setOn(on)
+    			.setRed(red)
+    			.setGreen(green)
+    			.setBlue(blue)
+    			.setWhite(white)
+    			.setAlarm(alarm);
+    	
+    	resEjb.updateManagedLamp(thisLamp);
+    	
+    	return Response.ok().build();
+    }    
+    
+    @POST
+    @Path("lamps/{id}/occupied")
+    public Response setLampOccupied(@PathParam("id") long id) {
+    	
+    	LampState thisLamp = resEjb.findLampStateByInfoId(id);
+    	
+    	if (thisLamp == null)
+    		throw new WebApplicationException(Response.Status.NOT_FOUND);
+    	
+    	thisLamp.setOccupied(true);
+    	
+    	resEjb.updateManagedLamp(thisLamp);
+    	
+    	return Response.ok().build();    	
+    }
+    
+    @POST
+    @Path("lamps/{id}/unoccupied")
+    public Response setLampUnoccupied(@PathParam("id") long id) {
+    	
+    	LampState thisLamp = resEjb.findLampStateByInfoId(id);
+    	
+    	if (thisLamp == null)
+    		throw new WebApplicationException(Response.Status.NOT_FOUND);
+    	
+    	thisLamp.setOccupied(false);
+    	
+    	resEjb.updateManagedLamp(thisLamp);
+    	
+    	return Response.ok().build();    	
+    }
+    
+    @POST
+    @Path("fridges/{id}")
+    public Response updateFridgeLastCode(@PathParam("id") long id,
+    								@FormParam("lastCode") FridgeCode lastCode) {
+    		
+    	FridgeState thisFridge = resEjb.findFridgeStateByInfoId(id);
+    	
+    	if (thisFridge == null)
+    		throw new WebApplicationException(Response.Status.NOT_FOUND);
+    	
+    	thisFridge.setLastCode(lastCode);
+    	
+    	resEjb.updateManagedFridge(thisFridge);
+    	
+    	return Response.ok().build();
+    }
+    
     @DELETE
     public Response deleteStates() {
     	
