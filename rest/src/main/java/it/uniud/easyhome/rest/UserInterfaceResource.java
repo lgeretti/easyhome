@@ -282,8 +282,8 @@ public class UserInterfaceResource {
 	        formData.add("deviceType", FunctionalityContainerType.COLORED_LAMP.toString());
 	        formData.add("imgPath","img/colorlight.svg");
 	        formData.add("help", "E' possibile cambiare luce o colore della lampada");
-	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(1L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(1L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(424752L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(424752L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        long lampadaSalottoId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
 	    	
 	        formData = new MultivaluedMapImpl();
@@ -292,8 +292,8 @@ public class UserInterfaceResource {
 	        formData.add("deviceType", FunctionalityContainerType.COLORED_LAMP.toString());
 	        formData.add("imgPath","img/colorlight.svg");
 	        formData.add("help", "E' possibile cambiare luce o colore della lampada");
-	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(2L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(2L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(524742L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(524742L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        long lampadaCameraId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
 	
 	        formData = new MultivaluedMapImpl();
@@ -301,7 +301,7 @@ public class UserInterfaceResource {
 	        formData.add("locationName",loc1);
 	        formData.add("imgPath","img/fridge.svg");
 	        formData.add("help", "Nessuna funzione correntemente disponibile");
-	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(3L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(101010L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	    	
 	    	// Fake
 	    	
