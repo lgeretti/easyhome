@@ -1,6 +1,6 @@
 package it.uniud.easyhome.devices.states;
 
-import it.uniud.easyhome.devices.InvalidColoredAlarmException;
+import it.uniud.easyhome.exceptions.InvalidColoredAlarmException;
 import it.uniud.easyhome.exceptions.InvalidFridgeCodeException;
 
 public enum FridgeCode {

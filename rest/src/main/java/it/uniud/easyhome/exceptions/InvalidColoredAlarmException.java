@@ -1,4 +1,4 @@
-package it.uniud.easyhome.devices;
+package it.uniud.easyhome.exceptions;
 
 public class InvalidColoredAlarmException extends RuntimeException {
 

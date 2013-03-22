@@ -1,7 +1,7 @@
 package it.uniud.easyhome.devices.states;
 
 import it.uniud.easyhome.contexts.ManagementContext;
-import it.uniud.easyhome.devices.InvalidColoredAlarmException;
+import it.uniud.easyhome.exceptions.InvalidColoredAlarmException;
 import it.uniud.easyhome.exceptions.InvalidContextException;
 import it.uniud.easyhome.packets.Domain;
 

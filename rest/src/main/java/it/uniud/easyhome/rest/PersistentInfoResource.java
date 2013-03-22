@@ -118,6 +118,13 @@ public final class PersistentInfoResource {
     	return Response.ok().build();
     }
     
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<PersistentInfo> getInfosByLocation(@QueryParam("locationId") int locationId) {
+    	
+        return resEjb.getPersistentInfosByLocationId(locationId);
+    }
+    
     @DELETE
     @Path("{gatewayId}/{nuid}")
     public Response deleteInfo(@PathParam("gatewayId") byte gatewayId, @PathParam("nuid") long nuid) {

@@ -448,6 +448,7 @@ public class UserInterfaceResource {
     	client.resource(TARGET).path(RestPaths.LINKS).delete();
     	client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).delete();
     	client.resource(TARGET).path(RestPaths.PAIRINGS).delete();
+    	client.resource(TARGET).path(RestPaths.STATES).delete();
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).delete();
     	client.resource(TARGET).path(RestPaths.LOCATIONS).delete();
     	
