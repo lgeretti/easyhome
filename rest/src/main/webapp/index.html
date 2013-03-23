@@ -10,8 +10,8 @@
    .selection_button { height: 250px; width: 250px; color: #36609f; }
    #eh_help_button { height: 125px; width: 125px; color: #eb7914; }
    .arrow_button { height: 100px; width: 100px; color: #61c165; }
-   .notch_button { height: 150px; width: 100px; color: #444444; background: #444444; float: left}
-   .blue_notch_button { height: 150px; width: 100px; color: #36609f; background: #36609f; float: left}
+   .grey_notch_button { height: 150px; width: 100px; color: #444444; float: left}
+   .colored_notch_button { height: 150px; width: 100px; color: #36609f; float: left}
    .navigation_button { height: 125px; width: 125px; color: #61c165; }
    .yellow { color: #e0c73d; }
    .green { color: #61c165; }
@@ -44,6 +44,7 @@
 var roomsLoaded = false;
 
 var grey = "#444444";
+var blue = "#36609f";
 
 var host = "http://localhost:8080/easyhome/";
 
@@ -191,57 +192,74 @@ function selectionButtonHoverEffectIn(button) {
 
 function notchButtonHoverEffectIn(button) {
     
-	/*
-    button.stop().animate({
-        backgroundColor: button.css('color')
-        }, hoverEffectTime );  
-    */
+	var hoveredButtonId = button.attr('id');
 	
-    hoverTimeoutFunc = function(state) {
-            
-        switch (state) {
+	$(".colored_notch_button").each(function() {
+		if (hoveredButtonId < currentOption) {
+			if ($(this).attr('id') <= currentOption && $(this).attr('id') > hoveredButtonId) {
+				$(this).stop().animate({
+	                backgroundColor: grey
+	            }, hoverEffectTime );
+			}
+		} else if (hoveredButtonId > currentOption) {
+            if ($(this).attr('id') > currentOption && $(this).attr('id') <= hoveredButtonId) {
+                $(this).stop().animate({
+                    backgroundColor: blue
+                }, hoverEffectTime );
+            }
+		}
+	});
+	
+    var hoverTimeoutFunc = function() {
+                
+          switch (currentFunctionality.type) {
+          
+          case 'LUMINOSITY_CONTROL':
+              
+              var lightLevel = Math.round(hoveredButtonId * 100/8);
+              
+              $.ajax({ 
+                  type: "POST",
+                  url: host+"rest/states/lamps/"+currentDevice.id+"/white",
+                  data: "value="+lightLevel,
+                  async: false
+              });
+              
+              break;
+              
+          case 'COLOR_CONTROL':
+              
+              break;
 
-            case uiState.Home:
-                break;
-            case uiState.Room:
-                break;
-            case uiState.Device:
-                break;
-            case uiState.Functionality:
-                
-                switch (currentFunctionality.type) {
-                
-                case 'LUMINOSITY_CONTROL':
-                    
-                    var lightLevel = Math.round(button.attr('id') * 100/8);
-                    
-                    $.ajax({ 
-                        type: "POST",
-                        url: host+"rest/states/lamps/"+currentDevice.id+"/white",
-                        data: "value="+lightLevel,
-                        async: false
-                    });
-                    
-                    break;
-                    
-                case 'COLOR_CONTROL':
-                    
-                    break;
-
-                }
-                
-                selectState(uiState.Functionality);
-        }
+          }
+          
+          selectState(uiState.Functionality);
     }
     
-    hoverTimeout = setTimeout(function() { hoverTimeoutFunc(currentState); }, hoverEffectTime);
+    hoverTimeout = setTimeout(hoverTimeoutFunc, hoverEffectTime);
 }	
 
 function notchButtonHoverEffectOut(button) {
 	
     clearTimeout(hoverTimeout);
-    button.stop().animate({backgroundColor: button.css('color')}, hoverEffectTime/2 );
+
+    var hoveredButtonId = button.attr('id');
     
+    $(".colored_notch_button").each(function() {
+      if (hoveredButtonId < currentOption) {
+          if ($(this).attr('id') <= currentOption && $(this).attr('id') > hoveredButtonId) {
+              $(this).stop().animate({
+                  backgroundColor: blue
+              }, hoverEffectTime );
+          }
+      } else if (hoveredButtonId > currentOption) {
+          if ($(this).attr('id') > currentOption && $(this).attr('id') <= hoveredButtonId) {
+              $(this).stop().animate({
+                  backgroundColor: grey
+              }, hoverEffectTime );
+          }
+      }
+    });
 }
 
 function navigationButtonHoverEffectIn(button) {
@@ -622,7 +640,7 @@ function showFunctionality(functionality) {
     	
     	var htmlText;
     
-    	htmlText += "<div id='0' class='eh_notch notch_button ui-widget-content ui-corner-all'><img height='150px' width='100px' src='img/L.svg' /></div>";
+    	htmlText += "<div id='0' class='eh_notch grey_notch_button ui-widget-content ui-corner-all'><img height='150px' width='100px' src='img/L.svg' /></div>";
     	
         var lampState = $.parseJSON($.ajax({ 
             type: "GET",
@@ -632,12 +650,14 @@ function showFunctionality(functionality) {
           }).responseText);
         
         var numNotches = Math.round(lampState.white/100*8);
+        
+        currentOption = numNotches;
     	
     	for (i = 0; i<numNotches; i++) {
-    		htmlText += "<div id='"+(i+1)+"' class='eh_notch id= blue_notch_button ui-widget-content ui-corner-all'></div>";
+    		htmlText += "<div id='"+(i+1)+"' class='eh_notch colored_notch_button ui-widget-content ui-corner-all' style='background:"+blue+"'></div>";
     	}
         for (i = numNotches; i<8; i++) {
-            htmlText += "<div id='"+(i+1)+"' class='eh_notch notch_button ui-widget-content ui-corner-all'></div>";
+            htmlText += "<div id='"+(i+1)+"' class='eh_notch colored_notch_button ui-widget-content ui-corner-all' style='background:"+grey+"'></div>";
         }
     	
     	$("#eh_functionality_container")
@@ -651,10 +671,10 @@ function showFunctionality(functionality) {
         var htmlText;
         
         for (j =0; j<3; j++) {
-          htmlText += "<div><div class='eh_notch notch_button ui-widget-content ui-corner-all'><img height='150px' width='100px' src='img/G.svg' /></div>"
+          htmlText += "<div><div class='eh_notch colored_notch_button ui-widget-content ui-corner-all'><img height='150px' width='100px' src='img/G.svg' /></div>"
           
           for (i = 0; i<8; i++) {
-              htmlText += "<div class='eh_notch blue_notch_button ui-widget-content ui-corner-all'></div>";
+              htmlText += "<div class='eh_notch colored_notch_button ui-widget-content ui-corner-all'></div>";
           }
           htmlText += "</div>"
         }
