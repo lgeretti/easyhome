@@ -193,16 +193,34 @@ function selectionButtonHoverEffectIn(button) {
 function notchButtonHoverEffectIn(button) {
     
 	var hoveredButtonId = button.attr('id');
+	var hoveredButtonColorClass;
+	var currentNotch;
+	if (button.hasClass('white_notch')) {
+		hoveredButtonColorClass = '.white_notch';
+		currentNotch = currentOption;
+	}
+	else if (button.hasClass('red_notch')) {
+        hoveredButtonColorClass = '.red_notch';
+        currentNotch = currentOption[0];   
+	}
+	else if (button.hasClass('green_notch')) {
+        hoveredButtonColorClass = '.green_notch';
+        currentNotch = currentOption[1];
+	}
+    if (button.hasClass('blue_notch')) {
+        hoveredButtonColorClass = '.blue_notch';
+        currentNotch = currentOption[2];
+    }
 	
-	$(".colored_notch_button").each(function() {
-		if (hoveredButtonId < currentOption) {
-			if ($(this).attr('id') <= currentOption && $(this).attr('id') > hoveredButtonId) {
+	$(hoveredButtonColorClass+'.colored_notch_button').each(function() {
+		if (hoveredButtonId < currentNotch) {
+			if ($(this).attr('id') <= currentNotch && $(this).attr('id') > hoveredButtonId) {
 				$(this).stop().animate({
 	                backgroundColor: grey
 	            }, hoverEffectTime );
 			}
-		} else if (hoveredButtonId > currentOption) {
-            if ($(this).attr('id') > currentOption && $(this).attr('id') <= hoveredButtonId) {
+		} else if (hoveredButtonId > currentNotch) {
+            if ($(this).attr('id') > currentNotch && $(this).attr('id') <= hoveredButtonId) {
                 $(this).stop().animate({
                     backgroundColor: blue
                 }, hoverEffectTime );
@@ -228,6 +246,29 @@ function notchButtonHoverEffectIn(button) {
               break;
               
           case 'COLOR_CONTROL':
+        	  
+        	  var colorLevel = Math.round(hoveredButtonId * 100/8);
+        	  
+        	  var color;
+        	  
+        	  switch (hoveredButtonColorClass) {
+        	  case '.red_notch':
+        		  color = "red";
+        		  break;
+        	  case '.green_notch':
+        		  color = "green";
+        		  break;
+        	  case '.blue_notch':
+        		  color = "blue";
+        		  break;
+        	  }
+        	  
+              $.ajax({ 
+                  type: "POST",
+                  url: host+"rest/states/lamps/"+currentDevice.id+"/"+color,
+                  data: "value="+colorLevel,
+                  async: false
+              });
               
               break;
 
@@ -244,16 +285,34 @@ function notchButtonHoverEffectOut(button) {
     clearTimeout(hoverTimeout);
 
     var hoveredButtonId = button.attr('id');
+    var hoveredButtonColorClass;
+    var currentNotch;
+    if (button.hasClass('white_notch')) {
+        hoveredButtonColorClass = '.white_notch';
+        currentNotch = currentOption;
+    }
+    else if (button.hasClass('red_notch')) {
+        hoveredButtonColorClass = '.red_notch';
+        currentNotch = currentOption[0];   
+    }
+    else if (button.hasClass('green_notch')) {
+        hoveredButtonColorClass = '.green_notch';
+        currentNotch = currentOption[1];
+    }
+    if (button.hasClass('blue_notch')) {
+        hoveredButtonColorClass = '.blue_notch';
+        currentNotch = currentOption[2];
+    }
     
-    $(".colored_notch_button").each(function() {
-      if (hoveredButtonId < currentOption) {
-          if ($(this).attr('id') <= currentOption && $(this).attr('id') > hoveredButtonId) {
+    $(hoveredButtonColorClass+'.colored_notch_button').each(function() {
+      if (hoveredButtonId < currentNotch) {
+          if ($(this).attr('id') <= currentNotch && $(this).attr('id') > hoveredButtonId) {
               $(this).stop().animate({
                   backgroundColor: blue
               }, hoverEffectTime );
           }
-      } else if (hoveredButtonId > currentOption) {
-          if ($(this).attr('id') > currentOption && $(this).attr('id') <= hoveredButtonId) {
+      } else if (hoveredButtonId > currentNotch) {
+          if ($(this).attr('id') > currentNotch && $(this).attr('id') <= hoveredButtonId) {
               $(this).stop().animate({
                   backgroundColor: grey
               }, hoverEffectTime );
@@ -638,9 +697,7 @@ function showFunctionality(functionality) {
     
     case 'LUMINOSITY_CONTROL':
     	
-    	var htmlText;
-    
-    	htmlText += "<div id='0' class='eh_notch grey_notch_button ui-widget-content ui-corner-all'><img height='150px' width='100px' src='img/L.svg' /></div>";
+    	var htmlText = "<div id='0' class='eh_notch grey_notch_button white_notch ui-widget-content ui-corner-all'><img height='150px' width='100px' src='img/L.svg' /></div>";
     	
         var lampState = $.parseJSON($.ajax({ 
             type: "GET",
@@ -654,10 +711,10 @@ function showFunctionality(functionality) {
         currentOption = numNotches;
     	
     	for (i = 0; i<numNotches; i++) {
-    		htmlText += "<div id='"+(i+1)+"' class='eh_notch colored_notch_button ui-widget-content ui-corner-all' style='background:"+blue+"'></div>";
+    		htmlText += "<div id='"+(i+1)+"' class='eh_notch colored_notch_button white_notch ui-widget-content ui-corner-all' style='background:"+blue+"'></div>";
     	}
         for (i = numNotches; i<8; i++) {
-            htmlText += "<div id='"+(i+1)+"' class='eh_notch colored_notch_button ui-widget-content ui-corner-all' style='background:"+grey+"'></div>";
+            htmlText += "<div id='"+(i+1)+"' class='eh_notch colored_notch_button white_notch ui-widget-content ui-corner-all' style='background:"+grey+"'></div>";
         }
     	
     	$("#eh_functionality_container")
@@ -668,16 +725,34 @@ function showFunctionality(functionality) {
     	
     case 'COLOR_CONTROL':
 
-        var htmlText;
+        var htmlText = "<div>";
+
+        var lampState = $.parseJSON($.ajax({ 
+            type: "GET",
+            dataType: "json",
+            url: host+"rest/states/lamps/"+currentDevice.id,
+            async: false
+          }).responseText);
         
-        for (j =0; j<3; j++) {
-          htmlText += "<div><div class='eh_notch colored_notch_button ui-widget-content ui-corner-all'><img height='150px' width='100px' src='img/G.svg' /></div>"
-          
-          for (i = 0; i<8; i++) {
-              htmlText += "<div class='eh_notch colored_notch_button ui-widget-content ui-corner-all'></div>";
-          }
-          htmlText += "</div>"
+        var numNotches = [ Math.round(lampState.red/100*8), Math.round(lampState.green/100*8), Math.round(lampState.blue/100*8) ];        
+        var colors = ['red', 'green', 'blue'];
+        var initials = ['R', 'G', 'B'];
+        
+        currentOption = numNotches;
+        
+        for (j = 0; j<3; j++) {
+        
+            htmlText += "<div id='0' class='eh_notch grey_notch_button "+colors[j]+"_notch ui-widget-content ui-corner-all'><img height='150px' width='100px' src='img/"+initials[j]+".svg' /></div>";
+            
+            for (i = 0; i<numNotches[j]; i++) {
+                htmlText += "<div id='"+(i+1)+"' class='eh_notch colored_notch_button "+colors[j]+"_notch ui-widget-content ui-corner-all' style='background:"+blue+"'></div>";
+            }
+            for (i = numNotches[j]; i<8; i++) {
+                htmlText += "<div id='"+(i+1)+"' class='eh_notch colored_notch_button "+colors[j]+"_notch ui-widget-content ui-corner-all' style='background:"+grey+"'></div>";
+            }
         }
+        htmlText += "</div>";
+        
         
         $("#eh_functionality_container")
           .css('left','65px').css('top','210px')
