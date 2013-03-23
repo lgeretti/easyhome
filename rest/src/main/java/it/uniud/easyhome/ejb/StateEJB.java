@@ -33,13 +33,8 @@ public class StateEJB {
 	}
 	
 	public <T> T findStateByInfoId(long id, Class<T> cls) {
-		
-		PersistentInfo info = findPersistentInfoById(id);
-		
-		if (info == null)
-			return null;
-		
-		return em.find(cls, info);		
+				
+		return em.find(cls, id);		
 	}
 	
 	public PersistentInfo findPersistentInfoById(long id) {
