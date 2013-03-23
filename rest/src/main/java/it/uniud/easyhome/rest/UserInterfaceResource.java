@@ -416,6 +416,8 @@ public class UserInterfaceResource {
 	        client.resource(TARGET).path(RestPaths.STATES).path("lamps").path(Long.toString(lampadaSalottoId)).put(ClientResponse.class);
 	        client.resource(TARGET).path(RestPaths.STATES).path("lamps").path(Long.toString(lampadaCameraId)).put(ClientResponse.class);
 	        client.resource(TARGET).path(RestPaths.STATES).path("fridges").path(Long.toString(frigoId)).put(ClientResponse.class);
+	        client.resource(TARGET).path(RestPaths.STATES).path("sensors").path("presence").path(Long.toString(lampadaSalottoId)).put(ClientResponse.class);
+	        client.resource(TARGET).path(RestPaths.STATES).path("sensors").path("presence").path(Long.toString(lampadaCameraId)).put(ClientResponse.class);
 	        
 	    	
     	} catch (JSONException ex) {
