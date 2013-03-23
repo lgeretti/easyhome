@@ -80,7 +80,7 @@ public class OccupancySensingRegistrationProcess extends Process {
 		        			if (location != null) {
 		        				
 		        				location.setOccupied(occupied);
-				                restResource.path(RestPaths.NODES).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,sender);
+				                restResource.path(RestPaths.LOCATIONS).path(Integer.toString(location.getId())).path("occupied").post(ClientResponse.class);
 				                log(LogLevel.INFO, location + " is " + (occupied ? "" : "not ") + "occupied");
 		        			}
 			                
