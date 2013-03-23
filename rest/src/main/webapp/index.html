@@ -5,8 +5,8 @@
 <title>Interfaccia utente EasyHome</title>
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.1/themes/vader/jquery-ui.css" />
 <style>
-   .eh_button { padding: 0.8em; margin: 1em; background: #666666; }
-   .eh_notch { padding: 0.4em; margin: 0.4em; background: #666666; }
+   .eh_button { padding: 0.8em; margin: 1em; background: #444444; }
+   .eh_notch { padding: 0.4em; margin: 0.4em; background: #444444; }
    .selection_button { height: 250px; width: 250px; color: #36609f; }
    #eh_help_button { height: 125px; width: 125px; color: #eb7914; }
    .arrow_button { height: 100px; width: 100px; color: #61c165; }
@@ -30,7 +30,7 @@
 
    .eh_arrow_button_positioner { position: relative; top: 75px; }
    
-   div.text { font-family:"Verdana"; font-size: 50pt; text-transform: uppercase; text-align: center; font-weight: bold; padding: 0.3em; color: #ffffff; } 
+   div.text { font-family:"Verdana"; font-size: 40pt; text-transform: uppercase; text-align: center; font-weight: bold; padding: 0.3em; color: #cccccc; } 
    #eh_description_float {position: absolute; left: 80px; top: 270px; }
    #eh_description_div { border-width: 1px; width: 1070px; border-style: solid; border-color: #666666; }
    
@@ -42,6 +42,8 @@
 <script type='text/javascript'>
 
 var roomsLoaded = false;
+
+var grey = "#444444";
 
 var host = "http://localhost:8080/easyhome/";
 
@@ -89,13 +91,16 @@ function arrowHoverEffectIn(button) {
 			break;    
 			
 		case uiState.Functionality:
-			
-			if (currentFunctionality.type == 'MOVE_ROOM') {
+
+			switch (currentFunctionality.type) {
+			case 'MOVE_ROOM':
+			case 'PAIRING':
 				showSelections(functionalityOptions);
+			default:
 			}
       }    
 
-      button.stop().css('backgroundColor', "#666666");
+      button.stop().css('backgroundColor', grey);
       
       if (button.css('visibility') == 'visible') 
     	  arrowHoverEffectIn(button);
@@ -135,7 +140,7 @@ function selectionButtonHoverEffectIn(button) {
                     }
             }
         	
-            button.stop().css('backgroundColor', "#666666");
+            button.stop().css('backgroundColor', grey);
     	}
         
         if (button.css('visibility') == 'visible')
@@ -186,7 +191,7 @@ function navigationButtonHoverEffectIn(button) {
     				default:
     		   }                  
     	       
-    	       button.stop().css('backgroundColor', "#666666");
+    	       button.stop().css('backgroundColor', grey);
 	
 	       }, hoverEffectTime
 	   );
@@ -196,7 +201,7 @@ function navigationButtonHoverEffectIn(button) {
 
 function buttonHoverEffectOut(button) {
     clearTimeout(hoverTimeout);
-    button.stop().animate({backgroundColor: "#666666"}, hoverEffectTime/2 );
+    button.stop().animate({backgroundColor: grey}, hoverEffectTime/2 );
 }
 
 function helpHoverEffectIn() {
@@ -219,7 +224,7 @@ function helpHoverEffectIn() {
     } else {
         
         button.stop().animate({
-              backgroundColor: "#666666"
+              backgroundColor: grey
                 }, hoverEffectTime );
 
         hoverTimeout = setTimeout(function(){
@@ -241,7 +246,7 @@ function helpHoverEffectOut() {
     clearTimeout(hoverTimeout);
     
     if (!helpSelected) {
-        button.stop().animate({backgroundColor: "#666666"}, hoverEffectTime/2 );
+        button.stop().animate({backgroundColor: grey}, hoverEffectTime/2 );
     } else {
         button.stop().animate({backgroundColor: button.css('color')}, hoverEffectTime/2 );  
     }
@@ -333,7 +338,7 @@ function selectState(newState) {
 
   $("#eh_description_div").hide();
   $("#eh_functionality_container").hide();
-  $("#eh_help_button").css('backgroundColor','#666666');
+  $("#eh_help_button").css('backgroundColor', grey);
   updateHelpText(currentState);
   
   switch (newState) {
@@ -544,8 +549,53 @@ function showFunctionality(functionality) {
         
     case 'PAIRING':
     	
-    	$("#eh_functionality_container").html("<div class='ui-corner-all text'>Accoppiamento</div>");
-    	$('#eh_functionality_container').show();
+    	$('#eh_selection_buttons_container').show();
+    	
+    	var destinationDeviceType;
+    	
+    	switch (currentDevice.deviceType) {
+    	case 'HAND_CONTROLLER':
+    		destinationDeviceType = 'COLORED_LAMP';
+    	default:
+    	}
+    	
+  	    functionalityOptions = $.parseJSON($.ajax({ 
+  	       type: "GET",
+  	       dataType: "json",
+  	       url: host+"rest/persistentinfo?deviceType="+destinationDeviceType,
+  	       async: false
+  	    }).responseText);
+  	    
+  	    var currentPairing;
+  	    
+        try
+        {
+            currentPairing = $.parseJSON($.ajax({ 
+                type: "GET",
+                dataType: "json",
+                url: host+"rest/pairings/"+currentDevice.id,
+                async: false
+              }).responseText);        
+        }
+        catch(err)
+        {
+        	currentPairing = false;
+        }
+  	    
+  	    for (i = 0; i<functionalityOptions.length;i++) {
+  	    	var destination = functionalityOptions[i];
+            if (currentPairing && currentPairing.destination.id == destination.id) {
+                	destination.name = "Disassocia da " + destination.name;
+                	destination.imgPath = "img/cancel.svg";
+            } else
+                destination.name = "Associa con " + destination.name;
+  	    	destination.name += " in " + destination.location.name;
+
+  	    }
+        
+  	    lowSelectionIndex = 0;
+  	    
+        showSelections(functionalityOptions);    	
     	break;
     }
     
