@@ -107,11 +107,11 @@ public final class PersistentInfoResource {
     	return Response.ok().build();
     }
     
-    @POST
-    @Path("{gatewayId}/{nuid}/changeLocation")
+    @PUT
+    @Path("{gatewayId}/{nuid}/location")
     public Response changeLocation(@PathParam("gatewayId") byte gatewayId, 
 								   @PathParam("nuid") long nuid,
-								   @FormParam("locationName") String locationName) {
+								   @FormParam("name") String locationName) {
 	
     	synchronized(infoLock) {
     		
@@ -131,6 +131,20 @@ public final class PersistentInfoResource {
     	}
         
     	return Response.ok().build();
+    }
+    
+    @GET
+    @Path("{gatewayId}/{nuid}/location")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Location getLocation(@PathParam("gatewayId") byte gatewayId, 
+								   @PathParam("nuid") long nuid) {
+    		
+		PersistentInfo info = resEjb.getPersistentInfo(gatewayId,nuid);
+		
+		if (info == null)
+    		throw new WebApplicationException(Response.Status.NOT_FOUND);
+        
+    	return info.getLocation(); 
     }
     
     @DELETE

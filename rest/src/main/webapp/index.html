@@ -67,6 +67,7 @@ var currentFunctionality;
 var currentOption;
 
 var lowSelectionIndex;
+var optionsCoverDescriptionText = false;
 
 function arrowHoverEffectIn(button) {
     button.stop().animate({
@@ -506,7 +507,8 @@ function selectState(newState) {
 
   currentState = newState;
   lowSelectionIndex = 0;
-
+  optionsCoverDescriptionText = false; // This is in general, some functionalities will override this
+  
   $("#eh_description_div").hide();
   $("#eh_functionality_container").hide();
   $("#eh_help_button").css('backgroundColor', grey);
@@ -515,7 +517,7 @@ function selectState(newState) {
   switch (newState) {
   
     case uiState.Home:
-    													
+    										
     	$("#eh_nav_room,#eh_nav_device,#eh_nav_functionality").hide();
     	$("#eh_selection_buttons_container").show();
 		showSelections(homeRooms);
@@ -668,9 +670,9 @@ function moveCurrentDeviceTo(room) {
 	$("#eh_nav_room").find('img').attr('src',room.imgPath).attr('alt',room.name);
 	
 	   $.ajax({ 
-	       type: "POST",
-	       data: "locationName="+room.name,
-	       url: host+"rest/persistentinfo/"+currentDevice.gatewayId+"/"+currentDevice.nuid+"/changeLocation"
+	       type: "PUT",
+	       data: "name="+room.name,
+	       url: host+"rest/persistentinfo/"+currentDevice.gatewayId+"/"+currentDevice.nuid+"/location"
 	   });  
 	
 	selectState(uiState.Device);
@@ -725,6 +727,7 @@ function showFunctionality(functionality) {
     	
     case 'COLOR_CONTROL':
 
+    	optionsCoverDescriptionText = true;
         var htmlText = "<div>";
 
         var lampState = $.parseJSON($.ajax({ 
@@ -855,7 +858,7 @@ $(".selection_button").hover(
 
 $(".navigation_button").hover(
     function() {
-    	if (!helpSelected)
+    	if (!helpSelected && !optionsCoverDescriptionText)
           $("#eh_description_div").text($(this).find("img").attr("alt")).show();
         navigationButtonHoverEffectIn($(this));
     }
@@ -869,7 +872,7 @@ $(".navigation_button").hover(
 
 $("#eh_help_button").hover(
     function() {
-		if (!helpSelected)
+		if (!helpSelected && !optionsCoverDescriptionText)
           $("#eh_description_div").text($(this).find("img").attr("alt")).show();
         helpHoverEffectIn();
     }

@@ -75,8 +75,10 @@ public class OccupancySensingRegistrationProcess extends Process {
 		                
 		        			Node sender = JsonUtils.getFrom(senderRetrievalResponse, Node.class);
 		        			
-		        			Location location = sender.getLocation();
-		        			
+			        		ClientResponse senderLocationRetrievalResponse = restResource.path(RestPaths.PERSISTENTINFO).path(Byte.toString(gatewayId))
+			        				.path(Long.toString(sender.getCoordinates().getNuid())).path("location").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);		        			
+			        		Location location = JsonUtils.getFrom(senderLocationRetrievalResponse, Location.class);
+			        		
 		        			if (location != null) {
 		        				
 		        				location.setOccupied(occupied);
