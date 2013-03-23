@@ -3,8 +3,8 @@ package it.uniud.easyhome.jsf;
 import java.util.List;
 
 import it.uniud.easyhome.common.JMSConstants;
+import it.uniud.easyhome.ejb.NodeEJB;
 import it.uniud.easyhome.network.NetworkEvent;
-import it.uniud.easyhome.network.NodeEJB;
 import it.uniud.easyhome.network.Node;
 
 import javax.annotation.PostConstruct;

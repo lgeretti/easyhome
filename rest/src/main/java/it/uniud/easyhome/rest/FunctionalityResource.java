@@ -1,5 +1,6 @@
 package it.uniud.easyhome.rest;
 
+import it.uniud.easyhome.ejb.FunctionalityEJB;
 import it.uniud.easyhome.network.*;
 
 import java.util.List;

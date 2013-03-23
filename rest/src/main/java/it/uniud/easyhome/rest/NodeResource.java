@@ -1,5 +1,6 @@
 package it.uniud.easyhome.rest;
 
+import it.uniud.easyhome.ejb.NodeEJB;
 import it.uniud.easyhome.exceptions.MultipleLinkException;
 import it.uniud.easyhome.network.*;
 import it.uniud.easyhome.processing.NetworkUpdateProcess;

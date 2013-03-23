@@ -1,6 +1,7 @@
 package it.uniud.easyhome.rest;
 
 import it.uniud.easyhome.devices.states.*;
+import it.uniud.easyhome.ejb.StateEJB;
 import it.uniud.easyhome.exceptions.MultipleLinkException;
 import it.uniud.easyhome.network.*;
 

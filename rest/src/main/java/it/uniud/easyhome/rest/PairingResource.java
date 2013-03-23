@@ -1,5 +1,6 @@
 package it.uniud.easyhome.rest;
 
+import it.uniud.easyhome.ejb.PairingEJB;
 import it.uniud.easyhome.network.*;
 
 import javax.naming.InitialContext;

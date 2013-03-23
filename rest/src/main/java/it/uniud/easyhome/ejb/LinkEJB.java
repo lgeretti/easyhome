@@ -1,9 +1,11 @@
-package it.uniud.easyhome.network;
+package it.uniud.easyhome.ejb;
 
 
 import it.uniud.easyhome.exceptions.MultipleLinkException;
 import it.uniud.easyhome.exceptions.MultipleNodesFoundException;
 import it.uniud.easyhome.exceptions.NodeNotFoundException;
+import it.uniud.easyhome.network.Link;
+import it.uniud.easyhome.network.LocalCoordinates;
 import it.uniud.easyhome.processing.NodeAnnceRegistrationProcess;
 import it.uniud.easyhome.processing.NodeDiscoveryRequestProcess;
 

@@ -1,7 +1,9 @@
-package it.uniud.easyhome.network;
+package it.uniud.easyhome.ejb;
 
 
 import it.uniud.easyhome.exceptions.MultipleNodesFoundException;
+import it.uniud.easyhome.network.Functionality;
+import it.uniud.easyhome.network.PersistentInfo;
 
 import java.util.ArrayList;
 import java.util.Collection;

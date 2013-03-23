@@ -1,7 +1,13 @@
-package it.uniud.easyhome.network;
+package it.uniud.easyhome.ejb;
 
 
 import it.uniud.easyhome.exceptions.*;
+import it.uniud.easyhome.network.Location;
+import it.uniud.easyhome.network.Manufacturer;
+import it.uniud.easyhome.network.NetworkJobType;
+import it.uniud.easyhome.network.Node;
+import it.uniud.easyhome.network.NodeLogicalType;
+import it.uniud.easyhome.network.PersistentInfo;
 
 import java.util.List;
 

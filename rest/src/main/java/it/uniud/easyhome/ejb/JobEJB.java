@@ -1,5 +1,7 @@
-package it.uniud.easyhome.network;
+package it.uniud.easyhome.ejb;
 
+import it.uniud.easyhome.network.NetworkJob;
+import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.processing.NodeAnnceRegistrationProcess;
 
 import java.util.List;

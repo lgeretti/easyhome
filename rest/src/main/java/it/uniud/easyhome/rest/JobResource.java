@@ -1,5 +1,6 @@
 package it.uniud.easyhome.rest;
 
+import it.uniud.easyhome.ejb.JobEJB;
 import it.uniud.easyhome.network.*;
 import it.uniud.easyhome.processing.NetworkUpdateProcess;
 import it.uniud.easyhome.processing.NodeAnnceRegistrationProcess;
