@@ -574,13 +574,12 @@ function showFunctionality(functionality) {
     case 'LUMINOSITY_CONTROL':
     	
     	var htmlText;
+    
+    	htmlText += "<div class='eh_notch notch_button ui-widget-content ui-corner-all'><div>0%</div></div>"
     	
-    	for (i = 0; i<3; i++) {
+    	for (i = 0; i<8; i++) {
     		htmlText += "<div class='eh_notch blue_notch_button ui-widget-content ui-corner-all'></div>";
     	}
-        for (i = 3; i<9; i++) {
-            htmlText += "<div class='eh_notch notch_button ui-widget-content ui-corner-all'></div>";
-        }
     	
     	$("#eh_functionality_container")
     	  .css('left','65px').css('top','450px')
@@ -589,9 +588,22 @@ function showFunctionality(functionality) {
     	break;
     	
     case 'COLOR_CONTROL':
-    	
-    	$("#eh_functionality_container").html("<div class='ui-corner-all text'>Controllo colore</div>");
-    	$('#eh_functionality_container').show();
+
+        var htmlText;
+        
+        for (j =0; j<3; j++) {
+          htmlText += "<div><div class='eh_notch notch_button ui-widget-content ui-corner-all'><img height='150px' width='100px' src='img/G.svg' /></div>"
+          
+          for (i = 0; i<8; i++) {
+              htmlText += "<div class='eh_notch blue_notch_button ui-widget-content ui-corner-all'></div>";
+          }
+          htmlText += "</div>"
+        }
+        
+        $("#eh_functionality_container")
+          .css('left','65px').css('top','210px')
+          .html(htmlText)
+          .show();
         break;
         
     case 'PAIRING':
@@ -744,10 +756,6 @@ $(".arrow_button").hover(
       <img src="img/help.svg" alt="Aiuto contestuale"/>
     </div>
   </div>
-
-  <div id="eh_description_float">
-      <div id="eh_description_div" class="ui-corner-all text"></div>
-  </div>
  
   <div id="eh_selection_buttons_container">
 
@@ -777,6 +785,10 @@ $(".arrow_button").hover(
   </div>
   
   <div id="eh_functionality_container"></div>
+  
+  <div id="eh_description_float">
+      <div id="eh_description_div" class="ui-corner-all text"></div>
+  </div>
 
 </body>
 </html>
