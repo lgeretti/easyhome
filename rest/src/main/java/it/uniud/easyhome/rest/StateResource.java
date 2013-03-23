@@ -138,6 +138,74 @@ public final class StateResource {
     }    
     
     @POST
+    @Path("lamps/{id}/red")
+    public Response updateLampRedColor(@PathParam("id") long id,
+    								@FormParam("value") byte value) {
+    		
+    	LampState thisLamp = resEjb.findStateByInfoId(id,LampState.class);
+    	
+    	if (thisLamp == null)
+    		throw new WebApplicationException(Response.Status.NOT_FOUND);
+    	
+    	thisLamp.setRed(value);
+    	
+    	resEjb.updateManagedState(thisLamp);
+    	
+    	return Response.ok().build();
+    }   
+    
+    @POST
+    @Path("lamps/{id}/green")
+    public Response updateLampGreenColor(@PathParam("id") long id,
+    								@FormParam("value") byte value) {
+    		
+    	LampState thisLamp = resEjb.findStateByInfoId(id,LampState.class);
+    	
+    	if (thisLamp == null)
+    		throw new WebApplicationException(Response.Status.NOT_FOUND);
+    	
+    	thisLamp.setGreen(value);
+    	
+    	resEjb.updateManagedState(thisLamp);
+    	
+    	return Response.ok().build();
+    }   
+    
+    @POST
+    @Path("lamps/{id}/blue")
+    public Response updateLampBlueColor(@PathParam("id") long id,
+    								@FormParam("value") byte value) {
+    		
+    	LampState thisLamp = resEjb.findStateByInfoId(id,LampState.class);
+    	
+    	if (thisLamp == null)
+    		throw new WebApplicationException(Response.Status.NOT_FOUND);
+    	
+    	thisLamp.setBlue(value);
+    	
+    	resEjb.updateManagedState(thisLamp);
+    	
+    	return Response.ok().build();
+    }   
+    
+    @POST
+    @Path("lamps/{id}/white")
+    public Response updateLampLuminosity(@PathParam("id") long id,
+    								@FormParam("value") byte value) {
+    		
+    	LampState thisLamp = resEjb.findStateByInfoId(id,LampState.class);
+    	
+    	if (thisLamp == null)
+    		throw new WebApplicationException(Response.Status.NOT_FOUND);
+    	
+    	thisLamp.setWhite(value);
+    	
+    	resEjb.updateManagedState(thisLamp);
+    	
+    	return Response.ok().build();
+    }   
+    
+    @POST
     @Path("fridges/{id}")
     public Response updateFridgeLastCode(@PathParam("id") long id,
     								@FormParam("lastCode") FridgeCode lastCode) {
