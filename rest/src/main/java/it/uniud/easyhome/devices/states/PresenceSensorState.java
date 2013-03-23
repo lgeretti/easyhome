@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.*;
 @Table(name = "PresenceSensorState")
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class PresenceSensorState {
+public class PresenceSensorState implements DeviceState {
 	
 	@Id
     @OneToOne

@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.*;
 @Table(name = "FridgeState")
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class FridgeState {
+public class FridgeState implements DeviceState {
 	
 	@Id
     @OneToOne

@@ -29,6 +29,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import java.io.File;
 
+@Ignore
 public class SIPROGatewayTest {
 	
 	private static final String TARGET = "http://localhost:5000/";

@@ -8,10 +8,7 @@ import java.util.List;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -23,83 +20,47 @@ public class StateEJB {
 	@PersistenceContext(unitName = "EasyHome-JTA")
 	private EntityManager em;
 	
-	public List<LampState> getLampStates() {
-	
+	public <T> List<T> getStatesOfClass(Class<T> cls) {
 		
         CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<LampState> criteria = builder.createQuery(LampState.class);
-        Root<LampState> info = criteria.from(LampState.class);
+        CriteriaQuery<T> criteria = builder.createQuery(cls);
+        Root<T> info = criteria.from(cls);
         criteria.select(info);
         
-        TypedQuery<LampState> query = em.createQuery(criteria);
+        TypedQuery<T> query = em.createQuery(criteria);
         
-        return query.getResultList();
+        return query.getResultList();		
 	}
 	
-	public List<FridgeState> getFridgeStates() {
-	
+	public <T> T findStateByInfoId(long id, Class<T> cls) {
 		
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<FridgeState> criteria = builder.createQuery(FridgeState.class);
-        Root<FridgeState> info = criteria.from(FridgeState.class);
-        criteria.select(info);
-        
-        TypedQuery<FridgeState> query = em.createQuery(criteria);
-        
-        return query.getResultList();
+		PersistentInfo info = findPersistentInfoById(id);
+		
+		if (info == null)
+			return null;
+		
+		return em.find(cls, info);		
 	}
 	
 	public PersistentInfo findPersistentInfoById(long id) {
 		return em.find(PersistentInfo.class, id);
 	}
-	
-	public FridgeState findFridgeStateByInfoId(long id) {
-		
-		PersistentInfo info = findPersistentInfoById(id);
-		
-		if (info == null)
-			return null;
-		
-		return em.find(FridgeState.class, info);
-	}
-	
-	public LampState findLampStateByInfoId(long id) {
-		
-		PersistentInfo info = findPersistentInfoById(id);
-		
-		if (info == null)
-			return null;
-		
-		return em.find(LampState.class, info);
-	}
 
 	public void removeAllStates() {
-		removeLampStates();
-		removeFridgeStates();
+		removeStates(LampState.class);
+		removeStates(FridgeState.class);
+		removeStates(PresenceSensorState.class);
 	}
 	
-	private void removeLampStates() {
+	private <T> void removeStates(Class<T> cls) {
+		List<T> states = getStatesOfClass(cls);
 		
-		List<LampState> lampStates = getLampStates();
-		
-		for (LampState st : lampStates)
-			em.remove(st);
-	}
-	
-	private void removeFridgeStates() {
-		
-		List<FridgeState> fridgeStates = getFridgeStates();
-		
-		for (FridgeState st : fridgeStates)
-			em.remove(st);
+		for (T state : states)
+			em.remove(state);		
 	}
 
-	public void updateManagedLamp(LampState lamp) {
-		em.merge(lamp);
-	}
-	
-	public void updateManagedFridge(FridgeState fridge) {
-		em.merge(fridge);
+	public <T> void updateManagedState(T state) {
+		em.merge(state);
 	}
 
 	public boolean insertLampStateFrom(long infoId) {
@@ -127,6 +88,21 @@ public class StateEJB {
 		// We accept trying to create an already existing fridge, but we do not do anything (PUT semantics)
 		if (em.find(FridgeState.class, info.getId()) == null) {
 			em.persist(new FridgeState(info));
+		}
+		
+		return true;
+	}
+	
+	public boolean insertPresenceSensorStateFrom(long infoId) {
+		
+		PersistentInfo info = findPersistentInfoById(infoId);
+		
+		if (info == null)
+			return false;
+		
+		// We accept trying to create an already existing presence sensor, but we do not do anything (PUT semantics)
+		if (em.find(PresenceSensorState.class, info.getId()) == null) {
+			em.persist(new PresenceSensorState(info));
 		}
 		
 		return true;

@@ -1,24 +1,13 @@
 package it.uniud.easyhome.ejb;
 
-
-import it.uniud.easyhome.exceptions.MultipleNodesFoundException;
 import it.uniud.easyhome.network.Functionality;
 import it.uniud.easyhome.network.PersistentInfo;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Queue;
-import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
