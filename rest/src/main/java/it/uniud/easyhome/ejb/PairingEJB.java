@@ -51,7 +51,7 @@ public class PairingEJB {
 		Pairing pairing = em.find(Pairing.class, id);
 		
 		if (pairing != null) {
-			em.detach(pairing);
+			em.remove(pairing);
 			return true;
 		} else 
 			return false;

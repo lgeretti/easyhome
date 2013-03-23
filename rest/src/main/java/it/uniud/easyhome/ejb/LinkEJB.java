@@ -95,7 +95,7 @@ public class LinkEJB {
 		Link link = em.find(Link.class, id);
 		
 		if (link != null) {
-			em.detach(link);
+			em.remove(link);
 			return true;
 		} else 
 			return false;
