@@ -135,9 +135,56 @@ function selectionButtonHoverEffectIn(button) {
                     selectFunctionality(deviceFunctionalities[idx]);
                     break;
                 case uiState.Functionality:
-                    if (currentFunctionality.type == 'MOVE_ROOM' && functionalityOptions[idx].id != currentRoom.id) {
-                        moveCurrentDeviceTo(functionalityOptions[idx]);
-                    }
+                	
+                	switch (currentFunctionality.type) {
+                	case 'MOVE_ROOM':
+                		moveCurrentDeviceTo(functionalityOptions[idx]);
+                		break;
+                		
+                	case 'PAIRING':
+                		
+                		var currentPairing;
+                		try { 
+                		    currentPairing = $.parseJSON($.ajax({ 
+                              type: "GET",
+                              dataType: "json",
+                              url: host+"rest/pairings/"+currentDevice.id,
+                              async: false
+                            }).responseText);       
+                		} catch (err) { 
+                			currentPairing = false;
+                		}
+                		
+                		if (currentPairing) {
+                			$.ajax({ 
+                                type: "DELETE",
+                                url: host+"rest/pairings/"+currentDevice.id,
+                                async: false
+                              });
+                		}
+                		
+                		if (!currentPairing || currentPairing.destination.id != functionalityOptions[idx].id) {
+                    		$.ajax({ 
+                                  type: "POST",
+                                  data: "sourceId="+currentDevice.id+"&destinationId="+functionalityOptions[idx].id,
+                                  url: host+"rest/pairings",
+                                  async: false
+                            });
+                		}
+                		
+                		selectState(uiState.Device);
+                	    
+                		break;
+                        
+                    case 'LUMINOSITY_CONTROL':
+                        
+                        break;
+                		
+                	case 'COLOR_CONTROL':
+                		
+                		break;
+
+                	}
             }
         	
             button.stop().css('backgroundColor', grey);

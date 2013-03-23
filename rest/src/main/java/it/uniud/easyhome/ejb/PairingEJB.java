@@ -48,8 +48,8 @@ public class PairingEJB {
         return query.getResultList();
 	}
 	
-	public boolean removePairing(long id) {
-		Pairing pairing = em.find(Pairing.class, id);
+	public boolean removePairingBySourceId(long id) {
+		Pairing pairing = findPairingBySourceId(id);
 		
 		if (pairing != null) {
 			em.remove(pairing);

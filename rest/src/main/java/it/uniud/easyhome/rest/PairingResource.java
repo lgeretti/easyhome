@@ -68,7 +68,7 @@ public final class PairingResource {
     	boolean existed;
     	
     	synchronized(pairingLock) {
-        	existed = resEjb.removePairing(id);
+        	existed = resEjb.removePairingBySourceId(id);
     	}
     	
         if (!existed) {
