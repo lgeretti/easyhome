@@ -43,7 +43,7 @@
 
 var roomsLoaded = false;
 
-var host = "localhost";
+var host = "http://localhost:8080/easyhome/";
 
 var hoverTimeout;
 var hoverEffectTime = 1000;
@@ -256,7 +256,7 @@ function selectRoom(room,isEntryPoint) {
    $.ajax({ 
        type: "GET",
        dataType: "json",
-       url: "http://"+host+":8080/easyhome/rest/persistentinfo/?locationId="+roomId,
+       url: host+"rest/persistentinfo/?locationId="+roomId,
        success: function(data){        
           roomDevices = data;
 											
@@ -279,7 +279,7 @@ function selectDevice(device) {
    $.ajax({ 
        type: "GET",
        dataType: "json",
-       url: "http://"+host+":8080/easyhome/rest/functionalities/?deviceId="+deviceId,
+       url: host+"rest/functionalities/?deviceId="+deviceId,
        success: function(data){        
           deviceFunctionalities = data;
                                             
@@ -311,7 +311,7 @@ function getHomeRoomsPeriodically(isEntryPoint) {
    $.ajax({ 
        type: "GET",
        dataType: "json",
-       url: "http://"+host+":8080/easyhome/rest/locations",
+       url: host+"rest/locations",
        success: function(data){        
           homeRooms = data;
 
@@ -494,7 +494,7 @@ function moveCurrentDeviceTo(room) {
 	   $.ajax({ 
 	       type: "POST",
 	       data: "locationName="+room.name,
-	       url: "http://"+host+":8080/easyhome/rest/persistentinfo/"+currentDevice.gatewayId+"/"+currentDevice.nuid+"/changeLocation"
+	       url: host+"rest/persistentinfo/"+currentDevice.gatewayId+"/"+currentDevice.nuid+"/changeLocation"
 	   });  
 	
 	selectState(uiState.Device);
