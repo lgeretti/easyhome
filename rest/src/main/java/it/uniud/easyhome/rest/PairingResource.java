@@ -13,7 +13,6 @@ public final class PairingResource {
 	
     private PairingEJB resEjb;
     
-    private static long pairingId = 0;
     private static Object pairingLock = new Object();
 
     public PairingResource() throws NamingException {
@@ -35,25 +34,24 @@ public final class PairingResource {
     	if (source == null || destination == null)
 	    	throw new WebApplicationException(Response.Status.BAD_REQUEST);    		
     	
-    	synchronized(pairingLock) { 
-    		thisPairingId = ++pairingId;
+    	synchronized(pairingLock) {
     		
-    		resEjb.insertPairing(thisPairingId, source, destination);
+    		resEjb.insertPairing(source, destination);
     		
             return Response.created(
                     uriInfo.getAbsolutePathBuilder()
-                           .path(Long.toString(thisPairingId))
+                           .path(Long.toString(sourceId))
                            .build())
                   .build();
     	}
     }
-
+    
 	@GET
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Pairing getPairing(@PathParam("id") long id) {
         
-		Pairing pairing = resEjb.findPairingById(id);
+		Pairing pairing = resEjb.findPairingBySourceId(id);
         
         if (pairing == null) 
             throw new WebApplicationException(Response.Status.NOT_FOUND);

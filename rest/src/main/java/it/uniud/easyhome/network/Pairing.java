@@ -1,6 +1,5 @@
 package it.uniud.easyhome.network;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
@@ -16,7 +15,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Pairing {
 	
 	@Id
-	private long id;
 	@OneToOne
 	private PersistentInfo source;
 	@OneToOne
@@ -25,15 +23,10 @@ public class Pairing {
     @SuppressWarnings("unused")
 	private Pairing() { }
     
-    public Pairing(long id, PersistentInfo source, PersistentInfo destination) {
-        this.id = id;
+    public Pairing(PersistentInfo source, PersistentInfo destination) {
         this.source = source;
         this.destination = destination;
     }
-    
-	public long getId() {
-		return id;
-	}
 
     public PersistentInfo getSource() {
     	return source;
@@ -74,7 +67,6 @@ public class Pairing {
     @Override
     public int hashCode() {
         int hash = 1;
-        hash = (int)(hash * 31 + id);
         hash = hash * 31 + source.hashCode();
         hash = hash * 31 + destination.hashCode();
         return hash;

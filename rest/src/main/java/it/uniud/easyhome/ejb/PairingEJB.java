@@ -25,14 +25,15 @@ public class PairingEJB {
 		return em.find(PersistentInfo.class, id);
 	}
 	
-	public void insertPairing(long id, PersistentInfo source, PersistentInfo destination) {
-		Pairing pairing = new Pairing(id, source, destination);
+	public void insertPairing(PersistentInfo source, PersistentInfo destination) {
+		Pairing pairing = new Pairing(source, destination);
 		
 		em.persist(pairing);
 	}
 	
-	public Pairing findPairingById(long id) {
-		return em.find(Pairing.class, id);
+	public Pairing findPairingBySourceId(long sourceId) {
+		
+        return em.find(Pairing.class, sourceId);
 	}
 	
 	public List<Pairing> getPairings() {
