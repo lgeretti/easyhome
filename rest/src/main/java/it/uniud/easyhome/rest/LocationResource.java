@@ -1,5 +1,7 @@
 package it.uniud.easyhome.rest;
 
+import it.uniud.easyhome.devices.Location;
+import it.uniud.easyhome.devices.LocationType;
 import it.uniud.easyhome.ejb.LocationEJB;
 import it.uniud.easyhome.network.*;
 import it.uniud.easyhome.processing.NetworkUpdateProcess;

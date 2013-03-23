@@ -1,6 +1,10 @@
 package it.uniud.easyhome.rest;
 
 import it.uniud.easyhome.gateway.Gateway;
+import it.uniud.easyhome.devices.Functionality;
+import it.uniud.easyhome.devices.Location;
+import it.uniud.easyhome.devices.Pairing;
+import it.uniud.easyhome.devices.PersistentInfo;
 import it.uniud.easyhome.devices.states.*;
 import it.uniud.easyhome.network.*;
 

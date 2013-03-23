@@ -1,4 +1,5 @@
-package it.uniud.easyhome.network;
+package it.uniud.easyhome.devices;
+
 
 import java.io.Serializable;
 

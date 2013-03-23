@@ -9,11 +9,11 @@ import java.util.Map;
 
 import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.devices.HomeAutomationDevice;
+import it.uniud.easyhome.devices.Location;
+import it.uniud.easyhome.devices.LocationType;
+import it.uniud.easyhome.devices.Manufacturer;
 import it.uniud.easyhome.network.Link;
 import it.uniud.easyhome.network.LocalCoordinates;
-import it.uniud.easyhome.network.Location;
-import it.uniud.easyhome.network.LocationType;
-import it.uniud.easyhome.network.Manufacturer;
 import it.uniud.easyhome.network.NetworkJob;
 import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.network.Node;

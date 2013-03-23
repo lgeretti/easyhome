@@ -1,5 +1,7 @@
 package it.uniud.easyhome.rest;
 
+import it.uniud.easyhome.devices.Pairing;
+import it.uniud.easyhome.devices.PersistentInfo;
 import it.uniud.easyhome.ejb.PairingEJB;
 import it.uniud.easyhome.network.*;
 

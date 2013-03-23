@@ -1,4 +1,5 @@
-package it.uniud.easyhome.network;
+package it.uniud.easyhome.devices;
+
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.*;
@@ -20,7 +21,7 @@ public class PersistentInfo {
     @OneToOne
     private Location location;
     @Column
-    private FunctionalityContainerType funcContainerType;
+    private DeviceType deviceType;
     @Column
     private String imgPath;
     @Column
@@ -29,13 +30,13 @@ public class PersistentInfo {
     @SuppressWarnings("unused")
 	private PersistentInfo() {}
     
-    public PersistentInfo(long id, byte gatewayId, long nuid, String name, Location location, FunctionalityContainerType funcContainerType, String imgPath, String help) {
+    public PersistentInfo(long id, byte gatewayId, long nuid, String name, Location location, DeviceType deviceType, String imgPath, String help) {
     	this.id = id;
     	this.gatewayId = gatewayId;
     	this.nuid = nuid;
     	this.name = name;
     	this.location = location;
-    	this.funcContainerType = funcContainerType;
+    	this.deviceType = deviceType;
     	this.imgPath = imgPath;
     	this.help = help;
     }
@@ -68,8 +69,8 @@ public class PersistentInfo {
 		return this.location;
 	}
 	
-	public FunctionalityContainerType getDeviceType() {
-		return this.funcContainerType;
+	public DeviceType getDeviceType() {
+		return this.deviceType;
 	}
 	
 	public String getImgPath() {

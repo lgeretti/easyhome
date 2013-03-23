@@ -1,6 +1,6 @@
 package it.uniud.easyhome.devices.states;
 
-import it.uniud.easyhome.network.PersistentInfo;
+import it.uniud.easyhome.devices.PersistentInfo;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.*;
@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.*;
 @Table(name = "LampState")
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class LampState {
+public class LampState implements DeviceState {
 	
 	@Id
     @OneToOne

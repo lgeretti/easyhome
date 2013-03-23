@@ -1,5 +1,8 @@
 package it.uniud.easyhome.rest;
 
+import it.uniud.easyhome.devices.DeviceType;
+import it.uniud.easyhome.devices.Location;
+import it.uniud.easyhome.devices.PersistentInfo;
 import it.uniud.easyhome.ejb.PersistentInfoEJB;
 import it.uniud.easyhome.network.*;
 
@@ -27,12 +30,20 @@ public final class PersistentInfoResource {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<PersistentInfo> getInfosByLocation(@QueryParam("locationId") int locationId) {
+    public List<PersistentInfo> getPersistentInfos(@QueryParam("locationId") int locationId,
+    											   @QueryParam("deviceType") DeviceType deviceType) {
     	
-    	if (locationId == 0)
-    		return resEjb.getPersistentInfos();
+    	// Just for lazyness of not implementing both filters
+    	if (locationId != 0 && deviceType != null)
+    		throw new WebApplicationException(Response.Status.BAD_REQUEST);
     	
-        return resEjb.getPersistentInfosByLocationId(locationId);
+    	if (locationId != 0)
+    		return resEjb.getPersistentInfosByLocationId(locationId);
+    	
+    	if (deviceType != null)
+    		return resEjb.getPersistentInfosByDeviceType(deviceType);
+    	
+        return resEjb.getPersistentInfos();
     }
     
     @GET
@@ -55,12 +66,12 @@ public final class PersistentInfoResource {
     											@PathParam("nuid") long nuid, 
     								  			@FormParam("name") String name, 
     								  			@FormParam("locationName") String locationName,
-    								  			@FormParam("deviceType") FunctionalityContainerType funcContainerType,
+    								  			@FormParam("deviceType") DeviceType funcContainerType,
     								  			@FormParam("imgPath") String imgPath,
     								  			@FormParam("help") String help) {
     	
     	if (funcContainerType == null)
-    		funcContainerType = FunctionalityContainerType.NONE;
+    		funcContainerType = DeviceType.NONE;
     	
     	synchronized(infoLock) {
     		

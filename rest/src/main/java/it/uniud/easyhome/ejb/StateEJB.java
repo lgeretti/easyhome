@@ -1,8 +1,8 @@
 package it.uniud.easyhome.ejb;
 
 
+import it.uniud.easyhome.devices.PersistentInfo;
 import it.uniud.easyhome.devices.states.*;
-import it.uniud.easyhome.network.PersistentInfo;
 
 import java.util.List;
 

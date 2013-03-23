@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import it.uniud.easyhome.common.*;
 import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.devices.HomeAutomationDevice;
-import it.uniud.easyhome.network.Manufacturer;
+import it.uniud.easyhome.devices.Manufacturer;
 import it.uniud.easyhome.network.LocalCoordinates;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.GlobalCoordinates;

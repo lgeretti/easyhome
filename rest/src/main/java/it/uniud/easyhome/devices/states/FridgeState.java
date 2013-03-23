@@ -1,6 +1,6 @@
 package it.uniud.easyhome.devices.states;
 
-import it.uniud.easyhome.network.PersistentInfo;
+import it.uniud.easyhome.devices.PersistentInfo;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.*;

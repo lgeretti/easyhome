@@ -1,10 +1,11 @@
 package it.uniud.easyhome.ejb;
 
 
-import it.uniud.easyhome.network.Location;
+import it.uniud.easyhome.devices.DeviceType;
+import it.uniud.easyhome.devices.Location;
+import it.uniud.easyhome.devices.PersistentInfo;
 import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.network.NodeLogicalType;
-import it.uniud.easyhome.network.PersistentInfo;
 
 import java.util.List;
 
@@ -171,6 +172,17 @@ public class PersistentInfoEJB {
         CriteriaQuery<PersistentInfo> criteria = builder.createQuery(PersistentInfo.class);
         Root<PersistentInfo> info = criteria.from(PersistentInfo.class);
         criteria.select(info).where(builder.equal(info.get("location").get("id"), locationId));
+        
+        TypedQuery<PersistentInfo> query = em.createQuery(criteria);
+		
+		return query.getResultList();
+	}
+
+	public List<PersistentInfo> getPersistentInfosByDeviceType(DeviceType deviceType) {
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<PersistentInfo> criteria = builder.createQuery(PersistentInfo.class);
+        Root<PersistentInfo> info = criteria.from(PersistentInfo.class);
+        criteria.select(info).where(builder.equal(info.get("deviceType"), deviceType));
         
         TypedQuery<PersistentInfo> query = em.createQuery(criteria);
 		

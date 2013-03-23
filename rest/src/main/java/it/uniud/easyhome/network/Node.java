@@ -9,6 +9,8 @@ import java.util.Map;
 import it.uniud.easyhome.common.ConcreteClassBuilder;
 import it.uniud.easyhome.devices.DeviceIdentifier;
 import it.uniud.easyhome.devices.HomeAutomationDevice;
+import it.uniud.easyhome.devices.Location;
+import it.uniud.easyhome.devices.Manufacturer;
 import it.uniud.easyhome.exceptions.EndpointNotFoundException;
 import it.uniud.easyhome.exceptions.InvalidNodeTypeException;
 import it.uniud.easyhome.exceptions.NodeConstructionException;

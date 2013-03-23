@@ -1,4 +1,4 @@
-package it.uniud.easyhome.network;
+package it.uniud.easyhome.devices;
 
 public enum FunctionalityType {
 

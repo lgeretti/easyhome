@@ -5,6 +5,9 @@ import static org.junit.Assert.*;
 import java.util.List;
 
 import it.uniud.easyhome.common.JsonUtils;
+import it.uniud.easyhome.devices.Location;
+import it.uniud.easyhome.devices.LocationType;
+import it.uniud.easyhome.devices.PersistentInfo;
 import it.uniud.easyhome.network.*;
 
 import javax.ws.rs.core.MediaType;

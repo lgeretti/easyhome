@@ -1,5 +1,8 @@
 package it.uniud.easyhome.rest;
 
+import it.uniud.easyhome.devices.Functionality;
+import it.uniud.easyhome.devices.FunctionalityType;
+import it.uniud.easyhome.devices.PersistentInfo;
 import it.uniud.easyhome.ejb.FunctionalityEJB;
 import it.uniud.easyhome.network.*;
 
@@ -28,9 +31,16 @@ public final class FunctionalityResource {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Functionality> getFunctionalitiesByDeviceId(@QueryParam("deviceId") long deviceId) {
+    public List<Functionality> getFunctionalities(@QueryParam("deviceId") long deviceId,
+    											  @QueryParam("functionalityType") FunctionalityType funcType) {
     	
-        return resEjb.getFunctionalitiesByDeviceId(deviceId);
+    	if (deviceId != 0)
+    		return resEjb.getFunctionalitiesByDeviceId(deviceId);
+    	
+    	if (funcType != null)
+    		return resEjb.getFunctionalitiesByFunctionalityType(funcType);
+    	else
+    		return resEjb.getFunctionalities();
     }
     
     // curl -X POST http://localhost:8080/easyhome/rest/functionalities -H "Content-Type: application/x-www-form-urlencoded" --data-binary "name=Link&deviceId=2&imgPath='img/link.svg'&help='Seleziona il dispositivo da linkare alla lampada'" 

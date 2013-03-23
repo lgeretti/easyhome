@@ -1,7 +1,7 @@
 package it.uniud.easyhome.ejb;
 
-import it.uniud.easyhome.network.Location;
-import it.uniud.easyhome.network.LocationType;
+import it.uniud.easyhome.devices.Location;
+import it.uniud.easyhome.devices.LocationType;
 
 import java.util.List;
 
