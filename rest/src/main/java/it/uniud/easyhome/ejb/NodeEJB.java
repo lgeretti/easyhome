@@ -213,7 +213,7 @@ public class NodeEJB {
 	private List<Node> getMissingNodes() {
 		
 		StringBuilder queryBuilder = new StringBuilder("SELECT n1 FROM Node n1 WHERE ")
-												.append("n1.logicalType <> :clt AND ")
+												.append("n1.logicalType <> :clt AND n1.permanent = FALSE AND ")
 												.append("(n1.manufacturer=:m1 OR n1.manufacturer=:m2) AND ")
 												.append("n1.id NOT IN (")
 												.append("SELECT DISTINCT n2.id FROM Node n2, Link l WHERE ")

@@ -4,6 +4,8 @@ public enum Manufacturer {
 
 	DIGI ((short)0x101E), 
 	UNDEFINED ((short)0x0), // Not previously defined, like before being collected from the node
+	CRP ((short)0x1), 
+	ELECTROLUX ((short)0x2),
 	OTHER ((short)0xFFFF); // Defined but not within this enumeration
 	
 	private short code;

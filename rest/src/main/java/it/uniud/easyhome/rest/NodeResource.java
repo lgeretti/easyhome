@@ -66,7 +66,8 @@ public final class NodeResource {
     						   @FormParam("logicalType") NodeLogicalType logicalType,
     						   @FormParam("manufacturer") Manufacturer manufacturer,
     						   @FormParam("locationName") String locationName,
-    						   @FormParam("name") String name) {
+    						   @FormParam("name") String name,
+    						   @FormParam("permanent") boolean permanent) {
     	
     	boolean existed = false;
     	
@@ -74,7 +75,7 @@ public final class NodeResource {
     		
     		long newNodeId = nodeId + 1;
     		
-    		Node.Builder nodeBuilder = new Node.Builder(newNodeId,gatewayId,nuid,address);
+    		Node.Builder nodeBuilder = new Node.Builder(newNodeId,gatewayId,nuid,address).setPermanent(permanent);
 					   
     		if (locationName != null) {
     			Location loc = resEjb.getLocation(locationName);

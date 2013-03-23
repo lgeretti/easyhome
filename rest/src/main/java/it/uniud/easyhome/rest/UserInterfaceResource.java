@@ -1,7 +1,9 @@
 package it.uniud.easyhome.rest;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 import it.uniud.easyhome.common.ByteUtils;
@@ -11,6 +13,7 @@ import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.devices.DeviceType;
 import it.uniud.easyhome.devices.FunctionalityType;
+import it.uniud.easyhome.devices.HomeAutomationDevice;
 import it.uniud.easyhome.devices.LocationType;
 import it.uniud.easyhome.devices.Manufacturer;
 import it.uniud.easyhome.devices.PersistentInfo;
@@ -41,6 +44,7 @@ import org.codehaus.jettison.json.JSONException;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 @Path(RestPaths.ADMIN)
@@ -192,6 +196,8 @@ public class UserInterfaceResource {
 	    	
 	        MultivaluedMap<String,String> formData;
 	        ClientResponse response;
+	        Node node;
+	        List<Byte> endpoints;
 	        
 	        // Locations
 	        
@@ -419,7 +425,60 @@ public class UserInterfaceResource {
 	        client.resource(TARGET).path(RestPaths.STATES).path("sensors").path("presence").path(Long.toString(lampadaSalottoId)).put(ClientResponse.class);
 	        client.resource(TARGET).path(RestPaths.STATES).path("sensors").path("presence").path(Long.toString(lampadaCameraId)).put(ClientResponse.class);
 	        
-	    	
+	        // Nodes for the powerline subnetwork
+	        
+	        formData = new MultivaluedMapImpl();
+            formData.add("gatewayId",Byte.toString((byte)3));
+            formData.add("nuid",Long.toString(424752L));
+            formData.add("address",Short.toString((short)4752));
+            formData.add("permanent",Boolean.toString(true));
+            client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+            response = client.resource(TARGET).path(RestPaths.NODES).path(Byte.toString((byte)3)).path(Short.toString((short)4752)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+            node = JsonUtils.getFrom(response, Node.class);
+            endpoints = new ArrayList<Byte>();
+            endpoints.add((byte)1);
+            endpoints.add((byte)2);
+            node.setLogicalType(NodeLogicalType.END_DEVICE)
+            	.setManufacturer(Manufacturer.CRP)
+            	.setEndpoints(endpoints)
+            	.addDevice((byte)1, HomeAutomationDevice.COLOR_DIMMABLE_LIGHT)
+            	.addDevice((byte)2, HomeAutomationDevice.OCCUPANCY_SENSOR);
+            client.resource(TARGET).path(RestPaths.NODES).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
+            
+	        formData = new MultivaluedMapImpl();
+            formData.add("gatewayId",Byte.toString((byte)3));
+            formData.add("nuid",Long.toString(524742L));
+            formData.add("address",Short.toString((short)4742));
+            formData.add("permanent",Boolean.toString(true));
+            client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+            response = client.resource(TARGET).path(RestPaths.NODES).path(Byte.toString((byte)3)).path(Short.toString((short)4742)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+            node = JsonUtils.getFrom(response, Node.class);
+            endpoints = new ArrayList<Byte>();
+            endpoints.add((byte)1);
+            endpoints.add((byte)2);
+            node.setLogicalType(NodeLogicalType.END_DEVICE)
+            	.setManufacturer(Manufacturer.CRP)
+            	.setEndpoints(endpoints)
+            	.addDevice((byte)1, HomeAutomationDevice.COLOR_DIMMABLE_LIGHT)
+            	.addDevice((byte)2, HomeAutomationDevice.OCCUPANCY_SENSOR);
+            client.resource(TARGET).path(RestPaths.NODES).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
+            
+	        formData = new MultivaluedMapImpl();
+            formData.add("gatewayId",Byte.toString((byte)3));
+            formData.add("nuid",Long.toString(101010L));
+            formData.add("address",Short.toString((short)1010));
+            formData.add("permanent",Boolean.toString(true));
+            client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+            response = client.resource(TARGET).path(RestPaths.NODES).path(Byte.toString((byte)3)).path(Short.toString((short)1010)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+            node = JsonUtils.getFrom(response, Node.class);
+            endpoints = new ArrayList<Byte>();
+            endpoints.add((byte)1);
+            node.setLogicalType(NodeLogicalType.END_DEVICE)
+            	.setManufacturer(Manufacturer.ELECTROLUX)
+            	.setEndpoints(endpoints)
+            	.addDevice((byte)1, HomeAutomationDevice.SIMPLE_SENSOR);
+            client.resource(TARGET).path(RestPaths.NODES).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
+            
     	} catch (JSONException ex) {
     		down();
     		throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);

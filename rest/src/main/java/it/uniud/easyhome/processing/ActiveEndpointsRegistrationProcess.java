@@ -79,7 +79,7 @@ public class ActiveEndpointsRegistrationProcess extends Process {
 				        		node.setEndpoints(activeEps);
 				        		
 				                updateResponse = restResource.path(RestPaths.NODES).path("update")
-				                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);			        			
+				                		.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);		
 			        		}
 		        		}
 		                if (nodeResponse.getClientResponseStatus() == ClientResponse.Status.OK) {

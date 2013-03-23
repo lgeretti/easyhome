@@ -38,6 +38,8 @@ public class Node {
     private Manufacturer manufacturer;
     @Column
     private byte powerLevel;
+    @Column
+    private boolean permanent;
     
     @Embedded
     @ElementCollection
@@ -51,16 +53,24 @@ public class Node {
 
     private Node() {}
     
-    public void setLogicalType(NodeLogicalType logicalType) {
+    public Node setLogicalType(NodeLogicalType logicalType) {
     	this.logicalType = logicalType;
+    	return this;
     }
     
-    public void setManufacturer(Manufacturer manufacturer) {
+    public Node setManufacturer(Manufacturer manufacturer) {
     	this.manufacturer = manufacturer;
+    	return this;
     }
     
-    public void setPowerLevel(byte powerLevel) {
+    public Node setPowerLevel(byte powerLevel) {
     	this.powerLevel = powerLevel;
+    	return this;
+    }
+    
+    public Node setPermanent(boolean permanent) {
+    	this.permanent = permanent;
+    	return this;
     }
     
     public void addNeighbor(Node node) {
@@ -71,14 +81,15 @@ public class Node {
 		this.neighbors = neighbors;
 	}
     
-	public void setEndpoints(List<Byte> endpoints) {
+	public Node setEndpoints(List<Byte> endpoints) {
 		this.devices.clear();
 		for (Byte ep : endpoints) {
 			this.devices.add(new DeviceIdentifier(ep,HomeAutomationDevice.UNKNOWN));
 		}
+		return this;
 	}
 	
-	public synchronized void addDevice(byte endpoint, HomeAutomationDevice device) {
+	public synchronized Node addDevice(byte endpoint, HomeAutomationDevice device) {
 		short epIndex = -1;
 		for (short i=0; i<devices.size(); i++) {
 			if (devices.get(i).getEndpoint() == endpoint) {
@@ -91,15 +102,18 @@ public class Node {
 			throw new EndpointNotFoundException();
 			
 		devices.get(epIndex).setDevice(device);
+		return this;
 	}
 	
 
-	public void setName(String name) {
+	public Node setName(String name) {
 		this.name = name;
+		return this;
 	}
 	
-	public void setLocation(Location location) {
+	public Node setLocation(Location location) {
 		this.location = location;
+		return this;
 	}
 
     public static class Builder implements ConcreteClassBuilder<Node> {
@@ -134,6 +148,11 @@ public class Node {
         	return this;
         }
         
+        public Builder setPermanent(boolean permanent) {
+        	node.permanent = permanent;
+        	return this;
+        }
+        
         public Node build() {
         	
         	if (node.coordinates.getGatewayId() == 0)
@@ -152,6 +171,10 @@ public class Node {
     
     public String getName() {
         return this.name;
+    }
+    
+    public boolean isPermanent() {
+    	return this.permanent;
     }
     
     public GlobalCoordinates getCoordinates() {

@@ -26,6 +26,8 @@ public class LampState implements DeviceState {
     private byte white;
     @Column
     private ColoredAlarm alarm;
+    @Column
+    private long lastUpdate;
     
     @SuppressWarnings("unused")
 	private LampState() {}
@@ -33,6 +35,7 @@ public class LampState implements DeviceState {
     public LampState(PersistentInfo device) {
     	this.device = device;
     	this.alarm = ColoredAlarm.NONE;
+    	this.lastUpdate = 0; // Conveniently set as the beginning of UNIX time
     }
     
 	public PersistentInfo getDevice() {
@@ -63,6 +66,10 @@ public class LampState implements DeviceState {
 		return alarm;
 	}
 	
+	public long getLastUpdate() {
+		return this.lastUpdate;
+	}
+	
     public LampState setOnline(boolean val) {
     	this.online = val;
     	return this;
@@ -90,6 +97,11 @@ public class LampState implements DeviceState {
 	
 	public LampState setAlarm(ColoredAlarm val) {
 		alarm = val;
+		return this;
+	}
+	
+	public LampState update() {
+		this.lastUpdate = System.currentTimeMillis();
 		return this;
 	}
 	
