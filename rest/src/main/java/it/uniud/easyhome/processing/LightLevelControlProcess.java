@@ -10,6 +10,7 @@ import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.devices.Location;
 import it.uniud.easyhome.devices.Manufacturer;
 import it.uniud.easyhome.devices.PersistentInfo;
+import it.uniud.easyhome.devices.states.LampState;
 import it.uniud.easyhome.exceptions.InvalidNodeLogicalTypeException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.LocalCoordinates;
@@ -76,18 +77,35 @@ public class LightLevelControlProcess extends Process {
 	        			int levelPercentage = levelControlPkt.getLevelPercentage();
 	        			log(LogLevel.DEBUG, "Level percentage " + levelPercentage + "% event recognized");
 	        			
-		        		ClientResponse getResponse = restResource.path(RestPaths.NODES).path(Byte.toString(gatewayId)).path(Short.toString(address))
+		        		ClientResponse getNodeResponse = restResource.path(RestPaths.NODES).path(Byte.toString(gatewayId)).path(Short.toString(address))
 								 .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 
-						if (getResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
+						if (getNodeResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
 							
-							NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.LEVEL_CONTROL_VARIATION, 
-    								gatewayId, address,new byte[]{(byte)(levelPercentage & 0x0FF)});
-					        try {
-					            ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
-					            networkEventsProducer.send(eventMessage);
-					        } catch (JMSException ex) { }
+			        		Node node = JsonUtils.getFrom(getNodeResponse, Node.class);
+							
+			        		ClientResponse getInfoResponse = restResource.path(RestPaths.PERSISTENTINFO)
+			        										.path(Byte.toString(gatewayId)).path(Long.toString(node.getCoordinates().getNuid()))
+			        										.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);		
+			        		PersistentInfo info = JsonUtils.getFrom(getInfoResponse, PersistentInfo.class);
+			        		
+			        		// GET THE PAIRED LAMP FIRST!
+			        		
+			        		ClientResponse getLampStateResponse = restResource.path(RestPaths.STATES).path("lamps").path(Long.toString(info.getId()))
+															.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+			        		LampState state = JsonUtils.getFrom(getLampStateResponse, LampState.class);
+	
+			        		byte previousVal = state.getWhite();
+			        		int newVal = Math.max(0, Math.min(100, previousVal * (100+levelPercentage)/100));
 						
+			        		log(LogLevel.DEBUG, "Level modified from " + previousVal + " to " + newVal);
+			        		
+			        		MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+			                formData.add("value",Byte.toString((byte)(newVal & 0xFF)));
+			                
+			                restResource.path(RestPaths.STATES).path("lamps").path(Long.toString(info.getId())).path("white")
+			                			.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+			        		
 						} else
 					    	log(LogLevel.DEBUG, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
 	        		}

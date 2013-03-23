@@ -83,6 +83,8 @@ public class OccupancySensingRegistrationProcess extends Process {
 		        				
 		        				location.setOccupied(occupied);
 				                restResource.path(RestPaths.LOCATIONS).path(Integer.toString(location.getId())).path("occupied").post(ClientResponse.class);
+				                restResource.path(RestPaths.STATES).path("sensors").path("presence").path(Integer.toString(location.getId())).path("occupied").post(ClientResponse.class);
+				                
 				                log(LogLevel.INFO, location + " is " + (occupied ? "" : "not ") + "occupied");
 		        			}
 			                

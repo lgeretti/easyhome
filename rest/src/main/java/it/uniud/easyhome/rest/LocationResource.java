@@ -78,7 +78,7 @@ public final class LocationResource {
         return loc;
     }
 	
-	@POST
+	@PUT
     @Path("{id}/occupied")
     @Produces(MediaType.APPLICATION_JSON)
     public Response setOccupied(@PathParam("id") int id) {
@@ -95,7 +95,7 @@ public final class LocationResource {
         return Response.ok().build();
     }
 	
-	@POST
+	@PUT
     @Path("{id}/unoccupied")
     @Produces(MediaType.APPLICATION_JSON)
     public Response setUnoccupied(@PathParam("id") int id) {

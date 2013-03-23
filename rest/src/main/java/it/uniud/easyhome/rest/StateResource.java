@@ -8,6 +8,8 @@ import it.uniud.easyhome.network.*;
 import java.util.List;
 import java.util.Set;
 
+import javax.jms.JMSException;
+import javax.jms.ObjectMessage;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.ws.rs.core.*;
@@ -222,17 +224,32 @@ public final class StateResource {
     	return Response.ok().build();
     }
     
-    @POST
-    @Path("sensors/presence/{id}")
-    public Response updatePresenceSensorOccupation(@PathParam("id") long id,
-    								@FormParam("occupied") boolean occupied) {
+    @PUT
+    @Path("sensors/presence/{id}/occupied")
+    public Response updatePresenceSensorOccupied(@PathParam("id") long id) {
     		
     	PresenceSensorState thisSensor = resEjb.findStateByInfoId(id,PresenceSensorState.class);
     	
     	if (thisSensor == null)
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
     	
-    	thisSensor.setOccupied(occupied);
+    	thisSensor.setOccupied(true);
+    	
+    	resEjb.updateManagedState(thisSensor);
+    	
+    	return Response.ok().build();
+    }
+    
+    @PUT
+    @Path("sensors/presence/{id}/unoccupied")
+    public Response updatePresenceSensorUnoccupied(@PathParam("id") long id) {
+    		
+    	PresenceSensorState thisSensor = resEjb.findStateByInfoId(id,PresenceSensorState.class);
+    	
+    	if (thisSensor == null)
+    		throw new WebApplicationException(Response.Status.NOT_FOUND);
+    	
+    	thisSensor.setOccupied(false);
     	
     	resEjb.updateManagedState(thisSensor);
     	
@@ -248,4 +265,16 @@ public final class StateResource {
         
         return Response.ok().build();
     }
+    
+    /*
+    private sendUpdateMessage() {
+    	
+		NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.LEVEL_CONTROL_VARIATION, 
+				gatewayId, address,new byte[]{(byte)(levelPercentage & 0x0FF)});
+        try {
+            ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
+            networkEventsProducer.send(eventMessage);
+        } catch (JMSException ex) { }
+    }
+    */
 }
