@@ -46,7 +46,7 @@ var roomsLoaded = false;
 var grey = "#444444";
 var blue = "#36609f";
 
-var host = "http://localhost:8080/easyhome/";
+var host = "";//http://localhost:8080/easyhome/";
 
 var hoverTimeout;
 var hoverEffectTime = 1000;
@@ -697,7 +697,7 @@ function showFunctionality(functionality) {
     
     case 'LUMINOSITY_CONTROL':
     	
-    	var htmlText = "<div id='0' class='eh_notch grey_notch_button white_notch ui-widget-content ui-corner-all'><img height='150px' width='100px' src='img/L.svg' /></div>";
+    	var htmlText = "<div id='0' class='eh_notch grey_notch_button white_notch ui-widget-content ui-corner-all'><img height='150px' width='100px' src='img/0.svg' /></div>";
     	
         var lampState = $.parseJSON($.ajax({ 
             type: "GET",
