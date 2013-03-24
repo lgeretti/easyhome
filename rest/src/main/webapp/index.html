@@ -596,6 +596,8 @@ function getAltMessage(selection) {
 function showSelections(selections) {
 
   	var firstSelection, secondSelection, thirdSelection;
+  	
+  	var selectionsAreDevices = (currentState == uiState.Room || (currentState == uiState.Functionality && currentFunctionality.type == 'PAIRING'));
 
 	if (lowSelectionIndex == 0)
 		$("#eh_arrow_left").css('visibility','hidden');
@@ -620,7 +622,7 @@ function showSelections(selections) {
 		  });
 		  var button = $("#eh_selection_center");
 		  button.css('visibility','visible');
-		  var loc = (currentState == uiState.Room ? selections[0].info : selections[0]);
+		  var loc = (selectionsAreDevices ? selections[0].info : selections[0]);
 	  	  button.find('img').attr('id',0).attr('alt',getAltMessage(loc)).attr('src',loc.imgPath);
 	  	  break;
 	  			
@@ -633,11 +635,11 @@ function showSelections(selections) {
 		  });
 					
 		  var button = $("#eh_selection_left");
-		  var loc = (currentState == uiState.Room ? selections[0].info : selections[0]);
+		  var loc = (selectionsAreDevices ? selections[0].info : selections[0]);
 	  	  button.find('img').attr('id',0).attr('alt',getAltMessage(loc)).attr('src',loc.imgPath);						
 					
 		  button = $("#eh_selection_right");
-		  var loc = (currentState == uiState.Room ? selections[1].info : selections[1]);
+		  var loc = (selectionsAreDevices ? selections[1].info : selections[1]);
 	  	  button.find('img').attr('id',1).attr('alt',getAltMessage(loc)).attr('src',loc.imgPath);
 	      break;		  	
 							  	
@@ -648,15 +650,15 @@ function showSelections(selections) {
 		  });	
 					
 		  var button = $("#eh_selection_left");
-		  var loc = (currentState == uiState.Room ? selections[lowSelectionIndex].info : selections[lowSelectionIndex]);
+		  var loc = (selectionsAreDevices ? selections[lowSelectionIndex].info : selections[lowSelectionIndex]);
 	  	  button.find('img').attr('id',lowSelectionIndex).attr('alt',getAltMessage(loc)).attr('src',loc.imgPath);						
 					
 		  button = $("#eh_selection_center");
-		  var loc = (currentState == uiState.Room ? selections[lowSelectionIndex+1].info : selections[lowSelectionIndex+1]);
+		  var loc = (selectionsAreDevices ? selections[lowSelectionIndex+1].info : selections[lowSelectionIndex+1]);
 	  	  button.find('img').attr('id',lowSelectionIndex+1).attr('alt',getAltMessage(loc)).attr('src',loc.imgPath);
 	  	  	
 		  button = $("#eh_selection_right");
-		  var loc = (currentState == uiState.Room ? selections[lowSelectionIndex+2].info : selections[lowSelectionIndex+2]);
+		  var loc = (selectionsAreDevices ? selections[lowSelectionIndex+2].info : selections[lowSelectionIndex+2]);
 	  	  button.find('img').attr('id',lowSelectionIndex+2).attr('alt',getAltMessage(loc)).attr('src',loc.imgPath);
 	  	  			  	  	
 	  	  break;
@@ -801,11 +803,11 @@ function showFunctionality(functionality) {
   	    for (i = 0; i<functionalityOptions.length;i++) {
   	    	var destination = functionalityOptions[i];
             if (currentPairing && currentPairing.destination.id == destination.id) {
-                	destination.name = "Disassocia da " + destination.name;
-                	destination.imgPath = "img/cancel.svg";
+                	destination.info.name = "Disassocia da " + destination.info.name;
+                	destination.info.imgPath = "img/cancel.svg";
             } else
-                destination.name = "Associa con " + destination.name;
-  	    	destination.name += " in " + destination.location.name;
+                destination.info.name = "Associa con " + destination.info.name;
+  	    	destination.info.name += " in " + destination.info.location.name;
 
   	    }
         

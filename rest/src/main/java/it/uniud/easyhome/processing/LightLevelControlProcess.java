@@ -86,13 +86,8 @@ public class LightLevelControlProcess extends Process {
 						if (getNodeResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
 							
 			        		Node node = JsonUtils.getFrom(getNodeResponse, Node.class);
-							
-			        		ClientResponse getInfoResponse = restResource.path(RestPaths.PERSISTENTINFO)
-			        										.path(Byte.toString(gatewayId)).path(Long.toString(node.getCoordinates().getNuid()))
-			        										.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);		
-			        		PersistentInfo info = JsonUtils.getFrom(getInfoResponse, PersistentInfo.class);
 			        		
-			        		ClientResponse getPairingResponse = restResource.path(RestPaths.PAIRINGS).path(Long.toString(info.getId()))
+			        		ClientResponse getPairingResponse = restResource.path(RestPaths.PAIRINGS).path(Long.toString(node.getId()))
 															.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 			        		
 			        		if (getPairingResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
