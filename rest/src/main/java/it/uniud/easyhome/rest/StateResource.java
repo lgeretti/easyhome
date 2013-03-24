@@ -3,6 +3,7 @@ package it.uniud.easyhome.rest;
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.devices.states.*;
 import it.uniud.easyhome.ejb.StateEJB;
+import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.packets.natives.LampStateSetPacket;
 
 import java.util.List;
@@ -121,17 +122,46 @@ public final class StateResource {
     
     @POST
     @Path("sensors/presence/{id}")
-    public Response updatePresenceSensorFromDevice(@PathParam("id") long id,
-    								@FormParam("on") boolean on,
-    								@FormParam("identifier") String identifier,
-    								@FormParam("occupied") boolean occupied) {
+    public Response updatePresenceSensor(@PathParam("id") long id,
+    									@FormParam("online") boolean online,
+    									@FormParam("identifier") String identifier,
+    									@FormParam("occupied") boolean occupied) {
     		
     	PresenceSensorState thisPresenceSensor = resEjb.findStateByInfoId(id,PresenceSensorState.class);
     	
     	if (thisPresenceSensor == null)
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
     	
-    	thisPresenceSensor.setOnline(on)
+    	thisPresenceSensor.setOnline(online)
+    			.setIdentifier(identifier)
+    			.setOccupied(occupied);
+    	
+    	resEjb.updateManagedState(thisPresenceSensor);
+    	
+    	// We do not send back the update request to the device, since the information came from there
+    	// FIXME: if we want, some time in the future, change more than one parameter at once, we must discriminate the source
+    	
+    	return Response.ok().build();
+    }  
+    
+    @POST
+    @Path("sensors/presence")
+    public Response updatePresenceSensorFromDevice(@FormParam("gatewayId") byte gatewayId,
+    											   @FormParam("nuid") long nuid,
+				    								@FormParam("online") boolean online,
+				    								@FormParam("identifier") String identifier,
+				    								@FormParam("occupied") boolean occupied) {
+    		
+    	Node node = resEjb.findNodeByGatewayIdAndNuid(gatewayId, nuid);
+    	if (node == null)
+    		throw new WebApplicationException(Response.Status.BAD_REQUEST);    	
+    	
+    	PresenceSensorState thisPresenceSensor = resEjb.findStateByInfoId(node.getId(),PresenceSensorState.class);
+    	
+    	if (thisPresenceSensor == null)
+    		throw new WebApplicationException(Response.Status.NOT_FOUND);
+    	
+    	thisPresenceSensor.setOnline(online)
     			.setIdentifier(identifier)
     			.setOccupied(occupied);
     	
@@ -145,17 +175,46 @@ public final class StateResource {
     
     @POST
     @Path("fridges/{id}")
-    public Response updateFridgeFromDevice(@PathParam("id") long id,
-    								@FormParam("on") boolean on,
-    								@FormParam("identifier") String identifier,
-    								@FormParam("lastCode") FridgeCode lastCode) {
+    public Response updateFridge(@PathParam("id") long id,
+    							 @FormParam("online") boolean online,
+    							 @FormParam("identifier") String identifier,
+    							 @FormParam("lastCode") FridgeCode lastCode) {
     		
     	FridgeState thisFridgeState = resEjb.findStateByInfoId(id,FridgeState.class);
     	
     	if (thisFridgeState == null)
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
     	
-    	thisFridgeState.setOnline(on)
+    	thisFridgeState.setOnline(online)
+    			.setIdentifier(identifier)
+    			.setLastCode(lastCode);
+    	
+    	resEjb.updateManagedState(thisFridgeState);
+    	
+    	// We do not send back the update request to the device, since the information came from there
+    	// FIXME: if we want, some time in the future, change more than one parameter at once, we must discriminate the source
+    	
+    	return Response.ok().build();
+    }  
+    
+    @POST
+    @Path("fridges")
+    public Response updateFridgeFromDevice(@FormParam("gatewayId") byte gatewayId,
+			   							   @FormParam("nuid") long nuid,
+			   							   @FormParam("online") boolean online,
+			   							   @FormParam("identifier") String identifier,
+			   							   @FormParam("lastCode") FridgeCode lastCode) {
+    		
+    	Node node = resEjb.findNodeByGatewayIdAndNuid(gatewayId, nuid);
+    	if (node == null)
+    		throw new WebApplicationException(Response.Status.BAD_REQUEST);    	
+    	
+    	FridgeState thisFridgeState = resEjb.findStateByInfoId(node.getId(),FridgeState.class);
+    	
+    	if (thisFridgeState == null)
+    		throw new WebApplicationException(Response.Status.NOT_FOUND);
+    	
+    	thisFridgeState.setOnline(online)
     			.setIdentifier(identifier)
     			.setLastCode(lastCode);
     	
@@ -170,8 +229,8 @@ public final class StateResource {
     
     @POST
     @Path("lamps/{id}")
-    public Response updateLampStateFromDevice(@PathParam("id") long id,
-    								@FormParam("on") boolean on,
+    public Response updateLampState(@PathParam("id") long id,
+    								@FormParam("online") boolean online,
     								@FormParam("identifier") String identifier,
     								@FormParam("red") byte red,
     								@FormParam("green") byte green,
@@ -184,7 +243,45 @@ public final class StateResource {
     	if (thisLamp == null)
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
     	
-    	thisLamp.setOnline(on)
+    	thisLamp.setOnline(online)
+    			.setIdentifier(identifier)
+    			.setRed(red)
+    			.setGreen(green)
+    			.setBlue(blue)
+    			.setWhite(white)
+    			.setAlarm(alarm)
+    			.update();
+    	
+    	resEjb.updateManagedState(thisLamp);
+    	
+    	// We do not send back the update request to the device, since the information came from there
+    	// FIXME: if we want, some time in the future, change more than one parameter at once, we must discriminate the source
+    	
+    	return Response.ok().build();
+    }    
+    
+    @POST
+    @Path("lamps")
+    public Response updateLampStateFromDevice(@FormParam("gatewayId") byte gatewayId,
+			   								  @FormParam("nuid") long nuid,
+    										  @FormParam("online") boolean online,
+    										  @FormParam("identifier") String identifier,
+    										  @FormParam("red") byte red,
+    										  @FormParam("green") byte green,
+    										  @FormParam("blue") byte blue,
+    										  @FormParam("white") byte white,
+    										  @FormParam("alarm") ColoredAlarm alarm) {
+    		
+    	Node node = resEjb.findNodeByGatewayIdAndNuid(gatewayId, nuid);
+    	if (node == null)
+    		throw new WebApplicationException(Response.Status.BAD_REQUEST);    	
+    	
+    	LampState thisLamp = resEjb.findStateByInfoId(node.getId(),LampState.class);
+    	
+    	if (thisLamp == null)
+    		throw new WebApplicationException(Response.Status.NOT_FOUND);
+    	
+    	thisLamp.setOnline(online)
     			.setIdentifier(identifier)
     			.setRed(red)
     			.setGreen(green)

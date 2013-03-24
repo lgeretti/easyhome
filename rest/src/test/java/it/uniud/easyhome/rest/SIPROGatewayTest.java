@@ -5,6 +5,8 @@ import static org.junit.Assert.*;
 import java.util.List;
 
 import it.uniud.easyhome.common.JsonUtils;
+import it.uniud.easyhome.devices.states.ColoredAlarm;
+import it.uniud.easyhome.devices.states.FridgeCode;
 import it.uniud.easyhome.gateway.Gateway;
 import it.uniud.easyhome.gateway.ProtocolType;
 
@@ -131,7 +133,7 @@ public class SIPROGatewayTest {
 	    	NodeList dataCategories = doc.getElementsByTagName("data");
 	     
 	    	handleSensors(dataCategories.item(0));
-	    	//handleActuators(dataCategories.item(1).getFirstChild());
+	    	handleActuators(dataCategories.item(1));
 	    	
 	    } catch (Exception e) {
 	    	e.printStackTrace();
@@ -141,36 +143,59 @@ public class SIPROGatewayTest {
     }
     
     private void handleSensors(Node node) {
-    	System.out.println(node.getNodeName());
     	NodeList children = node.getChildNodes();
-    	for (int i=0;i<children.getLength();i++)
-    		System.out.println(children.item(i).getNodeName());
-    	
-    	
-    	/*
-    	while (node != null) {
-    		
-    		System.out.println("Found one sensor named " + node.getLocalName());
-    		
-    		handleSensors(node.getNextSibling());
-    		
-    		try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+    	for (int i=0;i<children.getLength();i++) {
+    		Node child = children.item(i);
+    		if (child.getNodeName() != "#text") {
+    			handleLamp(node.getNodeName(),node.getChildNodes());
+    		}
     	}
-    	*/
     }
 
     private void handleActuators(Node node) {
-    	while (node != null) {
-    		
-    		System.out.println("Found one actuator");
-    		
-    		handleSensors(node.getNextSibling());
+    	NodeList children = node.getChildNodes();
+    	for (int i=0;i<children.getLength();i++) {
+    		Node child = children.item(i);
+    		if (child.getNodeName() != "#text") {
+    			String identifier = child.getNodeName();
+    			NodeList parameters = child.getChildNodes();
+    			if (parameters.getLength() == 15)
+    				handleFridge(identifier,parameters);
+    			else
+    				handlePIR(identifier,parameters);
+    		}
     	}
+    }    
+    
+    private byte fromHexStringToByte(String value) {
+    	
+    	return (byte)(Integer.parseInt(value,16) & 0xFF);
     }
-	
+
+    private void handleLamp(String identifier, NodeList parameters) {
+    	byte gatewayId = 3;
+    	boolean online = (parameters.item(1).getTextContent() == "ON");
+		long nuid = Long.parseLong(parameters.item(3).getTextContent() + parameters.item(5).getTextContent() + parameters.item(7).getTextContent(),16);
+		byte red = fromHexStringToByte(parameters.item(9).getTextContent());
+		byte green = fromHexStringToByte(parameters.item(11).getTextContent());
+		byte blue = fromHexStringToByte(parameters.item(13).getTextContent());
+		byte white = fromHexStringToByte(parameters.item(15).getTextContent());
+		ColoredAlarm alarm = ColoredAlarm.fromCode((byte)(Integer.parseInt(parameters.item(17).getTextContent(),16) & 0xFF));
+    }
+    
+    private void handleFridge(String identifier, NodeList parameters) {
+    	byte gatewayId = 3;
+    	boolean online = (parameters.item(1).getTextContent() == "ON");
+		long nuid = Long.parseLong(parameters.item(3).getTextContent() + parameters.item(5).getTextContent() + parameters.item(7).getTextContent(),16);
+		FridgeCode code = FridgeCode.fromCode(Short.parseShort(parameters.item(9).getTextContent() + parameters.item(11).getTextContent() + parameters.item(13).getTextContent()));
+		
+    }
+    
+    private void handlePIR(String identifier, NodeList parameters) {
+    	byte gatewayId = 3;
+    	boolean online = (parameters.item(1).getTextContent() == "ON");
+		long nuid = Long.parseLong(parameters.item(3).getTextContent() + parameters.item(5).getTextContent() + parameters.item(7).getTextContent(),16);
+		String occupation = parameters.item(9).getTextContent() + parameters.item(11).getTextContent();
+		boolean occupied = (occupation == "5031");
+    }
 }

@@ -3,6 +3,7 @@ package it.uniud.easyhome.ejb;
 
 import it.uniud.easyhome.devices.PersistentInfo;
 import it.uniud.easyhome.devices.states.*;
+import it.uniud.easyhome.exceptions.MultipleNodesFoundException;
 import it.uniud.easyhome.network.Node;
 
 import java.util.List;
@@ -40,6 +41,21 @@ public class StateEJB {
 	
 	public Node findNodeById(long id) {
 		return em.find(Node.class, id);
+	}
+	
+	public Node findNodeByGatewayIdAndNuid(byte gatewayId, long nuid) {
+		
+        CriteriaBuilder b = em.getCriteriaBuilder();
+        CriteriaQuery<Node> criteria = b.createQuery(Node.class);
+        Root<Node> node = criteria.from(Node.class);
+        criteria.select(node).where(
+        			b.and(
+        			b.equal(node.get("coordinates").get("gatewayId"), gatewayId),
+        			b.equal(node.get("coordinates").get("nuid"), nuid)));
+        
+        TypedQuery<Node> query = em.createQuery(criteria);
+        
+        return query.getSingleResult();
 	}
 
 	public void removeAllStates() {
