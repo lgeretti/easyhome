@@ -7,7 +7,6 @@ import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.exceptions.*;
 import it.uniud.easyhome.network.GlobalCoordinates;
 import it.uniud.easyhome.network.ModuleCoordinates;
-import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.packets.Operation;
 
@@ -44,5 +43,20 @@ public class AlarmStateReqPacket extends NativePacket {
 	
 	public short getAddrOfInterest() {
 		return ByteUtils.getShort(getOperation().getData(), 0, Endianness.LITTLE_ENDIAN); 
+	}
+	
+	public static boolean validates(NativePacket pkt) {
+		
+		if (pkt == null)
+			return false;
+		
+		Operation op = pkt.getOperation();
+		
+		if (op.getDomain() != Domain.EASYHOME.getCode())
+			return false;
+		if (op.getContext() != EasyHomeContext.ALARM.getCode())
+			return false;
+		
+		return true;
 	}
 }
