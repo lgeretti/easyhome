@@ -216,7 +216,7 @@ public class SIPROGateway extends Gateway {
 		byte blue = fromHexStringToByte(parameters.item(13).getTextContent());
 		byte white = fromHexStringToByte(parameters.item(15).getTextContent());
 		ColoredAlarm alarm = ColoredAlarm.fromCode((byte)(Integer.parseInt(parameters.item(17).getTextContent(),16) & 0xFF));
-		log(LogLevel.DEBUG,"To transmit: online=" + online + ", nuid=" + nuid + 
+		log(LogLevel.DEBUG,"To transmit: identifier=" + identifier + ", online=" + online + ", nuid=" + nuid + 
 						   ", red=" + red + ", green=" + green + ", blue=" + blue + ", white=" + white + ", alarm=" + alarm);
 		
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
@@ -239,14 +239,14 @@ public class SIPROGateway extends Gateway {
 		long nuid = Long.parseLong(parameters.item(1).getTextContent() + parameters.item(3).getTextContent() + parameters.item(5).getTextContent(),16);
 		String codeString = parameters.item(7).getTextContent() + parameters.item(9).getTextContent() + parameters.item(11).getTextContent();
 		FridgeCode lastCode = FridgeCode.fromCode(Short.parseShort(codeString));
-		log(LogLevel.DEBUG,"To transmit: nuid=" + nuid + ", code=" + lastCode);
+		log(LogLevel.DEBUG,"To transmit: identifier=" + identifier + ", nuid=" + nuid + ", code=" + lastCode);
 		
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         formData.add("gatewayId",Byte.toString(gatewayId));
         formData.add("nuid",Long.toString(nuid));  
         formData.add("identifier",identifier);
         formData.add("lastCode",lastCode.toString());
-        client.resource(INTERNAL_TARGET).path(RestPaths.STATES).path("lamps").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        client.resource(INTERNAL_TARGET).path(RestPaths.STATES).path("fridges").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         
         identifiersRegistered.add(identifier);
     }
@@ -256,14 +256,14 @@ public class SIPROGateway extends Gateway {
 		long nuid = Long.parseLong(parameters.item(1).getTextContent() + parameters.item(3).getTextContent() + parameters.item(5).getTextContent(),16);
 		String occupation = parameters.item(7).getTextContent() + parameters.item(9).getTextContent();
 		boolean occupied = (occupation == "5031");
-		log(LogLevel.DEBUG,"To transmit: nuid=" + nuid + ", occupied=" + occupied);
+		log(LogLevel.DEBUG,"To transmit: identifier=" + identifier + ", nuid=" + nuid + ", occupied=" + occupied);
 		
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         formData.add("gatewayId",Byte.toString(gatewayId));
         formData.add("nuid",Long.toString(nuid));  
         formData.add("identifier",identifier);
         formData.add("occupied",Boolean.toString(occupied));
-        client.resource(INTERNAL_TARGET).path(RestPaths.STATES).path("lamps").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        client.resource(INTERNAL_TARGET).path(RestPaths.STATES).path("sensors/presence").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         
         identifiersRegistered.add(identifier);
     }
