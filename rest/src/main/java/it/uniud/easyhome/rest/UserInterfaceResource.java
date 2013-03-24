@@ -168,7 +168,7 @@ public class UserInterfaceResource {
     	
     	insertLocationsAndDevices();
 		insertGateway(XBEE_GATEWAY_ID, XBEE_GATEWAY_PORT, ProtocolType.XBEE, LogLevel.INFO);
-		//insertGateway(SIPRO_GATEWAY_ID, SIPRO_GATEWAY_PORT, ProtocolType.SIPRO, LogLevel.DEBUG);
+		insertGateway(SIPRO_GATEWAY_ID, SIPRO_GATEWAY_PORT, ProtocolType.SIPRO, LogLevel.DEBUG);
 		insertProcess(ProcessKind.NODE_ANNCE_REGISTRATION);
 		insertProcess(ProcessKind.NODE_DESCR_REQUEST);
 		insertProcess(ProcessKind.NODE_DESCR_REGISTRATION);	

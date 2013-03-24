@@ -118,15 +118,13 @@ public class SIPROGateway extends Gateway {
 			
 			String paramsString = statePacket.getIdentifier()+";changeColor"+statePacket.getSeparatedParameters();
 			
-			log(LogLevel.DEBUG,"params="+paramsString);
+			log(LogLevel.DEBUG,"Request: ?method=setValueParam&params="+paramsString);
 			
 	        MultivaluedMap<String,String> queryParams = new MultivaluedMapImpl();
 	        queryParams.add("method","setValueParam");
 	        queryParams.add("params",paramsString);
 			
-			ClientResponse response = client.resource(TARGET).queryParams(queryParams).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-	
-			
+			client.resource(TARGET).queryParams(queryParams).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 		}
     }
   

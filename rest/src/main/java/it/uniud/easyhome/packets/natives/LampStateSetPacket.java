@@ -81,8 +81,8 @@ public class LampStateSetPacket extends NativePacket {
 		byte[] data = this.getOperation().getData();
 		
 		StringBuilder resultBuilder = new StringBuilder();
-		for (int i=data.length-9;i<data.length;i++)
-			resultBuilder.append(";").append(data[i]);
+		for (int i=data.length-8;i<data.length;i++)
+			resultBuilder.append(";").append(Integer.toHexString(data[i]));
 			
 		return resultBuilder.toString();
 	}	
