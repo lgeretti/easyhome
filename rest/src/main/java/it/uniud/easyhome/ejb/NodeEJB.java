@@ -1,6 +1,7 @@
 package it.uniud.easyhome.ejb;
 
 
+import it.uniud.easyhome.devices.DeviceType;
 import it.uniud.easyhome.devices.Location;
 import it.uniud.easyhome.devices.Manufacturer;
 import it.uniud.easyhome.devices.PersistentInfo;
@@ -261,5 +262,28 @@ public class NodeEJB {
         }
         
         return result;
+	}
+	
+	public List<Node> getNodesByLocationId(int locationId) {
+		
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<Node> criteria = builder.createQuery(Node.class);
+        Root<Node> node = criteria.from(Node.class);
+        criteria.select(node).where(builder.equal(node.get("info").get("location").get("id"), locationId));
+        
+        TypedQuery<Node> query = em.createQuery(criteria);
+		
+		return query.getResultList();
+	}
+
+	public List<Node> getNodesByDeviceType(DeviceType deviceType) {
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<Node> criteria = builder.createQuery(Node.class);
+        Root<Node> node = criteria.from(Node.class);
+        criteria.select(node).where(builder.equal(node.get("info").get("deviceType"), deviceType));
+        
+        TypedQuery<Node> query = em.createQuery(criteria);
+		
+		return query.getResultList();
 	}
 }

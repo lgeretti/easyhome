@@ -51,14 +51,14 @@ public final class FunctionalityResource {
     								  	@FormParam("imgPath") String imgPath,
     								  	@FormParam("help") String help) {
     	
-    	PersistentInfo info = resEjb.findPersistentInfoById(deviceId);
+    	Node node = resEjb.findNodeById(deviceId);
     		
-	    if (info == null)
+	    if (node == null)
 	    	throw new WebApplicationException(Response.Status.BAD_REQUEST);
     			
 	    synchronized(funcLock) {
 	    	
-    		resEjb.insertFunctionality(new Functionality(++functionalityId,name,type,info,imgPath,help));
+    		resEjb.insertFunctionality(new Functionality(++functionalityId,name,type,node,imgPath,help));
     		
     		return Response.created(
                 	uriInfo.getAbsolutePathBuilder()

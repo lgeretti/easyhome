@@ -1,7 +1,6 @@
 package it.uniud.easyhome.rest;
 
 import it.uniud.easyhome.devices.Pairing;
-import it.uniud.easyhome.devices.PersistentInfo;
 import it.uniud.easyhome.ejb.PairingEJB;
 import it.uniud.easyhome.network.*;
 
@@ -27,8 +26,6 @@ public final class PairingResource {
     @POST
     public Response insertPairing(@FormParam("sourceId") long sourceId,
     						      @FormParam("destinationId") long destinationId) {
-    	
-    	long thisPairingId;
     	
     	Node source = resEjb.findNodeById(sourceId);
     	Node destination = resEjb.findNodeById(destinationId);

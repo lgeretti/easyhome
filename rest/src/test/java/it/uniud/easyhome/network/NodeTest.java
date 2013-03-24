@@ -40,7 +40,6 @@ public class NodeTest {
         node1.addNeighbor(node2);
         
         assertEquals(10L, node1.getCoordinates().getNuid());
-        assertEquals("test", node1.getName());
         assertEquals(node1.getNeighbors().size(),1);
     }
     

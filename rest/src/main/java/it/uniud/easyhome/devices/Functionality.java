@@ -1,6 +1,8 @@
 package it.uniud.easyhome.devices;
 
 
+import it.uniud.easyhome.network.Node;
+
 import javax.persistence.*;
 import javax.xml.bind.annotation.*;
 
@@ -17,7 +19,7 @@ public class Functionality {
     @Column
     private FunctionalityType type;
     @OneToOne
-    private PersistentInfo device;
+    private Node device;
     @Column
     private String imgPath;
     @Column
@@ -26,7 +28,7 @@ public class Functionality {
     @SuppressWarnings("unused")
 	private Functionality() {}
     
-    public Functionality(long id,  String name, FunctionalityType type, PersistentInfo device, String imgPath, String help) {
+    public Functionality(long id,  String name, FunctionalityType type, Node device, String imgPath, String help) {
     	this.id = id;
     	this.name = name;
     	this.type = type;
@@ -51,7 +53,7 @@ public class Functionality {
     	return this.type;
     }
     
-	public PersistentInfo getDevice() {
+	public Node getDevice() {
 		return this.device;
 	}
 	

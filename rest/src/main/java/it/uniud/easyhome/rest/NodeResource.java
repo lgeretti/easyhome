@@ -1,7 +1,9 @@
 package it.uniud.easyhome.rest;
 
+import it.uniud.easyhome.devices.DeviceType;
 import it.uniud.easyhome.devices.Location;
 import it.uniud.easyhome.devices.Manufacturer;
+import it.uniud.easyhome.devices.PersistentInfo;
 import it.uniud.easyhome.ejb.NodeEJB;
 import it.uniud.easyhome.network.*;
 import java.util.List;
@@ -30,7 +32,17 @@ public final class NodeResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<Node> getNodes(@QueryParam("gatewayId") byte gatewayId, 
- 		   					   @QueryParam("nuid") long nuid) {        
+ 		   					   @QueryParam("nuid") long nuid,
+ 		   					   @QueryParam("locationId") int locationId,
+							   @QueryParam("deviceType") DeviceType deviceType) {   
+    	
+    	// For lazyness of programming, we only allow one of the latter two, or the former two
+    	if (locationId != 0)
+    		return resEjb.getNodesByLocationId(locationId);
+    	
+    	if (deviceType != null)
+    		return resEjb.getNodesByDeviceType(deviceType);
+    	
         return resEjb.getNodes(gatewayId,nuid);
     }
     

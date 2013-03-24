@@ -2,7 +2,7 @@ package it.uniud.easyhome.ejb;
 
 import it.uniud.easyhome.devices.Functionality;
 import it.uniud.easyhome.devices.FunctionalityType;
-import it.uniud.easyhome.devices.PersistentInfo;
+import it.uniud.easyhome.network.Node;
 
 import java.util.List;
 
@@ -53,8 +53,8 @@ public class FunctionalityEJB {
         	em.remove(func);
 	}
 	
-	public PersistentInfo findPersistentInfoById(long id) {
-		return em.find(PersistentInfo.class, id);
+	public Node findNodeById(long id) {
+		return em.find(Node.class, id);
 	}
 	
 	public List<Functionality> getFunctionalitiesByDeviceId(long deviceId) {
