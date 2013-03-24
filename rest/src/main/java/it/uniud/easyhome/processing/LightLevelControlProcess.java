@@ -1,6 +1,7 @@
 package it.uniud.easyhome.processing;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import it.uniud.easyhome.common.JMSConstants;
@@ -47,6 +48,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class LightLevelControlProcess extends Process {
 
+	private static int LOCK_TIME_BETWEEN_UPDATES_IN_SECONDS = 2;
 	
 	private MessageProducer networkEventsProducer = null;
 	
@@ -102,17 +104,25 @@ public class LightLevelControlProcess extends Process {
 				        		ClientResponse getLampStateResponse = restResource.path(RestPaths.STATES).path("lamps").path(Long.toString(lampId))
 																.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 				        		LampState state = JsonUtils.getFrom(getLampStateResponse, LampState.class);
-		
-				        		byte previousVal = state.getWhite();
-				        		int newVal = Math.max(0, Math.min(100, previousVal +levelPercentage));
-							
-				        		log(LogLevel.INFO, "Level modified from " + previousVal + " to " + newVal);
 				        		
-				        		MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-				                formData.add("value",Byte.toString((byte)(newVal & 0xFF)));
+				        		Date lastStateUpdatePlusTwoSeconds = new Date(state.getLastUpdate()+1000*LOCK_TIME_BETWEEN_UPDATES_IN_SECONDS);
+				        		Date currentDate = new Date(System.currentTimeMillis());
+				        		
+				        		if (currentDate.after(lastStateUpdatePlusTwoSeconds)) {
+		
+					        		byte previousVal = state.getWhite();
+					        		int newVal = Math.max(0, Math.min(100, previousVal +levelPercentage));
+								
+					        		log(LogLevel.INFO, "Level modified from " + previousVal + " to " + newVal);
+					        		
+					        		MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+					                formData.add("value",Byte.toString((byte)(newVal & 0xFF)));
+					                
+					                restResource.path(RestPaths.STATES).path("lamps").path(Long.toString(lampId)).path("white")
+					                			.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 				                
-				                restResource.path(RestPaths.STATES).path("lamps").path(Long.toString(lampId)).path("white")
-				                			.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+				        		} else
+				        			log(LogLevel.DEBUG, "Lamp state updated too recently: discarding the event");
 			                
 			        		} else if (getPairingResponse.getClientResponseStatus() == ClientResponse.Status.NOT_FOUND) 
 			                	log(LogLevel.DEBUG, "Pairing not present for this controller");
