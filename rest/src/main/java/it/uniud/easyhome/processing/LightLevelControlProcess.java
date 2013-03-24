@@ -9,6 +9,7 @@ import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.devices.Location;
 import it.uniud.easyhome.devices.Manufacturer;
+import it.uniud.easyhome.devices.Pairing;
 import it.uniud.easyhome.devices.PersistentInfo;
 import it.uniud.easyhome.devices.states.LampState;
 import it.uniud.easyhome.exceptions.InvalidNodeLogicalTypeException;
@@ -89,22 +90,32 @@ public class LightLevelControlProcess extends Process {
 			        										.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);		
 			        		PersistentInfo info = JsonUtils.getFrom(getInfoResponse, PersistentInfo.class);
 			        		
-			        		// GET THE PAIRED LAMP FIRST!
-			        		
-			        		ClientResponse getLampStateResponse = restResource.path(RestPaths.STATES).path("lamps").path(Long.toString(info.getId()))
+			        		ClientResponse getPairingResponse = restResource.path(RestPaths.PAIRINGS).path(Long.toString(info.getId()))
 															.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-			        		LampState state = JsonUtils.getFrom(getLampStateResponse, LampState.class);
-	
-			        		byte previousVal = state.getWhite();
-			        		int newVal = Math.max(0, Math.min(100, previousVal * (100+levelPercentage)/100));
-						
-			        		log(LogLevel.DEBUG, "Level modified from " + previousVal + " to " + newVal);
 			        		
-			        		MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-			                formData.add("value",Byte.toString((byte)(newVal & 0xFF)));
+			        		if (getPairingResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
+			        		
+			        			Pairing pairing = JsonUtils.getFrom(getPairingResponse, Pairing.class);
+			        			
+			        			long lampId = pairing.getDestination().getId();
+			        			
+				        		ClientResponse getLampStateResponse = restResource.path(RestPaths.STATES).path("lamps").path(Long.toString(lampId))
+																.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+				        		LampState state = JsonUtils.getFrom(getLampStateResponse, LampState.class);
+		
+				        		byte previousVal = state.getWhite();
+				        		int newVal = Math.max(0, Math.min(100, previousVal +levelPercentage));
+							
+				        		log(LogLevel.INFO, "Level modified from " + previousVal + " to " + newVal);
+				        		
+				        		MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+				                formData.add("value",Byte.toString((byte)(newVal & 0xFF)));
+				                
+				                restResource.path(RestPaths.STATES).path("lamps").path(Long.toString(lampId)).path("white")
+				                			.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 			                
-			                restResource.path(RestPaths.STATES).path("lamps").path(Long.toString(info.getId())).path("white")
-			                			.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+			        		} else if (getPairingResponse.getClientResponseStatus() == ClientResponse.Status.NOT_FOUND) 
+			                	log(LogLevel.DEBUG, "Pairing not present for this controller");
 			        		
 						} else
 					    	log(LogLevel.DEBUG, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");

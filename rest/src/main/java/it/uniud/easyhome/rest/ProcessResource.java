@@ -36,7 +36,7 @@ public class ProcessResource {
         
     	int pid = ++pidCounter;
     	
-    	LogLevel levelToUse = (logLevel == null ? LogLevel.INFO : logLevel);
+    	LogLevel levelToUse = (logLevel == null ? LogLevel.NONE : logLevel);
     	
     	Process process = kind.newProcess(pid, uriInfo, levelToUse);
     	

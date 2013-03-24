@@ -59,7 +59,7 @@ public class OccupancySensingRequestProcess extends Process {
 	    		OccupancyAttributeReqPacket packet = new OccupancyAttributeReqPacket(node.getCoordinates(),occupancyEndpoints.get(nodeIdx).endpoint,sequenceNumber);
 		 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
 		    	getOutboundPacketsProducer().send(outboundMessage);    
-		    	log(LogLevel.INFO, "Occupancy attribute request for " + node + " dispatched");
+		    	log(LogLevel.DEBUG, "Occupancy attribute request for " + node + " dispatched");
 		    	Thread.sleep(REQUEST_PERIOD_MS/nodes.size());
 	    	}
 			Thread.sleep(REQUEST_PERIOD_MS);
