@@ -8,21 +8,16 @@ import it.uniud.easyhome.common.RunnableState;
 import it.uniud.easyhome.contexts.HomeAutomationContext;
 import it.uniud.easyhome.devices.states.ColoredAlarm;
 import it.uniud.easyhome.devices.states.FridgeCode;
-import it.uniud.easyhome.exceptions.IncompletePacketException;
 import it.uniud.easyhome.network.ModuleCoordinates;
-import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.packets.Operation;
 import it.uniud.easyhome.packets.natives.LampStateSetPacket;
 import it.uniud.easyhome.packets.natives.NativePacket;
-import it.uniud.easyhome.packets.natives.NodeDescrReqPacket;
 import it.uniud.easyhome.packets.natives.OccupancyAttributeReqPacket;
 import it.uniud.easyhome.packets.natives.OccupancyAttributeRspPacket;
 import it.uniud.easyhome.rest.RestPaths;
 
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.SocketException;
 import java.util.HashSet;
 import java.util.Set;
@@ -43,11 +38,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.io.FileUtils;
-import org.codehaus.jettison.json.JSONException;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -60,6 +51,8 @@ public class SIPROGateway extends Gateway {
 	
 	private static final String SIPRO_TARGET = "http://localhost:5000/";
 	private static final String INTERNAL_TARGET = "http://localhost:8080/easyhome/rest/";
+	
+	private static final boolean MOCKED_GATEWAY = true;
 	
 	private static Client client = Client.create();
 	
@@ -166,14 +159,23 @@ public class SIPROGateway extends Gateway {
     	
 	    try {
 	    	
-	    	File xmlFile = new File("/home/geretti/Public/sources/uniud/easyhome/rest/src/test/resources/sensors.xml");
-	    	String xmlContent = "";
+	    	String xmlContent = null;
 	    	
-	        try{
-	            xmlContent = FileUtils.readFileToString(xmlFile);
-	        }catch(IOException e){
-	            e.printStackTrace();
-	        } 
+	    	if (!MOCKED_GATEWAY) {
+		        MultivaluedMap<String,String> queryParams = new MultivaluedMapImpl();
+		        queryParams.add("method","getData");
+		        queryParams.add("params","actuators");
+	    		ClientResponse dataModelResponse = client.resource(SIPRO_TARGET).queryParams(queryParams).accept(MediaType.TEXT_XML).get(ClientResponse.class);
+		    	xmlContent = dataModelResponse.getEntity(String.class);
+	    	} else {
+		    	File xmlFile = new File("/home/geretti/Public/sources/uniud/easyhome/rest/src/test/resources/sensors.xml");
+		    	
+		        try{
+		            xmlContent = FileUtils.readFileToString(xmlFile);
+		        }catch(IOException e){
+		            e.printStackTrace();
+		        } 
+	    	}
 	        
 	    	InputSource is = new InputSource(new StringReader(xmlContent));
 	    	DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -192,15 +194,24 @@ public class SIPROGateway extends Gateway {
     private void registerDevices() {
     	
 	    try {
-	    	 
-	    	File xmlFile = new File("/home/geretti/Public/sources/uniud/easyhome/rest/src/test/resources/datamodel.xml");
-	    	String xmlContent = "";
 	    	
-	        try{
-	            xmlContent = FileUtils.readFileToString(xmlFile);
-	        }catch(IOException e){
-	            e.printStackTrace();
-	        } 
+	    	String xmlContent = null;
+	    	
+	    	if (!MOCKED_GATEWAY) {
+		        MultivaluedMap<String,String> queryParams = new MultivaluedMapImpl();
+		        queryParams.add("method","getDataModel");
+		        queryParams.add("params","");
+	    		ClientResponse dataModelResponse = client.resource(SIPRO_TARGET).queryParams(queryParams).accept(MediaType.TEXT_XML).get(ClientResponse.class);
+		    	xmlContent = dataModelResponse.getEntity(String.class);
+	    	} else {
+		    	File xmlFile = new File("/home/geretti/Public/sources/uniud/easyhome/rest/src/test/resources/datamodel.xml");
+		    	
+		        try{
+		            xmlContent = FileUtils.readFileToString(xmlFile);
+		        }catch(IOException e){
+		            e.printStackTrace();
+		        } 
+	    	}
 	        
 	    	InputSource is = new InputSource(new StringReader(xmlContent));
 	    	DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();

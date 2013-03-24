@@ -71,50 +71,18 @@ public class SIPROGatewayTest {
 		assertEquals(ClientResponse.Status.OK,response.getClientResponseStatus());        
 	}
 	
-	@Ignore
-	@Test
-	public void readXml() {
-		
-	    try {
-	    	 
-	    	File fXmlFile = new File("/home/geretti/Public/sources/uniud/easyhome/rest/src/test/resources/actuators.xml");
-	    	DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-	    	DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-	    	Document doc = dBuilder.parse(fXmlFile);
-
-	    	//doc.getDocumentElement().normalize();
-	     
-	    	System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
-	     
-	    	NodeList nList = doc.getElementsByTagName("output1");
-	     
-	    	System.out.println("----------------------------");
-	     
-	    	for (int temp = 0; temp < nList.getLength(); temp++) {
-	     
-	    		Node nNode = nList.item(temp);
-	     
-	    		System.out.println("\nCurrent Element :" + nNode.getNodeName());
-	     
-	    		if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-	     
-	    			Element eElement = (Element) nNode;
-	     
-	    			System.out.println("State : " + eElement.getElementsByTagName("state").item(0).getTextContent());
-	     
-	    		}
-	    	}
-	    } catch (Exception e) {
-	    	e.printStackTrace();
-	    }		
-		
-	}
-	
 	@Test
     public void registerDevices() {
     	
 	    try {
 	    	 
+	        MultivaluedMap<String,String> queryParams = new MultivaluedMapImpl();
+	        queryParams.add("method","getDataModel");
+	        queryParams.add("params","");
+    		ClientResponse dataModelResponse = client.resource(TARGET).queryParams(queryParams).accept(MediaType.TEXT_XML).get(ClientResponse.class);
+	    	String xmlContent = dataModelResponse.getEntity(String.class);
+	    	 
+	    	/*
 	    	File xmlFile = new File("/home/geretti/Public/sources/uniud/easyhome/rest/src/test/resources/datamodel.xml");
 	    	String xmlContent = "";
 	    	
@@ -122,15 +90,14 @@ public class SIPROGatewayTest {
 	            xmlContent = FileUtils.readFileToString(xmlFile);
 	        }catch(IOException e){
 	            e.printStackTrace();
-	        } 
+	        }
+	        */ 
 	        
 	    	InputSource is = new InputSource(new StringReader(xmlContent));
 	    	DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 	    	DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 	    	Document doc = dBuilder.parse(is);
-
-	    	//doc.getDocumentElement().normalize();
-	    
+	    	
 	    	NodeList dataCategories = doc.getElementsByTagName("data");
 	     
 	    	handleActuators(dataCategories.item(0));
