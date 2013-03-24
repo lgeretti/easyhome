@@ -1,5 +1,7 @@
 package it.uniud.easyhome.rest;
 
+import it.uniud.easyhome.common.JMSConstants;
+import it.uniud.easyhome.devices.PersistentInfo;
 import it.uniud.easyhome.devices.states.*;
 import it.uniud.easyhome.ejb.StateEJB;
 import it.uniud.easyhome.exceptions.MultipleLinkException;
@@ -8,17 +10,32 @@ import it.uniud.easyhome.network.*;
 import java.util.List;
 import java.util.Set;
 
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
+import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
+import javax.jms.Session;
+import javax.jms.Topic;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.ws.rs.core.*;
 import javax.ws.rs.*;
 
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+
 @Path(RestPaths.STATES)
 public final class StateResource {
 	
     private StateEJB resEjb;
+    
+	private static final String TARGET = "http://localhost:8080/easyhome/rest/";
+	private static Client client = Client.create();
+    
+	private Connection jmsConnection = null;
+	protected javax.naming.Context jndiContext = null;
+	protected Session jmsSession = null;
     
     private static Object statesLock = new Object();
 
@@ -266,15 +283,39 @@ public final class StateResource {
         return Response.ok().build();
     }
     
-    /*
-    private sendUpdateMessage() {
+    private void sendLampStateUpdateMessage(LampState state, byte gatewayId, short address, int level) {
     	
-		NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.LEVEL_CONTROL_VARIATION, 
-				gatewayId, address,new byte[]{(byte)(levelPercentage & 0x0FF)});
-        try {
+    	try {
+	    	jndiContext = new InitialContext();
+	        ConnectionFactory connectionFactory = (ConnectionFactory) jndiContext.lookup(JMSConstants.CONNECTION_FACTORY);
+	        
+	        Topic networkEventsTopic = (Topic) jndiContext.lookup(JMSConstants.NETWORK_EVENTS_TOPIC);
+	        
+	        jmsConnection = connectionFactory.createConnection();
+	        jmsSession = jmsConnection.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
+	        MessageProducer producer = jmsSession.createProducer(networkEventsTopic);
+	            
+	        jmsConnection.start();
+	        
+	        PersistentInfo info = state.getDevice();
+	        
+	    	
+			NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.LEVEL_CONTROL_VARIATION, 
+					gatewayId, address,new byte[]{(byte)0,(byte)(level & 0x0FF)});
+        
             ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
-            networkEventsProducer.send(eventMessage);
-        } catch (JMSException ex) { }
+            producer.send(eventMessage);
+        } catch (JMSException ex) { 
+        	
+        } catch (NamingException e) {
+        	
+		} finally {
+        	
+        	try {
+				jmsConnection.close();
+			} catch (JMSException e) {
+			}
+        }
+        
     }
-    */
 }
