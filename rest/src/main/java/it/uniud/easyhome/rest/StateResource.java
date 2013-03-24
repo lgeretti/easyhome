@@ -130,6 +130,54 @@ public final class StateResource {
         return Response.ok().build();
     } 
     
+    @POST
+    @Path("sensors/presence/{id}")
+    public Response updatePresenceSensorFromDevice(@PathParam("id") long id,
+    								@FormParam("on") boolean on,
+    								@FormParam("identifier") String identifier,
+    								@FormParam("occupied") boolean occupied) {
+    		
+    	PresenceSensorState thisPresenceSensor = resEjb.findStateByInfoId(id,PresenceSensorState.class);
+    	
+    	if (thisPresenceSensor == null)
+    		throw new WebApplicationException(Response.Status.NOT_FOUND);
+    	
+    	thisPresenceSensor.setOnline(on)
+    			.setIdentifier(identifier)
+    			.setOccupied(occupied);
+    	
+    	resEjb.updateManagedState(thisPresenceSensor);
+    	
+    	// We do not send back the update request to the device, since the information came from there
+    	// FIXME: if we want, some time in the future, change more than one parameter at once, we must discriminate the source
+    	
+    	return Response.ok().build();
+    }  
+    
+    @POST
+    @Path("fridges/{id}")
+    public Response updateFridgeFromDevice(@PathParam("id") long id,
+    								@FormParam("on") boolean on,
+    								@FormParam("identifier") String identifier,
+    								@FormParam("lastCode") FridgeCode lastCode) {
+    		
+    	FridgeState thisFridgeState = resEjb.findStateByInfoId(id,FridgeState.class);
+    	
+    	if (thisFridgeState == null)
+    		throw new WebApplicationException(Response.Status.NOT_FOUND);
+    	
+    	thisFridgeState.setOnline(on)
+    			.setIdentifier(identifier)
+    			.setLastCode(lastCode);
+    	
+    	resEjb.updateManagedState(thisFridgeState);
+    	
+    	// We do not send back the update request to the device, since the information came from there
+    	// FIXME: if we want, some time in the future, change more than one parameter at once, we must discriminate the source
+    	
+    	return Response.ok().build();
+    }  
+    
     
     @POST
     @Path("lamps/{id}")

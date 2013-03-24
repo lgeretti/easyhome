@@ -23,10 +23,17 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.codehaus.jettison.json.JSONException;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -34,7 +41,8 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class SIPROGateway extends Gateway {
 	
-	private static final String TARGET = "http://localhost:5000/";
+	private static final String SIPRO_TARGET = "http://localhost:5000/";
+	private static final String INTERNAL_TARGET = "http://localhost:8080/easyhome/rest/";
 	
 	private static Client client = Client.create();
 			
@@ -81,6 +89,8 @@ public class SIPROGateway extends Gateway {
                 
                 jmsConnection.start();
                 
+                registerDevices();
+                
                 while (state != RunnableState.STOPPING) {
                 	
                     handleOutboundPacketsTo(null,outboundConsumer,inboundProducer);
@@ -124,8 +134,48 @@ public class SIPROGateway extends Gateway {
 	        queryParams.add("method","setValueParam");
 	        queryParams.add("params",paramsString);
 			
-			client.resource(TARGET).queryParams(queryParams).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+			client.resource(SIPRO_TARGET).queryParams(queryParams).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 		}
+    }
+    
+    private void registerDevices() {
+    	
+	    try {
+	    	 
+	    	File fXmlFile = new File("/home/geretti/Public/sources/uniud/easyhome/rest/src/test/resources/datamodel.xml");
+	    	String xmlContent = fXmlFile.toString();
+	    	InputSource is = new InputSource(new StringReader(xmlContent));
+	    	DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+	    	DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+	    	Document doc = dBuilder.parse(is);
+
+	    	//doc.getDocumentElement().normalize();
+	     
+	    	System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
+	     
+	    	NodeList nList = doc.getElementsByTagName("output1");
+	     
+	    	System.out.println("----------------------------");
+	     
+	    	for (int temp = 0; temp < nList.getLength(); temp++) {
+	     
+	    		Node nNode = nList.item(temp);
+	     
+	    		System.out.println("\nCurrent Element :" + nNode.getNodeName());
+	     
+	    		if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+	     
+	    			Element eElement = (Element) nNode;
+	     
+	    			System.out.println("State : " + eElement.getElementsByTagName("state").item(0).getTextContent());
+	     
+	    		}
+	    	}
+	    } catch (Exception e) {
+	    	e.printStackTrace();
+	    }	
+    	
+    	
     }
   
 }
