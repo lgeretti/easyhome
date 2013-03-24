@@ -433,7 +433,7 @@ function selectRoom(room,isEntryPoint) {
    $.ajax({ 
        type: "GET",
        dataType: "json",
-       url: host+"rest/persistentinfo/?locationId="+roomId,
+       url: host+"rest/nodes/?locationId="+roomId,
        success: function(data){        
           roomDevices = data;
 											
@@ -672,7 +672,7 @@ function moveCurrentDeviceTo(room) {
 	   $.ajax({ 
 	       type: "PUT",
 	       data: "name="+room.name,
-	       url: host+"rest/persistentinfo/"+currentDevice.gatewayId+"/"+currentDevice.nuid+"/location"
+	       url: host+"rest/persistentinfo/"+currentDevice.coordinates.gatewayId+"/"+currentDevice.coordinates.nuid+"/location"
 	   });  
 	
 	selectState(uiState.Device);
@@ -778,7 +778,7 @@ function showFunctionality(functionality) {
   	    functionalityOptions = $.parseJSON($.ajax({ 
   	       type: "GET",
   	       dataType: "json",
-  	       url: host+"rest/persistentinfo?deviceType="+destinationDeviceType,
+  	       url: host+"rest/nodes?deviceType="+destinationDeviceType,
   	       async: false
   	    }).responseText);
   	    
