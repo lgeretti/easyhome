@@ -209,7 +209,7 @@ public class SIPROGateway extends Gateway {
 
     private void registerLamp(String identifier, NodeList parameters) {
     	byte gatewayId = 3;
-    	boolean online = (parameters.item(1).getTextContent() == "ON");
+    	boolean online = (parameters.item(1).getTextContent().equals("ON"));
 		long nuid = Long.parseLong(parameters.item(3).getTextContent() + parameters.item(5).getTextContent() + parameters.item(7).getTextContent(),16);
 		byte red = fromHexStringToByte(parameters.item(9).getTextContent());
 		byte green = fromHexStringToByte(parameters.item(11).getTextContent());
