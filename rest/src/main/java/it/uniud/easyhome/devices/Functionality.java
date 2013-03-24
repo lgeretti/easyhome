@@ -25,11 +25,11 @@ public class Functionality {
     @SuppressWarnings("unused")
 	private Functionality() {}
     
-    public Functionality(long id,  String name, FunctionalityType type,PersistentInfo device, String imgPath, String help) {
+    public Functionality(long id,  String name, FunctionalityType type, PersistentInfo info, String imgPath, String help) {
     	this.id = id;
     	this.name = name;
     	this.type = type;
-    	this.info = device;
+    	this.info = info;
     	this.imgPath = imgPath;
     	this.help = help;
     }

@@ -47,18 +47,18 @@ public final class FunctionalityResource {
     @POST
     public Response insertFunctionality(@FormParam("name") String name, 
     									@FormParam("type") FunctionalityType type,
-    									@FormParam("deviceId") long deviceId, 
+    									@FormParam("infoId") long infoId, 
     								  	@FormParam("imgPath") String imgPath,
     								  	@FormParam("help") String help) {
     	
-    	PersistentInfo device = resEjb.findPersistentInfoById(deviceId);
-    		
-	    if (device == null)
+    	PersistentInfo info = resEjb.findPersistentInfoById(infoId);
+    	
+	    if (info == null)
 	    	throw new WebApplicationException(Response.Status.BAD_REQUEST);
     			
 	    synchronized(funcLock) {
 	    	
-    		resEjb.insertFunctionality(new Functionality(++functionalityId,name,type,device,imgPath,help));
+    		resEjb.insertFunctionality(new Functionality(++functionalityId,name,type,info,imgPath,help));
     		
     		return Response.created(
                 	uriInfo.getAbsolutePathBuilder()

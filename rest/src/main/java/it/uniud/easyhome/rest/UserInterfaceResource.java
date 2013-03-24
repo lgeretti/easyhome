@@ -336,7 +336,7 @@ public class UserInterfaceResource {
 	        formData.add("help", "E' possibile spostare il dispositivo in un'altra stanza");
 	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146521827785L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146521827785L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-	        long zigbeeGatewayId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
+	        long zigbeeGatewayInfoId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
 	    	
 	        formData = new MultivaluedMapImpl();
 	        formData.add("name","Interfaccia gestuale");
@@ -346,7 +346,7 @@ public class UserInterfaceResource {
 	        formData.add("help", "E' possibile cambiare la lampada associata all'interfaccia e spostare il dispositivo in un'altra stanza");
 	        client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928337L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928337L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-	        long gestualId = JsonUtils.getFrom(response, PersistentInfo.class).getId();     
+	        long gestualInfoId = JsonUtils.getFrom(response, PersistentInfo.class).getId();     
 	    	
 	        formData = new MultivaluedMapImpl();
 	        formData.add("name","Interfaccia gestuale (test)");
@@ -356,7 +356,7 @@ public class UserInterfaceResource {
 	        formData.add("help", "E' possibile cambiare la lampada associata all'interfaccia e spostare il dispositivo in un'altra stanza");
 	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928181L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928181L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-	        long testGestualId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
+	        long testGestualInfoId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
 	    	
 	    	// PowerLine
 	    	
@@ -376,7 +376,7 @@ public class UserInterfaceResource {
 	        response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(100L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        long plGatewayId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
 	    	
-	    	long timerId = addFakeDevices(locs);
+	    	long timerInfoId = addFakeDevices(locs);
 	    	
 	    	// Functionalities
 	    	
@@ -385,9 +385,9 @@ public class UserInterfaceResource {
 	        formData.add("type",FunctionalityType.PAIRING.toString());
 	        formData.add("imgPath","img/link.svg");
 	        formData.add("help", "Scegli una lampada a cui associare l'interfaccia gestuale. La precedente associazione verrà annullata");
-	        formData.putSingle("infoId",Long.toString(testGestualId));
+	        formData.putSingle("infoId",Long.toString(testGestualInfoId));
 	    	client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	    	formData.putSingle("infoId",Long.toString(gestualId));
+	    	formData.putSingle("infoId",Long.toString(gestualInfoId));
 	    	client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	    	
 	    	formData = new MultivaluedMapImpl();
@@ -415,15 +415,15 @@ public class UserInterfaceResource {
 	        formData.add("type",FunctionalityType.MOVE_ROOM.toString());
 	        formData.add("imgPath","img/move.svg");
 	        formData.add("help", "Seleziona la nuova stanza in cui spostare il dispositivo");
-	        formData.add("infoId",Long.toString(zigbeeGatewayId));
+	        formData.add("infoId",Long.toString(zigbeeGatewayInfoId));
 	    	client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        formData.putSingle("infoId",Long.toString(plGatewayId));
 	        client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	        formData.putSingle("infoId",Long.toString(testGestualId));
+	        formData.putSingle("infoId",Long.toString(testGestualInfoId));
 	        client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	        formData.putSingle("infoId",Long.toString(gestualId));
+	        formData.putSingle("infoId",Long.toString(gestualInfoId));
 	        client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	        formData.putSingle("infoId",Long.toString(timerId));
+	        formData.putSingle("infoId",Long.toString(timerInfoId));
 	        client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        
 	        addStates(lampadaSalottoInfoId,lampadaCameraDoppiaInfoId,frigoInfoId);

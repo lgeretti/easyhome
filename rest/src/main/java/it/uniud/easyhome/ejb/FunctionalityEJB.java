@@ -62,7 +62,7 @@ public class FunctionalityEJB {
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<Functionality> criteria = builder.createQuery(Functionality.class);
         Root<Functionality> func = criteria.from(Functionality.class);
-        criteria.select(func).where(builder.equal(func.get("device").get("id"), infoId));
+        criteria.select(func).where(builder.equal(func.get("info").get("id"), infoId));
         
         TypedQuery<Functionality> query = em.createQuery(criteria);
 		
