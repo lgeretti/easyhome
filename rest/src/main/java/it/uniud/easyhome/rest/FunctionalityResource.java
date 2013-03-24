@@ -31,11 +31,11 @@ public final class FunctionalityResource {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Functionality> getFunctionalities(@QueryParam("deviceId") long deviceId,
+    public List<Functionality> getFunctionalities(@QueryParam("infoId") long infoId,
     											  @QueryParam("functionalityType") FunctionalityType funcType) {
     	
-    	if (deviceId != 0)
-    		return resEjb.getFunctionalitiesByDeviceId(deviceId);
+    	if (infoId != 0)
+    		return resEjb.getFunctionalitiesByInfoId(infoId);
     	
     	if (funcType != null)
     		return resEjb.getFunctionalitiesByFunctionalityType(funcType);
@@ -51,14 +51,14 @@ public final class FunctionalityResource {
     								  	@FormParam("imgPath") String imgPath,
     								  	@FormParam("help") String help) {
     	
-    	Node node = resEjb.findNodeById(deviceId);
+    	PersistentInfo device = resEjb.findPersistentInfoById(deviceId);
     		
-	    if (node == null)
+	    if (device == null)
 	    	throw new WebApplicationException(Response.Status.BAD_REQUEST);
     			
 	    synchronized(funcLock) {
 	    	
-    		resEjb.insertFunctionality(new Functionality(++functionalityId,name,type,node,imgPath,help));
+    		resEjb.insertFunctionality(new Functionality(++functionalityId,name,type,device,imgPath,help));
     		
     		return Response.created(
                 	uriInfo.getAbsolutePathBuilder()

@@ -450,13 +450,13 @@ function selectRoom(room,isEntryPoint) {
 function selectDevice(device) {
 
    currentDevice = device;
-   var deviceId = device.id;
+   var infoId = device.info.id;
    $("#eh_nav_device").find('img').attr('src',device.info.imgPath).attr('alt',device.info.name);
   
    $.ajax({ 
        type: "GET",
        dataType: "json",
-       url: host+"rest/functionalities/?deviceId="+deviceId,
+       url: host+"rest/functionalities/?infoId="+infoId,
        success: function(data){        
           deviceFunctionalities = data;
                                             

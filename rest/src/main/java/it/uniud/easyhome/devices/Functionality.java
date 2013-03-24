@@ -1,8 +1,5 @@
 package it.uniud.easyhome.devices;
 
-
-import it.uniud.easyhome.network.Node;
-
 import javax.persistence.*;
 import javax.xml.bind.annotation.*;
 
@@ -19,7 +16,7 @@ public class Functionality {
     @Column
     private FunctionalityType type;
     @OneToOne
-    private Node device;
+    private PersistentInfo info;
     @Column
     private String imgPath;
     @Column
@@ -28,11 +25,11 @@ public class Functionality {
     @SuppressWarnings("unused")
 	private Functionality() {}
     
-    public Functionality(long id,  String name, FunctionalityType type, Node device, String imgPath, String help) {
+    public Functionality(long id,  String name, FunctionalityType type,PersistentInfo device, String imgPath, String help) {
     	this.id = id;
     	this.name = name;
     	this.type = type;
-    	this.device = device;
+    	this.info = device;
     	this.imgPath = imgPath;
     	this.help = help;
     }
@@ -53,8 +50,8 @@ public class Functionality {
     	return this.type;
     }
     
-	public Node getDevice() {
-		return this.device;
+	public PersistentInfo getInfo() {
+		return this.info;
 	}
 	
 	public String getImgPath() {
@@ -73,7 +70,7 @@ public class Functionality {
         Functionality otherFunctionality = (Functionality) other;
         
         if (!this.name.equals(otherFunctionality.name)) return false;
-        if (!this.device.equals(otherFunctionality.device)) return false;
+        if (!this.info.equals(otherFunctionality.info)) return false;
         
         return true;
     }
@@ -84,7 +81,7 @@ public class Functionality {
 
         long result = 1;
         result = prime * result + name.hashCode();
-        result = prime * result + device.hashCode();
+        result = prime * result + info.hashCode();
         return (int)result;
     }
 }

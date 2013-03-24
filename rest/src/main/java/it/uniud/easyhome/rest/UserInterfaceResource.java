@@ -385,9 +385,9 @@ public class UserInterfaceResource {
 	        formData.add("type",FunctionalityType.PAIRING.toString());
 	        formData.add("imgPath","img/link.svg");
 	        formData.add("help", "Scegli una lampada a cui associare l'interfaccia gestuale. La precedente associazione verrà annullata");
-	        formData.putSingle("deviceId",Long.toString(testGestualId));
+	        formData.putSingle("infoId",Long.toString(testGestualId));
 	    	client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	    	formData.putSingle("deviceId",Long.toString(gestualId));
+	    	formData.putSingle("infoId",Long.toString(gestualId));
 	    	client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	    	
 	    	formData = new MultivaluedMapImpl();
@@ -395,9 +395,9 @@ public class UserInterfaceResource {
 	        formData.add("type",FunctionalityType.LUMINOSITY_CONTROL.toString());
 	        formData.add("imgPath","img/sun.svg");
 	        formData.add("help", "Seleziona il livello di luminosità preferito, da 1 tacca (0%) a 9 tacche (100%)");
-	        formData.putSingle("deviceId",Long.toString(lampadaCameraDoppiaInfoId));
+	        formData.putSingle("infoId",Long.toString(lampadaCameraDoppiaInfoId));
 	    	client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	    	formData.putSingle("deviceId",Long.toString(lampadaSalottoInfoId));
+	    	formData.putSingle("infoId",Long.toString(lampadaSalottoInfoId));
 	    	client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	    	
 	    	formData = new MultivaluedMapImpl();
@@ -405,9 +405,9 @@ public class UserInterfaceResource {
 	        formData.add("type",FunctionalityType.COLOR_CONTROL.toString());
 	        formData.add("imgPath","img/colorpalette.svg");
 	        formData.add("help", "Seleziona il bilanciamento colore preferito per ognuno dei tre colori (crescente da sinistra verso destra)");
-	        formData.putSingle("deviceId",Long.toString(lampadaCameraDoppiaInfoId));
+	        formData.putSingle("infoId",Long.toString(lampadaCameraDoppiaInfoId));
 	    	client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	        formData.putSingle("deviceId",Long.toString(lampadaSalottoInfoId));
+	        formData.putSingle("infoId",Long.toString(lampadaSalottoInfoId));
 	    	client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	    	
 	    	formData = new MultivaluedMapImpl();
@@ -415,15 +415,15 @@ public class UserInterfaceResource {
 	        formData.add("type",FunctionalityType.MOVE_ROOM.toString());
 	        formData.add("imgPath","img/move.svg");
 	        formData.add("help", "Seleziona la nuova stanza in cui spostare il dispositivo");
-	        formData.add("deviceId",Long.toString(zigbeeGatewayId));
+	        formData.add("infoId",Long.toString(zigbeeGatewayId));
 	    	client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	        formData.putSingle("deviceId",Long.toString(plGatewayId));
+	        formData.putSingle("infoId",Long.toString(plGatewayId));
 	        client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	        formData.putSingle("deviceId",Long.toString(testGestualId));
+	        formData.putSingle("infoId",Long.toString(testGestualId));
 	        client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	        formData.putSingle("deviceId",Long.toString(gestualId));
+	        formData.putSingle("infoId",Long.toString(gestualId));
 	        client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	        formData.putSingle("deviceId",Long.toString(timerId));
+	        formData.putSingle("infoId",Long.toString(timerId));
 	        client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        
 	        addStates(lampadaSalottoInfoId,lampadaCameraDoppiaInfoId,frigoInfoId);

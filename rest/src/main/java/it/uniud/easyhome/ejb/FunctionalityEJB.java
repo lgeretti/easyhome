@@ -2,7 +2,7 @@ package it.uniud.easyhome.ejb;
 
 import it.uniud.easyhome.devices.Functionality;
 import it.uniud.easyhome.devices.FunctionalityType;
-import it.uniud.easyhome.network.Node;
+import it.uniud.easyhome.devices.PersistentInfo;
 
 import java.util.List;
 
@@ -53,16 +53,16 @@ public class FunctionalityEJB {
         	em.remove(func);
 	}
 	
-	public Node findNodeById(long id) {
-		return em.find(Node.class, id);
+	public PersistentInfo findPersistentInfoById(long infoId) {
+		return em.find(PersistentInfo.class, infoId);
 	}
 	
-	public List<Functionality> getFunctionalitiesByDeviceId(long deviceId) {
+	public List<Functionality> getFunctionalitiesByInfoId(long infoId) {
 		
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<Functionality> criteria = builder.createQuery(Functionality.class);
         Root<Functionality> func = criteria.from(Functionality.class);
-        criteria.select(func).where(builder.equal(func.get("device").get("id"), deviceId));
+        criteria.select(func).where(builder.equal(func.get("device").get("id"), infoId));
         
         TypedQuery<Functionality> query = em.createQuery(criteria);
 		
