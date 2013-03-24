@@ -347,23 +347,6 @@ public final class StateResource {
     	return Response.ok().build();
     }   
     
-    @POST
-    @Path("fridges/{id}")
-    public Response updateFridgeLastCode(@PathParam("id") long id,
-    								@FormParam("lastCode") FridgeCode lastCode) {
-    		
-    	FridgeState thisFridge = resEjb.findStateByInfoId(id,FridgeState.class);
-    	
-    	if (thisFridge == null)
-    		throw new WebApplicationException(Response.Status.NOT_FOUND);
-    	
-    	thisFridge.setLastCode(lastCode);
-    	
-    	resEjb.updateManagedState(thisFridge);
-    	
-    	return Response.ok().build();
-    }
-    
     @PUT
     @Path("sensors/presence/{id}/occupied")
     public Response updatePresenceSensorOccupied(@PathParam("id") long id) {
