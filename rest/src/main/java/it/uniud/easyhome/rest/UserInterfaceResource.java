@@ -44,7 +44,6 @@ import org.codehaus.jettison.json.JSONException;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 @Path(RestPaths.ADMIN)
@@ -186,7 +185,7 @@ public class UserInterfaceResource {
 		insertProcess(ProcessKind.NETWORK_UPDATE);
 		
 		insertProcess(ProcessKind.OCCUPANCY_REQUEST);
-		insertProcess(ProcessKind.OCCUPANCY_REGISTRATION, LogLevel.DEBUG);
+		insertProcess(ProcessKind.OCCUPANCY_REGISTRATION);
 		
 		insertProcess(ProcessKind.LIGHT_LEVEL_CONTROL,LogLevel.DEBUG);
 		
@@ -428,6 +427,14 @@ public class UserInterfaceResource {
 	        formData.putSingle("infoId",Long.toString(lampadaCameraDoppiaInfoId));
 	    	client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        formData.putSingle("infoId",Long.toString(lampadaSalottoInfoId));
+	    	client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+
+	    	formData = new MultivaluedMapImpl();
+	        formData.add("name","Allarme");
+	        formData.add("type",FunctionalityType.ALARM_ISSUING.toString());
+	        formData.add("imgPath","img/bell.svg");
+	        formData.add("help", "Nessuna funzione prevista: è semplicemente possibile rilevare la presenza di allarme");
+	        formData.putSingle("infoId",Long.toString(frigoInfoId));
 	    	client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	    	
 	    	formData = new MultivaluedMapImpl();
