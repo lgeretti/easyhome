@@ -1,6 +1,5 @@
 package it.uniud.easyhome.devices.states;
 
-import it.uniud.easyhome.devices.PersistentInfo;
 import it.uniud.easyhome.network.Node;
 
 import javax.persistence.*;

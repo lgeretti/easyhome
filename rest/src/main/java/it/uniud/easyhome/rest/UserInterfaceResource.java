@@ -244,11 +244,11 @@ public class UserInterfaceResource {
 
 	        formData = new MultivaluedMapImpl();
 	        formData.add("gatewayId",Byte.toString((byte)3));
-	        formData.add("nuid",Long.toString(424752L));
-	        formData.add("address",Short.toString((short)4752));
+	        formData.add("nuid",Long.toString(0x424752L));
+	        formData.add("address",Short.toString((short)0x4752));
 	        formData.add("permanent",Boolean.toString(true));
 	        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	        response = client.resource(TARGET).path(RestPaths.NODES).path(Byte.toString((byte)3)).path(Short.toString((short)4752)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	        response = client.resource(TARGET).path(RestPaths.NODES).path(Byte.toString((byte)3)).path(Short.toString((short)0x4752)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        node = JsonUtils.getFrom(response, Node.class);
 	        endpoints = new ArrayList<Byte>();
 	        endpoints.add((byte)1);
@@ -266,19 +266,19 @@ public class UserInterfaceResource {
 	        formData.add("deviceType", DeviceType.COLORED_LAMP.toString());
 	        formData.add("imgPath","img/colorlight.svg");
 	        formData.add("help", "E' possibile cambiare luce o colore della lampada");
-	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(424752L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(424752L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(0x424752L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(0x424752L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        long lampadaSalottoInfoId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
 	        
 	        // Lampada camera doppia
 	        
 	        formData = new MultivaluedMapImpl();
 	        formData.add("gatewayId",Byte.toString((byte)3));
-	        formData.add("nuid",Long.toString(524742L));
-	        formData.add("address",Short.toString((short)4742));
+	        formData.add("nuid",Long.toString(0x524742L));
+	        formData.add("address",Short.toString((short)0x4742));
 	        formData.add("permanent",Boolean.toString(true));
 	        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	        response = client.resource(TARGET).path(RestPaths.NODES).path(Byte.toString((byte)3)).path(Short.toString((short)4742)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	        response = client.resource(TARGET).path(RestPaths.NODES).path(Byte.toString((byte)3)).path(Short.toString((short)0x4742)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        node = JsonUtils.getFrom(response, Node.class);
 	        endpoints = new ArrayList<Byte>();
 	        endpoints.add((byte)1);
@@ -296,19 +296,19 @@ public class UserInterfaceResource {
 	        formData.add("deviceType", DeviceType.COLORED_LAMP.toString());
 	        formData.add("imgPath","img/colorlight.svg");
 	        formData.add("help", "E' possibile cambiare luce o colore della lampada");
-	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(524742L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(524742L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(0x524742L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(0x524742L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        long lampadaCameraDoppiaInfoId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
 	        
 	        // Frigo
 	        
 	        formData = new MultivaluedMapImpl();
 	        formData.add("gatewayId",Byte.toString((byte)3));
-	        formData.add("nuid",Long.toString(101010L));
-	        formData.add("address",Short.toString((short)1010));
+	        formData.add("nuid",Long.toString(0x101010L));
+	        formData.add("address",Short.toString((short)0x1010));
 	        formData.add("permanent",Boolean.toString(true));
 	        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	        response = client.resource(TARGET).path(RestPaths.NODES).path(Byte.toString((byte)3)).path(Short.toString((short)1010)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	        response = client.resource(TARGET).path(RestPaths.NODES).path(Byte.toString((byte)3)).path(Short.toString((short)0x1010)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        node = JsonUtils.getFrom(response, Node.class);
 	        endpoints = new ArrayList<Byte>();
 	        endpoints.add((byte)1);
@@ -323,8 +323,8 @@ public class UserInterfaceResource {
 	        formData.add("locationName",locs.get(1));
 	        formData.add("imgPath","img/fridge.svg");
 	        formData.add("help", "Nessuna funzione correntemente disponibile");
-	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(101010L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(101010L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(0x101010L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(0x101010L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	    	long frigoInfoId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
 	        
 	        // ZigBee devices, being non-persistent, will create nodes as soon as discovered, and their info will be associated when the node is created
@@ -362,8 +362,8 @@ public class UserInterfaceResource {
 	    	
 	        formData = new MultivaluedMapImpl();
 	        formData.add("gatewayId",Byte.toString((byte)3));
-	        formData.add("nuid",Long.toString(100L));
-	        formData.add("address",Short.toString((short)100));
+	        formData.add("nuid",Long.toString(0x100L));
+	        formData.add("address",Short.toString((short)0x100));
 	        formData.add("permanent",Boolean.toString(true));
 	        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        
@@ -372,8 +372,8 @@ public class UserInterfaceResource {
 	        formData.add("locationName",locs.get(0));
 	        formData.add("imgPath","img/accesspoint.svg");
 	        formData.add("help", "E' possibile spostare il dispositivo in un'altra stanza");
-	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(100L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	        response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(100L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(0x100L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	        response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(0x100L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        long plGatewayId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
 	    	
 	    	long timerInfoId = addFakeDevices(locs);

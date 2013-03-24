@@ -6,6 +6,7 @@ import it.uniud.easyhome.devices.states.*;
 import it.uniud.easyhome.ejb.StateEJB;
 import it.uniud.easyhome.exceptions.MultipleLinkException;
 import it.uniud.easyhome.network.*;
+import it.uniud.easyhome.packets.natives.LampStateSetPacket;
 
 import java.util.List;
 import java.util.Set;
@@ -131,7 +132,7 @@ public final class StateResource {
     
     @POST
     @Path("lamps/{id}")
-    public Response updateLampState(@PathParam("id") long id,
+    public Response updateLampStateFromDevice(@PathParam("id") long id,
     								@FormParam("on") boolean on,
     								@FormParam("red") byte red,
     								@FormParam("green") byte green,
@@ -153,6 +154,9 @@ public final class StateResource {
     	
     	resEjb.updateManagedState(thisLamp);
     	
+    	// We do not send back the update request to the device, since the information came from there
+    	// FIXME: if we want, some time in the future, change more than one parameter at once, we must discriminate the source
+    	
     	return Response.ok().build();
     }    
     
@@ -169,6 +173,8 @@ public final class StateResource {
     	thisLamp.setRed(value);
     	
     	resEjb.updateManagedState(thisLamp);
+    	
+    	sendLampStateUpdateMessage(thisLamp);
     	
     	return Response.ok().build();
     }   
@@ -187,6 +193,8 @@ public final class StateResource {
     	
     	resEjb.updateManagedState(thisLamp);
     	
+    	sendLampStateUpdateMessage(thisLamp);
+    	
     	return Response.ok().build();
     }   
     
@@ -204,6 +212,8 @@ public final class StateResource {
     	
     	resEjb.updateManagedState(thisLamp);
     	
+    	sendLampStateUpdateMessage(thisLamp);
+    	
     	return Response.ok().build();
     }   
     
@@ -220,6 +230,8 @@ public final class StateResource {
     	thisLamp.setWhite(value);
     	
     	resEjb.updateManagedState(thisLamp);
+    	
+    	sendLampStateUpdateMessage(thisLamp);
     	
     	return Response.ok().build();
     }   
@@ -283,28 +295,24 @@ public final class StateResource {
         return Response.ok().build();
     }
     
-    private void sendWhiteLampStateUpdateMessage(LampState state, int level) {
+    private void sendLampStateUpdateMessage(LampState lampState) {
     	
     	try {
 	    	jndiContext = new InitialContext();
 	        ConnectionFactory connectionFactory = (ConnectionFactory) jndiContext.lookup(JMSConstants.CONNECTION_FACTORY);
 	        
-	        Topic networkEventsTopic = (Topic) jndiContext.lookup(JMSConstants.NETWORK_EVENTS_TOPIC);
+	        Topic outboundPacketsTopic = (Topic) jndiContext.lookup(JMSConstants.OUTBOUND_PACKETS_TOPIC);
 	        
 	        jmsConnection = connectionFactory.createConnection();
 	        jmsSession = jmsConnection.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
-	        MessageProducer producer = jmsSession.createProducer(networkEventsTopic);
+	        MessageProducer producer = jmsSession.createProducer(outboundPacketsTopic);
 	            
 	        jmsConnection.start();
-	        
-	        Node node = state.getDevice();
-	        
 	    	
-			NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.LEVEL_CONTROL_VARIATION, 
-					node.getCoordinates().getGatewayId(), node.getCoordinates().getAddress(),new byte[]{(byte)0,(byte)(level & 0x0FF)});
+			LampStateSetPacket packet = new LampStateSetPacket(lampState);
         
-            ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
-            producer.send(eventMessage);
+            ObjectMessage changeMessage = jmsSession.createObjectMessage(packet);
+            producer.send(changeMessage);
         } catch (JMSException ex) { 
         	
         } catch (NamingException e) {

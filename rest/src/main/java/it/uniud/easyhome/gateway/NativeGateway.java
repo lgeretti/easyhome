@@ -5,6 +5,8 @@ import it.uniud.easyhome.packets.natives.NativePacket;
 
 import java.io.*;
 
+import javax.jms.MessageProducer;
+
 public class NativeGateway extends Gateway {
 	
     public NativeGateway(byte id, int port) {
@@ -47,7 +49,7 @@ public class NativeGateway extends Gateway {
     }
     
     @Override
-    final protected void write(NativePacket pkt, OutputStream os) throws IOException {
+    final protected void write(NativePacket pkt, OutputStream os, MessageProducer producer) throws IOException {
     	
 		pkt.write(os);
     }
