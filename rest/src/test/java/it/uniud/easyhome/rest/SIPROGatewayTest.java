@@ -133,8 +133,8 @@ public class SIPROGatewayTest {
 	    
 	    	NodeList dataCategories = doc.getElementsByTagName("data");
 	     
-	    	handleSensors(dataCategories.item(0));
-	    	handleActuators(dataCategories.item(1));
+	    	handleActuators(dataCategories.item(0));
+	    	handleSensors(dataCategories.item(1));
 	    	
 	    } catch (Exception e) {
 	    	e.printStackTrace();
@@ -143,7 +143,7 @@ public class SIPROGatewayTest {
     	
     }
     
-    private void handleSensors(Node node) {
+    private void handleActuators(Node node) {
     	NodeList children = node.getChildNodes();
     	for (int i=0;i<children.getLength();i++) {
     		Node child = children.item(i);
@@ -153,7 +153,7 @@ public class SIPROGatewayTest {
     	}
     }
 
-    private void handleActuators(Node node) {
+    private void handleSensors(Node node) {
     	NodeList children = node.getChildNodes();
     	for (int i=0;i<children.getLength();i++) {
     		Node child = children.item(i);

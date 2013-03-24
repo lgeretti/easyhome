@@ -17,6 +17,7 @@ import it.uniud.easyhome.packets.xbee.XBeePacketFromNode;
 import java.io.*;
 
 import javax.jms.MessageProducer;
+import javax.jms.Session;
 
 public class XBeeGateway extends Gateway {
     
@@ -134,7 +135,7 @@ public class XBeeGateway extends Gateway {
     }
     
     @Override
-    final protected void write(NativePacket pkt, OutputStream os, MessageProducer producer) throws IOException {
+    final protected void write(NativePacket pkt, OutputStream os, Session jmsSession, MessageProducer producer) throws IOException {
     	
     	// NOTE: we do not need to remap back the endpoint of the source, since the gateway will become the source
     	// We instead need to rewrite the endpoints in the APS payload, where present, thus depending on the packet type

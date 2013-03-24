@@ -7,6 +7,7 @@ import it.uniud.easyhome.packets.natives.NativePacket;
 import java.io.*;
 
 import javax.jms.MessageProducer;
+import javax.jms.Session;
 
 public class NativeGateway extends Gateway {
 	
@@ -50,7 +51,7 @@ public class NativeGateway extends Gateway {
     }
     
     @Override
-    final protected void write(NativePacket pkt, OutputStream os, MessageProducer producer) throws IOException {
+    final protected void write(NativePacket pkt, OutputStream os, Session jmsSession, MessageProducer producer) throws IOException {
     	
 		pkt.write(os);
     }

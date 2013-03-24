@@ -1,15 +1,23 @@
 package it.uniud.easyhome.gateway;
 
+import it.uniud.easyhome.common.ByteUtils;
+import it.uniud.easyhome.common.Endianness;
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.common.RunnableState;
+import it.uniud.easyhome.contexts.HomeAutomationContext;
 import it.uniud.easyhome.devices.states.ColoredAlarm;
 import it.uniud.easyhome.devices.states.FridgeCode;
 import it.uniud.easyhome.exceptions.IncompletePacketException;
+import it.uniud.easyhome.network.ModuleCoordinates;
 import it.uniud.easyhome.network.NetworkJobType;
+import it.uniud.easyhome.packets.Domain;
+import it.uniud.easyhome.packets.Operation;
 import it.uniud.easyhome.packets.natives.LampStateSetPacket;
 import it.uniud.easyhome.packets.natives.NativePacket;
+import it.uniud.easyhome.packets.natives.NodeDescrReqPacket;
 import it.uniud.easyhome.packets.natives.OccupancyAttributeReqPacket;
+import it.uniud.easyhome.packets.natives.OccupancyAttributeRspPacket;
 import it.uniud.easyhome.rest.RestPaths;
 
 import java.io.*;
@@ -24,6 +32,7 @@ import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
+import javax.jms.ObjectMessage;
 import javax.jms.Session;
 import javax.jms.Topic;
 import javax.naming.Context;
@@ -102,7 +111,7 @@ public class SIPROGateway extends Gateway {
                 while (state != RunnableState.STOPPING) {
                 	
                 	registerDevices();
-                    handleOutboundPacketsTo(null,outboundConsumer,inboundProducer);
+                    handleOutboundPacketsTo(null,outboundConsumer,jmsSession,inboundProducer);
                 }
                 
             } catch (SocketException ex) {
@@ -129,7 +138,7 @@ public class SIPROGateway extends Gateway {
     }
     
     @Override
-    final protected void write(NativePacket pkt, OutputStream os, MessageProducer producer) throws IOException {
+    final protected void write(NativePacket pkt, OutputStream os, Session jmsSession, MessageProducer producer) throws IOException {
     	
 		if (LampStateSetPacket.validates(pkt)) {
 			
@@ -147,9 +156,37 @@ public class SIPROGateway extends Gateway {
 			
 		} else if (OccupancyAttributeReqPacket.validates(pkt)) {
 			
+			long destinationNuid = pkt.getDstCoords().getNuid();
 			
-			
+			sendCorrespondingSensorData(destinationNuid,jmsSession,producer);
 		}
+    }
+    
+    private void sendCorrespondingSensorData(long destinationNuid, Session jmsSession, MessageProducer producer) {
+    	
+	    try {
+	    	
+	    	File xmlFile = new File("/home/geretti/Public/sources/uniud/easyhome/rest/src/test/resources/sensors.xml");
+	    	String xmlContent = "";
+	    	
+	        try{
+	            xmlContent = FileUtils.readFileToString(xmlFile);
+	        }catch(IOException e){
+	            e.printStackTrace();
+	        } 
+	        
+	    	InputSource is = new InputSource(new StringReader(xmlContent));
+	    	DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+	    	DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+	    	Document doc = dBuilder.parse(is);
+	    
+	    	NodeList inputs = doc.getElementsByTagName("data").item(0).getChildNodes();
+	     
+	    	handleSensorReply(inputs,destinationNuid,jmsSession,producer);
+	    	
+	    } catch (Exception e) {
+	    	e.printStackTrace();
+	    }	   
     }
     
     private void registerDevices() {
@@ -172,15 +209,15 @@ public class SIPROGateway extends Gateway {
 	    
 	    	NodeList dataCategories = doc.getElementsByTagName("data");
 	     
-	    	handleSensors(dataCategories.item(0));
-	    	handleActuators(dataCategories.item(1));
+	    	handleActuators(dataCategories.item(0));
+	    	handleSensors(dataCategories.item(1));
 	    	
 	    } catch (Exception e) {
 	    	e.printStackTrace();
 	    }	
     }
     
-    private void handleSensors(Node node) {
+    private void handleActuators(Node node) {
     	NodeList children = node.getChildNodes();
     	for (int i=0;i<children.getLength();i++) {
     		Node child = children.item(i);
@@ -192,7 +229,7 @@ public class SIPROGateway extends Gateway {
     	}
     }
 
-    private void handleActuators(Node node) {
+    private void handleSensors(Node node) {
     	NodeList children = node.getChildNodes();
     	for (int i=0;i<children.getLength();i++) {
     		Node child = children.item(i);
@@ -209,12 +246,27 @@ public class SIPROGateway extends Gateway {
     	}
     }    
     
+    private void handleSensorReply(NodeList inputs, long nuid, Session jmsSession, MessageProducer producer) {
+    	for (int i=0;i<inputs.getLength();i++) {
+    		Node input = inputs.item(i);
+    		if (input.getNodeName() != "#text") {
+    			NodeList parameters = input.getChildNodes();
+    			if (parameters.getLength() == 15) {
+    				if (handleSensorReplyForFridge(parameters,nuid,jmsSession,producer))
+    					break;
+    			} else {
+    				if (handleSensorReplyForPIR(parameters,nuid,jmsSession,producer))
+    					break;
+    			}
+    		}
+    	}
+    }    
+    
     private byte fromHexStringToByte(String value) {
     	return (byte)(Integer.parseInt(value,16) & 0xFF);
     }
 
     private void registerLamp(String identifier, NodeList parameters) {
-    	byte gatewayId = 3;
     	boolean online = (parameters.item(1).getTextContent().equals("ON"));
 		long nuid = Long.parseLong(parameters.item(3).getTextContent() + parameters.item(5).getTextContent() + parameters.item(7).getTextContent(),16);
 		byte red = fromHexStringToByte(parameters.item(9).getTextContent());
@@ -226,7 +278,7 @@ public class SIPROGateway extends Gateway {
 						   ", red=" + red + ", green=" + green + ", blue=" + blue + ", white=" + white + ", alarm=" + alarm);
 		
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        formData.add("gatewayId",Byte.toString(gatewayId));
+        formData.add("gatewayId",Byte.toString(this.id));
         formData.add("nuid",Long.toString(nuid));  
         formData.add("online",Boolean.toString(online));
         formData.add("identifier",identifier);
@@ -241,14 +293,13 @@ public class SIPROGateway extends Gateway {
     }
     
     private void registerFridge(String identifier, NodeList parameters) {
-    	byte gatewayId = 3;
 		long nuid = Long.parseLong(parameters.item(1).getTextContent() + parameters.item(3).getTextContent() + parameters.item(5).getTextContent(),16);
 		String codeString = parameters.item(7).getTextContent() + parameters.item(9).getTextContent() + parameters.item(11).getTextContent();
 		FridgeCode lastCode = FridgeCode.fromCode(Short.parseShort(codeString));
 		log(LogLevel.DEBUG,"To transmit: identifier=" + identifier + ", nuid=" + nuid + ", code=" + lastCode);
 		
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        formData.add("gatewayId",Byte.toString(gatewayId));
+        formData.add("gatewayId",Byte.toString(this.id));
         formData.add("nuid",Long.toString(nuid));  
         formData.add("identifier",identifier);
         formData.add("lastCode",lastCode.toString());
@@ -257,15 +308,60 @@ public class SIPROGateway extends Gateway {
         identifiersRegistered.add(identifier);
     }
     
+    private boolean handleSensorReplyForFridge(NodeList parameters, long nuidToMatch, Session jmsSession, MessageProducer producer) {
+		long nuid = Long.parseLong(parameters.item(1).getTextContent() + parameters.item(3).getTextContent() + parameters.item(5).getTextContent(),16);
+		if (nuid == nuidToMatch) {
+			String codeString = parameters.item(7).getTextContent() + parameters.item(9).getTextContent() + parameters.item(11).getTextContent();
+			FridgeCode lastCode = FridgeCode.fromCode(Short.parseShort(codeString));
+			log(LogLevel.DEBUG,"Code to transmit back from " + nuid + ": " + lastCode);
+			/*
+			 packet = new NodeDescrReqPacket(node.getCoordinates(),tsn);
+	        ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
+	        producer.send(outboundMessage); 
+			*/
+        	return true;
+		} else
+        	return false;
+    }
+    
+    private boolean handleSensorReplyForPIR(NodeList parameters, long nuidToMatch, Session jmsSession, MessageProducer producer) {
+		long nuid = Long.parseLong(parameters.item(1).getTextContent() + parameters.item(3).getTextContent() + parameters.item(5).getTextContent(),16);
+		if (nuid == nuidToMatch) {
+			String occupation = parameters.item(7).getTextContent() + parameters.item(9).getTextContent();
+			boolean occupied = (occupation == "5031");
+			log(LogLevel.DEBUG,"Occupation result to transmit back from " + nuid + ": " + occupied);
+			
+			short addr = (short)(nuid & 0xFFFF);
+			byte[] addrBytesLittleEndian = ByteUtils.getBytes(addr, Endianness.LITTLE_ENDIAN);
+			
+			byte[] payload = new byte[8];
+			payload[1] = addrBytesLittleEndian[0];
+			payload[2] = addrBytesLittleEndian[1];
+			payload[7] = (occupied ? (byte)0x1 : (byte)0x0);
+			ModuleCoordinates sourceCoordinates = new ModuleCoordinates(this.id,nuid,addr,(byte)1);
+			ModuleCoordinates destinationCoordinates = new ModuleCoordinates((byte)1,0L,(short)0,(byte)1);
+			Operation operation = new Operation((byte)0, Domain.HOME_AUTOMATION.getCode(), HomeAutomationContext.OCCUPANCY_SENSING.getCode(), (byte)0, (byte)1, payload);
+			OccupancyAttributeRspPacket packet = new OccupancyAttributeRspPacket(sourceCoordinates,destinationCoordinates,operation);
+	        ObjectMessage inboundMessage;
+			try {
+				inboundMessage = jmsSession.createObjectMessage(packet);
+				producer.send(inboundMessage); 
+			} catch (JMSException e) {
+				e.printStackTrace();
+			}
+        	return true;
+		} else
+        	return false;
+    }
+    
     private void registerPIR(String identifier, NodeList parameters) {
-    	byte gatewayId = 3;
 		long nuid = Long.parseLong(parameters.item(1).getTextContent() + parameters.item(3).getTextContent() + parameters.item(5).getTextContent(),16);
 		String occupation = parameters.item(7).getTextContent() + parameters.item(9).getTextContent();
 		boolean occupied = (occupation == "5031");
-		log(LogLevel.DEBUG,"To transmit: identifier=" + identifier + ", nuid=" + nuid + ", occupied=" + occupied);
+		log(LogLevel.DEBUG,"Initialization: identifier=" + identifier + ", nuid=" + nuid + ", occupied=" + occupied);
 		
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        formData.add("gatewayId",Byte.toString(gatewayId));
+        formData.add("gatewayId",Byte.toString(this.id));
         formData.add("nuid",Long.toString(nuid));  
         formData.add("identifier",identifier);
         formData.add("occupied",Boolean.toString(occupied));

@@ -249,7 +249,7 @@ public class Gateway implements Runnable {
                 while (state != RunnableState.STOPPING) {
                 	
 		            handleInboundPacketFrom(istream,buffer,jmsSession,inboundProducer,outboundProducer);
-                    handleOutboundPacketsTo(ostream,outboundConsumer,inboundProducer);
+                    handleOutboundPacketsTo(ostream,outboundConsumer,jmsSession,inboundProducer);
                 }
                 
             } catch (SocketException ex) {
@@ -323,11 +323,11 @@ public class Gateway implements Runnable {
     	return null;
     }
     
-    protected void write(NativePacket pkt, OutputStream os, MessageProducer producer) throws IOException {
+    protected void write(NativePacket pkt, OutputStream os, Session jmsSession, MessageProducer producer) throws IOException {
     	// To be overridden
     }
     
-    protected final void handleOutboundPacketsTo(OutputStream os, MessageConsumer consumer, MessageProducer producer) throws IOException {
+    protected final void handleOutboundPacketsTo(OutputStream os, MessageConsumer consumer, Session jmsSession, MessageProducer producer) throws IOException {
     	
         try {
             while (true) {
@@ -341,7 +341,7 @@ public class Gateway implements Runnable {
             	if (srcGatewayId != id) {
 	            	if (dstGatewayId == id || dstGatewayId == 0) {
 	            		log(LogLevel.DEBUG, "Outbound packet received from " + nativePkt.getSrcCoords());
-	            		write(nativePkt,os,producer);
+	            		write(nativePkt,os,jmsSession,producer);
 	            	}
             	}
             }
