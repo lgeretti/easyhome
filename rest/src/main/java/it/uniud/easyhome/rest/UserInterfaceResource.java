@@ -54,17 +54,26 @@ public class UserInterfaceResource {
 	private static Client client = Client.create();
 	private static final byte XBEE_GATEWAY_ID = (byte)2;
 	private static final int XBEE_GATEWAY_PORT = 5100;
+	private static final byte SIPRO_GATEWAY_ID = (byte)3;
+	private static final int SIPRO_GATEWAY_PORT = 5101;
 	
 	private Connection jmsConnection = null;
 	protected Context jndiContext = null;
 	protected Session jmsSession = null;
-    
+
     private ClientResponse insertGateway(byte id, int port, ProtocolType protocol) {
+    	
+    	return insertGateway(id,port,protocol,null);
+    }
+	
+    private ClientResponse insertGateway(byte id, int port, ProtocolType protocol, LogLevel logLevel) {
         
     	MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
     	formData.add("id", Byte.toString(id));
     	formData.add("port", String.valueOf(port));
     	formData.add("protocol", protocol.toString());
+    	if (logLevel != null)
+    		formData.add("logLevel", logLevel.toString());
     	ClientResponse response = client.resource(TARGET).path(RestPaths.GATEWAYS)
     							  .type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class, formData);
     	
@@ -158,7 +167,8 @@ public class UserInterfaceResource {
     public Response up() {
     	
     	insertLocationsAndDevices();
-		insertGateway(XBEE_GATEWAY_ID, XBEE_GATEWAY_PORT, ProtocolType.XBEE);
+		insertGateway(XBEE_GATEWAY_ID, XBEE_GATEWAY_PORT, ProtocolType.XBEE, LogLevel.INFO);
+		insertGateway(SIPRO_GATEWAY_ID, SIPRO_GATEWAY_PORT, ProtocolType.SIPRO, LogLevel.DEBUG);
 		insertProcess(ProcessKind.NODE_ANNCE_REGISTRATION);
 		insertProcess(ProcessKind.NODE_DESCR_REQUEST);
 		insertProcess(ProcessKind.NODE_DESCR_REGISTRATION);	

@@ -47,7 +47,7 @@ public class HubContext {
      * @param protocol The protocol used by the gateway
      * @param port The port for the gateway (must not be already bound)
      */
-    public void addGateway(byte id, ProtocolType protocol, int port) {
+    public void addGateway(byte id, ProtocolType protocol, int port, LogLevel logLevel) {
         
     	if (id < 1)
     		throw new RuntimeException("Gateway id must be greater than zero");
@@ -65,8 +65,13 @@ public class HubContext {
         
             case XBEE:  
         
-                gw = new XBeeGateway(id,port);
+                gw = new XBeeGateway(id,port,logLevel);
                 break;
+                
+            case SIPRO:
+            	
+            	gw = new SIPROGateway(id,port,logLevel);
+            	break;
             
             case NATIVE:
             	

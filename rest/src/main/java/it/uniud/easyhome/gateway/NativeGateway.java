@@ -1,5 +1,6 @@
 package it.uniud.easyhome.gateway;
 
+import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.exceptions.IncompletePacketException;
 import it.uniud.easyhome.packets.natives.NativePacket;
 
@@ -9,8 +10,8 @@ import javax.jms.MessageProducer;
 
 public class NativeGateway extends Gateway {
 	
-    public NativeGateway(byte id, int port) {
-    	super(id,ProtocolType.NATIVE,port);
+    public NativeGateway(byte id, int port, LogLevel logLevel) {
+    	super(id,ProtocolType.NATIVE,port,logLevel);
     	MAX_CONNECTIONS = 32;
     }
     

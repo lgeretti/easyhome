@@ -20,8 +20,8 @@ import javax.jms.MessageProducer;
 
 public class XBeeGateway extends Gateway {
     
-    public XBeeGateway(byte id, int port) {
-    	super(id,ProtocolType.XBEE,port);
+    public XBeeGateway(byte id, int port,LogLevel logLevel) {
+    	super(id,ProtocolType.XBEE,port,logLevel);
     }
     
     private NativePacket convertFrom(XBeePacketToNode xpkt) throws RoutingEntryMissingException {
@@ -91,14 +91,14 @@ public class XBeeGateway extends Gateway {
     		byte[] readBytes = new byte[is.available()];
     		is.read(readBytes);
     		
-    		log(LogLevel.DEBUG, "Read: " + ByteUtils.printBytes(readBytes));
+    		log(LogLevel.DEBUG, "Read: " + ByteUtils.toString(readBytes));
     		
     		buffer.write(readBytes);
     	}
     	
     	byte[] originalBuffer = buffer.toByteArray();
     	
-    	log(LogLevel.DEBUG, "Buffer: " + ByteUtils.printBytes(originalBuffer));
+    	log(LogLevel.DEBUG, "Buffer: " + ByteUtils.toString(originalBuffer));
     	
     	int readBytes = 0;
     	
@@ -126,7 +126,7 @@ public class XBeeGateway extends Gateway {
         		buffer.write(originalBuffer, readBytes, originalBuffer.length-readBytes);
     	}
     	
-    	log(LogLevel.DEBUG, "XBee packet: " + ByteUtils.printBytes(xbeePkt.getBytes()));
+    	log(LogLevel.DEBUG, "XBee packet: " + ByteUtils.toString(xbeePkt.getBytes()));
     	
    		result = convertFrom(xbeePkt);
     	

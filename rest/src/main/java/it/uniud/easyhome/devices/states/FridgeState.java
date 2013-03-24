@@ -1,6 +1,5 @@
 package it.uniud.easyhome.devices.states;
 
-import it.uniud.easyhome.devices.PersistentInfo;
 import it.uniud.easyhome.network.Node;
 
 import javax.persistence.*;
@@ -19,6 +18,8 @@ public class FridgeState implements DeviceState {
     private FridgeCode lastCode;
     @Column
     private boolean online;
+    @Column
+    private String identifier;
 
     @SuppressWarnings("unused")
 	private FridgeState() {}
@@ -40,6 +41,10 @@ public class FridgeState implements DeviceState {
 		return this.online;
 	}
 	
+	public String getIdentifier() {
+		return this.identifier;
+	}
+	
     @Override
     public boolean equals(Object other) {
         
@@ -59,6 +64,11 @@ public class FridgeState implements DeviceState {
     
     public FridgeState setOnline(boolean val) {
     	this.online = val;
+    	return this;
+    }
+    
+    public FridgeState setIdentifier(String identifier) {
+    	this.identifier = identifier;
     	return this;
     }
     

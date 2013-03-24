@@ -35,10 +35,10 @@ public class GatewayResource {
     // curl -X POST http://localhost:8080/easyhome/rest/gateways -H "Content-Type: application/x-www-form-urlencoded" --data-binary "port=5100&protocol=XBEE" 
     @POST
     public Response registerGateway(@FormParam("id") byte id, @FormParam("protocol") ProtocolType protocol,
-            @FormParam("port") int port) {
-
+            @FormParam("port") int port, @FormParam("logLevel") LogLevel logLevel) {
+    	
         try {
-            networkContext.addGateway(id, protocol, port);
+            networkContext.addGateway(id, protocol, port, logLevel);
 
             return Response.created(
                 uriInfo.getAbsolutePathBuilder().path(String.valueOf(id)).build())                

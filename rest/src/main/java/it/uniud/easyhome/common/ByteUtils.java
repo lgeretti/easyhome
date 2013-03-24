@@ -79,7 +79,7 @@ public class ByteUtils {
 		return result;
 	}
 	
-	public static String printBytes(byte[] bytes) {
+	public static String toString(byte[] bytes) {
 		
 		StringBuilder strb = new StringBuilder();
 		
@@ -94,10 +94,10 @@ public class ByteUtils {
 	}
 	
 	public static String printBytes(short val) {
-		return printBytes(getBytes(val,Endianness.BIG_ENDIAN));
+		return toString(getBytes(val,Endianness.BIG_ENDIAN));
 	}
 	
 	public static String printBytes(long val) {
-		return printBytes(getBytes(val,Endianness.BIG_ENDIAN));
+		return toString(getBytes(val,Endianness.BIG_ENDIAN));
 	}
 }

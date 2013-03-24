@@ -96,7 +96,7 @@ public class Gateway implements Runnable {
     
     protected ServerSocket server = null;
 	
-    protected volatile LogLevel logLevel = LogLevel.INFO;
+    protected volatile LogLevel logLevel;
     
 	protected volatile RunnableState state = RunnableState.STOPPED;
 	
@@ -104,11 +104,16 @@ public class Gateway implements Runnable {
     private Gateway() { }
     
     protected Gateway(byte id, ProtocolType protocolType, int port) {
+    	this(id,protocolType,port,LogLevel.NONE);
+    }
+    
+    protected Gateway(byte id, ProtocolType protocolType, int port, LogLevel logLevel) {
     	if (id == 0 || id == 1)
     		throw new RuntimeException("The gateway id must be different from 0 or 1");
     	this.id = id;
     	this.protocolType = protocolType;
     	this.port = port;
+    	this.logLevel = logLevel;
     }
     
     public final byte getId() {

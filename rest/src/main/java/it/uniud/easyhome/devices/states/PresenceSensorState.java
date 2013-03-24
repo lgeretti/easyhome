@@ -19,6 +19,8 @@ public class PresenceSensorState implements DeviceState {
     private boolean online;
     @Column
     private boolean occupied;
+    @Column
+    private String identifier;
 
     @SuppressWarnings("unused")
 	private PresenceSensorState() {}
@@ -39,6 +41,10 @@ public class PresenceSensorState implements DeviceState {
 		return this.online;
 	}
 	
+	public String getIdentifier() {
+		return this.identifier;
+	}
+	
 	public PresenceSensorState setOccupied(boolean val) {
 		this.occupied = val;
 		return this;
@@ -46,6 +52,11 @@ public class PresenceSensorState implements DeviceState {
 	
     public PresenceSensorState setOnline(boolean val) {
     	this.online = val;
+    	return this;
+    }
+    
+    public PresenceSensorState setIdentifier(String identifier) {
+    	this.identifier = identifier;
     	return this;
     }
 	

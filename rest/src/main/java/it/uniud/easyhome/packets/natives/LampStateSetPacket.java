@@ -1,5 +1,7 @@
 package it.uniud.easyhome.packets.natives;
 
+import java.util.Arrays;
+
 import it.uniud.easyhome.common.ByteUtils;
 import it.uniud.easyhome.common.Endianness;
 import it.uniud.easyhome.contexts.EasyHomeContext;
@@ -15,7 +17,6 @@ import it.uniud.easyhome.packets.Operation;
 public class LampStateSetPacket extends NativePacket {
 
 	private static final long serialVersionUID = 1658106643423371562L;
-	private static final int APS_PAYLOAD_LENGTH = 8;
 	
 	public LampStateSetPacket(ModuleCoordinates srcCoords, ModuleCoordinates dstCoords, Operation op) {
 		
@@ -27,8 +28,6 @@ public class LampStateSetPacket extends NativePacket {
 			throw new InvalidDomainException();
 		if (op.getContext() != EasyHomeContext.LAMP_UPDATE.getCode())
 			throw new InvalidContextException();
-		if (op.getData().length != APS_PAYLOAD_LENGTH)
-			throw new InvalidPayloadLengthException();
 	}
 	
 	public LampStateSetPacket(LampState lampState) {
@@ -48,18 +47,58 @@ public class LampStateSetPacket extends NativePacket {
 
 	private static byte[] getBytes(LampState lampState) {
 		
-		byte[] result = new byte[8];
+		byte[] identifierBytes = lampState.getIdentifier().getBytes();
+		int numIdentifierBytes = identifierBytes.length;
+		
+		int numBytes = 8+numIdentifierBytes;
+		
+		byte[] result = new byte[numBytes];
 		
 		byte[] nuidBytes = ByteUtils.getBytes(lampState.getDevice().getCoordinates().getNuid(),Endianness.BIG_ENDIAN);
-		result[0] = nuidBytes[5];
-		result[1] = nuidBytes[6];
-		result[2] = nuidBytes[7];
-		result[3] = lampState.getRed();
-		result[4] = lampState.getGreen();
-		result[5] = lampState.getBlue();
-		result[6] = lampState.getWhite();
-		result[7] = lampState.getAlarm().getCode();
+		
+		int i=0;
+		
+		for (byte b : identifierBytes) 
+			result[i++] = b;
+		result[i++] = nuidBytes[5];
+		result[i++] = nuidBytes[6];
+		result[i++] = nuidBytes[7];
+		result[i++] = lampState.getRed();
+		result[i++] = lampState.getGreen();
+		result[i++] = lampState.getBlue();
+		result[i++] = lampState.getWhite();
+		result[i++] = lampState.getAlarm().getCode();
 		
 		return result;
+	}
+	
+	public String getIdentifier() {
+		byte[] data = this.getOperation().getData();
+		return new String(Arrays.copyOfRange(data, 0, data.length-8));
+	}
+	
+	public String getSeparatedParameters() {
+		byte[] data = this.getOperation().getData();
+		
+		StringBuilder resultBuilder = new StringBuilder();
+		for (int i=data.length-9;i<data.length;i++)
+			resultBuilder.append(";").append(data[i]);
+			
+		return resultBuilder.toString();
+	}	
+	
+	public static boolean validates(NativePacket pkt) {
+		
+		if (pkt == null)
+			return false;
+		
+		Operation op = pkt.getOperation();
+		
+		if (op.getDomain() != Domain.EASYHOME.getCode())
+			return false;
+		if (op.getContext() != EasyHomeContext.LAMP_UPDATE.getCode())
+			return false;
+		
+		return true;
 	}
 }

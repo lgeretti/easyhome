@@ -1,5 +1,6 @@
 package it.uniud.easyhome.rest;
 
+import it.uniud.easyhome.common.ByteUtils;
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.devices.PersistentInfo;
 import it.uniud.easyhome.devices.states.*;
@@ -134,6 +135,7 @@ public final class StateResource {
     @Path("lamps/{id}")
     public Response updateLampStateFromDevice(@PathParam("id") long id,
     								@FormParam("on") boolean on,
+    								@FormParam("identifier") String identifier,
     								@FormParam("red") byte red,
     								@FormParam("green") byte green,
     								@FormParam("blue") byte blue,
@@ -146,11 +148,13 @@ public final class StateResource {
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
     	
     	thisLamp.setOnline(on)
+    			.setIdentifier(identifier)
     			.setRed(red)
     			.setGreen(green)
     			.setBlue(blue)
     			.setWhite(white)
-    			.setAlarm(alarm);
+    			.setAlarm(alarm)
+    			.update();
     	
     	resEjb.updateManagedState(thisLamp);
     	
@@ -170,7 +174,7 @@ public final class StateResource {
     	if (thisLamp == null)
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
     	
-    	thisLamp.setRed(value);
+    	thisLamp.setRed(value).update();
     	
     	resEjb.updateManagedState(thisLamp);
     	
@@ -189,7 +193,7 @@ public final class StateResource {
     	if (thisLamp == null)
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
     	
-    	thisLamp.setGreen(value);
+    	thisLamp.setGreen(value).update();
     	
     	resEjb.updateManagedState(thisLamp);
     	
@@ -208,7 +212,7 @@ public final class StateResource {
     	if (thisLamp == null)
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
     	
-    	thisLamp.setBlue(value);
+    	thisLamp.setBlue(value).update();
     	
     	resEjb.updateManagedState(thisLamp);
     	
@@ -227,7 +231,7 @@ public final class StateResource {
     	if (thisLamp == null)
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
     	
-    	thisLamp.setWhite(value);
+    	thisLamp.setWhite(value).update();
     	
     	resEjb.updateManagedState(thisLamp);
     	
@@ -314,9 +318,9 @@ public final class StateResource {
             ObjectMessage changeMessage = jmsSession.createObjectMessage(packet);
             producer.send(changeMessage);
         } catch (JMSException ex) { 
-        	
+        	ex.printStackTrace();
         } catch (NamingException e) {
-        	
+        	e.printStackTrace();
 		} finally {
         	
         	try {

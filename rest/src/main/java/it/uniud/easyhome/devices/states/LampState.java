@@ -17,6 +17,8 @@ public class LampState implements DeviceState {
 	@Column
 	private boolean online;
     @Column
+    private String identifier;
+    @Column
     private byte red;
     @Column
     private byte green;
@@ -28,6 +30,7 @@ public class LampState implements DeviceState {
     private ColoredAlarm alarm;
     @Column
     private long lastUpdate;
+
     
     @SuppressWarnings("unused")
 	private LampState() {}
@@ -44,6 +47,10 @@ public class LampState implements DeviceState {
 	
 	public boolean isOnline() {
 		return this.online;
+	}
+	
+	public String getIdentifier() {
+		return this.identifier;
 	}
 	
 	public byte getRed() {
@@ -72,6 +79,11 @@ public class LampState implements DeviceState {
 	
     public LampState setOnline(boolean val) {
     	this.online = val;
+    	return this;
+    }
+    
+    public LampState setIdentifier(String outputName) {
+    	this.identifier = outputName;
     	return this;
     }
 	
