@@ -1,13 +1,26 @@
 package it.uniud.easyhome.gateway;
 
+import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.LogLevel;
+import it.uniud.easyhome.common.RunnableState;
 import it.uniud.easyhome.exceptions.IncompletePacketException;
 import it.uniud.easyhome.packets.natives.LampStateSetPacket;
 import it.uniud.easyhome.packets.natives.NativePacket;
 
 import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
 
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
+import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
+import javax.jms.Session;
+import javax.jms.Topic;
+import javax.naming.Context;
+import javax.naming.InitialContext;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -27,7 +40,6 @@ public class SIPROGateway extends Gateway {
 			
     public SIPROGateway(byte id, int port, LogLevel logLevel) {
     	super(id,ProtocolType.NATIVE,port,logLevel);
-    	MAX_CONNECTIONS = 32;
     }
     
     @Override
@@ -42,6 +54,59 @@ public class SIPROGateway extends Gateway {
     	
     	NativePacket result = null;
     	return result;
+    }
+    
+    @Override
+    public void run() {
+    	
+    	state = RunnableState.STARTED;
+
+        while (state != RunnableState.STOPPING) {
+        	
+        	Connection jmsConnection = null;
+        	
+        	try {
+                
+    	   		Context jndiContext = new InitialContext();
+    	        ConnectionFactory connectionFactory = (ConnectionFactory) jndiContext.lookup(JMSConstants.CONNECTION_FACTORY);
+    	        
+                Topic outboundTopic = (Topic) jndiContext.lookup(JMSConstants.OUTBOUND_PACKETS_TOPIC);
+                Topic inboundTopic = (Topic) jndiContext.lookup(JMSConstants.INBOUND_PACKETS_TOPIC);
+                
+    	        jmsConnection = connectionFactory.createConnection();
+    	        Session jmsSession = jmsConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+                
+                MessageConsumer outboundConsumer = jmsSession.createConsumer(outboundTopic);
+                MessageProducer inboundProducer = jmsSession.createProducer(inboundTopic);
+                
+                jmsConnection.start();
+                
+                while (state != RunnableState.STOPPING) {
+                	
+                    handleOutboundPacketsTo(null,outboundConsumer,inboundProducer);
+                }
+                
+            } catch (SocketException ex) {
+            	// We do not want errors to show when close() is called during operations
+            } catch (Exception ex) {
+            	ex.printStackTrace();
+            } finally {
+	              try {
+	            	  server.close();
+	              } catch (IOException ex) {
+	          		  // Whatever the case, the connection is not available anymore
+	              } finally {
+		        	  try {
+		        		  if (jmsConnection != null)
+		        			  jmsConnection.close();
+		        	  } catch (JMSException ex) {
+		        		// Whatever the case, the connection is not available anymore  
+		        	  }
+	              }
+            }
+        }
+        state = RunnableState.STOPPED;
+        log(LogLevel.INFO, "Gateway is closed");
     }
     
     @Override

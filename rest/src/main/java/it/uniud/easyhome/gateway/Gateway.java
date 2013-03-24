@@ -206,7 +206,7 @@ public class Gateway implements Runnable {
 	}
     
     @Override
-    public final void run() {
+    public void run() {
     	
     	state = RunnableState.STARTED;
 
@@ -327,7 +327,7 @@ public class Gateway implements Runnable {
     	// To be overridden
     }
     
-    private final void handleOutboundPacketsTo(OutputStream os, MessageConsumer consumer, MessageProducer producer) throws IOException {
+    protected final void handleOutboundPacketsTo(OutputStream os, MessageConsumer consumer, MessageProducer producer) throws IOException {
     	
         try {
             while (true) {
