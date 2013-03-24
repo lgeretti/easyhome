@@ -23,7 +23,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class OccupancySensingRequestProcess extends Process {
 	
-	public static long REQUEST_PERIOD_MS = 1000;
+	public static long REQUEST_PERIOD_MS = 2000;
 	
 	private byte sequenceNumber = 0;
 	
@@ -39,25 +39,33 @@ public class OccupancySensingRequestProcess extends Process {
 	        	        
 	    	List<Node> nodes = JsonUtils.getListFrom(getResponse, Node.class);
 	    	
+    		MultivaluedMap<String,String> params = new MultivaluedMapImpl();
+            params.add("funcType",FunctionalityType.OCCUPATION_SENSING.toString());
+    		ClientResponse functionalitiesResponse = restResource.path(RestPaths.FUNCTIONALITIES).queryParams(params).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+    		List<Functionality> functionalities = JsonUtils.getListFrom(functionalitiesResponse, Functionality.class);
+	    	
 	    	for (Node node : nodes) {
 
-	    		MultivaluedMap<String,String> params = new MultivaluedMapImpl();
-	            params.add("infoId",Long.toString(node.getInfo().getId()));
-	            params.add("funcType",FunctionalityType.OCCUPATION_SENSING.toString());
-        		ClientResponse functionalitiesResponse = restResource.path(RestPaths.FUNCTIONALITIES).queryParams(params).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-        		List<Functionality> functionalities = JsonUtils.getListFrom(functionalitiesResponse, Functionality.class);
-
-	    		if (functionalities.size() == 1) {
+	    		if (hasOccupancySensingFunctionality(node,functionalities)) {
 	    			OccupancyAttributeReqPacket packet = new OccupancyAttributeReqPacket(node.getCoordinates(),(byte)1,++sequenceNumber);
 			 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
 			    	getOutboundPacketsProducer().send(outboundMessage);    
 			    	log(LogLevel.DEBUG, "Occupancy attribute request for " + node + " dispatched");
 	    		}
 	    	}
-			Thread.sleep(REQUEST_PERIOD_MS);
+			Thread.sleep(REQUEST_PERIOD_MS/functionalities.size());
 	    	
         } catch (Exception e) {
         	e.printStackTrace();
         }
     }   
+    
+    private boolean hasOccupancySensingFunctionality(Node node, List<Functionality> functionalities) {
+    	
+    	for (Functionality func: functionalities) {
+    		if (func.getInfo().getId() == node.getInfo().getId())
+    			return true;
+    	}
+    	return false;
+    }
 }

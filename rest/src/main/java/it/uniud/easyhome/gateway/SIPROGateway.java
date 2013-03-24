@@ -9,6 +9,7 @@ import it.uniud.easyhome.exceptions.IncompletePacketException;
 import it.uniud.easyhome.network.NetworkJobType;
 import it.uniud.easyhome.packets.natives.LampStateSetPacket;
 import it.uniud.easyhome.packets.natives.NativePacket;
+import it.uniud.easyhome.packets.natives.OccupancyAttributeReqPacket;
 import it.uniud.easyhome.rest.RestPaths;
 
 import java.io.*;
@@ -143,6 +144,11 @@ public class SIPROGateway extends Gateway {
 	        queryParams.add("params",paramsString);
 			
 			client.resource(SIPRO_TARGET).queryParams(queryParams).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+			
+		} else if (OccupancyAttributeReqPacket.validates(pkt)) {
+			
+			
+			
 		}
     }
     

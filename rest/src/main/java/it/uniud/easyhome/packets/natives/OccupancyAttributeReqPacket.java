@@ -1,13 +1,9 @@
 package it.uniud.easyhome.packets.natives;
 
-import it.uniud.easyhome.common.ByteUtils;
-import it.uniud.easyhome.common.Endianness;
 import it.uniud.easyhome.contexts.HomeAutomationContext;
-import it.uniud.easyhome.contexts.ManagementContext;
 import it.uniud.easyhome.exceptions.*;
 import it.uniud.easyhome.network.GlobalCoordinates;
 import it.uniud.easyhome.network.ModuleCoordinates;
-import it.uniud.easyhome.network.Node;
 import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.packets.Operation;
 
@@ -38,5 +34,20 @@ public class OccupancyAttributeReqPacket extends NativePacket {
 	
 	public OccupancyAttributeReqPacket(NativePacket pkt) {
 		this(pkt.getSrcCoords(),pkt.getDstCoords(),pkt.getOperation());
+	}
+
+	public static boolean validates(NativePacket pkt) {
+		
+		if (pkt == null)
+			return false;
+		
+		Operation op = pkt.getOperation();
+		
+		if (op.getDomain() != Domain.HOME_AUTOMATION.getCode())
+			return false;
+		if (op.getContext() != HomeAutomationContext.OCCUPANCY_SENSING.getCode())
+			return false;
+		
+		return true;
 	}
 }
