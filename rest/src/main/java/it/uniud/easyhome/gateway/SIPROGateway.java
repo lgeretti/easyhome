@@ -179,9 +179,9 @@ public class SIPROGateway extends Gateway {
     	for (int i=0;i<children.getLength();i++) {
     		Node child = children.item(i);
     		if (child.getNodeName() != "#text") {
-    			String identifier = node.getNodeName();
+    			String identifier = child.getNodeName();
     			if (!identifiersRegistered.contains(identifier)) 
-    				registerLamp(identifier,node.getChildNodes());
+    				registerLamp(identifier,child.getChildNodes());
     		}
     	}
     }
@@ -236,16 +236,14 @@ public class SIPROGateway extends Gateway {
     
     private void registerFridge(String identifier, NodeList parameters) {
     	byte gatewayId = 3;
-    	boolean online = (parameters.item(1).getTextContent() == "ON");
-		long nuid = Long.parseLong(parameters.item(3).getTextContent() + parameters.item(5).getTextContent() + parameters.item(7).getTextContent(),16);
-		FridgeCode lastCode = FridgeCode.fromCode(Short.parseShort(parameters.item(9).getTextContent() + parameters.item(11).getTextContent() + parameters.item(13).getTextContent()));
-		log(LogLevel.DEBUG,"To transmit: online=" + online + ", nuid=" + nuid + 
-				   ", code=" + lastCode);
+		long nuid = Long.parseLong(parameters.item(1).getTextContent() + parameters.item(3).getTextContent() + parameters.item(5).getTextContent(),16);
+		String codeString = parameters.item(7).getTextContent() + parameters.item(9).getTextContent() + parameters.item(11).getTextContent();
+		FridgeCode lastCode = FridgeCode.fromCode(Short.parseShort(codeString));
+		log(LogLevel.DEBUG,"To transmit: nuid=" + nuid + ", code=" + lastCode);
 		
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         formData.add("gatewayId",Byte.toString(gatewayId));
         formData.add("nuid",Long.toString(nuid));  
-        formData.add("online",Boolean.toString(online));
         formData.add("identifier",identifier);
         formData.add("lastCode",lastCode.toString());
         client.resource(INTERNAL_TARGET).path(RestPaths.STATES).path("lamps").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
@@ -255,16 +253,14 @@ public class SIPROGateway extends Gateway {
     
     private void registerPIR(String identifier, NodeList parameters) {
     	byte gatewayId = 3;
-    	boolean online = (parameters.item(1).getTextContent() == "ON");
-		long nuid = Long.parseLong(parameters.item(3).getTextContent() + parameters.item(5).getTextContent() + parameters.item(7).getTextContent(),16);
-		String occupation = parameters.item(9).getTextContent() + parameters.item(11).getTextContent();
+		long nuid = Long.parseLong(parameters.item(1).getTextContent() + parameters.item(3).getTextContent() + parameters.item(5).getTextContent(),16);
+		String occupation = parameters.item(7).getTextContent() + parameters.item(9).getTextContent();
 		boolean occupied = (occupation == "5031");
-		log(LogLevel.DEBUG,"To transmit: online=" + online + ", nuid=" + nuid + ", occupied=" + occupied);
+		log(LogLevel.DEBUG,"To transmit: nuid=" + nuid + ", occupied=" + occupied);
 		
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         formData.add("gatewayId",Byte.toString(gatewayId));
         formData.add("nuid",Long.toString(nuid));  
-        formData.add("online",Boolean.toString(online));
         formData.add("identifier",identifier);
         formData.add("occupied",Boolean.toString(occupied));
         client.resource(INTERNAL_TARGET).path(RestPaths.STATES).path("lamps").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);

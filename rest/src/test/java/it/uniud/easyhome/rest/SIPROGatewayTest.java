@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.util.List;
 
 import it.uniud.easyhome.common.JsonUtils;
+import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.devices.states.ColoredAlarm;
 import it.uniud.easyhome.devices.states.FridgeCode;
 import it.uniud.easyhome.gateway.Gateway;
@@ -147,7 +148,7 @@ public class SIPROGatewayTest {
     	for (int i=0;i<children.getLength();i++) {
     		Node child = children.item(i);
     		if (child.getNodeName() != "#text") {
-    			handleLamp(node.getNodeName(),node.getChildNodes());
+    			handleLamp(child.getNodeName(),child.getChildNodes());
     		}
     	}
     }
@@ -185,17 +186,15 @@ public class SIPROGatewayTest {
     
     private void handleFridge(String identifier, NodeList parameters) {
     	byte gatewayId = 3;
-    	boolean online = (parameters.item(1).getTextContent() == "ON");
-		long nuid = Long.parseLong(parameters.item(3).getTextContent() + parameters.item(5).getTextContent() + parameters.item(7).getTextContent(),16);
-		FridgeCode code = FridgeCode.fromCode(Short.parseShort(parameters.item(9).getTextContent() + parameters.item(11).getTextContent() + parameters.item(13).getTextContent()));
-		
+		long nuid = Long.parseLong(parameters.item(1).getTextContent() + parameters.item(3).getTextContent() + parameters.item(5).getTextContent(),16);
+		String codeString = parameters.item(7).getTextContent() + parameters.item(9).getTextContent() + parameters.item(11).getTextContent();
+		FridgeCode lastCode = FridgeCode.fromCode(Short.parseShort(codeString));	
     }
     
     private void handlePIR(String identifier, NodeList parameters) {
     	byte gatewayId = 3;
-    	boolean online = (parameters.item(1).getTextContent() == "ON");
-		long nuid = Long.parseLong(parameters.item(3).getTextContent() + parameters.item(5).getTextContent() + parameters.item(7).getTextContent(),16);
-		String occupation = parameters.item(9).getTextContent() + parameters.item(11).getTextContent();
+		long nuid = Long.parseLong(parameters.item(1).getTextContent() + parameters.item(3).getTextContent() + parameters.item(5).getTextContent(),16);
+		String occupation = parameters.item(7).getTextContent() + parameters.item(9).getTextContent();
 		boolean occupied = (occupation == "5031");
     }
 }

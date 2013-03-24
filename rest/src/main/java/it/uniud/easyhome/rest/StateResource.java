@@ -123,7 +123,6 @@ public final class StateResource {
     @POST
     @Path("sensors/presence/{id}")
     public Response updatePresenceSensor(@PathParam("id") long id,
-    									@FormParam("online") boolean online,
     									@FormParam("identifier") String identifier,
     									@FormParam("occupied") boolean occupied) {
     		
@@ -132,23 +131,17 @@ public final class StateResource {
     	if (thisPresenceSensor == null)
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
     	
-    	thisPresenceSensor.setOnline(online)
-    			.setIdentifier(identifier)
-    			.setOccupied(occupied);
+    	thisPresenceSensor.setIdentifier(identifier).setOccupied(occupied);
     	
     	resEjb.updateManagedState(thisPresenceSensor);
-    	
-    	// We do not send back the update request to the device, since the information came from there
-    	// FIXME: if we want, some time in the future, change more than one parameter at once, we must discriminate the source
     	
     	return Response.ok().build();
     }  
     
     @POST
     @Path("sensors/presence")
-    public Response updatePresenceSensorFromDevice(@FormParam("gatewayId") byte gatewayId,
+    public Response updatePresenceSensorFromGateway(@FormParam("gatewayId") byte gatewayId,
     											   @FormParam("nuid") long nuid,
-				    								@FormParam("online") boolean online,
 				    								@FormParam("identifier") String identifier,
 				    								@FormParam("occupied") boolean occupied) {
     		
@@ -161,14 +154,10 @@ public final class StateResource {
     	if (thisPresenceSensor == null)
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
     	
-    	thisPresenceSensor.setOnline(online)
-    			.setIdentifier(identifier)
-    			.setOccupied(occupied);
+    	thisPresenceSensor.setIdentifier(identifier)
+    					  .setOccupied(occupied);
     	
     	resEjb.updateManagedState(thisPresenceSensor);
-    	
-    	// We do not send back the update request to the device, since the information came from there
-    	// FIXME: if we want, some time in the future, change more than one parameter at once, we must discriminate the source
     	
     	return Response.ok().build();
     }  
@@ -176,7 +165,6 @@ public final class StateResource {
     @POST
     @Path("fridges/{id}")
     public Response updateFridge(@PathParam("id") long id,
-    							 @FormParam("online") boolean online,
     							 @FormParam("identifier") String identifier,
     							 @FormParam("lastCode") FridgeCode lastCode) {
     		
@@ -185,23 +173,17 @@ public final class StateResource {
     	if (thisFridgeState == null)
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
     	
-    	thisFridgeState.setOnline(online)
-    			.setIdentifier(identifier)
-    			.setLastCode(lastCode);
+    	thisFridgeState.setIdentifier(identifier).setLastCode(lastCode);
     	
     	resEjb.updateManagedState(thisFridgeState);
-    	
-    	// We do not send back the update request to the device, since the information came from there
-    	// FIXME: if we want, some time in the future, change more than one parameter at once, we must discriminate the source
     	
     	return Response.ok().build();
     }  
     
     @POST
     @Path("fridges")
-    public Response updateFridgeFromDevice(@FormParam("gatewayId") byte gatewayId,
+    public Response updateFridgeFromGateway(@FormParam("gatewayId") byte gatewayId,
 			   							   @FormParam("nuid") long nuid,
-			   							   @FormParam("online") boolean online,
 			   							   @FormParam("identifier") String identifier,
 			   							   @FormParam("lastCode") FridgeCode lastCode) {
     		
@@ -214,14 +196,9 @@ public final class StateResource {
     	if (thisFridgeState == null)
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
     	
-    	thisFridgeState.setOnline(online)
-    			.setIdentifier(identifier)
-    			.setLastCode(lastCode);
+    	thisFridgeState.setIdentifier(identifier).setLastCode(lastCode);
     	
     	resEjb.updateManagedState(thisFridgeState);
-    	
-    	// We do not send back the update request to the device, since the information came from there
-    	// FIXME: if we want, some time in the future, change more than one parameter at once, we must discriminate the source
     	
     	return Response.ok().build();
     }  
@@ -254,15 +231,14 @@ public final class StateResource {
     	
     	resEjb.updateManagedState(thisLamp);
     	
-    	// We do not send back the update request to the device, since the information came from there
-    	// FIXME: if we want, some time in the future, change more than one parameter at once, we must discriminate the source
+    	sendLampStateUpdateMessage(thisLamp);
     	
     	return Response.ok().build();
     }    
     
     @POST
     @Path("lamps")
-    public Response updateLampStateFromDevice(@FormParam("gatewayId") byte gatewayId,
+    public Response updateLampStateFromGateway(@FormParam("gatewayId") byte gatewayId,
 			   								  @FormParam("nuid") long nuid,
     										  @FormParam("online") boolean online,
     										  @FormParam("identifier") String identifier,
@@ -291,9 +267,6 @@ public final class StateResource {
     			.update();
     	
     	resEjb.updateManagedState(thisLamp);
-    	
-    	// We do not send back the update request to the device, since the information came from there
-    	// FIXME: if we want, some time in the future, change more than one parameter at once, we must discriminate the source
     	
     	return Response.ok().build();
     }    

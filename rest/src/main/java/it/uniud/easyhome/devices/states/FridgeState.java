@@ -17,8 +17,6 @@ public class FridgeState implements DeviceState {
     @Column
     private FridgeCode lastCode;
     @Column
-    private boolean online;
-    @Column
     private String identifier;
 
     @SuppressWarnings("unused")
@@ -35,10 +33,6 @@ public class FridgeState implements DeviceState {
 	
 	public FridgeCode getLastCode() {
 		return this.lastCode;
-	}
-	
-	public boolean isOnline() {
-		return this.online;
 	}
 	
 	public String getIdentifier() {
@@ -59,11 +53,6 @@ public class FridgeState implements DeviceState {
     
     public FridgeState setLastCode(FridgeCode val) {
     	this.lastCode = val;
-    	return this;
-    }
-    
-    public FridgeState setOnline(boolean val) {
-    	this.online = val;
     	return this;
     }
     

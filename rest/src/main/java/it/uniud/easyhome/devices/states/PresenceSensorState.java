@@ -15,8 +15,6 @@ public class PresenceSensorState implements DeviceState {
     @OneToOne
     private Node device;
     @Column
-    private boolean online;
-    @Column
     private boolean occupied;
     @Column
     private String identifier;
@@ -36,10 +34,6 @@ public class PresenceSensorState implements DeviceState {
 		return this.occupied;
 	}
 	
-	public boolean isOnline() {
-		return this.online;
-	}
-	
 	public String getIdentifier() {
 		return this.identifier;
 	}
@@ -48,11 +42,6 @@ public class PresenceSensorState implements DeviceState {
 		this.occupied = val;
 		return this;
 	}
-	
-    public PresenceSensorState setOnline(boolean val) {
-    	this.online = val;
-    	return this;
-    }
     
     public PresenceSensorState setIdentifier(String identifier) {
     	this.identifier = identifier;
