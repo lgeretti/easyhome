@@ -32,15 +32,12 @@ public final class FunctionalityResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<Functionality> getFunctionalities(@QueryParam("infoId") long infoId,
-    											  @QueryParam("functionalityType") FunctionalityType funcType) {
+    											  @QueryParam("funcType") FunctionalityType funcType) {
     	
-    	if (infoId != 0)
-    		return resEjb.getFunctionalitiesByInfoId(infoId);
-    	
-    	if (funcType != null)
-    		return resEjb.getFunctionalitiesByFunctionalityType(funcType);
-    	else
+    	if (infoId == 0 && funcType == null)
     		return resEjb.getFunctionalities();
+    	else
+    		return resEjb.getFunctionalitiesByFunctionalityTypeAndInfoId(infoId,funcType);
     }
     
     // curl -X POST http://localhost:8080/easyhome/rest/functionalities -H "Content-Type: application/x-www-form-urlencoded" --data-binary "name=Link&deviceId=2&imgPath='img/link.svg'&help='Seleziona il dispositivo da linkare alla lampada'" 

@@ -155,6 +155,10 @@ public class Node {
     		return coordinates.toString();
     }
     
+    public PersistentInfo getInfo() {
+    	return this.info;
+    }
+    
     public boolean isPermanent() {
     	return this.permanent;
     }

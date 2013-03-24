@@ -185,8 +185,8 @@ public class UserInterfaceResource {
 		insertProcess(ProcessKind.NETWORK_GRAPH_MINIMIZATION);
 		insertProcess(ProcessKind.NETWORK_UPDATE);
 		
-		insertProcess(ProcessKind.OCCUPANCY_REQUEST);
-		insertProcess(ProcessKind.OCCUPANCY_REGISTRATION);
+		insertProcess(ProcessKind.OCCUPANCY_REQUEST, LogLevel.DEBUG);
+		insertProcess(ProcessKind.OCCUPANCY_REGISTRATION, LogLevel.DEBUG);
 		
 		insertProcess(ProcessKind.LIGHT_LEVEL_CONTROL,LogLevel.DEBUG);
 		
@@ -415,6 +415,16 @@ public class UserInterfaceResource {
 	        formData.add("type",FunctionalityType.COLOR_CONTROL.toString());
 	        formData.add("imgPath","img/colorpalette.svg");
 	        formData.add("help", "Seleziona il bilanciamento colore preferito per ognuno dei tre colori (crescente da sinistra verso destra)");
+	        formData.putSingle("infoId",Long.toString(lampadaCameraDoppiaInfoId));
+	    	client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	        formData.putSingle("infoId",Long.toString(lampadaSalottoInfoId));
+	    	client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	    	
+	    	formData = new MultivaluedMapImpl();
+	        formData.add("name","Sensore presenza");
+	        formData.add("type",FunctionalityType.OCCUPATION_SENSING.toString());
+	        formData.add("imgPath","img/person.svg");
+	        formData.add("help", "Nessuna funzione prevista: è semplicemente possibile rilevare lo stato di occupazione della stanza");
 	        formData.putSingle("infoId",Long.toString(lampadaCameraDoppiaInfoId));
 	    	client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        formData.putSingle("infoId",Long.toString(lampadaSalottoInfoId));

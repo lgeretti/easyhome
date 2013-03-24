@@ -12,6 +12,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 @Stateless
@@ -69,11 +70,29 @@ public class FunctionalityEJB {
 		return query.getResultList();
 	}
 
-	public List<Functionality> getFunctionalitiesByFunctionalityType(FunctionalityType funcType) {
+	public List<Functionality> getFunctionalitiesByFunctionalityTypeAndInfoId(long infoId, FunctionalityType funcType) {
 		CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<Functionality> criteria = builder.createQuery(Functionality.class);
         Root<Functionality> func = criteria.from(Functionality.class);
-        criteria.select(func).where(builder.equal(func.get("functionalityType"), funcType));
+        
+        Predicate wherePredicate = null;
+        Predicate funcTypePredicate = null;
+        if (funcType != null) {
+        	funcTypePredicate = builder.equal(func.get("type"), funcType);
+        }
+        Predicate infoPredicate = null;
+        if (infoId != 0) {
+        	infoPredicate = builder.equal(func.get("info").get("id"), infoId);
+        }        
+        
+        if (infoId != 0 && funcType != null) {
+        	wherePredicate = builder.and(funcTypePredicate,infoPredicate);
+        } else if (infoId != 0) {
+        	wherePredicate = infoPredicate;
+        } else 
+        	wherePredicate = funcTypePredicate;
+        
+        criteria.select(func).where(wherePredicate);
         
         TypedQuery<Functionality> query = em.createQuery(criteria);
 		
