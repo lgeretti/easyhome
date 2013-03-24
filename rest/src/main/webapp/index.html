@@ -451,7 +451,7 @@ function selectDevice(device) {
 
    currentDevice = device;
    var deviceId = device.id;
-   $("#eh_nav_device").find('img').attr('src',device.imgPath).attr('alt',device.name);
+   $("#eh_nav_device").find('img').attr('src',device.info.imgPath).attr('alt',device.info.name);
   
    $.ajax({ 
        type: "GET",
@@ -564,7 +564,7 @@ function updateHelpText(currentState) {
 				
 	case uiState.Device:
 		
-		helpText = currentDevice.help;
+		helpText = currentDevice.info.help;
 		break;
 				
 	case uiState.Functionality:  
@@ -620,7 +620,7 @@ function showSelections(selections) {
 		  });
 		  var button = $("#eh_selection_center");
 		  button.css('visibility','visible');
-		  var loc = selections[0];
+		  var loc = (currentState == uiState.Room ? selections[0].info : selections[0]);
 	  	  button.find('img').attr('id',0).attr('alt',getAltMessage(loc)).attr('src',loc.imgPath);
 	  	  break;
 	  			
@@ -633,11 +633,11 @@ function showSelections(selections) {
 		  });
 					
 		  var button = $("#eh_selection_left");
-		  var loc = selections[0];
+		  var loc = (currentState == uiState.Room ? selections[0].info : selections[0]);
 	  	  button.find('img').attr('id',0).attr('alt',getAltMessage(loc)).attr('src',loc.imgPath);						
 					
 		  button = $("#eh_selection_right");
-		  var loc = selections[1];
+		  var loc = (currentState == uiState.Room ? selections[1].info : selections[1]);
 	  	  button.find('img').attr('id',1).attr('alt',getAltMessage(loc)).attr('src',loc.imgPath);
 	      break;		  	
 							  	
@@ -648,15 +648,15 @@ function showSelections(selections) {
 		  });	
 					
 		  var button = $("#eh_selection_left");
-		  var loc = selections[lowSelectionIndex];
+		  var loc = (currentState == uiState.Room ? selections[lowSelectionIndex].info : selections[lowSelectionIndex]);
 	  	  button.find('img').attr('id',lowSelectionIndex).attr('alt',getAltMessage(loc)).attr('src',loc.imgPath);						
 					
 		  button = $("#eh_selection_center");
-		  var loc = selections[lowSelectionIndex+1];
+		  var loc = (currentState == uiState.Room ? selections[lowSelectionIndex+1].info : selections[lowSelectionIndex+1]);
 	  	  button.find('img').attr('id',lowSelectionIndex+1).attr('alt',getAltMessage(loc)).attr('src',loc.imgPath);
 	  	  	
 		  button = $("#eh_selection_right");
-		  var loc = selections[lowSelectionIndex+2];
+		  var loc = (currentState == uiState.Room ? selections[lowSelectionIndex+2].info : selections[lowSelectionIndex+2]);
 	  	  button.find('img').attr('id',lowSelectionIndex+2).attr('alt',getAltMessage(loc)).attr('src',loc.imgPath);
 	  	  			  	  	
 	  	  break;
@@ -769,7 +769,7 @@ function showFunctionality(functionality) {
     	
     	var destinationDeviceType;
     	
-    	switch (currentDevice.deviceType) {
+    	switch (currentDevice.info.deviceType) {
     	case 'HAND_CONTROLLER':
     		destinationDeviceType = 'COLORED_LAMP';
     	default:

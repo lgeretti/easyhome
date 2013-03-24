@@ -151,8 +151,8 @@ public class Node {
     	
     	if (info != null)
     		return info.getName();
-    			
-    	return coordinates.toString();
+    	else	
+    		return coordinates.toString();
     }
     
     public boolean isPermanent() {
