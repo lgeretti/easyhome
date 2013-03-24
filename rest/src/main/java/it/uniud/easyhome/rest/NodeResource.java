@@ -65,8 +65,6 @@ public final class NodeResource {
     						   @FormParam("address") short address,
     						   @FormParam("logicalType") NodeLogicalType logicalType,
     						   @FormParam("manufacturer") Manufacturer manufacturer,
-    						   @FormParam("locationName") String locationName,
-    						   @FormParam("name") String name,
     						   @FormParam("permanent") boolean permanent) {
     	
     	boolean existed = false;
@@ -76,22 +74,11 @@ public final class NodeResource {
     		long newNodeId = nodeId + 1;
     		
     		Node.Builder nodeBuilder = new Node.Builder(newNodeId,gatewayId,nuid,address).setPermanent(permanent);
-					   
-    		if (locationName != null) {
-    			Location loc = resEjb.getLocation(locationName);
-    		
-	    		if (loc == null)
-	    			throw new WebApplicationException(Response.Status.BAD_REQUEST);
-	    		else 
-	    			nodeBuilder.setLocation(loc);
-    		}
     		
     		if (logicalType != null)
     			nodeBuilder.setLogicalType(logicalType);
     		if (manufacturer != null)
     			nodeBuilder.setManufacturer(manufacturer);
-    		if (name != null)
-    			nodeBuilder.setName(name);
 
     		existed = resEjb.insertOrUpdateNode(nodeBuilder.build());
     		
@@ -126,7 +113,7 @@ public final class NodeResource {
     	return cleanedNodes;
     }
     
-    @POST
+    @PUT
     @Path("/update")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateNode(Node node) {

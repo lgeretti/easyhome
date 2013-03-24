@@ -119,11 +119,7 @@ public class NodeEJB {
         	if (node.getLogicalType() != NodeLogicalType.UNDEFINED)
         		persistedNode.setLogicalType(node.getLogicalType());
         	if (node.getManufacturer() != Manufacturer.UNDEFINED)
-        		persistedNode.setManufacturer(node.getManufacturer());
-        	if (node.getLocation() != null)
-        		persistedNode.setLocation(node.getLocation());    
-        	if (node.getName() != null)
-        		persistedNode.setName(node.getName());            	
+        		persistedNode.setManufacturer(node.getManufacturer());         	
 
         	em.merge(persistedNode);
         }
@@ -165,10 +161,7 @@ public class NodeEJB {
         try {
         	PersistentInfo correspondingInfo = query.getSingleResult();
         	
-        	if (correspondingInfo.getLocation() != null)
-        		node.setLocation(correspondingInfo.getLocation());
-        	if (correspondingInfo.getName() != null)
-        		node.setName(correspondingInfo.getName());
+        	node.setInfo(correspondingInfo);
         	
         } catch (NoResultException ex) {
         	// Nothing to do in this case

@@ -197,6 +197,8 @@ public class UserInterfaceResource {
 	    	
 	        MultivaluedMap<String,String> formData;
 	        ClientResponse response;
+	        Node node;
+	        List<Byte> endpoints;
 	        
 	        // Locations
 	        
@@ -236,9 +238,96 @@ public class UserInterfaceResource {
 	        formData.add("imgPath","img/bathroom.svg");        
 	        client.resource(TARGET).path(RestPaths.LOCATIONS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        
-	        // Devices
+	        // Nodes and their persistent infos (infos will be back-associated with the node as soon as inserted)
+	    	
+	        // Lampada salotto
+
+	        formData = new MultivaluedMapImpl();
+	        formData.add("gatewayId",Byte.toString((byte)3));
+	        formData.add("nuid",Long.toString(424752L));
+	        formData.add("address",Short.toString((short)4752));
+	        formData.add("permanent",Boolean.toString(true));
+	        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	        response = client.resource(TARGET).path(RestPaths.NODES).path(Byte.toString((byte)3)).path(Short.toString((short)4752)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	        node = JsonUtils.getFrom(response, Node.class);
+	        endpoints = new ArrayList<Byte>();
+	        endpoints.add((byte)1);
+	        endpoints.add((byte)2);
+	        node.setLogicalType(NodeLogicalType.END_DEVICE)
+	        	.setManufacturer(Manufacturer.CRP)
+	        	.setEndpoints(endpoints)
+	        	.addDevice((byte)1, HomeAutomationDevice.COLOR_DIMMABLE_LIGHT)
+	        	.addDevice((byte)2, HomeAutomationDevice.OCCUPANCY_SENSOR);
+	        client.resource(TARGET).path(RestPaths.NODES).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
 	        
-	        // ZigBee
+	        formData = new MultivaluedMapImpl();
+	        formData.add("name","Lampada");
+	        formData.add("locationName",locs.get(0));
+	        formData.add("deviceType", DeviceType.COLORED_LAMP.toString());
+	        formData.add("imgPath","img/colorlight.svg");
+	        formData.add("help", "E' possibile cambiare luce o colore della lampada");
+	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(424752L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(424752L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	        long lampadaSalottoInfoId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
+	        
+	        // Lampada camera doppia
+	        
+	        formData = new MultivaluedMapImpl();
+	        formData.add("gatewayId",Byte.toString((byte)3));
+	        formData.add("nuid",Long.toString(524742L));
+	        formData.add("address",Short.toString((short)4742));
+	        formData.add("permanent",Boolean.toString(true));
+	        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	        response = client.resource(TARGET).path(RestPaths.NODES).path(Byte.toString((byte)3)).path(Short.toString((short)4742)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	        node = JsonUtils.getFrom(response, Node.class);
+	        endpoints = new ArrayList<Byte>();
+	        endpoints.add((byte)1);
+	        endpoints.add((byte)2);
+	        node.setLogicalType(NodeLogicalType.END_DEVICE)
+	        	.setManufacturer(Manufacturer.CRP)
+	        	.setEndpoints(endpoints)
+	        	.addDevice((byte)1, HomeAutomationDevice.COLOR_DIMMABLE_LIGHT)
+	        	.addDevice((byte)2, HomeAutomationDevice.OCCUPANCY_SENSOR);
+	        client.resource(TARGET).path(RestPaths.NODES).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
+	        
+	        formData = new MultivaluedMapImpl();
+	        formData.add("name","Lampada");
+	        formData.add("locationName",locs.get(2));
+	        formData.add("deviceType", DeviceType.COLORED_LAMP.toString());
+	        formData.add("imgPath","img/colorlight.svg");
+	        formData.add("help", "E' possibile cambiare luce o colore della lampada");
+	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(524742L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(524742L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	        long lampadaCameraDoppiaInfoId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
+	        
+	        // Frigo
+	        
+	        formData = new MultivaluedMapImpl();
+	        formData.add("gatewayId",Byte.toString((byte)3));
+	        formData.add("nuid",Long.toString(101010L));
+	        formData.add("address",Short.toString((short)1010));
+	        formData.add("permanent",Boolean.toString(true));
+	        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	        response = client.resource(TARGET).path(RestPaths.NODES).path(Byte.toString((byte)3)).path(Short.toString((short)1010)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	        node = JsonUtils.getFrom(response, Node.class);
+	        endpoints = new ArrayList<Byte>();
+	        endpoints.add((byte)1);
+	        node.setLogicalType(NodeLogicalType.END_DEVICE)
+	        	.setManufacturer(Manufacturer.ELECTROLUX)
+	        	.setEndpoints(endpoints)
+	        	.addDevice((byte)1, HomeAutomationDevice.SIMPLE_SENSOR);
+	        client.resource(TARGET).path(RestPaths.NODES).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);  
+	        
+	        formData = new MultivaluedMapImpl();
+	        formData.add("name","Frigo");
+	        formData.add("locationName",locs.get(1));
+	        formData.add("imgPath","img/fridge.svg");
+	        formData.add("help", "Nessuna funzione correntemente disponibile");
+	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(101010L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(101010L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	    	long frigoInfoId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
+	        
+	        // ZigBee devices, being non-persistent, will create nodes as soon as discovered, and their info will be associated when the node is created
 	        
 	        formData = new MultivaluedMapImpl();
 	        formData.add("name","Gateway ZigBee");
@@ -272,6 +361,13 @@ public class UserInterfaceResource {
 	    	// PowerLine
 	    	
 	        formData = new MultivaluedMapImpl();
+	        formData.add("gatewayId",Byte.toString((byte)3));
+	        formData.add("nuid",Long.toString(100L));
+	        formData.add("address",Short.toString((short)100));
+	        formData.add("permanent",Boolean.toString(true));
+	        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	        
+	        formData = new MultivaluedMapImpl();
 	        formData.add("name","Gateway Powerline");
 	        formData.add("locationName",locs.get(0));
 	        formData.add("imgPath","img/accesspoint.svg");
@@ -279,35 +375,6 @@ public class UserInterfaceResource {
 	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(100L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(100L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        long plGatewayId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
-	    	
-	        formData = new MultivaluedMapImpl();
-	        formData.add("name","Lampada");
-	        formData.add("locationName",locs.get(0));
-	        formData.add("deviceType", DeviceType.COLORED_LAMP.toString());
-	        formData.add("imgPath","img/colorlight.svg");
-	        formData.add("help", "E' possibile cambiare luce o colore della lampada");
-	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(424752L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(424752L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-	        long lampadaSalottoId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
-	    	
-	        formData = new MultivaluedMapImpl();
-	        formData.add("name","Lampada");
-	        formData.add("locationName",locs.get(2));
-	        formData.add("deviceType", DeviceType.COLORED_LAMP.toString());
-	        formData.add("imgPath","img/colorlight.svg");
-	        formData.add("help", "E' possibile cambiare luce o colore della lampada");
-	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(524742L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(524742L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-	        long lampadaCameraId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
-	
-	        formData = new MultivaluedMapImpl();
-	        formData.add("name","Frigo");
-	        formData.add("locationName",locs.get(1));
-	        formData.add("imgPath","img/fridge.svg");
-	        formData.add("help", "Nessuna funzione correntemente disponibile");
-	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(101010L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(101010L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-	    	long frigoId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
 	    	
 	    	long timerId = addFakeDevices(locs);
 	    	
@@ -328,9 +395,9 @@ public class UserInterfaceResource {
 	        formData.add("type",FunctionalityType.LUMINOSITY_CONTROL.toString());
 	        formData.add("imgPath","img/sun.svg");
 	        formData.add("help", "Seleziona il livello di luminosità preferito, da 1 tacca (0%) a 9 tacche (100%)");
-	        formData.putSingle("deviceId",Long.toString(lampadaCameraId));
+	        formData.putSingle("deviceId",Long.toString(lampadaCameraDoppiaInfoId));
 	    	client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	    	formData.putSingle("deviceId",Long.toString(lampadaSalottoId));
+	    	formData.putSingle("deviceId",Long.toString(lampadaSalottoInfoId));
 	    	client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	    	
 	    	formData = new MultivaluedMapImpl();
@@ -338,9 +405,9 @@ public class UserInterfaceResource {
 	        formData.add("type",FunctionalityType.COLOR_CONTROL.toString());
 	        formData.add("imgPath","img/colorpalette.svg");
 	        formData.add("help", "Seleziona il bilanciamento colore preferito per ognuno dei tre colori (crescente da sinistra verso destra)");
-	        formData.putSingle("deviceId",Long.toString(lampadaCameraId));
+	        formData.putSingle("deviceId",Long.toString(lampadaCameraDoppiaInfoId));
 	    	client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	        formData.putSingle("deviceId",Long.toString(lampadaSalottoId));
+	        formData.putSingle("deviceId",Long.toString(lampadaSalottoInfoId));
 	    	client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	    	
 	    	formData = new MultivaluedMapImpl();
@@ -359,8 +426,7 @@ public class UserInterfaceResource {
 	        formData.putSingle("deviceId",Long.toString(timerId));
 	        client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        
-	        addStates(lampadaSalottoId,lampadaCameraId,frigoId);
-	        addNodes();
+	        addStates(lampadaSalottoInfoId,lampadaCameraDoppiaInfoId,frigoInfoId);
 
             
     	} catch (JSONException ex) {
@@ -374,12 +440,30 @@ public class UserInterfaceResource {
     	MultivaluedMap<String,String> formData;
     	ClientResponse response;
     	
+    	// Forno
+    	
+        formData = new MultivaluedMapImpl();
+        formData.add("gatewayId",Byte.toString((byte)4));
+        formData.add("nuid",Long.toString(1L));
+        formData.add("address",Short.toString((short)1));
+        formData.add("permanent",Boolean.toString(true));
+        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+    	
         formData = new MultivaluedMapImpl();
         formData.add("name","Forno");
         formData.add("locationName",locs.get(1));
         formData.add("imgPath","img/oven.svg");
         formData.add("help", "Nessuna funzione correntemente disponibile (dispositivo fittizio)");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(1L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+    	
+    	// Macchina del caffe'
+    	
+        formData = new MultivaluedMapImpl();
+        formData.add("gatewayId",Byte.toString((byte)4));
+        formData.add("nuid",Long.toString(2L));
+        formData.add("address",Short.toString((short)2));
+        formData.add("permanent",Boolean.toString(true));
+        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     	
         formData = new MultivaluedMapImpl();
         formData.add("name","Macchina del caffè");
@@ -388,6 +472,15 @@ public class UserInterfaceResource {
         formData.add("help", "Nessuna funzione correntemente disponibile (dispositivo fittizio)");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(2L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 
+    	// Tostapane
+    	
+        formData = new MultivaluedMapImpl();
+        formData.add("gatewayId",Byte.toString((byte)4));
+        formData.add("nuid",Long.toString(3L));
+        formData.add("address",Short.toString((short)3));
+        formData.add("permanent",Boolean.toString(true));
+        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+
         formData = new MultivaluedMapImpl();
         formData.add("name","Tostapane");
         formData.add("locationName",locs.get(1));
@@ -395,6 +488,15 @@ public class UserInterfaceResource {
         formData.add("help", "Nessuna funzione correntemente disponibile (dispositivo fittizio)");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(3L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 
+    	// Televisore
+    	
+        formData = new MultivaluedMapImpl();
+        formData.add("gatewayId",Byte.toString((byte)4));
+        formData.add("nuid",Long.toString(4L));
+        formData.add("address",Short.toString((short)4));
+        formData.add("permanent",Boolean.toString(true));
+        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+    	
         formData = new MultivaluedMapImpl();
         formData.add("name","Televisore");
         formData.add("locationName",locs.get(0));
@@ -402,6 +504,15 @@ public class UserInterfaceResource {
         formData.add("help", "Nessuna funzione correntemente disponibile (dispositivo fittizio)");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(4L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 
+    	// HiFi
+    	
+        formData = new MultivaluedMapImpl();
+        formData.add("gatewayId",Byte.toString((byte)4));
+        formData.add("nuid",Long.toString(5L));
+        formData.add("address",Short.toString((short)5));
+        formData.add("permanent",Boolean.toString(true));
+        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+    	
         formData = new MultivaluedMapImpl();
         formData.add("name","HiFi");
         formData.add("locationName",locs.get(0));
@@ -409,12 +520,30 @@ public class UserInterfaceResource {
         formData.add("help", "Nessuna funzione correntemente disponibile (dispositivo fittizio)");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(5L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     	
+    	// Termostato
+    	
+        formData = new MultivaluedMapImpl();
+        formData.add("gatewayId",Byte.toString((byte)4));
+        formData.add("nuid",Long.toString(6L));
+        formData.add("address",Short.toString((short)6));
+        formData.add("permanent",Boolean.toString(true));
+        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+    	
         formData = new MultivaluedMapImpl();
         formData.add("name","Termostato");
         formData.add("locationName",locs.get(0));
         formData.add("imgPath","img/thermostat.svg");
         formData.add("help", "Nessuna funzione correntemente disponibile (dispositivo fittizio)");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(6L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+    	
+    	// Sveglia
+    	
+        formData = new MultivaluedMapImpl();
+        formData.add("gatewayId",Byte.toString((byte)4));
+        formData.add("nuid",Long.toString(7L));
+        formData.add("address",Short.toString((short)7));
+        formData.add("permanent",Boolean.toString(true));
+        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     	
         formData = new MultivaluedMapImpl();
         formData.add("name","Sveglia");
@@ -425,6 +554,15 @@ public class UserInterfaceResource {
     	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(7L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         long timerId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
     	
+        // Lavatrice
+        
+        formData = new MultivaluedMapImpl();
+        formData.add("gatewayId",Byte.toString((byte)4));
+        formData.add("nuid",Long.toString(8L));
+        formData.add("address",Short.toString((short)8));
+        formData.add("permanent",Boolean.toString(true));
+        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        
         formData = new MultivaluedMapImpl();
         formData.add("name","Lavatrice");
         formData.add("locationName",locs.get(5));
@@ -442,67 +580,6 @@ public class UserInterfaceResource {
         client.resource(TARGET).path(RestPaths.STATES).path("fridges").path(Long.toString(frigoId)).put(ClientResponse.class);
         client.resource(TARGET).path(RestPaths.STATES).path("sensors").path("presence").path(Long.toString(lampadaSalottoId)).put(ClientResponse.class);
         client.resource(TARGET).path(RestPaths.STATES).path("sensors").path("presence").path(Long.toString(lampadaCameraId)).put(ClientResponse.class);
-    }
-    
-    private void addNodes() throws JSONException {
-    	
-    	ClientResponse response;
-    	Node node;
-    	List<Byte> endpoints;
-    	MultivaluedMap<String,String> formData;
-    	
-        formData = new MultivaluedMapImpl();
-        formData.add("gatewayId",Byte.toString((byte)3));
-        formData.add("nuid",Long.toString(424752L));
-        formData.add("address",Short.toString((short)4752));
-        formData.add("permanent",Boolean.toString(true));
-        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-        response = client.resource(TARGET).path(RestPaths.NODES).path(Byte.toString((byte)3)).path(Short.toString((short)4752)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-        node = JsonUtils.getFrom(response, Node.class);
-        endpoints = new ArrayList<Byte>();
-        endpoints.add((byte)1);
-        endpoints.add((byte)2);
-        node.setLogicalType(NodeLogicalType.END_DEVICE)
-        	.setManufacturer(Manufacturer.CRP)
-        	.setEndpoints(endpoints)
-        	.addDevice((byte)1, HomeAutomationDevice.COLOR_DIMMABLE_LIGHT)
-        	.addDevice((byte)2, HomeAutomationDevice.OCCUPANCY_SENSOR);
-        client.resource(TARGET).path(RestPaths.NODES).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
-        
-        formData = new MultivaluedMapImpl();
-        formData.add("gatewayId",Byte.toString((byte)3));
-        formData.add("nuid",Long.toString(524742L));
-        formData.add("address",Short.toString((short)4742));
-        formData.add("permanent",Boolean.toString(true));
-        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-        response = client.resource(TARGET).path(RestPaths.NODES).path(Byte.toString((byte)3)).path(Short.toString((short)4742)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-        node = JsonUtils.getFrom(response, Node.class);
-        endpoints = new ArrayList<Byte>();
-        endpoints.add((byte)1);
-        endpoints.add((byte)2);
-        node.setLogicalType(NodeLogicalType.END_DEVICE)
-        	.setManufacturer(Manufacturer.CRP)
-        	.setEndpoints(endpoints)
-        	.addDevice((byte)1, HomeAutomationDevice.COLOR_DIMMABLE_LIGHT)
-        	.addDevice((byte)2, HomeAutomationDevice.OCCUPANCY_SENSOR);
-        client.resource(TARGET).path(RestPaths.NODES).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);
-        
-        formData = new MultivaluedMapImpl();
-        formData.add("gatewayId",Byte.toString((byte)3));
-        formData.add("nuid",Long.toString(101010L));
-        formData.add("address",Short.toString((short)1010));
-        formData.add("permanent",Boolean.toString(true));
-        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-        response = client.resource(TARGET).path(RestPaths.NODES).path(Byte.toString((byte)3)).path(Short.toString((short)1010)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-        node = JsonUtils.getFrom(response, Node.class);
-        endpoints = new ArrayList<Byte>();
-        endpoints.add((byte)1);
-        node.setLogicalType(NodeLogicalType.END_DEVICE)
-        	.setManufacturer(Manufacturer.ELECTROLUX)
-        	.setEndpoints(endpoints)
-        	.addDevice((byte)1, HomeAutomationDevice.SIMPLE_SENSOR);
-        client.resource(TARGET).path(RestPaths.NODES).path("update").type(MediaType.APPLICATION_JSON).post(ClientResponse.class,node);   	    	
-    	
     }
     
     private void stopEventBasedJSFProcesses() throws NamingException, JMSException {

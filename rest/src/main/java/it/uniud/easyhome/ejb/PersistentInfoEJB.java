@@ -135,9 +135,7 @@ public class PersistentInfoEJB {
 	        try {
 	        	Node correspondingNode = query.getSingleResult();
 	        	
-	        	correspondingNode.setLocation(info.getLocation());
-	        	if (info.getName() != null)
-	        		correspondingNode.setName(info.getName());
+	        	correspondingNode.setInfo(info);
 	        	
 	        	em.merge(correspondingNode);
 	        	

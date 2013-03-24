@@ -30,8 +30,8 @@ public final class PairingResource {
     	
     	long thisPairingId;
     	
-    	PersistentInfo source = resEjb.findPersistentInfoById(sourceId);
-    	PersistentInfo destination = resEjb.findPersistentInfoById(destinationId);
+    	Node source = resEjb.findNodeById(sourceId);
+    	Node destination = resEjb.findNodeById(destinationId);
     	
     	if (source == null || destination == null)
 	    	throw new WebApplicationException(Response.Status.BAD_REQUEST);    		

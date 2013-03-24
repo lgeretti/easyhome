@@ -3,6 +3,7 @@ package it.uniud.easyhome.ejb;
 
 import it.uniud.easyhome.devices.Pairing;
 import it.uniud.easyhome.devices.PersistentInfo;
+import it.uniud.easyhome.network.Node;
 
 import java.util.List;
 
@@ -21,11 +22,11 @@ public class PairingEJB {
 	private EntityManager em;
 	
 	
-	public PersistentInfo findPersistentInfoById(long id) {
-		return em.find(PersistentInfo.class, id);
+	public Node findNodeById(long id) {
+		return em.find(Node.class, id);
 	}
 	
-	public void insertPairing(PersistentInfo source, PersistentInfo destination) {
+	public void insertPairing(Node source, Node destination) {
 		Pairing pairing = new Pairing(source, destination);
 		
 		em.persist(pairing);

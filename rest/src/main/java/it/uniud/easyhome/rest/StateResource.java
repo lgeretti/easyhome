@@ -283,7 +283,7 @@ public final class StateResource {
         return Response.ok().build();
     }
     
-    private void sendLampStateUpdateMessage(LampState state, byte gatewayId, short address, int level) {
+    private void sendWhiteLampStateUpdateMessage(LampState state, int level) {
     	
     	try {
 	    	jndiContext = new InitialContext();
@@ -297,11 +297,11 @@ public final class StateResource {
 	            
 	        jmsConnection.start();
 	        
-	        PersistentInfo info = state.getDevice();
+	        Node node = state.getDevice();
 	        
 	    	
 			NetworkEvent event = new NetworkEvent(NetworkEvent.EventKind.LEVEL_CONTROL_VARIATION, 
-					gatewayId, address,new byte[]{(byte)0,(byte)(level & 0x0FF)});
+					node.getCoordinates().getGatewayId(), node.getCoordinates().getAddress(),new byte[]{(byte)0,(byte)(level & 0x0FF)});
         
             ObjectMessage eventMessage = jmsSession.createObjectMessage(event);
             producer.send(eventMessage);

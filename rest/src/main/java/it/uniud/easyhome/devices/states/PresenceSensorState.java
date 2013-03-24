@@ -1,6 +1,7 @@
 package it.uniud.easyhome.devices.states;
 
 import it.uniud.easyhome.devices.PersistentInfo;
+import it.uniud.easyhome.network.Node;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.*;
@@ -13,7 +14,7 @@ public class PresenceSensorState implements DeviceState {
 	
 	@Id
     @OneToOne
-    private PersistentInfo device;
+    private Node device;
     @Column
     private boolean online;
     @Column
@@ -22,11 +23,11 @@ public class PresenceSensorState implements DeviceState {
     @SuppressWarnings("unused")
 	private PresenceSensorState() {}
     
-    public PresenceSensorState(PersistentInfo device) {
+    public PresenceSensorState(Node device) {
     	this.device = device;
     }
 
-	public PersistentInfo getDevice() {
+	public Node getDevice() {
 		return this.device;
 	}
 	

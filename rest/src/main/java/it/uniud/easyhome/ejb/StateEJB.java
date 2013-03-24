@@ -3,6 +3,7 @@ package it.uniud.easyhome.ejb;
 
 import it.uniud.easyhome.devices.PersistentInfo;
 import it.uniud.easyhome.devices.states.*;
+import it.uniud.easyhome.network.Node;
 
 import java.util.List;
 
@@ -37,8 +38,8 @@ public class StateEJB {
 		return em.find(cls, id);		
 	}
 	
-	public PersistentInfo findPersistentInfoById(long id) {
-		return em.find(PersistentInfo.class, id);
+	public Node findNodeById(long id) {
+		return em.find(Node.class, id);
 	}
 
 	public void removeAllStates() {
@@ -58,46 +59,46 @@ public class StateEJB {
 		em.merge(state);
 	}
 
-	public boolean insertLampStateFrom(long infoId) {
+	public boolean insertLampStateFrom(long nodeId) {
 		
-		PersistentInfo info = findPersistentInfoById(infoId);
+		Node node = findNodeById(nodeId);
 		
-		if (info == null)
+		if (node == null)
 			return false;
 		
 		// We accept trying to create an already existing lamp, but we do not do anything (PUT semantics)
-		if (em.find(LampState.class, info.getId()) == null) {
-			em.persist(new LampState(info));
+		if (em.find(LampState.class, node.getId()) == null) {
+			em.persist(new LampState(node));
 		}
 		
 		return true;
 	}
 	
-	public boolean insertFridgeStateFrom(long infoId) {
+	public boolean insertFridgeStateFrom(long nodeId) {
 		
-		PersistentInfo info = findPersistentInfoById(infoId);
+		Node node = findNodeById(nodeId);
 		
-		if (info == null)
+		if (node == null)
 			return false;
 		
 		// We accept trying to create an already existing fridge, but we do not do anything (PUT semantics)
-		if (em.find(FridgeState.class, info.getId()) == null) {
-			em.persist(new FridgeState(info));
+		if (em.find(FridgeState.class, node.getId()) == null) {
+			em.persist(new FridgeState(node));
 		}
 		
 		return true;
 	}
 	
-	public boolean insertPresenceSensorStateFrom(long infoId) {
+	public boolean insertPresenceSensorStateFrom(long nodeId) {
 		
-		PersistentInfo info = findPersistentInfoById(infoId);
+		Node node = findNodeById(nodeId);
 		
-		if (info == null)
+		if (node == null)
 			return false;
 		
 		// We accept trying to create an already existing presence sensor, but we do not do anything (PUT semantics)
-		if (em.find(PresenceSensorState.class, info.getId()) == null) {
-			em.persist(new PresenceSensorState(info));
+		if (em.find(PresenceSensorState.class, node.getId()) == null) {
+			em.persist(new PresenceSensorState(node));
 		}
 		
 		return true;

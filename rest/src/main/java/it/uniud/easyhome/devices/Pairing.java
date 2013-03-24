@@ -1,6 +1,8 @@
 package it.uniud.easyhome.devices;
 
 
+import it.uniud.easyhome.network.Node;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
@@ -17,23 +19,23 @@ public class Pairing {
 	
 	@Id
 	@OneToOne
-	private PersistentInfo source;
+	private Node source;
 	@OneToOne
-	private PersistentInfo destination;
+	private Node destination;
 	
     @SuppressWarnings("unused")
 	private Pairing() { }
     
-    public Pairing(PersistentInfo source, PersistentInfo destination) {
+    public Pairing(Node source, Node destination) {
         this.source = source;
         this.destination = destination;
     }
 
-    public PersistentInfo getSource() {
+    public Node getSource() {
     	return source;
     }
 
-    public PersistentInfo getDestination() {
+    public Node getDestination() {
     	return destination;
     }
     

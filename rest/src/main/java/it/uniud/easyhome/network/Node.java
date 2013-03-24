@@ -11,6 +11,7 @@ import it.uniud.easyhome.devices.DeviceIdentifier;
 import it.uniud.easyhome.devices.HomeAutomationDevice;
 import it.uniud.easyhome.devices.Location;
 import it.uniud.easyhome.devices.Manufacturer;
+import it.uniud.easyhome.devices.PersistentInfo;
 import it.uniud.easyhome.exceptions.EndpointNotFoundException;
 import it.uniud.easyhome.exceptions.InvalidNodeTypeException;
 import it.uniud.easyhome.exceptions.NodeConstructionException;
@@ -26,20 +27,18 @@ public class Node {
 	
 	@Id
 	private long id;
-    @Column(nullable = false, length = 200)
-    private String name;
     @Embedded
     private GlobalCoordinates coordinates;
     @Column(nullable = false)
     private NodeLogicalType logicalType;
-    @OneToOne
-    private Location location;    
     @Column
     private Manufacturer manufacturer;
     @Column
     private byte powerLevel;
     @Column
     private boolean permanent;
+    @OneToOne
+    private PersistentInfo info;
     
     @Embedded
     @ElementCollection
@@ -104,17 +103,6 @@ public class Node {
 		devices.get(epIndex).setDevice(device);
 		return this;
 	}
-	
-
-	public Node setName(String name) {
-		this.name = name;
-		return this;
-	}
-	
-	public Node setLocation(Location location) {
-		this.location = location;
-		return this;
-	}
 
     public static class Builder implements ConcreteClassBuilder<Node> {
         
@@ -130,13 +118,6 @@ public class Node {
             node.logicalType = NodeLogicalType.UNDEFINED;
             node.manufacturer = Manufacturer.UNDEFINED;
         }
-        
-        public Builder setName(String name) {
-            if (name == null)
-                throw new IllegalArgumentException();
-            node.name = name;
-            return this;
-        }   
         
         public Builder setLogicalType(NodeLogicalType logicalType) {
         	node.logicalType = logicalType;
@@ -158,19 +139,20 @@ public class Node {
         	if (node.coordinates.getGatewayId() == 0)
         		throw new NodeConstructionException();
         	
-        	if (node.name == null)
-        		node.name = Node.nameFor(node.coordinates.getGatewayId(),node.coordinates.getAddress());
-        	
             return node;
         }
-
-		public void setLocation(Location location) {
-			node.location = location;
-		}
+    }
+    
+    public long getId() {
+    	return this.id;
     }
     
     public String getName() {
-        return this.name;
+    	
+    	if (info != null)
+    		return info.getName();
+    			
+    	return coordinates.toString();
     }
     
     public boolean isPermanent() {
@@ -194,7 +176,11 @@ public class Node {
     }
     
 	public Location getLocation() {
-		return this.location;
+		
+		if (info == null)
+			return null;
+		else
+			return info.getLocation();
 	}
     
     public List<LocalCoordinates> getNeighbors() {
@@ -221,7 +207,12 @@ public class Node {
     }
     
     public String toString() {
-    	return name;
+    	return getName();
+    }
+    
+    public Node setInfo(PersistentInfo info) {
+    	this.info = info;
+    	return this;
     }
     
     public static String nameFor(byte gatewayId, short address) {
@@ -240,7 +231,6 @@ public class Node {
         Node otherNode = (Node) other;
         
         if (!this.coordinates.equals(otherNode.coordinates)) return false;
-        if (!this.name.equals(otherNode.name)) return false;
         if (this.logicalType != otherNode.logicalType) return false;
         if (this.manufacturer != otherNode.manufacturer) return false;
         
@@ -252,7 +242,6 @@ public class Node {
         final int prime = 31;
 
         long result = 1;
-        result = prime * result + name.hashCode();
         result = prime * result + coordinates.hashCode();
         result = prime * result + logicalType.hashCode();
         result = prime * result + manufacturer.hashCode();
