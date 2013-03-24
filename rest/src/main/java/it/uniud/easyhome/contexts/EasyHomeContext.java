@@ -7,8 +7,8 @@ public enum EasyHomeContext implements Context {
 
 	// General
 	LAMP_UPDATE((short)0x0),
-	LAMP_STATUS((short)0x1);
-	
+	LAMP_STATUS((short)0x1),
+	ALARM((short)0x2);
 	
 	private short code;
 	

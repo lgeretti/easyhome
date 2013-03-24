@@ -483,7 +483,7 @@ public class UserInterfaceResource {
         formData.add("help", "Nessuna funzione correntemente disponibile (dispositivo fittizio)");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(1L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     	
-    	// Macchina del caffe'
+    	// Macchina del caffè
     	
         formData = new MultivaluedMapImpl();
         formData.add("gatewayId",Byte.toString((byte)4));
