@@ -130,7 +130,13 @@ public enum ProcessKind {
 		public Process newProcess(int pid, UriInfo uriInfo, LogLevel logLevel) throws NamingException, JMSException {
 			return new LightLevelControlProcess(pid,uriInfo,this,logLevel);
 		}
-	}; 	
+	},
+	ALARM_STATE_REQUEST {
+		@Override
+		public Process newProcess(int pid, UriInfo uriInfo, LogLevel logLevel) throws NamingException, JMSException {
+			return new AlarmStateRequestProcess(pid,uriInfo,this,logLevel);
+		}
+	};
 	
 	public abstract Process newProcess(int pid, UriInfo uriInfo, LogLevel logLevel) throws NamingException, JMSException;
 }

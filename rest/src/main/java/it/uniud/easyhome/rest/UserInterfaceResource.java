@@ -189,6 +189,8 @@ public class UserInterfaceResource {
 		
 		insertProcess(ProcessKind.LIGHT_LEVEL_CONTROL,LogLevel.DEBUG);
 		
+		insertProcess(ProcessKind.ALARM_STATE_REQUEST,LogLevel.DEBUG);
+		
         return Response.ok().build();
     }
     
