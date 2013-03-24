@@ -150,32 +150,35 @@ public class SIPROGateway extends Gateway {
 	    	Document doc = dBuilder.parse(is);
 
 	    	//doc.getDocumentElement().normalize();
+	    
+	    	NodeList dataCategories = doc.getElementsByTagName("data");
 	     
-	    	System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
-	     
-	    	NodeList nList = doc.getElementsByTagName("output1");
-	     
-	    	System.out.println("----------------------------");
-	     
-	    	for (int temp = 0; temp < nList.getLength(); temp++) {
-	     
-	    		Node nNode = nList.item(temp);
-	     
-	    		System.out.println("\nCurrent Element :" + nNode.getNodeName());
-	     
-	    		if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-	     
-	    			Element eElement = (Element) nNode;
-	     
-	    			System.out.println("State : " + eElement.getElementsByTagName("state").item(0).getTextContent());
-	     
-	    		}
-	    	}
+	    	handleSensors(dataCategories.item(0).getFirstChild());
+	    	handleActuators(dataCategories.item(1).getFirstChild());
+	    	
 	    } catch (Exception e) {
 	    	e.printStackTrace();
 	    }	
     	
     	
     }
-  
+    
+    private void handleSensors(Node node) {
+    	while (node != null) {
+    		
+    		System.out.println("Found one sensor");
+    		
+    		handleSensors(node.getNextSibling());
+    	}
+    }
+
+    private void handleActuators(Node node) {
+    	while (node != null) {
+    		
+    		System.out.println("Found one actuator");
+    		
+    		handleSensors(node.getNextSibling());
+    	}
+    }
+    
 }

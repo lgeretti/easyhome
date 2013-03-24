@@ -1,16 +1,11 @@
 package it.uniud.easyhome.rest;
 
-import it.uniud.easyhome.common.ByteUtils;
 import it.uniud.easyhome.common.JMSConstants;
-import it.uniud.easyhome.devices.PersistentInfo;
 import it.uniud.easyhome.devices.states.*;
 import it.uniud.easyhome.ejb.StateEJB;
-import it.uniud.easyhome.exceptions.MultipleLinkException;
-import it.uniud.easyhome.network.*;
 import it.uniud.easyhome.packets.natives.LampStateSetPacket;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -24,16 +19,10 @@ import javax.naming.NamingException;
 import javax.ws.rs.core.*;
 import javax.ws.rs.*;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-
 @Path(RestPaths.STATES)
 public final class StateResource {
 	
     private StateEJB resEjb;
-    
-	private static final String TARGET = "http://localhost:8080/easyhome/rest/";
-	private static Client client = Client.create();
     
 	private Connection jmsConnection = null;
 	protected javax.naming.Context jndiContext = null;

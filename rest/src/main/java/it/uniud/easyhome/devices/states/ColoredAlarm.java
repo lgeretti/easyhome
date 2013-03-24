@@ -1,7 +1,5 @@
 package it.uniud.easyhome.devices.states;
 
-import it.uniud.easyhome.exceptions.InvalidColoredAlarmException;
-
 public enum ColoredAlarm {
 
 	RED_FIXED((byte)0x64),

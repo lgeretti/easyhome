@@ -11,6 +11,7 @@ import it.uniud.easyhome.gateway.ProtocolType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.commons.io.FileUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.junit.After;
 import org.junit.BeforeClass;
@@ -27,9 +28,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
-import java.io.File;
+import org.xml.sax.InputSource;
 
-@Ignore
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+
 public class SIPROGatewayTest {
 	
 	private static final String TARGET = "http://localhost:5000/";
@@ -41,6 +45,7 @@ public class SIPROGatewayTest {
         client = Client.create();
     }
 
+	@Ignore
 	@Test
 	public void initialSetup() throws JSONException {
 		
@@ -63,6 +68,7 @@ public class SIPROGatewayTest {
 		assertEquals(ClientResponse.Status.OK,response.getClientResponseStatus());        
 	}
 	
+	@Ignore
 	@Test
 	public void readXml() {
 		
@@ -100,5 +106,65 @@ public class SIPROGatewayTest {
 	    }		
 		
 	}
+	
+	@Test
+    public void registerDevices() {
+    	
+	    try {
+	    	 
+	    	File xmlFile = new File("/home/geretti/Public/sources/uniud/easyhome/rest/src/test/resources/datamodel.xml");
+	    	String xmlContent = "";
+	    	
+	        try{
+	            xmlContent = FileUtils.readFileToString(xmlFile);
+	        }catch(IOException e){
+	            e.printStackTrace();
+	        } 
+	        
+	    	InputSource is = new InputSource(new StringReader(xmlContent));
+	    	DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+	    	DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+	    	Document doc = dBuilder.parse(is);
+
+	    	//doc.getDocumentElement().normalize();
+	    
+	    	NodeList dataCategories = doc.getElementsByTagName("data");
+	    	
+	    	System.out.println(dataCategories.getLength());
+	     
+	    	handleSensors(dataCategories.item(0).getFirstChild());
+	    	//handleActuators(dataCategories.item(1).getFirstChild());
+	    	
+	    } catch (Exception e) {
+	    	e.printStackTrace();
+	    }	
+    	
+    	
+    }
+    
+    private void handleSensors(Node node) {
+    	while (node != null && node.getLocalName() != "null") {
+    		
+    		System.out.println("Found one sensor named " + node.getLocalName());
+    		
+    		handleSensors(node.getNextSibling());
+    		
+    		try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+    }
+
+    private void handleActuators(Node node) {
+    	while (node != null) {
+    		
+    		System.out.println("Found one actuator");
+    		
+    		handleSensors(node.getNextSibling());
+    	}
+    }
 	
 }
