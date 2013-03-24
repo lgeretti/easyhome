@@ -129,10 +129,8 @@ public class SIPROGatewayTest {
 	    	//doc.getDocumentElement().normalize();
 	    
 	    	NodeList dataCategories = doc.getElementsByTagName("data");
-	    	
-	    	System.out.println(dataCategories.getLength());
 	     
-	    	handleSensors(dataCategories.item(0).getFirstChild());
+	    	handleSensors(dataCategories.item(0));
 	    	//handleActuators(dataCategories.item(1).getFirstChild());
 	    	
 	    } catch (Exception e) {
@@ -143,7 +141,14 @@ public class SIPROGatewayTest {
     }
     
     private void handleSensors(Node node) {
-    	while (node != null && node.getLocalName() != "null") {
+    	System.out.println(node.getNodeName());
+    	NodeList children = node.getChildNodes();
+    	for (int i=0;i<children.getLength();i++)
+    		System.out.println(children.item(i).getNodeName());
+    	
+    	
+    	/*
+    	while (node != null) {
     		
     		System.out.println("Found one sensor named " + node.getLocalName());
     		
@@ -156,6 +161,7 @@ public class SIPROGatewayTest {
 				e.printStackTrace();
 			}
     	}
+    	*/
     }
 
     private void handleActuators(Node node) {
