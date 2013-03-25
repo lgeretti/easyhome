@@ -436,7 +436,7 @@ public final class StateResource {
             queryParams.add("nuid",Long.toString(lampState.getDevice().getNuid()));
             
             ClientResponse nodeResponse = client.resource(TARGET).path(RestPaths.NODES).queryParams(queryParams)
-            									.accept(MediaType.APPLICATION_JSON).post(ClientResponse.class);
+            									.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
             List<Node> nodes = JsonUtils.getListFrom(nodeResponse, Node.class);
 	    	
 			LampStateSetPacket packet = new LampStateSetPacket(lampState,nodes.get(0).getCoordinates());
