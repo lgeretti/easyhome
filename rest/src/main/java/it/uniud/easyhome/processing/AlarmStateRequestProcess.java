@@ -23,7 +23,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class AlarmStateRequestProcess extends Process {
 	
-	public static long REQUEST_PERIOD_MS = 6000;
+	public static long REQUEST_PERIOD_MS = 5000;
 	
 	private byte sequenceNumber = 0;
 	
