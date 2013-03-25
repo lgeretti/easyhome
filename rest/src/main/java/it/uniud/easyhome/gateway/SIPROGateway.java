@@ -64,9 +64,18 @@ public class SIPROGateway extends Gateway {
 	
 	private volatile Set<Long> sensorsRegistered = new HashSet<Long>();
 	private volatile Set<Long> actuatorsRegistered = new HashSet<Long>();
+	private Set<Long> actuators = new HashSet<Long>();
+	private Set<Long> sensors = new HashSet<Long>();
+	
 			
     public SIPROGateway(byte id, int port, LogLevel logLevel) {
     	super(id,ProtocolType.NATIVE,port,logLevel);
+    	
+    	actuators.add(Long.parseLong("424752",16));
+    	actuators.add(Long.parseLong("524742",16));
+    	sensors.add(Long.parseLong("424752",16));
+    	sensors.add(Long.parseLong("524742",16));
+    	sensors.add(Long.parseLong("101010",16));
     }
     
     @Override
@@ -110,7 +119,7 @@ public class SIPROGateway extends Gateway {
                 
                 while (state != RunnableState.STOPPING) {
                 	
-                	if (actuatorsRegistered.size() + sensorsRegistered.size() < 5)
+                	if (actuatorsRegistered.size() < actuators.size() || sensorsRegistered.size() < sensors.size())
                 		registerDevices();
                     handleOutboundPacketsTo(null,outboundConsumer,jmsSession,inboundProducer,MESSAGE_WAIT_TIME_MS);
                 }
@@ -222,9 +231,9 @@ public class SIPROGateway extends Gateway {
 	    
 	    	NodeList dataCategories = doc.getElementsByTagName("data");
 	     
-	    	if (actuatorsRegistered.size() < 2)
+	    	if (actuatorsRegistered.size() < actuators.size())
 	    		handleActuators(dataCategories.item(0));
-	    	if (sensorsRegistered.size() < 3)
+	    	if (sensorsRegistered.size() < sensors.size())
 	    		handleSensors(dataCategories.item(1));
 	    	
 	    } catch (Exception e) {
