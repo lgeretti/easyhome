@@ -291,7 +291,10 @@ public class SIPROGateway extends Gateway {
 		log(LogLevel.DEBUG,"Registering: identifier=" + identifier + ", online=" + online + ", nuid=" + nuid + 
 						   ", red=" + red + ", green=" + green + ", blue=" + blue + ", white=" + white + ", alarm=" + alarm);
 		
-        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+		addNode(nuid);
+		
+		MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+        formData = new MultivaluedMapImpl();
         formData.add("gatewayId",Byte.toString(this.id));
         formData.add("nuid",Long.toString(nuid));  
         formData.add("online",Boolean.toString(online));
@@ -311,6 +314,8 @@ public class SIPROGateway extends Gateway {
 		String codeString = parameters.item(7).getTextContent() + parameters.item(9).getTextContent() + parameters.item(11).getTextContent();
 		FridgeCode lastCode = FridgeCode.fromCode(Short.parseShort(codeString));
 		log(LogLevel.DEBUG,"Registering: identifier=" + identifier + ", nuid=" + nuid + ", code=" + lastCode);
+		
+		addNode(nuid);
 		
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         formData.add("gatewayId",Byte.toString(this.id));
@@ -398,6 +403,18 @@ public class SIPROGateway extends Gateway {
         client.resource(INTERNAL_TARGET).path(RestPaths.STATES).path("sensors/presence").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         
         identifiersRegistered.add(identifier);
+    }
+    
+    private void addNode(long nuid) {
+    	
+		MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+        formData = new MultivaluedMapImpl();
+        formData.add("gatewayId",Byte.toString(this.id));
+        formData.add("nuid",Long.toString(nuid));  
+        formData.add("address",Short.toString((short)(nuid & 0xFFFF)));
+        formData.add("permanent",Boolean.toString(true));
+        client.resource(INTERNAL_TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+    	
     }
     
 }

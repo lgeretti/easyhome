@@ -453,7 +453,8 @@ public final class StateResource {
 		} finally {
         	
         	try {
-				jmsConnection.close();
+        		if (jmsConnection != null)
+        			jmsConnection.close();
 			} catch (JMSException e) {
 			}
         }
