@@ -5,12 +5,15 @@ import it.uniud.easyhome.common.Endianness;
 import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.common.RunnableState;
+import it.uniud.easyhome.contexts.EasyHomeContext;
 import it.uniud.easyhome.contexts.HomeAutomationContext;
 import it.uniud.easyhome.devices.states.ColoredAlarm;
 import it.uniud.easyhome.devices.states.FridgeCode;
 import it.uniud.easyhome.network.ModuleCoordinates;
 import it.uniud.easyhome.packets.Domain;
 import it.uniud.easyhome.packets.Operation;
+import it.uniud.easyhome.packets.natives.AlarmStateReqPacket;
+import it.uniud.easyhome.packets.natives.AlarmStateRspPacket;
 import it.uniud.easyhome.packets.natives.LampStateSetPacket;
 import it.uniud.easyhome.packets.natives.NativePacket;
 import it.uniud.easyhome.packets.natives.OccupancyAttributeReqPacket;
@@ -147,7 +150,7 @@ public class SIPROGateway extends Gateway {
 			
 			client.resource(SIPRO_TARGET).queryParams(queryParams).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 			
-		} else if (OccupancyAttributeReqPacket.validates(pkt)) {
+		} else if (OccupancyAttributeReqPacket.validates(pkt) || AlarmStateReqPacket.validates(pkt)) {
 			
 			long destinationNuid = pkt.getDstCoords().getNuid();
 			
@@ -324,12 +327,28 @@ public class SIPROGateway extends Gateway {
 		if (nuid == nuidToMatch) {
 			String codeString = parameters.item(7).getTextContent() + parameters.item(9).getTextContent() + parameters.item(11).getTextContent();
 			FridgeCode lastCode = FridgeCode.fromCode(Short.parseShort(codeString));
+			
 			log(LogLevel.DEBUG,"Code to transmit back from " + nuid + ": " + lastCode);
-			/*
-			 packet = new NodeDescrReqPacket(node.getCoordinates(),tsn);
-	        ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
-	        producer.send(outboundMessage); 
-			*/
+			short addr = (short)(nuid & 0xFFFF);
+			byte[] addrBytesLittleEndian = ByteUtils.getBytes(addr, Endianness.LITTLE_ENDIAN);
+			byte[] codeBytesLittleEndian = ByteUtils.getBytes(lastCode.getCode(), Endianness.LITTLE_ENDIAN);
+			
+			byte[] payload = new byte[5];
+			payload[1] = addrBytesLittleEndian[0];
+			payload[2] = addrBytesLittleEndian[1];
+			payload[3] = codeBytesLittleEndian[0];
+			payload[4] = codeBytesLittleEndian[1];
+			ModuleCoordinates sourceCoordinates = new ModuleCoordinates(this.id,nuid,addr,(byte)1);
+			ModuleCoordinates destinationCoordinates = new ModuleCoordinates((byte)1,0L,(short)0,(byte)1);
+			Operation operation = new Operation((byte)0, Domain.EASYHOME.getCode(), EasyHomeContext.ALARM.getCode(), (byte)0, (byte)1, payload);
+			AlarmStateRspPacket packet = new AlarmStateRspPacket(sourceCoordinates,destinationCoordinates,operation);
+	        ObjectMessage inboundMessage;
+			try {
+				inboundMessage = jmsSession.createObjectMessage(packet);
+				producer.send(inboundMessage); 
+			} catch (JMSException e) {
+				e.printStackTrace();
+			}
         	return true;
 		} else
         	return false;
