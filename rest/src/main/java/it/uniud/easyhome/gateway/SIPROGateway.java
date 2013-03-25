@@ -115,18 +115,12 @@ public class SIPROGateway extends Gateway {
             } catch (Exception ex) {
             	ex.printStackTrace();
             } finally {
-	              try {
-	            	  server.close();
-	              } catch (IOException ex) {
-	          		  // Whatever the case, the connection is not available anymore
-	              } finally {
-		        	  try {
-		        		  if (jmsConnection != null)
-		        			  jmsConnection.close();
-		        	  } catch (JMSException ex) {
-		        		// Whatever the case, the connection is not available anymore  
-		        	  }
-	              }
+	        	  try {
+	        		  if (jmsConnection != null)
+	        			  jmsConnection.close();
+	        	  } catch (JMSException ex) {
+	        		// Whatever the case, the connection is not available anymore  
+	        	  }
             }
         }
         state = RunnableState.STOPPED;

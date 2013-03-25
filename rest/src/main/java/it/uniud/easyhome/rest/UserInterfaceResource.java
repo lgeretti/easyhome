@@ -187,10 +187,10 @@ public class UserInterfaceResource {
 		insertProcess(ProcessKind.OCCUPANCY_REQUEST);
 		insertProcess(ProcessKind.OCCUPANCY_REGISTRATION);
 		
-		insertProcess(ProcessKind.LIGHT_LEVEL_CONTROL,LogLevel.DEBUG);
+		insertProcess(ProcessKind.LIGHT_LEVEL_CONTROL);//,LogLevel.DEBUG);
 		
-		insertProcess(ProcessKind.ALARM_STATE_REQUEST,LogLevel.DEBUG);
-		insertProcess(ProcessKind.ALARM_STATE_ACKNOWLEDGMENT,LogLevel.DEBUG);
+		insertProcess(ProcessKind.ALARM_STATE_REQUEST);//,LogLevel.DEBUG);
+		insertProcess(ProcessKind.ALARM_STATE_ACKNOWLEDGMENT);//,LogLevel.DEBUG);
 		
         return Response.ok().build();
     }

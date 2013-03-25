@@ -37,7 +37,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 
-@Ignore
 public class SIPROGatewayTest {
 	
 	private static final String TARGET = "http://localhost:5000/";
@@ -77,13 +76,14 @@ public class SIPROGatewayTest {
     	
 	    try {
 	    	 
+	    	/*
 	        MultivaluedMap<String,String> queryParams = new MultivaluedMapImpl();
 	        queryParams.add("method","getDataModel");
 	        queryParams.add("params","");
     		ClientResponse dataModelResponse = client.resource(TARGET).queryParams(queryParams).accept(MediaType.TEXT_XML).get(ClientResponse.class);
 	    	String xmlContent = dataModelResponse.getEntity(String.class);
-	    	 
-	    	/*
+	    	*/
+	    	
 	    	File xmlFile = new File("/home/geretti/Public/sources/uniud/easyhome/rest/src/test/resources/datamodel.xml");
 	    	String xmlContent = "";
 	    	
@@ -92,7 +92,7 @@ public class SIPROGatewayTest {
 	        }catch(IOException e){
 	            e.printStackTrace();
 	        }
-	        */ 
+	        
 	        
 	    	InputSource is = new InputSource(new StringReader(xmlContent));
 	    	DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
