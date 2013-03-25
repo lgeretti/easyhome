@@ -53,6 +53,10 @@ var hoverEffectTime = 1000;
 var helpSelected = false;
 var helpText = "";
 
+var isInterfaceInactive = false;
+var activityTimeout;
+var timeBeforeInactive = 2000;
+
 var homeRooms;
 var roomDevices;
 var deviceFunctionalities;
@@ -69,7 +73,16 @@ var currentOption;
 var lowSelectionIndex;
 var optionsCoverDescriptionText = false;
 
+function restartInactivityCounter() {
+	
+	isInterfaceInactive = false;
+	
+	clearTimeout(activityTimeout);
+	activityTimeout = setTimeout(function() {isInterfaceInactive = true; }, timeBeforeInactive);
+}
+
 function arrowHoverEffectIn(button) {
+	
     button.stop().animate({
           backgroundColor: button.css('color')
             }, hoverEffectTime );
@@ -192,7 +205,6 @@ function selectionButtonHoverEffectIn(button) {
 }
 
 function notchButtonHoverEffectIn(button) {
-    
 	var hoveredButtonId = button.attr('id');
 	var hoveredButtonColorClass;
 	var currentNotch;
@@ -282,7 +294,6 @@ function notchButtonHoverEffectIn(button) {
 }	
 
 function notchButtonHoverEffectOut(button) {
-	
     clearTimeout(hoverTimeout);
 
     var hoveredButtonId = button.attr('id');
@@ -680,6 +691,86 @@ function moveCurrentDeviceTo(room) {
 	selectState(uiState.Device);
 }
 
+function updateLuminosityValue() {
+	
+	if (currentState == uiState.Functionality && currentFunctionality.type == 'LUMINOSITY_CONTROL') {
+		
+		if (isInterfaceInactive) {
+			putLuminosityControls();
+		}	
+			
+		setTimeout(updateLuminosityValue, 500);
+	}
+}
+
+function putLuminosityControls() {
+	
+    var htmlText = "<div id='0' class='eh_notch grey_notch_button white_notch ui-widget-content ui-corner-all'><img height='150px' width='100px' src='img/0.svg' /></div>";
+    
+    var lampState = $.parseJSON($.ajax({ 
+        type: "GET",
+        dataType: "json",
+        url: host+"rest/states/lamps/"+currentDevice.id,
+        async: false
+      }).responseText);
+    
+    var numNotches = Math.round(lampState.white/100*8);
+    
+    currentOption = numNotches;
+    
+    for (i = 0; i<numNotches; i++) {
+        htmlText += "<div id='"+(i+1)+"' class='eh_notch colored_notch_button white_notch ui-widget-content ui-corner-all' style='background:"+blue+"'></div>";
+    }
+    for (i = numNotches; i<8; i++) {
+        htmlText += "<div id='"+(i+1)+"' class='eh_notch colored_notch_button white_notch ui-widget-content ui-corner-all' style='background:"+grey+"'></div>";
+    }
+    
+    $("#eh_functionality_container")
+      .css('left','65px').css('top','450px')
+      .html(htmlText)
+      .show();
+	
+}
+
+function putColorControls() {
+	
+    optionsCoverDescriptionText = true;
+    var htmlText = "<div>";
+
+    var lampState = $.parseJSON($.ajax({ 
+        type: "GET",
+        dataType: "json",
+        url: host+"rest/states/lamps/"+currentDevice.id,
+        async: false
+      }).responseText);
+    
+    var numNotches = [ Math.round(lampState.red/100*8), Math.round(lampState.green/100*8), Math.round(lampState.blue/100*8) ];        
+    var colors = ['red', 'green', 'blue'];
+    var initials = ['R', 'G', 'B'];
+    
+    currentOption = numNotches;
+    
+    for (j = 0; j<3; j++) {
+    
+        htmlText += "<div id='0' class='eh_notch grey_notch_button "+colors[j]+"_notch ui-widget-content ui-corner-all'><img height='150px' width='100px' src='img/"+initials[j]+".svg' /></div>";
+        
+        for (i = 0; i<numNotches[j]; i++) {
+            htmlText += "<div id='"+(i+1)+"' class='eh_notch colored_notch_button "+colors[j]+"_notch ui-widget-content ui-corner-all' style='background:"+blue+"'></div>";
+        }
+        for (i = numNotches[j]; i<8; i++) {
+            htmlText += "<div id='"+(i+1)+"' class='eh_notch colored_notch_button "+colors[j]+"_notch ui-widget-content ui-corner-all' style='background:"+grey+"'></div>";
+        }
+    }
+    htmlText += "</div>";
+    
+    
+    $("#eh_functionality_container")
+      .css('left','65px').css('top','210px')
+      .html(htmlText)
+      .show();	
+	
+}
+
 function showFunctionality(functionality) {
 	
     switch (functionality.type) {
@@ -701,68 +792,16 @@ function showFunctionality(functionality) {
     
     case 'LUMINOSITY_CONTROL':
     	
-    	var htmlText = "<div id='0' class='eh_notch grey_notch_button white_notch ui-widget-content ui-corner-all'><img height='150px' width='100px' src='img/0.svg' /></div>";
+    	putLuminosityControls();
     	
-        var lampState = $.parseJSON($.ajax({ 
-            type: "GET",
-            dataType: "json",
-            url: host+"rest/states/lamps/"+currentDevice.id,
-            async: false
-          }).responseText);
-        
-        var numNotches = Math.round(lampState.white/100*8);
-        
-        currentOption = numNotches;
+    	updateLuminosityValue();
     	
-    	for (i = 0; i<numNotches; i++) {
-    		htmlText += "<div id='"+(i+1)+"' class='eh_notch colored_notch_button white_notch ui-widget-content ui-corner-all' style='background:"+blue+"'></div>";
-    	}
-        for (i = numNotches; i<8; i++) {
-            htmlText += "<div id='"+(i+1)+"' class='eh_notch colored_notch_button white_notch ui-widget-content ui-corner-all' style='background:"+grey+"'></div>";
-        }
-    	
-    	$("#eh_functionality_container")
-    	  .css('left','65px').css('top','450px')
-    	  .html(htmlText)
-    	  .show();
     	break;
     	
     case 'COLOR_CONTROL':
 
-    	optionsCoverDescriptionText = true;
-        var htmlText = "<div>";
-
-        var lampState = $.parseJSON($.ajax({ 
-            type: "GET",
-            dataType: "json",
-            url: host+"rest/states/lamps/"+currentDevice.id,
-            async: false
-          }).responseText);
-        
-        var numNotches = [ Math.round(lampState.red/100*8), Math.round(lampState.green/100*8), Math.round(lampState.blue/100*8) ];        
-        var colors = ['red', 'green', 'blue'];
-        var initials = ['R', 'G', 'B'];
-        
-        currentOption = numNotches;
-        
-        for (j = 0; j<3; j++) {
-        
-            htmlText += "<div id='0' class='eh_notch grey_notch_button "+colors[j]+"_notch ui-widget-content ui-corner-all'><img height='150px' width='100px' src='img/"+initials[j]+".svg' /></div>";
-            
-            for (i = 0; i<numNotches[j]; i++) {
-                htmlText += "<div id='"+(i+1)+"' class='eh_notch colored_notch_button "+colors[j]+"_notch ui-widget-content ui-corner-all' style='background:"+blue+"'></div>";
-            }
-            for (i = numNotches[j]; i<8; i++) {
-                htmlText += "<div id='"+(i+1)+"' class='eh_notch colored_notch_button "+colors[j]+"_notch ui-widget-content ui-corner-all' style='background:"+grey+"'></div>";
-            }
-        }
-        htmlText += "</div>";
-        
-        
-        $("#eh_functionality_container")
-          .css('left','65px').css('top','210px')
-          .html(htmlText)
-          .show();
+    	putColorControls();
+    	
         break;
         
     case 'PAIRING':
@@ -819,10 +858,12 @@ function showFunctionality(functionality) {
     
     $(".eh_notch").hover(
     	    function() {
+    	    	restartInactivityCounter();
     	        notchButtonHoverEffectIn($(this));
     	    }
     	    ,
     	    function() {
+    	    	restartInactivityCounter();
     	        notchButtonHoverEffectOut($(this));
     	    }
     );
@@ -846,12 +887,14 @@ $(".eh_button").each(
 
 $(".selection_button").hover(
     function() {
+    	restartInactivityCounter();
     	if (!helpSelected)
           $("#eh_description_div").text($(this).find("img").attr("alt")).show();
         selectionButtonHoverEffectIn($(this));
     }
     ,
     function() {
+    	restartInactivityCounter();
         if (!helpSelected)
           $("#eh_description_div").hide();
         buttonHoverEffectOut($(this));
@@ -860,12 +903,14 @@ $(".selection_button").hover(
 
 $(".navigation_button").hover(
     function() {
+    	restartInactivityCounter();
     	if (!helpSelected && !optionsCoverDescriptionText)
           $("#eh_description_div").text($(this).find("img").attr("alt")).show();
         navigationButtonHoverEffectIn($(this));
     }
     ,
     function() {
+    	restartInactivityCounter();
         if (!helpSelected)
           $("#eh_description_div").hide();
         buttonHoverEffectOut($(this));
@@ -874,12 +919,14 @@ $(".navigation_button").hover(
 
 $("#eh_help_button").hover(
     function() {
+    	restartInactivityCounter();
 		if (!helpSelected && !optionsCoverDescriptionText)
           $("#eh_description_div").text($(this).find("img").attr("alt")).show();
         helpHoverEffectIn();
     }
     ,
     function() {
+    	restartInactivityCounter();
     	if (!helpSelected)
         	 $("#eh_description_div").hide();
         helpHoverEffectOut();
@@ -888,10 +935,12 @@ $("#eh_help_button").hover(
 
 $(".arrow_button").hover(
     function() {
+    	restartInactivityCounter();
         arrowHoverEffectIn($(this));
     }
     ,
     function() {
+    	restartInactivityCounter();
         buttonHoverEffectOut($(this));
     }
 );

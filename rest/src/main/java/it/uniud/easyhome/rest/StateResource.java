@@ -226,8 +226,7 @@ public final class StateResource {
     			.setGreen(green)
     			.setBlue(blue)
     			.setWhite(white)
-    			.setAlarm(alarm)
-    			.update();
+    			.setAlarm(alarm);
     	
     	resEjb.updateManagedState(thisLamp);
     	
@@ -263,8 +262,7 @@ public final class StateResource {
     			.setGreen(green)
     			.setBlue(blue)
     			.setWhite(white)
-    			.setAlarm(alarm)
-    			.update();
+    			.setAlarm(alarm);
     	
     	resEjb.updateManagedState(thisLamp);
     	
@@ -281,7 +279,7 @@ public final class StateResource {
     	if (thisLamp == null)
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
     	
-    	thisLamp.setRed(value).update();
+    	thisLamp.setRed(value);
     	
     	resEjb.updateManagedState(thisLamp);
     	
@@ -300,7 +298,7 @@ public final class StateResource {
     	if (thisLamp == null)
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
     	
-    	thisLamp.setGreen(value).update();
+    	thisLamp.setGreen(value);
     	
     	resEjb.updateManagedState(thisLamp);
     	
@@ -319,7 +317,7 @@ public final class StateResource {
     	if (thisLamp == null)
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
     	
-    	thisLamp.setBlue(value).update();
+    	thisLamp.setBlue(value);
     	
     	resEjb.updateManagedState(thisLamp);
     	
@@ -338,7 +336,7 @@ public final class StateResource {
     	if (thisLamp == null)
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
     	
-    	thisLamp.setWhite(value).update();
+    	thisLamp.setWhite(value);
     	
     	resEjb.updateManagedState(thisLamp);
     	
@@ -357,7 +355,7 @@ public final class StateResource {
     	if (thisLamp == null)
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
     	
-    	thisLamp.setAlarm(value).update();
+    	thisLamp.setAlarm(value);
     	
     	resEjb.updateManagedState(thisLamp);
     	

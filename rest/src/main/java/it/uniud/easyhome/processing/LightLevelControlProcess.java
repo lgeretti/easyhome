@@ -75,7 +75,7 @@ public class LightLevelControlProcess extends Process {
 				        		
 				        		if (state.isOnline()) {
 				        			
-					        		Date lastStateUpdatePlusTwoSeconds = new Date(state.getLastUpdate()+1000*LOCK_TIME_BETWEEN_UPDATES_IN_SECONDS);
+					        		Date lastStateUpdatePlusTwoSeconds = new Date(state.getLastWhiteUpdate()+1000*LOCK_TIME_BETWEEN_UPDATES_IN_SECONDS);
 					        		Date currentDate = new Date(System.currentTimeMillis());
 					        		
 					        		if (currentDate.after(lastStateUpdatePlusTwoSeconds)) {
