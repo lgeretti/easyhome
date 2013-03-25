@@ -438,11 +438,17 @@ public final class StateResource {
             ClientResponse nodeResponse = client.resource(TARGET).path(RestPaths.NODES).queryParams(queryParams)
             									.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
             List<Node> nodes = JsonUtils.getListFrom(nodeResponse, Node.class);
+            
+            if (nodes.size() == 1) {
 	    	
-			LampStateSetPacket packet = new LampStateSetPacket(lampState,nodes.get(0).getCoordinates());
-        
-            ObjectMessage changeMessage = jmsSession.createObjectMessage(packet);
-            producer.send(changeMessage);
+				LampStateSetPacket packet = new LampStateSetPacket(lampState,nodes.get(0).getCoordinates());
+	        
+	            ObjectMessage changeMessage = jmsSession.createObjectMessage(packet);
+	            producer.send(changeMessage);
+	            
+            } else
+            	System.out.println("Missing node for gatewayId " + queryParams.get("gatewayId") + " and nuid " + queryParams.get("nuid"));
+            
         } catch (JMSException ex) { 
         	ex.printStackTrace();
         } catch (NamingException e) {
