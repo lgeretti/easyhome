@@ -42,6 +42,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.io.FileUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -229,26 +230,27 @@ public class SIPROGateway extends Gateway {
     	NodeList children = node.getChildNodes();
     	for (int i=0;i<children.getLength();i++) {
     		Node child = children.item(i);
-    		if (child.getNodeName() != "#text") {
+    		if (child.getNodeType() == Node.ELEMENT_NODE) {
     			String identifier = child.getNodeName();
     			if (!identifiersRegistered.contains(identifier)) 
-    				registerLamp(identifier,child.getChildNodes());
+    				registerLamp(identifier,(Element)child);
     		}
     	}
     }
 
     private void handleSensors(Node node) {
+
     	NodeList children = node.getChildNodes();
     	for (int i=0;i<children.getLength();i++) {
     		Node child = children.item(i);
-    		if (child.getNodeName() != "#text") {
+    		if (child.getNodeType() == Node.ELEMENT_NODE) {
     			String identifier = child.getNodeName();
     			if (!identifiersRegistered.contains(identifier)) { 
-	    			NodeList parameters = child.getChildNodes();
-	    			if (parameters.getLength() == 15)
-	    				registerFridge(identifier,parameters);
-	    			else
-	    				registerPIR(identifier,parameters);
+	    			String descrName = getDescriptorName((Element)child);
+	    			if (descrName.equals("Fridge Alarm Light"))
+	    				registerFridge(identifier,(Element)child);
+	    			else if (descrName.equals("PIR"))
+	    				registerPIR(identifier,(Element)child);
     			}
     		}
     	}
@@ -257,13 +259,13 @@ public class SIPROGateway extends Gateway {
     private void handleSensorReply(NodeList inputs, long nuid, Session jmsSession, MessageProducer producer) {
     	for (int i=0;i<inputs.getLength();i++) {
     		Node input = inputs.item(i);
-    		if (input.getNodeName() != "#text") {
-    			NodeList parameters = input.getChildNodes();
-    			if (parameters.getLength() == 15) {
-    				if (handleSensorReplyForFridge(parameters,nuid,jmsSession,producer))
+    		if (input.getNodeType() == Node.ELEMENT_NODE) {
+    			String descrName = getDescriptorName((Element)input);
+    			if (descrName.equals("Fridge Alarm Light")) {
+    				if (handleSensorReplyForFridge((Element)input,nuid,jmsSession,producer))
     					break;
-    			} else {
-    				if (handleSensorReplyForPIR(parameters,nuid,jmsSession,producer))
+    			} else if (descrName.equals("PIR")) {
+    				if (handleSensorReplyForPIR((Element)input,nuid,jmsSession,producer))
     					break;
     			}
     		}
@@ -274,14 +276,14 @@ public class SIPROGateway extends Gateway {
     	return (byte)(Integer.parseInt(value,16) & 0xFF);
     }
 
-    private void registerLamp(String identifier, NodeList parameters) {
-    	boolean online = (parameters.item(1).getTextContent().equals("ON"));
-		long nuid = Long.parseLong(parameters.item(3).getTextContent() + parameters.item(5).getTextContent() + parameters.item(7).getTextContent(),16);
-		byte red = fromHexStringToByte(parameters.item(9).getTextContent());
-		byte green = fromHexStringToByte(parameters.item(11).getTextContent());
-		byte blue = fromHexStringToByte(parameters.item(13).getTextContent());
-		byte white = fromHexStringToByte(parameters.item(15).getTextContent());
-		ColoredAlarm alarm = ColoredAlarm.fromCode((byte)(Integer.parseInt(parameters.item(17).getTextContent(),16) & 0xFF));
+    private void registerLamp(String identifier, Element elem) {
+    	boolean online = (getTxtFor(elem,"state").equals("ON"));
+		long nuid = Long.parseLong(getTxtFor(elem,"value-3") + getTxtFor(elem,"value-2") + getTxtFor(elem,"value-1"),16);
+		byte red = fromHexStringToByte(getTxtFor(elem,"value0"));
+		byte green = fromHexStringToByte(getTxtFor(elem,"value1"));
+		byte blue = fromHexStringToByte(getTxtFor(elem,"value2"));
+		byte white = fromHexStringToByte(getTxtFor(elem,"value3"));
+		ColoredAlarm alarm = ColoredAlarm.fromCode((byte)(Integer.parseInt(getTxtFor(elem,"value4"),16) & 0xFF));
 		log(LogLevel.DEBUG,"Registering Lamp: identifier=" + identifier + ", online=" + online + ", nuid=0x" + Long.toHexString(nuid) + 
 						   ", red=" + red + ", green=" + green + ", blue=" + blue + ", white=" + white + ", alarm=" + alarm);
 		
@@ -303,10 +305,26 @@ public class SIPROGateway extends Gateway {
         identifiersRegistered.add(identifier);
     }
     
-    private void registerFridge(String identifier, NodeList parameters) {
-		long nuid = Long.parseLong(parameters.item(1).getTextContent() + parameters.item(3).getTextContent() + parameters.item(5).getTextContent(),16);
-		String codeString = parameters.item(7).getTextContent() + parameters.item(9).getTextContent() + parameters.item(11).getTextContent();
-		FridgeCode lastCode = FridgeCode.fromCode(Short.parseShort(codeString));
+    private void registerPIR(String identifier, Element elem) {
+		long nuid = Long.parseLong(getTxtFor(elem,"value-3") + getTxtFor(elem,"value-2") + getTxtFor(elem,"value-1"),16);
+		String occupation = getTxtFor(elem,"value0") + getTxtFor(elem,"value1");
+		boolean occupied = (occupation.equals("5031"));
+		log(LogLevel.DEBUG,"Registering PIR: identifier=" + identifier + ", nuid=0x" + Long.toHexString(nuid) + ", occupied=" + occupied);
+		
+        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+        formData.add("gatewayId",Byte.toString(this.id));
+        formData.add("nuid",Long.toString(nuid));  
+        formData.add("identifier",identifier);
+        formData.add("occupied",Boolean.toString(occupied));
+        client.resource(INTERNAL_TARGET).path(RestPaths.STATES).path("sensors/presence").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        
+        identifiersRegistered.add(identifier);
+    }
+    
+    private void registerFridge(String identifier, Element elem) {
+		long nuid = Long.parseLong(getTxtFor(elem,"value-3") + getTxtFor(elem,"value-2") + getTxtFor(elem,"value-1"),16);
+		String codeString = getTxtFor(elem,"value0") + getTxtFor(elem,"value1") + getTxtFor(elem,"value2");
+		FridgeCode lastCode = FridgeCode.fromCode(Short.parseShort(codeString));	
 		log(LogLevel.DEBUG,"Registering Fridge: identifier=" + identifier + ", nuid=0x" + Long.toHexString(nuid) + ", code=" + lastCode);
 		
 		addNode(nuid);
@@ -321,10 +339,10 @@ public class SIPROGateway extends Gateway {
         identifiersRegistered.add(identifier);
     }
     
-    private boolean handleSensorReplyForFridge(NodeList parameters, long nuidToMatch, Session jmsSession, MessageProducer producer) {
-		long nuid = Long.parseLong(parameters.item(1).getTextContent() + parameters.item(3).getTextContent() + parameters.item(5).getTextContent(),16);
+    private boolean handleSensorReplyForFridge(Element elem, long nuidToMatch, Session jmsSession, MessageProducer producer) {
+    	long nuid = Long.parseLong(getTxtFor(elem,"value-3") + getTxtFor(elem,"value-2") + getTxtFor(elem,"value-1"),16);
 		if (nuid == nuidToMatch) {
-			String codeString = parameters.item(7).getTextContent() + parameters.item(9).getTextContent() + parameters.item(11).getTextContent();
+			String codeString = getTxtFor(elem,"value0") + getTxtFor(elem,"value1") + getTxtFor(elem,"value2");
 			FridgeCode lastCode = FridgeCode.fromCode(Short.parseShort(codeString));
 			
 			log(LogLevel.DEBUG,"Code to transmit back from 0x" + Long.toHexString(nuid) + ": " + lastCode);
@@ -353,10 +371,10 @@ public class SIPROGateway extends Gateway {
         	return false;
     }
     
-    private boolean handleSensorReplyForPIR(NodeList parameters, long nuidToMatch, Session jmsSession, MessageProducer producer) {
-		long nuid = Long.parseLong(parameters.item(1).getTextContent() + parameters.item(3).getTextContent() + parameters.item(5).getTextContent(),16);
+    private boolean handleSensorReplyForPIR(Element	elem, long nuidToMatch, Session jmsSession, MessageProducer producer) {
+    	long nuid = Long.parseLong(getTxtFor(elem,"value-3") + getTxtFor(elem,"value-2") + getTxtFor(elem,"value-1"),16);
 		if (nuid == nuidToMatch) {
-			String occupation = parameters.item(7).getTextContent() + parameters.item(9).getTextContent();
+			String occupation = getTxtFor(elem,"value0") + getTxtFor(elem,"value1");
 			boolean occupied = occupation.equals("5031");
 			log(LogLevel.DEBUG,"Occupation result to transmit back from 0x" + Long.toHexString(nuid) + ": " + occupied);
 			
@@ -383,22 +401,6 @@ public class SIPROGateway extends Gateway {
         	return false;
     }
     
-    private void registerPIR(String identifier, NodeList parameters) {
-		long nuid = Long.parseLong(parameters.item(1).getTextContent() + parameters.item(3).getTextContent() + parameters.item(5).getTextContent(),16);
-		String occupation = parameters.item(7).getTextContent() + parameters.item(9).getTextContent();
-		boolean occupied = occupation.equals("5031");
-		log(LogLevel.DEBUG,"Registering PIR: identifier=" + identifier + ", nuid=0x" + Long.toHexString(nuid) + ", occupied=" + occupied);
-		
-        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-        formData.add("gatewayId",Byte.toString(this.id));
-        formData.add("nuid",Long.toString(nuid));  
-        formData.add("identifier",identifier);
-        formData.add("occupied",Boolean.toString(occupied));
-        client.resource(INTERNAL_TARGET).path(RestPaths.STATES).path("sensors/presence").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-        
-        identifiersRegistered.add(identifier);
-    }
-    
     private void addNode(long nuid) {
     	
 		MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
@@ -409,6 +411,25 @@ public class SIPROGateway extends Gateway {
         formData.add("permanent",Boolean.toString(true));
         client.resource(INTERNAL_TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     	
+    }
+    
+    private String getTxtFor(Element input, String tagName) {
+    	
+        NodeList tagList = input.getElementsByTagName(tagName);
+        Element tagElement = (Element)tagList.item(0);
+
+        NodeList textFNList = tagElement.getChildNodes();
+        return ((Node)textFNList.item(0)).getNodeValue().trim();
+    }
+    
+    private String getDescriptorName(Element input) {
+    	
+        NodeList inputElementList = input.getElementsByTagName("descriptor");
+        Element descrElement = (Element)inputElementList.item(0);
+        NodeList descriptorElements = descrElement.getElementsByTagName("name");
+        Element descrNameElement = (Element)descriptorElements.item(0);
+        NodeList textFNList = descrNameElement.getChildNodes();
+        return ((Node)textFNList.item(0)).getNodeValue().trim();
     }
     
 }

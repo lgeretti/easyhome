@@ -119,8 +119,8 @@ public class SIPROGatewayTest {
     	NodeList children = node.getChildNodes();
     	for (int i=0;i<children.getLength();i++) {
     		Node child = children.item(i);
-    		if (child.getNodeName() != "#text") {
-    			handleLamp(child.getNodeName(),child.getChildNodes());
+    		if (child.getNodeType() == Node.ELEMENT_NODE) {
+    			handleLamp(child.getNodeName(),(Element)child);
     		}
     	}
     }
@@ -129,13 +129,13 @@ public class SIPROGatewayTest {
     	NodeList children = node.getChildNodes();
     	for (int i=0;i<children.getLength();i++) {
     		Node child = children.item(i);
-    		if (child.getNodeName() != "#text") {
+    		if (child.getNodeType() == Node.ELEMENT_NODE) {
     			String identifier = child.getNodeName();
-    			NodeList parameters = child.getChildNodes();
-    			if (parameters.getLength() == 15)
-    				handleFridge(identifier,parameters);
-    			else
-    				handlePIR(identifier,parameters);
+    			String descrName = getDescriptorName((Element)child);
+    			if (descrName.equals("Fridge Alarm Light"))
+    				handleFridge(identifier,(Element)child);
+    			else if (descrName.equals("PIR"))
+    				handlePIR(identifier,(Element)child);
     		}
     	}
     }    
@@ -145,111 +145,55 @@ public class SIPROGatewayTest {
     	return (byte)(Integer.parseInt(value,16) & 0xFF);
     }
 
-    private void handleLamp(String identifier, NodeList parameters) {
+    private void handleLamp(String identifier, Element input) {
     	byte gatewayId = 3;
-    	boolean online = (parameters.item(1).getTextContent().equals("ON"));
-		long nuid = Long.parseLong(parameters.item(3).getTextContent() + parameters.item(5).getTextContent() + parameters.item(7).getTextContent(),16);
-		byte red = fromHexStringToByte(parameters.item(9).getTextContent());
-		byte green = fromHexStringToByte(parameters.item(11).getTextContent());
-		byte blue = fromHexStringToByte(parameters.item(13).getTextContent());
-		byte white = fromHexStringToByte(parameters.item(15).getTextContent());
-		ColoredAlarm alarm = ColoredAlarm.fromCode((byte)(Integer.parseInt(parameters.item(17).getTextContent(),16) & 0xFF));
+    	boolean online = (getTxtFor(input,"state").equals("ON"));
+		long nuid = Long.parseLong(getTxtFor(input,"value-3") + getTxtFor(input,"value-2") + getTxtFor(input,"value-1"),16);
+		byte red = fromHexStringToByte(getTxtFor(input,"value0"));
+		byte green = fromHexStringToByte(getTxtFor(input,"value1"));
+		byte blue = fromHexStringToByte(getTxtFor(input,"value2"));
+		byte white = fromHexStringToByte(getTxtFor(input,"value3"));
+		ColoredAlarm alarm = ColoredAlarm.fromCode((byte)(Integer.parseInt(getTxtFor(input,"value4"),16) & 0xFF));
 		
 		System.out.println("Lamp: identifier=" + identifier + ", online=" + online + ", nuid=0x" + Long.toHexString(nuid) + 
 				   ", red=" + red + ", green=" + green + ", blue=" + blue + ", white=" + white + ", alarm=" + alarm);
     }
     
-    private void handleFridge(String identifier, NodeList parameters) {
+    private void handleFridge(String identifier, Element input) {
     	byte gatewayId = 3;
-		long nuid = Long.parseLong(parameters.item(1).getTextContent() + parameters.item(3).getTextContent() + parameters.item(5).getTextContent(),16);
-		String codeString = parameters.item(7).getTextContent() + parameters.item(9).getTextContent() + parameters.item(11).getTextContent();
+		long nuid = Long.parseLong(getTxtFor(input,"value-3") + getTxtFor(input,"value-2") + getTxtFor(input,"value-1"),16);
+		String codeString = getTxtFor(input,"value0") + getTxtFor(input,"value1") + getTxtFor(input,"value2");
 		FridgeCode lastCode = FridgeCode.fromCode(Short.parseShort(codeString));	
 		
 		System.out.println("Fridge: identifier=" + identifier + ", nuid=0x" + Long.toHexString(nuid) + ", code=" + lastCode);
     }
     
-    private void handlePIR(String identifier, NodeList parameters) {
-    	byte gatewayId = 3;
-		long nuid = Long.parseLong(parameters.item(1).getTextContent() + parameters.item(3).getTextContent() + parameters.item(5).getTextContent(),16);
-		String occupation = parameters.item(7).getTextContent() + parameters.item(9).getTextContent();
-		boolean occupied = (occupation == "5031");
+    private void handlePIR(String identifier, Element input) {
+    	byte gatewayId = 3;    	
+    	
+		long nuid = Long.parseLong(getTxtFor(input,"value-3") + getTxtFor(input,"value-2") + getTxtFor(input,"value-1"),16);
+		String occupation = getTxtFor(input,"value0") + getTxtFor(input,"value1");
+		boolean occupied = (occupation.equals("5031"));
 		
 		System.out.println("PIR: identifier=" + identifier + ", nuid=0x" + Long.toHexString(nuid) + ", occupied=" + occupied);
     }
     
-    @Test
-    public void parseBookFile(){
-    try {
+    private String getTxtFor(Element input, String tagName) {
+    	
+        NodeList tagList = input.getElementsByTagName(tagName);
+        Element tagElement = (Element)tagList.item(0);
 
-            DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-            Document doc = docBuilder.parse (new File("/home/geretti/Downloads/book.xml"));
-
-            // normalize text representation
-            doc.getDocumentElement ().normalize ();
-            System.out.println ("Root element of the doc is " + 
-                 doc.getDocumentElement().getNodeName());
-
-
-            NodeList listOfPersons = doc.getElementsByTagName("person");
-            int totalPersons = listOfPersons.getLength();
-            System.out.println("Total no of people : " + totalPersons);
-
-            for(int s=0; s<listOfPersons.getLength() ; s++){
-
-
-                Node firstPersonNode = listOfPersons.item(s);
-                if(firstPersonNode.getNodeType() == Node.ELEMENT_NODE){
-
-
-                    Element firstPersonElement = (Element)firstPersonNode;
-
-                    //-------
-                    NodeList firstNameList = firstPersonElement.getElementsByTagName("first");
-                    Element firstNameElement = (Element)firstNameList.item(0);
-
-                    NodeList textFNList = firstNameElement.getChildNodes();
-                    System.out.println("First Name : " + 
-                           ((Node)textFNList.item(0)).getNodeValue().trim());
-
-                    //-------
-                    NodeList lastNameList = firstPersonElement.getElementsByTagName("last");
-                    Element lastNameElement = (Element)lastNameList.item(0);
-
-                    NodeList textLNList = lastNameElement.getChildNodes();
-                    System.out.println("Last Name : " + 
-                           ((Node)textLNList.item(0)).getNodeValue().trim());
-
-                    //----
-                    NodeList ageList = firstPersonElement.getElementsByTagName("age");
-                    Element ageElement = (Element)ageList.item(0);
-
-                    NodeList textAgeList = ageElement.getChildNodes();
-                    System.out.println("Age : " + 
-                           ((Node)textAgeList.item(0)).getNodeValue().trim());
-
-                    //------
-
-
-                }//end of if clause
-
-
-            }//end of for loop with s var
-
-
-        }catch (SAXParseException err) {
-        System.out.println ("** Parsing error" + ", line " 
-             + err.getLineNumber () + ", uri " + err.getSystemId ());
-        System.out.println(" " + err.getMessage ());
-
-        }catch (SAXException e) {
-        Exception x = e.getException ();
-        ((x == null) ? e : x).printStackTrace ();
-
-        }catch (Throwable t) {
-        t.printStackTrace ();
-        }
-        //System.exit (0);
-
-    }//end of main
+        NodeList textFNList = tagElement.getChildNodes();
+        return ((Node)textFNList.item(0)).getNodeValue().trim();
+    }
+    
+    private String getDescriptorName(Element input) {
+    	
+        NodeList inputElementList = input.getElementsByTagName("descriptor");
+        Element descrElement = (Element)inputElementList.item(0);
+        NodeList descriptorElements = descrElement.getElementsByTagName("name");
+        Element descrNameElement = (Element)descriptorElements.item(0);
+        NodeList textFNList = descrNameElement.getChildNodes();
+        return ((Node)textFNList.item(0)).getNodeValue().trim();
+    }
 }
