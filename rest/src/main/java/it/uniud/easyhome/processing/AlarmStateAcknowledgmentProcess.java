@@ -65,8 +65,6 @@ public class AlarmStateAcknowledgmentProcess extends Process {
 	        		
 	        		if (alarmPkt.getStatus() == ResponseStatus.SUCCESS) {
 	        			
-	        			byte gatewayId = alarmPkt.getSrcCoords().getGatewayId();
-	        			short address = alarmPkt.getAddrOfInterest();
 	        			FridgeCode alarmCode = FridgeCode.fromCode(alarmPkt.getAlarmCode());
 	        			
 	        			// (NOTE: for simplicity, we assume that only one source of alarms exists)
@@ -87,6 +85,10 @@ public class AlarmStateAcknowledgmentProcess extends Process {
 				            												   .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 				            		PresenceSensorState presenceState = JsonUtils.getFrom(presenceStateResponse, PresenceSensorState.class);
 				            		
+				            		ClientResponse lampResponse = restResource.path(RestPaths.STATES).path("lamps").path(Long.toString(node.getInfo().getId()))
+				            												  .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+				            		LampState lampState = JsonUtils.getFrom(lampResponse, LampState.class);
+				            		
 				            		MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
 				            		ColoredAlarm alarmToIssue = null;
 				            		switch (alarmCode) {
@@ -105,12 +107,16 @@ public class AlarmStateAcknowledgmentProcess extends Process {
 					            		default:
 					            			alarmToIssue = ColoredAlarm.NONE;
 				            		}
-				            		formData.add("value",alarmToIssue.toString());
-					                restResource.path(RestPaths.STATES).path("lamps").path(Long.toString(node.getInfo().getId())).path("alarm")
-		                						.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-					                
-					                log(LogLevel.INFO, "Alarm set for lamp id " + node.getId() + " (" + (presenceState.isOccupied()? "occupied":"unoccupied") 
-					                					+ "): " + alarmToIssue);
+				            		
+				            		if (alarmToIssue != lampState.getAlarm()) {
+					            		formData.add("value",alarmToIssue.toString());
+						                restResource.path(RestPaths.STATES).path("lamps").path(Long.toString(node.getInfo().getId())).path("alarm")
+			                						.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+						                log(LogLevel.INFO, "Alarm set for lamp id " + node.getId() + " (" + (presenceState.isOccupied()? "occupied":"unoccupied") 
+			                					+ "): " + alarmToIssue);
+				            		} else
+				            			log(LogLevel.DEBUG, "Alarm for lamp id " + node.getId() + " (" + (presenceState.isOccupied()? "occupied":"unoccupied") 
+			                					+ ") not changed");
 			        			}
 			        			
 				        	} else

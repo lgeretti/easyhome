@@ -26,7 +26,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class LightLevelControlProcess extends Process {
 
-	private static int LOCK_TIME_BETWEEN_UPDATES_IN_SECONDS = 2;
+	private static int LOCK_TIME_BETWEEN_UPDATES_IN_SECONDS = 3;
 	
     public LightLevelControlProcess(int pid, UriInfo uriInfo,ProcessKind kind, LogLevel logLevel) throws NamingException, JMSException {
         super(pid, UriBuilder.fromUri(uriInfo.getBaseUri()).build(new Object[0]),kind,logLevel);
@@ -75,10 +75,10 @@ public class LightLevelControlProcess extends Process {
 				        		
 				        		if (state.isOnline()) {
 				        			
-					        		Date lastStateUpdatePlusTwoSeconds = new Date(state.getLastWhiteUpdate()+1000*LOCK_TIME_BETWEEN_UPDATES_IN_SECONDS);
+					        		Date lastStateUpdatePlusLockTime = new Date(state.getLastWhiteUpdate()+1000*LOCK_TIME_BETWEEN_UPDATES_IN_SECONDS);
 					        		Date currentDate = new Date(System.currentTimeMillis());
 					        		
-					        		if (currentDate.after(lastStateUpdatePlusTwoSeconds)) {
+					        		if (currentDate.after(lastStateUpdatePlusLockTime)) {
 			
 						        		byte previousVal = state.getWhite();
 						        		int newVal = Math.max(0, Math.min(100, previousVal +levelPercentage));
@@ -93,7 +93,7 @@ public class LightLevelControlProcess extends Process {
 							                restResource.path(RestPaths.STATES).path("lamps").path(Long.toString(lampId)).path("white")
 							                			.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 						        		} else
-						        			log(LogLevel.DEBUG, "Lamp state has not been not changed by control: discarding the event");
+						        			log(LogLevel.DEBUG, "Lamp state has not been changed by control: discarding the event");
 					                
 					        		} else
 					        			log(LogLevel.DEBUG, "Lamp state updated too recently: discarding the event");				        			
