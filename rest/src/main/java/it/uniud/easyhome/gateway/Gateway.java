@@ -253,7 +253,7 @@ public class Gateway implements Runnable {
                 while (state != RunnableState.STOPPING) {
                 	
 		            handleInboundPacketFrom(istream,buffer,jmsSession,inboundProducer,outboundProducer);
-                    handleOutboundPacketsTo(ostream,outboundConsumer,jmsSession,inboundProducer,MESSAGE_WAIT_TIME_MS);
+                    handleOutboundPacketsTo(ostream,outboundConsumer,jmsSession,inboundProducer);
                 }
                 
             } catch (SocketException ex) {
@@ -331,11 +331,11 @@ public class Gateway implements Runnable {
     	// To be overridden
     }
     
-    protected void handleOutboundPacketsTo(OutputStream os, MessageConsumer consumer, Session jmsSession, MessageProducer producer, int waitTime) throws IOException {
+    protected void handleOutboundPacketsTo(OutputStream os, MessageConsumer consumer, Session jmsSession, MessageProducer producer) throws IOException {
     	
         try {
             while (true) {
-            	ObjectMessage msg = (ObjectMessage) consumer.receive(waitTime);
+            	ObjectMessage msg = (ObjectMessage) consumer.receive(MESSAGE_WAIT_TIME_MS);
                 if (msg == null) {
                 	break;
                 }

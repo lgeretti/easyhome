@@ -56,7 +56,7 @@ public class SIPROGateway extends Gateway {
 	private static final String SIPRO_TARGET = "http://localhost:5000/";
 	private static final String INTERNAL_TARGET = "http://localhost:8080/easyhome/rest/";
 	
-	private static final int MESSAGE_WAIT_TIME_MS = 5000;
+	private static final int DISCOVERY_PERIOD_MS = 8000; 
 	
 	private static final boolean MOCKED_GATEWAY = true;
 	
@@ -67,7 +67,8 @@ public class SIPROGateway extends Gateway {
 	private Set<Long> actuators = new HashSet<Long>();
 	private Set<Long> sensors = new HashSet<Long>();
 	
-			
+	private long lastDiscoveryTimeMillis = 0;
+	
     public SIPROGateway(byte id, int port, LogLevel logLevel) {
     	super(id,ProtocolType.NATIVE,port,logLevel);
     	
@@ -121,9 +122,9 @@ public class SIPROGateway extends Gateway {
                 
                 while (state != RunnableState.STOPPING) {
                 	
-                	if (actuatorsRegistered.size() < actuators.size() || sensorsRegistered.size() < sensors.size())
-                		registerDevices();
-                    handleOutboundPacketsTo(null,outboundConsumer,jmsSession,inboundProducer,MESSAGE_WAIT_TIME_MS);
+                	if (canTryToDiscoverNewDevices())
+                		lookForNewDevices();
+                    handleOutboundPacketsTo(null,outboundConsumer,jmsSession,inboundProducer);
                 }
                 
             } catch (SocketException ex) {
@@ -169,6 +170,17 @@ public class SIPROGateway extends Gateway {
 		}
     }
     
+    private boolean canTryToDiscoverNewDevices() {
+    	
+    	if (actuatorsRegistered.size() < actuators.size() || sensorsRegistered.size() < sensors.size()) {
+    		if (System.currentTimeMillis() > lastDiscoveryTimeMillis + DISCOVERY_PERIOD_MS)
+    			return true;
+    		else
+    			return false;
+    	} else
+    		return false;
+    }
+    
     private void sendCorrespondingSensorData(long destinationNuid, Session jmsSession, MessageProducer producer) {
     	
 	    try {
@@ -205,7 +217,7 @@ public class SIPROGateway extends Gateway {
 	    }	   
     }
     
-    private void registerDevices() {
+    private void lookForNewDevices() {
     	
 	    try {
 	    	
@@ -234,10 +246,20 @@ public class SIPROGateway extends Gateway {
 	    
 	    	NodeList dataCategories = doc.getElementsByTagName("data");
 	     
-	    	if (actuatorsRegistered.size() < actuators.size())
+	    	if (actuatorsRegistered.size() < actuators.size()) {
 	    		handleActuators(dataCategories.item(0));
-	    	if (sensorsRegistered.size() < sensors.size())
+	    		if (actuatorsRegistered.size() == actuators.size())
+	    			log(LogLevel.FINE,"All actuators registered");
+	    	}
+	    	
+	    	if (sensorsRegistered.size() < sensors.size()) {
 	    		handleSensors(dataCategories.item(1));
+	    		if (sensorsRegistered.size() == sensors.size())
+	    			log(LogLevel.FINE,"All sensors registered");
+	    	}
+	    	
+	    	if (actuatorsRegistered.size() == actuators.size() && sensorsRegistered.size() == sensors.size())
+	    		log(LogLevel.FINE,"All devices registered");
 	    	
 	    } catch (Exception e) {
 	    	e.printStackTrace();
@@ -256,6 +278,7 @@ public class SIPROGateway extends Gateway {
     				actuatorsRegistered.add(nuid);
     				registerLamp(identifier,(Element)child);
     			}
+    				
     		}
     	}
     }
