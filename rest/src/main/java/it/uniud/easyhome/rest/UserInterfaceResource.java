@@ -262,6 +262,7 @@ public class UserInterfaceResource {
 	        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        response = client.resource(TARGET).path(RestPaths.NODES).path(Byte.toString((byte)3)).path(Short.toString((short)0x4752)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        node = JsonUtils.getFrom(response, Node.class);
+	        long lampadaSalottoId = node.getId();
 	        endpoints = new ArrayList<Byte>();
 	        endpoints.add((byte)1);
 	        endpoints.add((byte)2);
@@ -292,6 +293,7 @@ public class UserInterfaceResource {
 	        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        response = client.resource(TARGET).path(RestPaths.NODES).path(Byte.toString((byte)3)).path(Short.toString((short)0x4742)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        node = JsonUtils.getFrom(response, Node.class);
+	        long lampadaCameraDoppiaId = node.getId();
 	        endpoints = new ArrayList<Byte>();
 	        endpoints.add((byte)1);
 	        endpoints.add((byte)2);
@@ -322,6 +324,7 @@ public class UserInterfaceResource {
 	        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        response = client.resource(TARGET).path(RestPaths.NODES).path(Byte.toString((byte)3)).path(Short.toString((short)0x1010)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        node = JsonUtils.getFrom(response, Node.class);
+	        long frigoId = node.getId();
 	        endpoints = new ArrayList<Byte>();
 	        endpoints.add((byte)1);
 	        node.setLogicalType(NodeLogicalType.END_DEVICE)
@@ -456,7 +459,7 @@ public class UserInterfaceResource {
 	        formData.putSingle("infoId",Long.toString(timerInfoId));
 	        client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        
-	        addStates(lampadaSalottoInfoId,lampadaCameraDoppiaInfoId,frigoInfoId);
+	        addStates(lampadaSalottoId,lampadaCameraDoppiaId,frigoId);
 
             
     	} catch (JSONException ex) {
