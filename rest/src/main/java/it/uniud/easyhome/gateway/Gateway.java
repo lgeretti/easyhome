@@ -132,6 +132,10 @@ public class Gateway implements Runnable {
         return routingTable;
     }
     
+    protected int getMessageWaitTime() {
+    	return MESSAGE_WAIT_TIME_MS;
+    }
+    
     public final int addRoutingEntry(ModuleCoordinates coords) {
         
     	int mappedEndpoint = mappedEndpointCounter++;
@@ -249,7 +253,7 @@ public class Gateway implements Runnable {
                 while (state != RunnableState.STOPPING) {
                 	
 		            handleInboundPacketFrom(istream,buffer,jmsSession,inboundProducer,outboundProducer);
-                    handleOutboundPacketsTo(ostream,outboundConsumer,jmsSession,inboundProducer);
+                    handleOutboundPacketsTo(ostream,outboundConsumer,jmsSession,inboundProducer,MESSAGE_WAIT_TIME_MS);
                 }
                 
             } catch (SocketException ex) {
@@ -327,11 +331,11 @@ public class Gateway implements Runnable {
     	// To be overridden
     }
     
-    protected final void handleOutboundPacketsTo(OutputStream os, MessageConsumer consumer, Session jmsSession, MessageProducer producer) throws IOException {
+    protected void handleOutboundPacketsTo(OutputStream os, MessageConsumer consumer, Session jmsSession, MessageProducer producer, int waitTime) throws IOException {
     	
         try {
             while (true) {
-            	ObjectMessage msg = (ObjectMessage) consumer.receive(MESSAGE_WAIT_TIME_MS);
+            	ObjectMessage msg = (ObjectMessage) consumer.receive(waitTime);
                 if (msg == null) {
                 	break;
                 }

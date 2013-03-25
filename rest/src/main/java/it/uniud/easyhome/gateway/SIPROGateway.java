@@ -56,11 +56,14 @@ public class SIPROGateway extends Gateway {
 	private static final String SIPRO_TARGET = "http://localhost:5000/";
 	private static final String INTERNAL_TARGET = "http://localhost:8080/easyhome/rest/";
 	
+	private static final int MESSAGE_WAIT_TIME_MS = 5000;
+	
 	private static final boolean MOCKED_GATEWAY = true;
 	
 	private static Client client = Client.create();
 	
-	private Set<String> identifiersRegistered = new HashSet<String>();
+	private volatile Set<Long> sensorsRegistered = new HashSet<Long>();
+	private volatile Set<Long> actuatorsRegistered = new HashSet<Long>();
 			
     public SIPROGateway(byte id, int port, LogLevel logLevel) {
     	super(id,ProtocolType.NATIVE,port,logLevel);
@@ -107,8 +110,9 @@ public class SIPROGateway extends Gateway {
                 
                 while (state != RunnableState.STOPPING) {
                 	
-                	registerDevices();
-                    handleOutboundPacketsTo(null,outboundConsumer,jmsSession,inboundProducer);
+                	if (actuatorsRegistered.size() + sensorsRegistered.size() < 5)
+                		registerDevices();
+                    handleOutboundPacketsTo(null,outboundConsumer,jmsSession,inboundProducer,MESSAGE_WAIT_TIME_MS);
                 }
                 
             } catch (SocketException ex) {
@@ -218,8 +222,10 @@ public class SIPROGateway extends Gateway {
 	    
 	    	NodeList dataCategories = doc.getElementsByTagName("data");
 	     
-	    	handleActuators(dataCategories.item(0));
-	    	handleSensors(dataCategories.item(1));
+	    	if (actuatorsRegistered.size() < 2)
+	    		handleActuators(dataCategories.item(0));
+	    	if (sensorsRegistered.size() < 3)
+	    		handleSensors(dataCategories.item(1));
 	    	
 	    } catch (Exception e) {
 	    	e.printStackTrace();
@@ -231,9 +237,13 @@ public class SIPROGateway extends Gateway {
     	for (int i=0;i<children.getLength();i++) {
     		Node child = children.item(i);
     		if (child.getNodeType() == Node.ELEMENT_NODE) {
-    			String identifier = child.getNodeName();
-    			if (!identifiersRegistered.contains(identifier)) 
+    			Element sensor = (Element)child;
+    			String identifier = sensor.getNodeName();
+    			long nuid = Long.parseLong(getTxtFor(sensor,"value-3") + getTxtFor(sensor,"value-2") + getTxtFor(sensor,"value-1"),16);
+    			if (!actuatorsRegistered.contains(nuid)) {
+    				actuatorsRegistered.add(nuid);
     				registerLamp(identifier,(Element)child);
+    			}
     		}
     	}
     }
@@ -244,13 +254,16 @@ public class SIPROGateway extends Gateway {
     	for (int i=0;i<children.getLength();i++) {
     		Node child = children.item(i);
     		if (child.getNodeType() == Node.ELEMENT_NODE) {
-    			String identifier = child.getNodeName();
-    			if (!identifiersRegistered.contains(identifier)) { 
-	    			String descrName = getDescriptorName((Element)child);
+    			Element sensor = (Element)child;
+    			String identifier = sensor.getNodeName();
+    			long nuid = Long.parseLong(getTxtFor(sensor,"value-3") + getTxtFor(sensor,"value-2") + getTxtFor(sensor,"value-1"),16);
+    			if (!sensorsRegistered.contains(nuid)) { 
+    				sensorsRegistered.add(nuid);
+	    			String descrName = getDescriptorName(sensor);
 	    			if (descrName.equals("Fridge Alarm Light"))
-	    				registerFridge(identifier,(Element)child);
+	    				registerFridge(identifier,sensor);
 	    			else if (descrName.equals("PIR"))
-	    				registerPIR(identifier,(Element)child);
+	    				registerPIR(identifier,sensor);
     			}
     		}
     	}
@@ -301,8 +314,6 @@ public class SIPROGateway extends Gateway {
         formData.add("white",Byte.toString(white));
         formData.add("alarm",alarm.toString());
         client.resource(INTERNAL_TARGET).path(RestPaths.STATES).path("lamps").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-        
-        identifiersRegistered.add(identifier);
     }
     
     private void registerPIR(String identifier, Element elem) {
@@ -317,8 +328,6 @@ public class SIPROGateway extends Gateway {
         formData.add("identifier",identifier);
         formData.add("occupied",Boolean.toString(occupied));
         client.resource(INTERNAL_TARGET).path(RestPaths.STATES).path("sensors/presence").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-        
-        identifiersRegistered.add(identifier);
     }
     
     private void registerFridge(String identifier, Element elem) {
@@ -335,8 +344,6 @@ public class SIPROGateway extends Gateway {
         formData.add("identifier",identifier);
         formData.add("lastCode",lastCode.toString());
         client.resource(INTERNAL_TARGET).path(RestPaths.STATES).path("fridges").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-        
-        identifiersRegistered.add(identifier);
     }
     
     private boolean handleSensorReplyForFridge(Element elem, long nuidToMatch, Session jmsSession, MessageProducer producer) {
