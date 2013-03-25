@@ -347,6 +347,25 @@ public final class StateResource {
     	return Response.ok().build();
     }   
     
+    @POST
+    @Path("lamps/{id}/alarm")
+    public Response updateLampAlarm(@PathParam("id") long id,
+    								@FormParam("value") ColoredAlarm value) {
+    		
+    	LampState thisLamp = resEjb.findStateByInfoId(id,LampState.class);
+    	
+    	if (thisLamp == null)
+    		throw new WebApplicationException(Response.Status.NOT_FOUND);
+    	
+    	thisLamp.setAlarm(value).update();
+    	
+    	resEjb.updateManagedState(thisLamp);
+    	
+    	sendLampStateUpdateMessage(thisLamp);
+    	
+    	return Response.ok().build();
+    } 
+    
     @PUT
     @Path("sensors/presence/{id}/occupied")
     public Response updatePresenceSensorOccupied(@PathParam("id") long id) {

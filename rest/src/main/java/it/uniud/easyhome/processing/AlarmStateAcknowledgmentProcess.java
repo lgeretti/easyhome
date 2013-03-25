@@ -8,7 +8,10 @@ import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.devices.DeviceType;
 import it.uniud.easyhome.devices.FunctionalityType;
+import it.uniud.easyhome.devices.states.ColoredAlarm;
 import it.uniud.easyhome.devices.states.FridgeCode;
+import it.uniud.easyhome.devices.states.LampState;
+import it.uniud.easyhome.devices.states.PresenceSensorState;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.NetworkEvent;
 import it.uniud.easyhome.network.NetworkJob;
@@ -80,7 +83,34 @@ public class AlarmStateAcknowledgmentProcess extends Process {
 
 			        			for (Node node : nodes) {
 			        				
-			        				// TODO : if no alarm, remove the alarm to any lamp, if an alarm add it to occupied lamps (idempotent)
+				            		ClientResponse presenceStateResponse = restResource.path(RestPaths.STATES).path("sensors/presence").path(Long.toString(node.getId()))
+				            												   .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+				            		PresenceSensorState presenceState = JsonUtils.getFrom(presenceStateResponse, PresenceSensorState.class);
+				            		
+				            		MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+				            		ColoredAlarm alarmToIssue = null;
+				            		switch (alarmCode) {
+					            		case ALARM1:
+					            			if (presenceState.isOccupied())
+					            				alarmToIssue = ColoredAlarm.RED_BLINK;
+					            			else
+					            				alarmToIssue = ColoredAlarm.NONE;
+					            			break;
+					            		case ALARM2:
+					            			if (presenceState.isOccupied())
+					            				alarmToIssue = ColoredAlarm.BLUE_BLINK;
+					            			else
+					            				alarmToIssue = ColoredAlarm.NONE;
+					            			break;
+					            		default:
+					            			alarmToIssue = ColoredAlarm.NONE;
+				            		}
+				            		formData.add("value",alarmToIssue.toString());
+					                restResource.path(RestPaths.STATES).path("lamps").path(Long.toString(node.getId())).path("alarm")
+		                						.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+					                
+					                log(LogLevel.INFO, "Alarm set for lamp id " + node.getId() + " (" + (presenceState.isOccupied()? "occupied":"unoccupied") 
+					                					+ "): " + alarmToIssue);
 			        			}
 			        			
 				        	} else

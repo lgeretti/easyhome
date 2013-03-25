@@ -37,6 +37,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 
+@Ignore
 public class SIPROGatewayTest {
 	
 	private static final String TARGET = "http://localhost:5000/";
