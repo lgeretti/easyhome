@@ -184,7 +184,7 @@ public class UserInterfaceResource {
 		insertProcess(ProcessKind.NETWORK_GRAPH_MINIMIZATION);
 		insertProcess(ProcessKind.NETWORK_UPDATE);
 		
-		insertProcess(ProcessKind.OCCUPANCY_REQUEST);
+		insertProcess(ProcessKind.OCCUPANCY_REQUEST);//, LogLevel.DEBUG);
 		insertProcess(ProcessKind.OCCUPANCY_REGISTRATION);
 		
 		insertProcess(ProcessKind.LIGHT_LEVEL_CONTROL);//,LogLevel.DEBUG);
@@ -255,13 +255,6 @@ public class UserInterfaceResource {
 	        // Lampada salotto
 
 	        formData = new MultivaluedMapImpl();
-	        formData.add("gatewayId",Byte.toString((byte)3));
-	        formData.add("nuid",Long.toString(0x424752L));
-	        formData.add("address",Short.toString((short)0x4752));
-	        formData.add("permanent",Boolean.toString(true));
-	        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	        
-	        formData = new MultivaluedMapImpl();
 	        formData.add("name","Lampada");
 	        formData.add("locationName",locs.get(0));
 	        formData.add("deviceType", DeviceType.COLORED_LAMP.toString());
@@ -274,13 +267,6 @@ public class UserInterfaceResource {
 	        // Lampada camera doppia
 	        
 	        formData = new MultivaluedMapImpl();
-	        formData.add("gatewayId",Byte.toString((byte)3));
-	        formData.add("nuid",Long.toString(0x524742L));
-	        formData.add("address",Short.toString((short)0x4742));
-	        formData.add("permanent",Boolean.toString(true));
-	        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	        
-	        formData = new MultivaluedMapImpl();
 	        formData.add("name","Lampada");
 	        formData.add("locationName",locs.get(2));
 	        formData.add("deviceType", DeviceType.COLORED_LAMP.toString());
@@ -291,13 +277,6 @@ public class UserInterfaceResource {
 	        long lampadaCameraDoppiaInfoId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
 	        
 	        // Frigo
-	        
-	        formData = new MultivaluedMapImpl();
-	        formData.add("gatewayId",Byte.toString((byte)3));
-	        formData.add("nuid",Long.toString(0x101010L));
-	        formData.add("address",Short.toString((short)0x1010));
-	        formData.add("permanent",Boolean.toString(true));
-	        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        
 	        formData = new MultivaluedMapImpl();
 	        formData.add("name","Frigo");

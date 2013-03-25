@@ -425,8 +425,9 @@ public class SIPROGateway extends Gateway {
         formData.add("nuid",Long.toString(nuid));  
         formData.add("address",Short.toString((short)(nuid & 0xFFFF)));
         formData.add("permanent",Boolean.toString(true));
-        client.resource(INTERNAL_TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-    	
+        ClientResponse response = client.resource(INTERNAL_TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+        if (response.getClientResponseStatus() != ClientResponse.Status.CREATED)
+        	log(LogLevel.DEBUG, "Node insertion response: " + response.getClientResponseStatus());
     }
     
     private String getTxtFor(Element input, String tagName) {

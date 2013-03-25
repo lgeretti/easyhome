@@ -43,7 +43,7 @@ public class OccupancySensingRequestProcess extends Process {
             params.add("funcType",FunctionalityType.OCCUPATION_SENSING.toString());
     		ClientResponse functionalitiesResponse = restResource.path(RestPaths.FUNCTIONALITIES).queryParams(params).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
     		List<Functionality> functionalities = JsonUtils.getListFrom(functionalitiesResponse, Functionality.class);
-	    	
+    		
 	    	for (Node node : nodes) {
 
 	    		if (hasOccupancySensingFunctionality(node,functionalities)) {
