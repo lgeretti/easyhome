@@ -419,7 +419,7 @@ public class UserInterfaceResource {
 	        formData.add("name","Colore");
 	        formData.add("type",FunctionalityType.COLOR_CONTROL.toString());
 	        formData.add("imgPath","img/colorpalette.svg");
-	        formData.add("help", "Seleziona il bilanciamento colore preferito per ognuno dei tre colori (crescente da sinistra verso destra)");
+	        formData.add("help", "Seleziona l'intensità colore per rosso(R), verde(G) e blu(B), crescente da sinistra verso destra");
 	        formData.putSingle("infoId",Long.toString(lampadaCameraDoppiaInfoId));
 	    	client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        formData.putSingle("infoId",Long.toString(lampadaSalottoInfoId));
