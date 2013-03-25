@@ -83,12 +83,12 @@ public class OccupancySensingRegistrationProcess extends Process {
 		        				
 		        				boolean previouslyOccupied = location.isOccupied();
 		        				location.setOccupied(occupied);
-				                restResource.path(RestPaths.LOCATIONS).path(Integer.toString(location.getId())).path(occupied ? "occupied" : "unoccupied").put(ClientResponse.class);
-				                restResource.path(RestPaths.STATES).path("sensors").path("presence").path(Long.toString(sender.getInfo().getId())).path(occupied ? "occupied" : "unoccupied").put(ClientResponse.class);
 				                
-				                if (previouslyOccupied != occupied) 
+				                if (previouslyOccupied != occupied) {
+					                restResource.path(RestPaths.LOCATIONS).path(Integer.toString(location.getId())).path(occupied ? "occupied" : "unoccupied").put(ClientResponse.class);
+					                restResource.path(RestPaths.STATES).path("sensors").path("presence").path(Long.toString(sender.getInfo().getId())).path(occupied ? "occupied" : "unoccupied").put(ClientResponse.class);
 				                	log(LogLevel.INFO, location + " is now " + (occupied ? "occupied" : "unoccupied"));
-				                else
+				                } else
 				                	log(LogLevel.DEBUG, "No change in occupancy state");
 		        			}
 			                
