@@ -306,7 +306,7 @@ public class Gateway implements Runnable {
         try {
         	
         	NativePacket nativePkt = readFrom(is,buffer);
-        	log(LogLevel.DEBUG, "Inbound packet received from " + nativePkt.getSrcCoords());
+        	log(LogLevel.FINE, "Inbound packet received from " + nativePkt.getSrcCoords());
         	dispatchPacket(nativePkt,jmsSession,inboundProducer,outboundProducer);
         } catch (NoBytesAvailableException | IncompletePacketException ex) {
         	// Just move on
@@ -344,7 +344,7 @@ public class Gateway implements Runnable {
             	byte dstGatewayId = nativePkt.getDstCoords().getGatewayId();
             	if (srcGatewayId != id) {
 	            	if (dstGatewayId == id || dstGatewayId == 0) {
-	            		log(LogLevel.DEBUG, "Outbound packet received from " + nativePkt.getSrcCoords());
+	            		log(LogLevel.FINE, "Outbound packet received from " + nativePkt.getSrcCoords());
 	            		write(nativePkt,os,jmsSession,producer);
 	            	}
             	}

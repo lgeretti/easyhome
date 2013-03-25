@@ -71,7 +71,7 @@ public class ActiveEndpointsRequestProcess extends Process {
 		        log(LogLevel.INFO, "Node " + node + " active endpoints request " + (isRepeated ? "re-" : "") + "dispatched");
 	        }
         } else {
-        	log(LogLevel.DEBUG, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
+        	log(LogLevel.FINE, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
         }
     }
     

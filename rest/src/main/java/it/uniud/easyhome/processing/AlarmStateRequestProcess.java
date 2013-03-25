@@ -50,7 +50,7 @@ public class AlarmStateRequestProcess extends Process {
 	    			AlarmStateReqPacket packet = new AlarmStateReqPacket(node.getCoordinates(),++sequenceNumber);
 			 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
 			    	getOutboundPacketsProducer().send(outboundMessage);    
-			    	log(LogLevel.DEBUG, "Alarm state request for " + node + " dispatched");
+			    	log(LogLevel.FINE, "Alarm state request for " + node + " dispatched");
 	    		}
 	    	}
 			Thread.sleep(REQUEST_PERIOD_MS/functionalities.size());

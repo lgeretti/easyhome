@@ -68,15 +68,15 @@ public class SimpleDescrRequestProcess extends Process {
 	    	        		} catch (Exception e) {
 	    	    	        	e.printStackTrace();
 	    	    	        	i--;
-	    	    	        	log(LogLevel.DEBUG, "Simple descriptor request for endpoint " + endpoints.get(i) + " of node " + node +  
+	    	    	        	log(LogLevel.FINE, "Simple descriptor request for endpoint " + endpoints.get(i) + " of node " + node +  
 	    	    	        			" could not be dispatched, retrying");
 	    	    	        }
 	    	        	}
         	        } else
-        	        	log(LogLevel.DEBUG, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
+        	        	log(LogLevel.FINE, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
     	        } catch (Exception e) {
     	        	e.printStackTrace();
-    	        	log(LogLevel.DEBUG, "Simple descriptors cannot be recovered: issue when getting node " + Node.nameFor(gatewayId, address));
+    	        	log(LogLevel.FINE, "Simple descriptors cannot be recovered: issue when getting node " + Node.nameFor(gatewayId, address));
     	        }
     		}
        	}

@@ -40,14 +40,14 @@ public class XBeeGateway extends Gateway {
         if (receiveOptions == 0x02) {
         	if (xpkt.getProfileId() == Domain.MANAGEMENT.getCode() && (dstEndpoint == 0x00 || dstEndpoint == (byte)0xEA)) {        		
 	        	dstCoords = new ModuleCoordinates((byte)0,0xFFFFL,(short)0xFFFE,dstEndpoint);
-	        	log(LogLevel.DEBUG, "Setting destination as broadcast");
+	        	log(LogLevel.FINE, "Setting destination as broadcast");
         	} else {
         		throw new IllegalBroadcastPortException();
         	}
         } else {
 	        
         	dstCoords = new ModuleCoordinates((byte)1,0x0L,(short)0x0,dstEndpoint);
-    		log(LogLevel.DEBUG, "Setting destination as domotic controller");
+    		log(LogLevel.FINE, "Setting destination as domotic controller");
         	
         	// If this is the implicit EasyHome controller endpoint
         	/*
@@ -92,14 +92,14 @@ public class XBeeGateway extends Gateway {
     		byte[] readBytes = new byte[is.available()];
     		is.read(readBytes);
     		
-    		log(LogLevel.DEBUG, "Read: " + ByteUtils.toString(readBytes));
+    		log(LogLevel.FINE, "Read: " + ByteUtils.toString(readBytes));
     		
     		buffer.write(readBytes);
     	}
     	
     	byte[] originalBuffer = buffer.toByteArray();
     	
-    	log(LogLevel.DEBUG, "Buffer: " + ByteUtils.toString(originalBuffer));
+    	log(LogLevel.FINE, "Buffer: " + ByteUtils.toString(originalBuffer));
     	
     	int readBytes = 0;
     	
@@ -127,7 +127,7 @@ public class XBeeGateway extends Gateway {
         		buffer.write(originalBuffer, readBytes, originalBuffer.length-readBytes);
     	}
     	
-    	log(LogLevel.DEBUG, "XBee packet: " + ByteUtils.toString(xbeePkt.getBytes()));
+    	log(LogLevel.FINE, "XBee packet: " + ByteUtils.toString(xbeePkt.getBytes()));
     	
    		result = convertFrom(xbeePkt);
     	

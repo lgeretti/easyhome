@@ -42,7 +42,7 @@ public class LightLevelControlProcess extends Process {
         	NativePacket pkt = (NativePacket) msg.getObject();
         	
         	if (LevelControlRspPacket.validates(pkt)) {
-	        	log(LogLevel.DEBUG, "LevelControlRspPacket received from " + pkt.getSrcCoords());
+	        	log(LogLevel.FINE, "LevelControlRspPacket received from " + pkt.getSrcCoords());
 	        	
 	        	try {
 	        		LevelControlRspPacket levelControlPkt = new LevelControlRspPacket(pkt);
@@ -51,7 +51,7 @@ public class LightLevelControlProcess extends Process {
 	        			byte gatewayId = levelControlPkt.getSrcCoords().getGatewayId();
 	        			short address = levelControlPkt.getAddrOfInterest();
 	        			int levelPercentage = levelControlPkt.getLevelPercentage();
-	        			log(LogLevel.DEBUG, "Level percentage " + levelPercentage + "% event recognized");
+	        			log(LogLevel.FINE, "Level percentage " + levelPercentage + "% event recognized");
 	        			
 		        		ClientResponse getNodeResponse = restResource.path(RestPaths.NODES).path(Byte.toString(gatewayId)).path(Short.toString(address))
 								 .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
@@ -93,19 +93,19 @@ public class LightLevelControlProcess extends Process {
 							                restResource.path(RestPaths.STATES).path("lamps").path(Long.toString(lampId)).path("white")
 							                			.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 						        		} else
-						        			log(LogLevel.DEBUG, "Lamp state has not been changed by control: discarding the event");
+						        			log(LogLevel.FINE, "Lamp state has not been changed by control: discarding the event");
 					                
 					        		} else
-					        			log(LogLevel.DEBUG, "Lamp state updated too recently: discarding the event");				        			
+					        			log(LogLevel.FINE, "Lamp state updated too recently: discarding the event");				        			
 				        			
 				        		} else 
-				        			log(LogLevel.DEBUG, "Lamp is offline: discarding the event");
+				        			log(LogLevel.FINE, "Lamp is offline: discarding the event");
 			                
 			        		} else if (getPairingResponse.getClientResponseStatus() == ClientResponse.Status.NOT_FOUND) 
-			                	log(LogLevel.DEBUG, "Pairing not present for this controller");
+			                	log(LogLevel.FINE, "Pairing not present for this controller");
 			        		
 						} else
-					    	log(LogLevel.DEBUG, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
+					    	log(LogLevel.FINE, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
 	        		}
 	        	} catch (InvalidPacketTypeException e) {
 	        		e.printStackTrace();

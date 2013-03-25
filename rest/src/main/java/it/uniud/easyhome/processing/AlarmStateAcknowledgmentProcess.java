@@ -58,7 +58,7 @@ public class AlarmStateAcknowledgmentProcess extends Process {
         	NativePacket pkt = (NativePacket) msg.getObject();
         	
         	if (AlarmStateRspPacket.validates(pkt)) {
-	        	log(LogLevel.DEBUG, "AlarmStateRspPacket received from " + pkt.getSrcCoords());
+	        	log(LogLevel.FINE, "AlarmStateRspPacket received from " + pkt.getSrcCoords());
 	        	
 	        	try {
 	        		AlarmStateRspPacket alarmPkt = new AlarmStateRspPacket(pkt);
@@ -115,12 +115,12 @@ public class AlarmStateAcknowledgmentProcess extends Process {
 						                log(LogLevel.INFO, "Alarm set for lamp id " + node.getId() + " (" + (presenceState.isOccupied()? "occupied":"unoccupied") 
 			                					+ "): " + alarmToIssue);
 				            		} else
-				            			log(LogLevel.DEBUG, "Alarm for lamp id " + node.getId() + " (" + (presenceState.isOccupied()? "occupied":"unoccupied") 
+				            			log(LogLevel.FINE, "Alarm for lamp id " + node.getId() + " (" + (presenceState.isOccupied()? "occupied":"unoccupied") 
 			                					+ ") not changed");
 			        			}
 			        			
 				        	} else
-				        		log(LogLevel.DEBUG, "No lamp actuators are available for alarms, ignoring");
+				        		log(LogLevel.FINE, "No lamp actuators are available for alarms, ignoring");
 		        		
 		        		}
 	        		}

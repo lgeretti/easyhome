@@ -4,7 +4,9 @@ public enum LogLevel {
 
 	NONE(0),
 	INFO(1),
-	DEBUG(2);
+	FINE(2),
+	ULTRAFINE(3),
+	DEBUG(4);
 	
 	private int level;
 	

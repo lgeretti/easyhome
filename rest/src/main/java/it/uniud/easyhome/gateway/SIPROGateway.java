@@ -150,7 +150,7 @@ public class SIPROGateway extends Gateway {
 			
 			String paramsString = statePacket.getIdentifier()+";changeColor"+statePacket.getSeparatedParameters();
 			
-			log(LogLevel.DEBUG,"Request: ?method=setValueParam&params="+paramsString);
+			log(LogLevel.FINE,"Request: ?method=setValueParam&params="+paramsString);
 			
 	        MultivaluedMap<String,String> queryParams = new MultivaluedMapImpl();
 	        queryParams.add("method","setValueParam");
@@ -306,7 +306,7 @@ public class SIPROGateway extends Gateway {
 		byte blue = fromHexStringToByte(getTxtFor(elem,"value2"));
 		byte white = fromHexStringToByte(getTxtFor(elem,"value3"));
 		ColoredAlarm alarm = ColoredAlarm.fromCode((byte)(Integer.parseInt(getTxtFor(elem,"value4"),16) & 0xFF));
-		log(LogLevel.DEBUG,"Registering Lamp: identifier=" + identifier + ", online=" + online + ", nuid=0x" + Long.toHexString(nuid) + 
+		log(LogLevel.FINE,"Registering Lamp: identifier=" + identifier + ", online=" + online + ", nuid=0x" + Long.toHexString(nuid) + 
 						   ", red=" + red + ", green=" + green + ", blue=" + blue + ", white=" + white + ", alarm=" + alarm);
 		
 		addNode(nuid);
@@ -329,7 +329,7 @@ public class SIPROGateway extends Gateway {
 		long nuid = Long.parseLong(getTxtFor(elem,"value-3") + getTxtFor(elem,"value-2") + getTxtFor(elem,"value-1"),16);
 		String occupation = getTxtFor(elem,"value0") + getTxtFor(elem,"value1");
 		boolean occupied = (occupation.equals("5031"));
-		log(LogLevel.DEBUG,"Registering PIR: identifier=" + identifier + ", nuid=0x" + Long.toHexString(nuid) + ", occupied=" + occupied);
+		log(LogLevel.FINE,"Registering PIR: identifier=" + identifier + ", nuid=0x" + Long.toHexString(nuid) + ", occupied=" + occupied);
 		
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         formData.add("gatewayId",Byte.toString(this.id));
@@ -343,7 +343,7 @@ public class SIPROGateway extends Gateway {
 		long nuid = Long.parseLong(getTxtFor(elem,"value-3") + getTxtFor(elem,"value-2") + getTxtFor(elem,"value-1"),16);
 		String codeString = getTxtFor(elem,"value0") + getTxtFor(elem,"value1") + getTxtFor(elem,"value2");
 		FridgeCode lastCode = FridgeCode.fromCode(Short.parseShort(codeString));	
-		log(LogLevel.DEBUG,"Registering Fridge: identifier=" + identifier + ", nuid=0x" + Long.toHexString(nuid) + ", code=" + lastCode);
+		log(LogLevel.FINE,"Registering Fridge: identifier=" + identifier + ", nuid=0x" + Long.toHexString(nuid) + ", code=" + lastCode);
 		
 		addNode(nuid);
 		
@@ -361,7 +361,7 @@ public class SIPROGateway extends Gateway {
 			String codeString = getTxtFor(elem,"value0") + getTxtFor(elem,"value1") + getTxtFor(elem,"value2");
 			FridgeCode lastCode = FridgeCode.fromCode(Short.parseShort(codeString));
 			
-			log(LogLevel.DEBUG,"Code to transmit back from 0x" + Long.toHexString(nuid) + ": " + lastCode);
+			log(LogLevel.FINE,"Code to transmit back from 0x" + Long.toHexString(nuid) + ": " + lastCode);
 			short addr = (short)(nuid & 0xFFFF);
 			byte[] addrBytesLittleEndian = ByteUtils.getBytes(addr, Endianness.LITTLE_ENDIAN);
 			byte[] codeBytesLittleEndian = ByteUtils.getBytes(lastCode.getCode(), Endianness.LITTLE_ENDIAN);
@@ -392,7 +392,7 @@ public class SIPROGateway extends Gateway {
 		if (nuid == nuidToMatch) {
 			String occupation = getTxtFor(elem,"value0") + getTxtFor(elem,"value1");
 			boolean occupied = occupation.equals("5031");
-			log(LogLevel.DEBUG,"Occupation result to transmit back from 0x" + Long.toHexString(nuid) + ": " + occupied);
+			log(LogLevel.FINE,"Occupation result to transmit back from 0x" + Long.toHexString(nuid) + ": " + occupied);
 			
 			short addr = (short)(nuid & 0xFFFF);
 			byte[] addrBytesLittleEndian = ByteUtils.getBytes(addr, Endianness.LITTLE_ENDIAN);
@@ -427,7 +427,7 @@ public class SIPROGateway extends Gateway {
         formData.add("permanent",Boolean.toString(true));
         ClientResponse response = client.resource(INTERNAL_TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         if (response.getClientResponseStatus() != ClientResponse.Status.CREATED)
-        	log(LogLevel.DEBUG, "Node insertion response: " + response.getClientResponseStatus());
+        	log(LogLevel.FINE, "Node insertion response: " + response.getClientResponseStatus());
     }
     
     private String getTxtFor(Element input, String tagName) {

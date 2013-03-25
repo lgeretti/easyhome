@@ -72,7 +72,7 @@ public class NodePowerLevelRequestProcess extends Process {
 		        log(LogLevel.INFO, "Power level request for " + node + (isRepeated ? " re-" : " ") + "dispatched");
 	        }
         } else
-        	log(LogLevel.DEBUG, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
+        	log(LogLevel.FINE, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
     }
     
     
@@ -112,7 +112,7 @@ public class NodePowerLevelRequestProcess extends Process {
         	// Nothing to be done
         } catch (Exception e) {
         	e.printStackTrace();
-        	log(LogLevel.DEBUG, "Node power level request could not be dispatched to outbound packets topic");
+        	log(LogLevel.FINE, "Node power level request could not be dispatched to outbound packets topic");
         	try {
 				Thread.sleep(JOB_POLLING_TIME_MILLIS);
 			} catch (InterruptedException e1) {

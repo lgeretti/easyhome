@@ -51,7 +51,7 @@ public class NodePowerLevelRegistrationProcess extends Process {
         	NativePacket pkt = (NativePacket) msg.getObject();
         	
         	if (NodePowerLevelRspPacket.validates(pkt)) {
-	        	log(LogLevel.DEBUG, "NodePowerLevelRspPacket received from " + pkt.getSrcCoords());
+	        	log(LogLevel.FINE, "NodePowerLevelRspPacket received from " + pkt.getSrcCoords());
 	        	
 	        	try {
 	        		NodePowerLevelRspPacket plPkt = new NodePowerLevelRspPacket(pkt);
@@ -84,10 +84,10 @@ public class NodePowerLevelRegistrationProcess extends Process {
 				                	
 				                    log(LogLevel.INFO, "Node " + node.getName() + " updated with power level (" + powerLevel + ")");
 				                } else
-				                	log(LogLevel.DEBUG, "Node " + node.getName() + " power level information insertion failed");	
+				                	log(LogLevel.FINE, "Node " + node.getName() + " power level information insertion failed");	
 				        
 				        	} else
-				        		log(LogLevel.DEBUG, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
+				        		log(LogLevel.FINE, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
 		        		
 		        		}
 	        		}

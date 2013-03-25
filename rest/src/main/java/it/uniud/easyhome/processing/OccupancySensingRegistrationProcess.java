@@ -58,7 +58,7 @@ public class OccupancySensingRegistrationProcess extends Process {
         	NativePacket pkt = (NativePacket) msg.getObject();
         	
         	if (OccupancyAttributeRspPacket.validates(pkt)) {
-	        	log(LogLevel.DEBUG, "OccupancyAttributeRspPacket received from " + pkt.getSrcCoords());
+	        	log(LogLevel.FINE, "OccupancyAttributeRspPacket received from " + pkt.getSrcCoords());
 	        	
 	        	try {
 	        		OccupancyAttributeRspPacket occupancyPkt = new OccupancyAttributeRspPacket(pkt);
@@ -89,11 +89,11 @@ public class OccupancySensingRegistrationProcess extends Process {
 					                restResource.path(RestPaths.STATES).path("sensors").path("presence").path(Long.toString(sender.getInfo().getId())).path(occupied ? "occupied" : "unoccupied").put(ClientResponse.class);
 				                	log(LogLevel.INFO, location + " is now " + (occupied ? "occupied" : "unoccupied"));
 				                } else
-				                	log(LogLevel.DEBUG, "No change in occupancy state");
+				                	log(LogLevel.FINE, "No change in occupancy state");
 		        			}
 			                
 		        		} else 
-		        			log(LogLevel.DEBUG, "Sender node " + Node.nameFor(gatewayId, senderAddress) + " not found, hence discarding occupancy information");
+		        			log(LogLevel.FINE, "Sender node " + Node.nameFor(gatewayId, senderAddress) + " not found, hence discarding occupancy information");
 	        		}
 	        	} catch (InvalidPacketTypeException e) {
 	        		e.printStackTrace();

@@ -61,7 +61,7 @@ public class NodeDiscoveryRegistrationProcess extends Process {
         	NativePacket pkt = (NativePacket) msg.getObject();
         	
         	if (NodeDiscoveryRspPacket.validates(pkt)) {
-	        	log(LogLevel.DEBUG, "NodeDiscoveryRspPacket received from " + pkt.getSrcCoords());
+	        	log(LogLevel.FINE, "NodeDiscoveryRspPacket received from " + pkt.getSrcCoords());
 	        	
 	        	try {
 	        		NodeDiscoveryRspPacket discPkt = new NodeDiscoveryRspPacket(pkt);
@@ -134,7 +134,7 @@ public class NodeDiscoveryRegistrationProcess extends Process {
 			                restResource.path(RestPaths.LINKS).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 			                
 		        		} else 
-		        			log(LogLevel.DEBUG, "Sender node " + Node.nameFor(gatewayId, senderAddress) + " not found, hence discarding discovered node");
+		        			log(LogLevel.FINE, "Sender node " + Node.nameFor(gatewayId, senderAddress) + " not found, hence discarding discovered node");
 	        		}
 	        	} catch (InvalidPacketTypeException e) {
 	        		e.printStackTrace();

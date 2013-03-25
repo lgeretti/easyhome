@@ -62,7 +62,7 @@ public class NetworkGraphMinimizationProcess extends Process {
     	
     	Node node = null;
     	
-		log(LogLevel.DEBUG, "Trying to set power level " + powerLevel + " for node " + Node.nameFor(gatewayId, address));
+		log(LogLevel.FINE, "Trying to set power level " + powerLevel + " for node " + Node.nameFor(gatewayId, address));
     	
     	while (issueRetryCount < MAX_PL_SET_ISS_RETRIES) {
 	        MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
@@ -87,7 +87,7 @@ public class NetworkGraphMinimizationProcess extends Process {
 	        	
 	        	node = JsonUtils.getFrom(nodeResponse, Node.class);
 	        	if (node.getPowerLevel() == powerLevel) {
-	        		log(LogLevel.DEBUG, "Successfully set power level for node " + node);
+	        		log(LogLevel.FINE, "Successfully set power level for node " + node);
 	        		break;
 	        	}
 	        	
@@ -116,12 +116,12 @@ public class NetworkGraphMinimizationProcess extends Process {
         		}
            	}   
         } catch (InterruptedException e) {
-        	log(LogLevel.DEBUG, "Network graph minimization interrupted");
+        	log(LogLevel.FINE, "Network graph minimization interrupted");
         } catch (NodeNotFoundException e) {
-        	log(LogLevel.DEBUG, "Network graph minimization aborted due to a missing node during the procedure");
+        	log(LogLevel.FINE, "Network graph minimization aborted due to a missing node during the procedure");
         } catch (Exception e) {
         	e.printStackTrace();
-        	log(LogLevel.DEBUG, "Network graph minimization failure");
+        	log(LogLevel.FINE, "Network graph minimization failure");
         }
     	
 		
@@ -173,7 +173,7 @@ public class NetworkGraphMinimizationProcess extends Process {
     		
     		MinimizationEntry entry = entries.poll();
     		
-    		log(LogLevel.DEBUG, "Trying to reduce " + entry);
+    		log(LogLevel.FINE, "Trying to reduce " + entry);
     		
     		entry.reducePowerLevel();
     		requestPowerLevelChange(entry.getGatewayId(),entry.getAddress(),entry.getPowerLevel());
@@ -185,7 +185,7 @@ public class NetworkGraphMinimizationProcess extends Process {
         	
         	if (nodes.size() < numNodes) {
         		
-        		log(LogLevel.DEBUG, "Reduction resulted in reduced graph size, thus restoring power level and discarding the node");
+        		log(LogLevel.FINE, "Reduction resulted in reduced graph size, thus restoring power level and discarding the node");
         		entry.increasePowerLevel();
         		requestPowerLevelChange(entry.getGatewayId(),entry.getAddress(),entry.getPowerLevel());
         		
@@ -193,9 +193,9 @@ public class NetworkGraphMinimizationProcess extends Process {
 
             	if (entry.getPowerLevel() > 0) {
             		entries.offer(entry);
-            		log(LogLevel.DEBUG, "Reduced successfully");
+            		log(LogLevel.FINE, "Reduced successfully");
             	} else
-            		log(LogLevel.DEBUG, "Reduced to zero successfully, hence discarding the node");
+            		log(LogLevel.FINE, "Reduced to zero successfully, hence discarding the node");
         	}
     	}
     	

@@ -72,9 +72,9 @@ public class NodePowerLevelSetIssueProcess extends Process {
 		    	getOutboundPacketsProducer().send(outboundMessage);    
 		        log(LogLevel.INFO, node + " power level set issue " + (isRepeated ? "re-" : "") + "dispatched");
 	        } else 
-	        	log(LogLevel.DEBUG, node + " is not a router or coordinator, cannot reliably set the power level thus ignoring");
+	        	log(LogLevel.FINE, node + " is not a router or coordinator, cannot reliably set the power level thus ignoring");
         } else
-        	log(LogLevel.DEBUG, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
+        	log(LogLevel.FINE, "Node " + Node.nameFor(gatewayId, address) + " not found, ignoring");
     }
     
     
@@ -115,7 +115,7 @@ public class NodePowerLevelSetIssueProcess extends Process {
         	// Nothing to be done
         } catch (Exception e) {
         	e.printStackTrace();
-        	log(LogLevel.DEBUG, "Node power level set issue could not be dispatched to outbound packets topic");
+        	log(LogLevel.FINE, "Node power level set issue could not be dispatched to outbound packets topic");
         }
     	
 		
