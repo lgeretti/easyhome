@@ -83,13 +83,17 @@ public class LightLevelControlProcess extends Process {
 						        		byte previousVal = state.getWhite();
 						        		int newVal = Math.max(0, Math.min(100, previousVal +levelPercentage));
 									
-						        		log(LogLevel.INFO, "Level modified from " + previousVal + " to " + newVal);
-						        		
-						        		MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
-						                formData.add("value",Byte.toString((byte)(newVal & 0xFF)));
-						                
-						                restResource.path(RestPaths.STATES).path("lamps").path(Long.toString(lampId)).path("white")
-						                			.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+						        		if (previousVal != newVal) {
+							        		log(LogLevel.INFO, "Level modified from " + previousVal + " to " + newVal);
+							        		
+							        		
+							        		MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+							                formData.add("value",Byte.toString((byte)(newVal & 0xFF)));
+							                
+							                restResource.path(RestPaths.STATES).path("lamps").path(Long.toString(lampId)).path("white")
+							                			.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+						        		} else
+						        			log(LogLevel.DEBUG, "Lamp state has not been not changed by control: discarding the event");
 					                
 					        		} else
 					        			log(LogLevel.DEBUG, "Lamp state updated too recently: discarding the event");				        			
