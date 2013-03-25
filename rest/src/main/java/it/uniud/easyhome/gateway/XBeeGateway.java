@@ -40,14 +40,14 @@ public class XBeeGateway extends Gateway {
         if (receiveOptions == 0x02) {
         	if (xpkt.getProfileId() == Domain.MANAGEMENT.getCode() && (dstEndpoint == 0x00 || dstEndpoint == (byte)0xEA)) {        		
 	        	dstCoords = new ModuleCoordinates((byte)0,0xFFFFL,(short)0xFFFE,dstEndpoint);
-	        	log(LogLevel.FINE, "Setting destination as broadcast");
+	        	log(LogLevel.ULTRAFINE, "Setting destination as broadcast");
         	} else {
         		throw new IllegalBroadcastPortException();
         	}
         } else {
 	        
         	dstCoords = new ModuleCoordinates((byte)1,0x0L,(short)0x0,dstEndpoint);
-    		log(LogLevel.FINE, "Setting destination as domotic controller");
+    		log(LogLevel.ULTRAFINE, "Setting destination as domotic controller");
         	
         	// If this is the implicit EasyHome controller endpoint
         	/*
@@ -92,14 +92,14 @@ public class XBeeGateway extends Gateway {
     		byte[] readBytes = new byte[is.available()];
     		is.read(readBytes);
     		
-    		log(LogLevel.FINE, "Read: " + ByteUtils.toString(readBytes));
+    		log(LogLevel.DEBUG, "Read: " + ByteUtils.toString(readBytes));
     		
     		buffer.write(readBytes);
     	}
     	
     	byte[] originalBuffer = buffer.toByteArray();
     	
-    	log(LogLevel.FINE, "Buffer: " + ByteUtils.toString(originalBuffer));
+    	log(LogLevel.DEBUG, "Buffer: " + ByteUtils.toString(originalBuffer));
     	
     	int readBytes = 0;
     	
@@ -110,13 +110,13 @@ public class XBeeGateway extends Gateway {
     	} catch (ChecksumException ex) {
 
     		readBytes = 4 + (originalBuffer[1]*256) + originalBuffer[2];
-    		log(LogLevel.INFO, "Discarding checksum-failing packet of " + readBytes + " bytes");
+    		log(LogLevel.DEBUG, "Discarding checksum-failing packet of " + readBytes + " bytes");
     		
     		throw ex;
     	} catch (InvalidPacketTypeException ex) {
 
     		readBytes = 4 + (originalBuffer[1]*256) + originalBuffer[2];
-    		log(LogLevel.INFO, "Discarding invalid-type packet of " + readBytes + " bytes");
+    		log(LogLevel.DEBUG, "Discarding invalid-type packet of " + readBytes + " bytes");
     		
     		throw ex;
     	} finally {
@@ -127,7 +127,7 @@ public class XBeeGateway extends Gateway {
         		buffer.write(originalBuffer, readBytes, originalBuffer.length-readBytes);
     	}
     	
-    	log(LogLevel.FINE, "XBee packet: " + ByteUtils.toString(xbeePkt.getBytes()));
+    	log(LogLevel.DEBUG, "XBee packet: " + ByteUtils.toString(xbeePkt.getBytes()));
     	
    		result = convertFrom(xbeePkt);
     	

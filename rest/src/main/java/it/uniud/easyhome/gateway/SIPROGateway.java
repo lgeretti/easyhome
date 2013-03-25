@@ -117,6 +117,8 @@ public class SIPROGateway extends Gateway {
                 
                 jmsConnection.start();
                 
+                log(LogLevel.INFO, "Gateway is opened");
+                
                 while (state != RunnableState.STOPPING) {
                 	
                 	if (actuatorsRegistered.size() < actuators.size() || sensorsRegistered.size() < sensors.size())
@@ -150,7 +152,8 @@ public class SIPROGateway extends Gateway {
 			
 			String paramsString = statePacket.getIdentifier()+";changeColor"+statePacket.getSeparatedParameters();
 			
-			log(LogLevel.FINE,"Request: ?method=setValueParam&params="+paramsString);
+			log(LogLevel.FINE,"Request to set lamp state values");
+			log(LogLevel.ULTRAFINE,"Request: ?method=setValueParam&params="+paramsString);
 			
 	        MultivaluedMap<String,String> queryParams = new MultivaluedMapImpl();
 	        queryParams.add("method","setValueParam");
@@ -427,7 +430,7 @@ public class SIPROGateway extends Gateway {
         formData.add("permanent",Boolean.toString(true));
         ClientResponse response = client.resource(INTERNAL_TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
         if (response.getClientResponseStatus() != ClientResponse.Status.CREATED)
-        	log(LogLevel.FINE, "Node insertion response: " + response.getClientResponseStatus());
+        	log(LogLevel.DEBUG, "Node insertion response: " + response.getClientResponseStatus());
     }
     
     private String getTxtFor(Element input, String tagName) {
