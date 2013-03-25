@@ -288,7 +288,7 @@ public class SIPROGateway extends Gateway {
 		byte blue = fromHexStringToByte(parameters.item(13).getTextContent());
 		byte white = fromHexStringToByte(parameters.item(15).getTextContent());
 		ColoredAlarm alarm = ColoredAlarm.fromCode((byte)(Integer.parseInt(parameters.item(17).getTextContent(),16) & 0xFF));
-		log(LogLevel.DEBUG,"To transmit: identifier=" + identifier + ", online=" + online + ", nuid=" + nuid + 
+		log(LogLevel.DEBUG,"Registering: identifier=" + identifier + ", online=" + online + ", nuid=" + nuid + 
 						   ", red=" + red + ", green=" + green + ", blue=" + blue + ", white=" + white + ", alarm=" + alarm);
 		
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
@@ -310,7 +310,7 @@ public class SIPROGateway extends Gateway {
 		long nuid = Long.parseLong(parameters.item(1).getTextContent() + parameters.item(3).getTextContent() + parameters.item(5).getTextContent(),16);
 		String codeString = parameters.item(7).getTextContent() + parameters.item(9).getTextContent() + parameters.item(11).getTextContent();
 		FridgeCode lastCode = FridgeCode.fromCode(Short.parseShort(codeString));
-		log(LogLevel.DEBUG,"To transmit: identifier=" + identifier + ", nuid=" + nuid + ", code=" + lastCode);
+		log(LogLevel.DEBUG,"Registering: identifier=" + identifier + ", nuid=" + nuid + ", code=" + lastCode);
 		
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         formData.add("gatewayId",Byte.toString(this.id));
@@ -358,7 +358,7 @@ public class SIPROGateway extends Gateway {
 		long nuid = Long.parseLong(parameters.item(1).getTextContent() + parameters.item(3).getTextContent() + parameters.item(5).getTextContent(),16);
 		if (nuid == nuidToMatch) {
 			String occupation = parameters.item(7).getTextContent() + parameters.item(9).getTextContent();
-			boolean occupied = (occupation == "5031");
+			boolean occupied = occupation.equals("5031");
 			log(LogLevel.DEBUG,"Occupation result to transmit back from " + nuid + ": " + occupied);
 			
 			short addr = (short)(nuid & 0xFFFF);
@@ -387,7 +387,7 @@ public class SIPROGateway extends Gateway {
     private void registerPIR(String identifier, NodeList parameters) {
 		long nuid = Long.parseLong(parameters.item(1).getTextContent() + parameters.item(3).getTextContent() + parameters.item(5).getTextContent(),16);
 		String occupation = parameters.item(7).getTextContent() + parameters.item(9).getTextContent();
-		boolean occupied = (occupation == "5031");
+		boolean occupied = occupation.equals("5031");
 		log(LogLevel.DEBUG,"Initialization: identifier=" + identifier + ", nuid=" + nuid + ", occupied=" + occupied);
 		
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
