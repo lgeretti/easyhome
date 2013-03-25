@@ -1,5 +1,6 @@
 package it.uniud.easyhome.devices.states;
 
+import it.uniud.easyhome.devices.PersistentInfo;
 import it.uniud.easyhome.network.Node;
 
 import javax.persistence.*;
@@ -13,7 +14,7 @@ public class LampState implements DeviceState {
 	
 	@Id
     @OneToOne
-    private Node device;
+    private PersistentInfo device;
 	@Column
 	private boolean online;
     @Column
@@ -35,13 +36,13 @@ public class LampState implements DeviceState {
     @SuppressWarnings("unused")
 	private LampState() {}
     
-    public LampState(Node device) {
+    public LampState(PersistentInfo device) {
     	this.device = device;
     	this.alarm = ColoredAlarm.NONE;
     	this.lastWhiteUpdate = 0; // Conveniently set as the beginning of UNIX time
     }
     
-	public Node getDevice() {
+	public PersistentInfo getDevice() {
 		return this.device;
 	}
 	

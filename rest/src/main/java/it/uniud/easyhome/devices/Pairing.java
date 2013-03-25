@@ -19,23 +19,23 @@ public class Pairing {
 	
 	@Id
 	@OneToOne
-	private Node source;
+	private PersistentInfo source;
 	@OneToOne
-	private Node destination;
+	private PersistentInfo destination;
 	
     @SuppressWarnings("unused")
 	private Pairing() { }
     
-    public Pairing(Node source, Node destination) {
+    public Pairing(PersistentInfo source, PersistentInfo destination) {
         this.source = source;
         this.destination = destination;
     }
 
-    public Node getSource() {
+    public PersistentInfo getSource() {
     	return source;
     }
 
-    public Node getDestination() {
+    public PersistentInfo getDestination() {
     	return destination;
     }
     

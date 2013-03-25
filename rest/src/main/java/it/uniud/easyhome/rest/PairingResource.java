@@ -1,6 +1,7 @@
 package it.uniud.easyhome.rest;
 
 import it.uniud.easyhome.devices.Pairing;
+import it.uniud.easyhome.devices.PersistentInfo;
 import it.uniud.easyhome.ejb.PairingEJB;
 import it.uniud.easyhome.network.*;
 
@@ -27,8 +28,8 @@ public final class PairingResource {
     public Response insertPairing(@FormParam("sourceId") long sourceId,
     						      @FormParam("destinationId") long destinationId) {
     	
-    	Node source = resEjb.findNodeById(sourceId);
-    	Node destination = resEjb.findNodeById(destinationId);
+    	PersistentInfo source = resEjb.findPersistentInfoById(sourceId);
+    	PersistentInfo destination = resEjb.findPersistentInfoById(destinationId);
     	
     	if (source == null || destination == null)
 	    	throw new WebApplicationException(Response.Status.BAD_REQUEST);    		

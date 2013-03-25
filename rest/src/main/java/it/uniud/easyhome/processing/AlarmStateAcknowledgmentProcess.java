@@ -83,7 +83,7 @@ public class AlarmStateAcknowledgmentProcess extends Process {
 
 			        			for (Node node : nodes) {
 			        				
-				            		ClientResponse presenceStateResponse = restResource.path(RestPaths.STATES).path("sensors/presence").path(Long.toString(node.getId()))
+				            		ClientResponse presenceStateResponse = restResource.path(RestPaths.STATES).path("sensors/presence").path(Long.toString(node.getInfo().getId()))
 				            												   .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 				            		PresenceSensorState presenceState = JsonUtils.getFrom(presenceStateResponse, PresenceSensorState.class);
 				            		
@@ -106,7 +106,7 @@ public class AlarmStateAcknowledgmentProcess extends Process {
 					            			alarmToIssue = ColoredAlarm.NONE;
 				            		}
 				            		formData.add("value",alarmToIssue.toString());
-					                restResource.path(RestPaths.STATES).path("lamps").path(Long.toString(node.getId())).path("alarm")
+					                restResource.path(RestPaths.STATES).path("lamps").path(Long.toString(node.getInfo().getId())).path("alarm")
 		                						.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 					                
 					                log(LogLevel.INFO, "Alarm set for lamp id " + node.getId() + " (" + (presenceState.isOccupied()? "occupied":"unoccupied") 

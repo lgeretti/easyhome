@@ -1,9 +1,12 @@
 package it.uniud.easyhome.rest;
 
 import it.uniud.easyhome.common.JMSConstants;
+import it.uniud.easyhome.common.JsonUtils;
+import it.uniud.easyhome.devices.PersistentInfo;
 import it.uniud.easyhome.devices.states.*;
 import it.uniud.easyhome.ejb.StateEJB;
 import it.uniud.easyhome.network.Node;
+import it.uniud.easyhome.network.NodeLogicalType;
 import it.uniud.easyhome.packets.natives.LampStateSetPacket;
 
 import java.util.List;
@@ -19,6 +22,12 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.ws.rs.core.*;
 import javax.ws.rs.*;
+
+import org.codehaus.jettison.json.JSONException;
+
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 @Path(RestPaths.STATES)
 public final class StateResource {
@@ -145,11 +154,11 @@ public final class StateResource {
 				    								@FormParam("identifier") String identifier,
 				    								@FormParam("occupied") boolean occupied) {
     		
-    	Node node = resEjb.findNodeByGatewayIdAndNuid(gatewayId, nuid);
-    	if (node == null)
+    	PersistentInfo info = resEjb.findPersistentInfoByGatewayIdAndNuid(gatewayId, nuid);
+    	if (info == null)
     		throw new WebApplicationException(Response.Status.BAD_REQUEST);    	
     	
-    	PresenceSensorState thisPresenceSensor = resEjb.findStateByInfoId(node.getId(),PresenceSensorState.class);
+    	PresenceSensorState thisPresenceSensor = resEjb.findStateByInfoId(info.getId(),PresenceSensorState.class);
     	
     	if (thisPresenceSensor == null)
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -187,11 +196,11 @@ public final class StateResource {
 			   							   @FormParam("identifier") String identifier,
 			   							   @FormParam("lastCode") FridgeCode lastCode) {
     		
-    	Node node = resEjb.findNodeByGatewayIdAndNuid(gatewayId, nuid);
-    	if (node == null)
+    	PersistentInfo info = resEjb.findPersistentInfoByGatewayIdAndNuid(gatewayId, nuid);
+    	if (info == null)
     		throw new WebApplicationException(Response.Status.BAD_REQUEST);    	
     	
-    	FridgeState thisFridgeState = resEjb.findStateByInfoId(node.getId(),FridgeState.class);
+    	FridgeState thisFridgeState = resEjb.findStateByInfoId(info.getId(),FridgeState.class);
     	
     	if (thisFridgeState == null)
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -247,11 +256,11 @@ public final class StateResource {
     										  @FormParam("white") byte white,
     										  @FormParam("alarm") ColoredAlarm alarm) {
     		
-    	Node node = resEjb.findNodeByGatewayIdAndNuid(gatewayId, nuid);
-    	if (node == null)
+    	PersistentInfo info = resEjb.findPersistentInfoByGatewayIdAndNuid(gatewayId, nuid);
+    	if (info == null)
     		throw new WebApplicationException(Response.Status.BAD_REQUEST);    	
     	
-    	LampState thisLamp = resEjb.findStateByInfoId(node.getId(),LampState.class);
+    	LampState thisLamp = resEjb.findStateByInfoId(info.getId(),LampState.class);
     	
     	if (thisLamp == null)
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -419,8 +428,18 @@ public final class StateResource {
 	        MessageProducer producer = jmsSession.createProducer(outboundPacketsTopic);
 	            
 	        jmsConnection.start();
+	        
+	    	String TARGET = "http://localhost:8080/easyhome/rest/";
+	    	Client client = Client.create();
+    		MultivaluedMap<String,String> queryParams = new MultivaluedMapImpl();
+            queryParams.add("gatewayId",Byte.toString(lampState.getDevice().getGatewayId()));
+            queryParams.add("nuid",Long.toString(lampState.getDevice().getNuid()));
+            
+            ClientResponse nodeResponse = client.resource(TARGET).path(RestPaths.NODES).queryParams(queryParams)
+            									.accept(MediaType.APPLICATION_JSON).post(ClientResponse.class);
+            List<Node> nodes = JsonUtils.getListFrom(nodeResponse, Node.class);
 	    	
-			LampStateSetPacket packet = new LampStateSetPacket(lampState);
+			LampStateSetPacket packet = new LampStateSetPacket(lampState,nodes.get(0).getCoordinates());
         
             ObjectMessage changeMessage = jmsSession.createObjectMessage(packet);
             producer.send(changeMessage);
@@ -428,6 +447,9 @@ public final class StateResource {
         	ex.printStackTrace();
         } catch (NamingException e) {
         	e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} finally {
         	
         	try {

@@ -30,11 +30,11 @@ public class LampStateSetPacket extends NativePacket {
 			throw new InvalidContextException();
 	}
 	
-	public LampStateSetPacket(LampState lampState) {
+	public LampStateSetPacket(LampState lampState, GlobalCoordinates destination) {
 		this(new ModuleCoordinates((byte)1,0L,(short)0,(byte)0xEA),
-			 new ModuleCoordinates(lampState.getDevice().getCoordinates(),(byte)0xEA),				
+			 new ModuleCoordinates(destination,(byte)0xEA),				
 			 new Operation((byte)0,Domain.EASYHOME.getCode(),EasyHomeContext.LAMP_UPDATE.getCode(),
-					       (byte)0x0/*Context invariant*/,(byte)0x0/*Irrelevant*/,getBytes(lampState)));
+					       (byte)0x0/*Context invariant*/,(byte)0x0/*Irrelevant*/,getBytes(lampState,destination)));
 	}
 	
 	public LampStateSetPacket(NativePacket pkt) {
@@ -45,7 +45,7 @@ public class LampStateSetPacket extends NativePacket {
 		return ByteUtils.getShort(getOperation().getData(), 0, Endianness.LITTLE_ENDIAN); 
 	}
 
-	private static byte[] getBytes(LampState lampState) {
+	private static byte[] getBytes(LampState lampState, GlobalCoordinates destination) {
 		
 		byte[] identifierBytes = lampState.getIdentifier().getBytes();
 		int numIdentifierBytes = identifierBytes.length;
@@ -54,7 +54,7 @@ public class LampStateSetPacket extends NativePacket {
 		
 		byte[] result = new byte[numBytes];
 		
-		byte[] nuidBytes = ByteUtils.getBytes(lampState.getDevice().getCoordinates().getNuid(),Endianness.BIG_ENDIAN);
+		byte[] nuidBytes = ByteUtils.getBytes(destination.getNuid(),Endianness.BIG_ENDIAN);
 		
 		int i=0;
 		

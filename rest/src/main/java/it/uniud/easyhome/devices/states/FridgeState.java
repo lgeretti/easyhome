@@ -1,5 +1,6 @@
 package it.uniud.easyhome.devices.states;
 
+import it.uniud.easyhome.devices.PersistentInfo;
 import it.uniud.easyhome.network.Node;
 
 import javax.persistence.*;
@@ -13,7 +14,7 @@ public class FridgeState implements DeviceState {
 	
 	@Id
     @OneToOne
-    private Node device;
+    private PersistentInfo device;
     @Column
     private FridgeCode lastCode;
     @Column
@@ -22,12 +23,12 @@ public class FridgeState implements DeviceState {
     @SuppressWarnings("unused")
 	private FridgeState() {}
     
-    public FridgeState(Node device) {
+    public FridgeState(PersistentInfo device) {
     	this.device = device;
     	lastCode = FridgeCode.UNKNOWN;
     }
 
-	public Node getDevice() {
+	public PersistentInfo getDevice() {
 		return this.device;
 	}
 	

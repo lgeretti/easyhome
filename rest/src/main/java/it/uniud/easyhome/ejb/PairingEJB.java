@@ -22,11 +22,11 @@ public class PairingEJB {
 	private EntityManager em;
 	
 	
-	public Node findNodeById(long id) {
-		return em.find(Node.class, id);
+	public PersistentInfo findPersistentInfoById(long id) {
+		return em.find(PersistentInfo.class, id);
 	}
 	
-	public void insertPairing(Node source, Node destination) {
+	public void insertPairing(PersistentInfo source, PersistentInfo destination) {
 		Pairing pairing = new Pairing(source, destination);
 		
 		em.persist(pairing);

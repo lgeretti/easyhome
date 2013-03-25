@@ -39,21 +39,21 @@ public class StateEJB {
 		return em.find(cls, id);		
 	}
 	
-	public Node findNodeById(long id) {
-		return em.find(Node.class, id);
+	public PersistentInfo findPersistentInfoById(long id) {
+		return em.find(PersistentInfo.class, id);
 	}
 	
-	public Node findNodeByGatewayIdAndNuid(byte gatewayId, long nuid) {
+	public PersistentInfo findPersistentInfoByGatewayIdAndNuid(byte gatewayId, long nuid) {
 		
         CriteriaBuilder b = em.getCriteriaBuilder();
-        CriteriaQuery<Node> criteria = b.createQuery(Node.class);
-        Root<Node> node = criteria.from(Node.class);
-        criteria.select(node).where(
+        CriteriaQuery<PersistentInfo> criteria = b.createQuery(PersistentInfo.class);
+        Root<PersistentInfo> info = criteria.from(PersistentInfo.class);
+        criteria.select(info).where(
         			b.and(
-        			b.equal(node.get("coordinates").get("gatewayId"), gatewayId),
-        			b.equal(node.get("coordinates").get("nuid"), nuid)));
+        			b.equal(info.get("gatewayId"), gatewayId),
+        			b.equal(info.get("nuid"), nuid)));
         
-        TypedQuery<Node> query = em.createQuery(criteria);
+        TypedQuery<PersistentInfo> query = em.createQuery(criteria);
         
         return query.getSingleResult();
 	}
@@ -75,16 +75,16 @@ public class StateEJB {
 		em.merge(state);
 	}
 
-	public boolean insertLampStateFrom(long nodeId) {
+	public boolean insertLampStateFrom(long infoId) {
 		
-		Node node = findNodeById(nodeId);
+		PersistentInfo info = findPersistentInfoById(infoId);
 		
-		if (node == null)
+		if (info == null)
 			return false;
 		
 		// We accept trying to create an already existing lamp, but we do not do anything (PUT semantics)
-		if (em.find(LampState.class, node.getId()) == null) {
-			em.persist(new LampState(node));
+		if (em.find(LampState.class, info.getId()) == null) {
+			em.persist(new LampState(info));
 		}
 		
 		return true;
@@ -92,14 +92,14 @@ public class StateEJB {
 	
 	public boolean insertFridgeStateFrom(long nodeId) {
 		
-		Node node = findNodeById(nodeId);
+		PersistentInfo info = findPersistentInfoById(nodeId);
 		
-		if (node == null)
+		if (info == null)
 			return false;
 		
 		// We accept trying to create an already existing fridge, but we do not do anything (PUT semantics)
-		if (em.find(FridgeState.class, node.getId()) == null) {
-			em.persist(new FridgeState(node));
+		if (em.find(FridgeState.class, info.getId()) == null) {
+			em.persist(new FridgeState(info));
 		}
 		
 		return true;
@@ -107,14 +107,14 @@ public class StateEJB {
 	
 	public boolean insertPresenceSensorStateFrom(long nodeId) {
 		
-		Node node = findNodeById(nodeId);
+		PersistentInfo info = findPersistentInfoById(nodeId);
 		
-		if (node == null)
+		if (info == null)
 			return false;
 		
 		// We accept trying to create an already existing presence sensor, but we do not do anything (PUT semantics)
-		if (em.find(PresenceSensorState.class, node.getId()) == null) {
-			em.persist(new PresenceSensorState(node));
+		if (em.find(PresenceSensorState.class, info.getId()) == null) {
+			em.persist(new PresenceSensorState(info));
 		}
 		
 		return true;

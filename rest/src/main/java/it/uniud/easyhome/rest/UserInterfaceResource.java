@@ -262,7 +262,6 @@ public class UserInterfaceResource {
 	        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        response = client.resource(TARGET).path(RestPaths.NODES).path(Byte.toString((byte)3)).path(Short.toString((short)0x4752)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        node = JsonUtils.getFrom(response, Node.class);
-	        long lampadaSalottoId = node.getId();
 	        endpoints = new ArrayList<Byte>();
 	        endpoints.add((byte)1);
 	        endpoints.add((byte)2);
@@ -293,7 +292,6 @@ public class UserInterfaceResource {
 	        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        response = client.resource(TARGET).path(RestPaths.NODES).path(Byte.toString((byte)3)).path(Short.toString((short)0x4742)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        node = JsonUtils.getFrom(response, Node.class);
-	        long lampadaCameraDoppiaId = node.getId();
 	        endpoints = new ArrayList<Byte>();
 	        endpoints.add((byte)1);
 	        endpoints.add((byte)2);
@@ -324,7 +322,6 @@ public class UserInterfaceResource {
 	        client.resource(TARGET).path(RestPaths.NODES).path("insert").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        response = client.resource(TARGET).path(RestPaths.NODES).path(Byte.toString((byte)3)).path(Short.toString((short)0x1010)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        node = JsonUtils.getFrom(response, Node.class);
-	        long frigoId = node.getId();
 	        endpoints = new ArrayList<Byte>();
 	        endpoints.add((byte)1);
 	        node.setLogicalType(NodeLogicalType.END_DEVICE)
@@ -459,7 +456,7 @@ public class UserInterfaceResource {
 	        formData.putSingle("infoId",Long.toString(timerInfoId));
 	        client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        
-	        addStates(lampadaSalottoId,lampadaCameraDoppiaId,frigoId);
+	        addStates(lampadaSalottoInfoId,lampadaCameraDoppiaInfoId,frigoInfoId);
 
             
     	} catch (JSONException ex) {
@@ -585,7 +582,7 @@ public class UserInterfaceResource {
         formData.add("help", "E' possibile spostare il dispositivo in un'altra stanza (dispositivo fittizio)");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(7L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(7L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-        long timerId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
+        long timerInfoId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
     	
         // Lavatrice
         
@@ -603,16 +600,16 @@ public class UserInterfaceResource {
         formData.add("help", "Nessuna funzione correntemente disponibile (dispositivo fittizio)");
     	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)4)).path(Long.toString(8L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     	
-    	return timerId;
+    	return timerInfoId;
     }
     
-    private void addStates(long lampadaSalottoId, long lampadaCameraId, long frigoId) {
+    private void addStates(long lampadaSalottoInfoId, long lampadaCameraInfoId, long frigoInfoId) {
 
-        client.resource(TARGET).path(RestPaths.STATES).path("lamps").path(Long.toString(lampadaSalottoId)).put(ClientResponse.class);
-        client.resource(TARGET).path(RestPaths.STATES).path("lamps").path(Long.toString(lampadaCameraId)).put(ClientResponse.class);
-        client.resource(TARGET).path(RestPaths.STATES).path("fridges").path(Long.toString(frigoId)).put(ClientResponse.class);
-        client.resource(TARGET).path(RestPaths.STATES).path("sensors").path("presence").path(Long.toString(lampadaSalottoId)).put(ClientResponse.class);
-        client.resource(TARGET).path(RestPaths.STATES).path("sensors").path("presence").path(Long.toString(lampadaCameraId)).put(ClientResponse.class);
+        client.resource(TARGET).path(RestPaths.STATES).path("lamps").path(Long.toString(lampadaSalottoInfoId)).put(ClientResponse.class);
+        client.resource(TARGET).path(RestPaths.STATES).path("lamps").path(Long.toString(lampadaCameraInfoId)).put(ClientResponse.class);
+        client.resource(TARGET).path(RestPaths.STATES).path("fridges").path(Long.toString(frigoInfoId)).put(ClientResponse.class);
+        client.resource(TARGET).path(RestPaths.STATES).path("sensors").path("presence").path(Long.toString(lampadaSalottoInfoId)).put(ClientResponse.class);
+        client.resource(TARGET).path(RestPaths.STATES).path("sensors").path("presence").path(Long.toString(lampadaCameraInfoId)).put(ClientResponse.class);
     }
     
     private void stopEventBasedJSFProcesses() throws NamingException, JMSException {

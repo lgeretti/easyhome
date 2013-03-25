@@ -164,7 +164,7 @@ function selectionButtonHoverEffectIn(button) {
                 		    currentPairing = $.parseJSON($.ajax({ 
                               type: "GET",
                               dataType: "json",
-                              url: host+"rest/pairings/"+currentDevice.id,
+                              url: host+"rest/pairings/"+currentDevice.info.id,
                               async: false
                             }).responseText);       
                 		} catch (err) { 
@@ -174,15 +174,15 @@ function selectionButtonHoverEffectIn(button) {
                 		if (currentPairing) {
                 			$.ajax({ 
                                 type: "DELETE",
-                                url: host+"rest/pairings/"+currentDevice.id,
+                                url: host+"rest/pairings/"+currentDevice.info.id,
                                 async: false
                               });
                 		}
                 		
-                		if (!currentPairing || currentPairing.destination.id != functionalityOptions[idx].id) {
+                		if (!currentPairing || currentPairing.destination.info.id != functionalityOptions[idx].info.id) {
                     		$.ajax({ 
                                   type: "POST",
-                                  data: "sourceId="+currentDevice.id+"&destinationId="+functionalityOptions[idx].id,
+                                  data: "sourceId="+currentDevice.info.id+"&destinationId="+functionalityOptions[idx].info.id,
                                   url: host+"rest/pairings",
                                   async: false
                             });
@@ -251,7 +251,7 @@ function notchButtonHoverEffectIn(button) {
               
               $.ajax({ 
                   type: "POST",
-                  url: host+"rest/states/lamps/"+currentDevice.id+"/white",
+                  url: host+"rest/states/lamps/"+currentDevice.info.id+"/white",
                   data: "value="+lightLevel,
                   async: false
               });
@@ -278,7 +278,7 @@ function notchButtonHoverEffectIn(button) {
         	  
               $.ajax({ 
                   type: "POST",
-                  url: host+"rest/states/lamps/"+currentDevice.id+"/"+color,
+                  url: host+"rest/states/lamps/"+currentDevice.info.id+"/"+color,
                   data: "value="+colorLevel,
                   async: false
               });
@@ -710,7 +710,7 @@ function putLuminosityControls() {
     var lampState = $.parseJSON($.ajax({ 
         type: "GET",
         dataType: "json",
-        url: host+"rest/states/lamps/"+currentDevice.id,
+        url: host+"rest/states/lamps/"+currentDevice.info.id,
         async: false
       }).responseText);
     
@@ -740,7 +740,7 @@ function putColorControls() {
     var lampState = $.parseJSON($.ajax({ 
         type: "GET",
         dataType: "json",
-        url: host+"rest/states/lamps/"+currentDevice.id,
+        url: host+"rest/states/lamps/"+currentDevice.info.id,
         async: false
       }).responseText);
     
@@ -830,7 +830,7 @@ function showFunctionality(functionality) {
             currentPairing = $.parseJSON($.ajax({ 
                 type: "GET",
                 dataType: "json",
-                url: host+"rest/pairings/"+currentDevice.id,
+                url: host+"rest/pairings/"+currentDevice.info.id,
                 async: false
               }).responseText);        
         }
@@ -841,7 +841,7 @@ function showFunctionality(functionality) {
   	    
   	    for (i = 0; i<functionalityOptions.length;i++) {
   	    	var destination = functionalityOptions[i];
-            if (currentPairing && currentPairing.destination.id == destination.id) {
+            if (currentPairing && currentPairing.destination.id == destination.info.id) {
                 	destination.info.name = "Disassocia da " + destination.info.name;
                 	destination.info.imgPath = "img/cancel.svg";
             } else
