@@ -32,6 +32,8 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import java.io.File;
 import java.io.IOException;
@@ -99,6 +101,8 @@ public class SIPROGatewayTest {
 	    	DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 	    	Document doc = dBuilder.parse(is);
 	    	
+	    	doc.getDocumentElement().normalize();
+	    	
 	    	NodeList dataCategories = doc.getElementsByTagName("data");
 	     
 	    	handleActuators(dataCategories.item(0));
@@ -150,6 +154,9 @@ public class SIPROGatewayTest {
 		byte blue = fromHexStringToByte(parameters.item(13).getTextContent());
 		byte white = fromHexStringToByte(parameters.item(15).getTextContent());
 		ColoredAlarm alarm = ColoredAlarm.fromCode((byte)(Integer.parseInt(parameters.item(17).getTextContent(),16) & 0xFF));
+		
+		System.out.println("Lamp: identifier=" + identifier + ", online=" + online + ", nuid=0x" + Long.toHexString(nuid) + 
+				   ", red=" + red + ", green=" + green + ", blue=" + blue + ", white=" + white + ", alarm=" + alarm);
     }
     
     private void handleFridge(String identifier, NodeList parameters) {
@@ -157,6 +164,8 @@ public class SIPROGatewayTest {
 		long nuid = Long.parseLong(parameters.item(1).getTextContent() + parameters.item(3).getTextContent() + parameters.item(5).getTextContent(),16);
 		String codeString = parameters.item(7).getTextContent() + parameters.item(9).getTextContent() + parameters.item(11).getTextContent();
 		FridgeCode lastCode = FridgeCode.fromCode(Short.parseShort(codeString));	
+		
+		System.out.println("Fridge: identifier=" + identifier + ", nuid=0x" + Long.toHexString(nuid) + ", code=" + lastCode);
     }
     
     private void handlePIR(String identifier, NodeList parameters) {
@@ -164,5 +173,83 @@ public class SIPROGatewayTest {
 		long nuid = Long.parseLong(parameters.item(1).getTextContent() + parameters.item(3).getTextContent() + parameters.item(5).getTextContent(),16);
 		String occupation = parameters.item(7).getTextContent() + parameters.item(9).getTextContent();
 		boolean occupied = (occupation == "5031");
+		
+		System.out.println("PIR: identifier=" + identifier + ", nuid=0x" + Long.toHexString(nuid) + ", occupied=" + occupied);
     }
+    
+    @Test
+    public void parseBookFile(){
+    try {
+
+            DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+            Document doc = docBuilder.parse (new File("/home/geretti/Downloads/book.xml"));
+
+            // normalize text representation
+            doc.getDocumentElement ().normalize ();
+            System.out.println ("Root element of the doc is " + 
+                 doc.getDocumentElement().getNodeName());
+
+
+            NodeList listOfPersons = doc.getElementsByTagName("person");
+            int totalPersons = listOfPersons.getLength();
+            System.out.println("Total no of people : " + totalPersons);
+
+            for(int s=0; s<listOfPersons.getLength() ; s++){
+
+
+                Node firstPersonNode = listOfPersons.item(s);
+                if(firstPersonNode.getNodeType() == Node.ELEMENT_NODE){
+
+
+                    Element firstPersonElement = (Element)firstPersonNode;
+
+                    //-------
+                    NodeList firstNameList = firstPersonElement.getElementsByTagName("first");
+                    Element firstNameElement = (Element)firstNameList.item(0);
+
+                    NodeList textFNList = firstNameElement.getChildNodes();
+                    System.out.println("First Name : " + 
+                           ((Node)textFNList.item(0)).getNodeValue().trim());
+
+                    //-------
+                    NodeList lastNameList = firstPersonElement.getElementsByTagName("last");
+                    Element lastNameElement = (Element)lastNameList.item(0);
+
+                    NodeList textLNList = lastNameElement.getChildNodes();
+                    System.out.println("Last Name : " + 
+                           ((Node)textLNList.item(0)).getNodeValue().trim());
+
+                    //----
+                    NodeList ageList = firstPersonElement.getElementsByTagName("age");
+                    Element ageElement = (Element)ageList.item(0);
+
+                    NodeList textAgeList = ageElement.getChildNodes();
+                    System.out.println("Age : " + 
+                           ((Node)textAgeList.item(0)).getNodeValue().trim());
+
+                    //------
+
+
+                }//end of if clause
+
+
+            }//end of for loop with s var
+
+
+        }catch (SAXParseException err) {
+        System.out.println ("** Parsing error" + ", line " 
+             + err.getLineNumber () + ", uri " + err.getSystemId ());
+        System.out.println(" " + err.getMessage ());
+
+        }catch (SAXException e) {
+        Exception x = e.getException ();
+        ((x == null) ? e : x).printStackTrace ();
+
+        }catch (Throwable t) {
+        t.printStackTrace ();
+        }
+        //System.exit (0);
+
+    }//end of main
 }

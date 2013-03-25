@@ -282,7 +282,7 @@ public class SIPROGateway extends Gateway {
 		byte blue = fromHexStringToByte(parameters.item(13).getTextContent());
 		byte white = fromHexStringToByte(parameters.item(15).getTextContent());
 		ColoredAlarm alarm = ColoredAlarm.fromCode((byte)(Integer.parseInt(parameters.item(17).getTextContent(),16) & 0xFF));
-		log(LogLevel.DEBUG,"Registering: identifier=" + identifier + ", online=" + online + ", nuid=0x" + Long.toHexString(nuid) + 
+		log(LogLevel.DEBUG,"Registering Lamp: identifier=" + identifier + ", online=" + online + ", nuid=0x" + Long.toHexString(nuid) + 
 						   ", red=" + red + ", green=" + green + ", blue=" + blue + ", white=" + white + ", alarm=" + alarm);
 		
 		addNode(nuid);
@@ -307,7 +307,7 @@ public class SIPROGateway extends Gateway {
 		long nuid = Long.parseLong(parameters.item(1).getTextContent() + parameters.item(3).getTextContent() + parameters.item(5).getTextContent(),16);
 		String codeString = parameters.item(7).getTextContent() + parameters.item(9).getTextContent() + parameters.item(11).getTextContent();
 		FridgeCode lastCode = FridgeCode.fromCode(Short.parseShort(codeString));
-		log(LogLevel.DEBUG,"Registering: identifier=" + identifier + ", nuid=0x" + Long.toHexString(nuid) + ", code=" + lastCode);
+		log(LogLevel.DEBUG,"Registering Fridge: identifier=" + identifier + ", nuid=0x" + Long.toHexString(nuid) + ", code=" + lastCode);
 		
 		addNode(nuid);
 		
@@ -387,7 +387,7 @@ public class SIPROGateway extends Gateway {
 		long nuid = Long.parseLong(parameters.item(1).getTextContent() + parameters.item(3).getTextContent() + parameters.item(5).getTextContent(),16);
 		String occupation = parameters.item(7).getTextContent() + parameters.item(9).getTextContent();
 		boolean occupied = occupation.equals("5031");
-		log(LogLevel.DEBUG,"Initialization: identifier=" + identifier + ", nuid=0x" + Long.toHexString(nuid) + ", occupied=" + occupied);
+		log(LogLevel.DEBUG,"Registering PIR: identifier=" + identifier + ", nuid=0x" + Long.toHexString(nuid) + ", occupied=" + occupied);
 		
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         formData.add("gatewayId",Byte.toString(this.id));
