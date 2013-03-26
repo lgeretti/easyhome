@@ -1,42 +1,20 @@
 package it.uniud.easyhome.rest;
 
-import it.uniud.easyhome.common.JMSConstants;
-import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.devices.PersistentInfo;
 import it.uniud.easyhome.devices.states.*;
 import it.uniud.easyhome.ejb.StateEJB;
-import it.uniud.easyhome.network.Node;
-import it.uniud.easyhome.network.NodeLogicalType;
-import it.uniud.easyhome.packets.natives.LampStateSetPacket;
 
 import java.util.List;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
-import javax.jms.MessageProducer;
-import javax.jms.ObjectMessage;
-import javax.jms.Session;
-import javax.jms.Topic;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.ws.rs.core.*;
 import javax.ws.rs.*;
 
-import org.codehaus.jettison.json.JSONException;
-
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
-
 @Path(RestPaths.STATES)
 public final class StateResource {
 	
     private StateEJB resEjb;
-    
-	private Connection jmsConnection = null;
-	protected javax.naming.Context jndiContext = null;
-	protected Session jmsSession = null;
     
     private static Object statesLock = new Object();
 
@@ -232,8 +210,6 @@ public final class StateResource {
     	
     	resEjb.updateManagedState(thisLamp);
     	
-    	sendLampStateUpdateMessage(thisLamp);
-    	
     	return Response.ok().build();
     }    
     
@@ -283,8 +259,6 @@ public final class StateResource {
     	
     	resEjb.updateManagedState(thisLamp);
     	
-    	sendLampStateUpdateMessage(thisLamp);
-    	
     	return Response.ok().build();
     }   
     
@@ -301,8 +275,6 @@ public final class StateResource {
     	thisLamp.setGreen(value);
     	
     	resEjb.updateManagedState(thisLamp);
-    	
-    	sendLampStateUpdateMessage(thisLamp);
     	
     	return Response.ok().build();
     }   
@@ -321,8 +293,6 @@ public final class StateResource {
     	
     	resEjb.updateManagedState(thisLamp);
     	
-    	sendLampStateUpdateMessage(thisLamp);
-    	
     	return Response.ok().build();
     }   
     
@@ -340,8 +310,6 @@ public final class StateResource {
     	
     	resEjb.updateManagedState(thisLamp);
     	
-    	sendLampStateUpdateMessage(thisLamp);
-    	
     	return Response.ok().build();
     }   
     
@@ -358,8 +326,6 @@ public final class StateResource {
     	thisLamp.setAlarm(value);
     	
     	resEjb.updateManagedState(thisLamp);
-    	
-    	sendLampStateUpdateMessage(thisLamp);
     	
     	return Response.ok().build();
     } 
@@ -404,57 +370,5 @@ public final class StateResource {
     	}
         
         return Response.ok().build();
-    }
-    
-    private void sendLampStateUpdateMessage(LampState lampState) {
-    	
-    	try {
-	    	jndiContext = new InitialContext();
-	        ConnectionFactory connectionFactory = (ConnectionFactory) jndiContext.lookup(JMSConstants.CONNECTION_FACTORY);
-	        
-	        Topic outboundPacketsTopic = (Topic) jndiContext.lookup(JMSConstants.OUTBOUND_PACKETS_TOPIC);
-	        
-	        jmsConnection = connectionFactory.createConnection();
-	        jmsSession = jmsConnection.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
-	        MessageProducer producer = jmsSession.createProducer(outboundPacketsTopic);
-	            
-	        jmsConnection.start();
-	        
-	    	String TARGET = "http://localhost:8080/easyhome/rest/";
-	    	Client client = Client.create();
-    		MultivaluedMap<String,String> queryParams = new MultivaluedMapImpl();
-            queryParams.add("gatewayId",Byte.toString(lampState.getDevice().getGatewayId()));
-            queryParams.add("nuid",Long.toString(lampState.getDevice().getNuid()));
-            
-            ClientResponse nodeResponse = client.resource(TARGET).path(RestPaths.NODES).queryParams(queryParams)
-            									.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-            List<Node> nodes = JsonUtils.getListFrom(nodeResponse, Node.class);
-            
-            if (nodes.size() == 1) {
-	    	
-				LampStateSetPacket packet = new LampStateSetPacket(lampState,nodes.get(0).getCoordinates());
-	        
-	            ObjectMessage changeMessage = jmsSession.createObjectMessage(packet);
-	            producer.send(changeMessage);
-	            
-            } else
-            	System.out.println("Missing node for gatewayId " + queryParams.get("gatewayId") + " and nuid " + queryParams.get("nuid"));
-            
-        } catch (JMSException ex) { 
-        	ex.printStackTrace();
-        } catch (NamingException e) {
-        	e.printStackTrace();
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-        	
-        	try {
-        		if (jmsConnection != null)
-        			jmsConnection.close();
-			} catch (JMSException e) {
-			}
-        }
-        
     }
 }

@@ -184,6 +184,8 @@ public class UserInterfaceResource {
 		insertProcess(ProcessKind.NETWORK_GRAPH_MINIMIZATION);
 		insertProcess(ProcessKind.NETWORK_UPDATE);
 		
+		insertProcess(ProcessKind.LAMP_STATE_UPDATE,LogLevel.DEBUG);
+		
 		insertProcess(ProcessKind.OCCUPANCY_REQUEST);//, LogLevel.DEBUG);
 		insertProcess(ProcessKind.OCCUPANCY_REGISTRATION);
 		
@@ -191,6 +193,8 @@ public class UserInterfaceResource {
 		
 		insertProcess(ProcessKind.ALARM_STATE_REQUEST);//,LogLevel.DEBUG);
 		insertProcess(ProcessKind.ALARM_STATE_ACKNOWLEDGMENT);//,LogLevel.DEBUG);
+		
+		
 		
         return Response.ok().build();
     }

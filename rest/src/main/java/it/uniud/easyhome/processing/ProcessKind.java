@@ -142,6 +142,12 @@ public enum ProcessKind {
 		public Process newProcess(int pid, UriInfo uriInfo, LogLevel logLevel) throws NamingException, JMSException {
 			return new AlarmStateAcknowledgmentProcess(pid,uriInfo,this,logLevel);
 		}
+	},
+	LAMP_STATE_UPDATE {
+		@Override
+		public Process newProcess(int pid, UriInfo uriInfo, LogLevel logLevel) throws NamingException, JMSException {
+			return new LampStateUpdateProcess(pid,uriInfo,this,logLevel);
+		}		
 	};
 	
 	public abstract Process newProcess(int pid, UriInfo uriInfo, LogLevel logLevel) throws NamingException, JMSException;

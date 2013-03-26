@@ -58,7 +58,7 @@ public class SIPROGateway extends Gateway {
 	private static final String SIPRO_TARGET = "http://localhost:5000/";
 	private static final String INTERNAL_TARGET = "http://localhost:8080/easyhome/rest/";
 	
-	private static final int DISCOVERY_PERIOD_MS = 10000; 
+	private static final int DISCOVERY_PERIOD_MS = 5000; 
 	
 	private static final boolean MOCKED_GATEWAY = true;
 	
