@@ -54,8 +54,10 @@ public class OccupancySensingRequestProcess extends Process {
 			    	getOutboundPacketsProducer().send(outboundMessage);    
 			    	log(LogLevel.FINE, "Occupancy attribute request for " + node + " dispatched");
 	    		}
+	    		Thread.sleep(updateTimeout);
 	    	}
-			Thread.sleep(updateTimeout/functionalities.size());
+	    	if (nodes.size() == 0)
+	    		Thread.sleep(updateTimeout);
 	    	
         } catch (Exception e) {
         	e.printStackTrace();

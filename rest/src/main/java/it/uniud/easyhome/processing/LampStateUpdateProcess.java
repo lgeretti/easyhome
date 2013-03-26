@@ -58,6 +58,7 @@ public class LampStateUpdateProcess extends Process {
 		            getOutboundPacketsProducer().send(changeMessage); 
 		            
 		            log(LogLevel.FINE,"State update sent to lamp with address 0x"+Long.toHexString(node.getCoordinates().getNuid()));
+		            break; // This way we distribute the updates
 	    		} else
 	    			log(LogLevel.DEBUG,"Latest update too close: will wait more time");
 	    	}

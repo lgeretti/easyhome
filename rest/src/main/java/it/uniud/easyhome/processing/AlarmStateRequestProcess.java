@@ -37,7 +37,7 @@ public class AlarmStateRequestProcess extends Process {
 	        	        
 	    	List<Node> nodes = JsonUtils.getListFrom(getResponse, Node.class);
 	    	
-	    	long updateTimeout = Long.parseLong(restResource.path(RestPaths.STATES).path("timeouts").path("read").path("fridgecode").accept(MediaType.TEXT_PLAIN).get(String.class));
+	    	long readTimeout = Long.parseLong(restResource.path(RestPaths.STATES).path("timeouts").path("read").path("fridgecode").accept(MediaType.TEXT_PLAIN).get(String.class));
 	    	
     		MultivaluedMap<String,String> params = new MultivaluedMapImpl();
             params.add("funcType",FunctionalityType.ALARM_ISSUING.toString());
@@ -51,10 +51,12 @@ public class AlarmStateRequestProcess extends Process {
 			 	    ObjectMessage outboundMessage = jmsSession.createObjectMessage(packet);
 			    	getOutboundPacketsProducer().send(outboundMessage);    
 			    	log(LogLevel.FINE, "Alarm state request for " + node + " dispatched");
+			    	Thread.sleep(readTimeout);
 	    		}
 	    	}
-			Thread.sleep(updateTimeout/functionalities.size());
-	    	
+			if (nodes.size() == 0)
+				Thread.sleep(readTimeout);
+			
         } catch (Exception e) {
         	e.printStackTrace();
         }
