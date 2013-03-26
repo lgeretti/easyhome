@@ -59,7 +59,8 @@ public class SIPROGateway extends Gateway {
 	private static final String SIPRO_TARGET = "http://localhost:5000/";
 	private static final String INTERNAL_TARGET = "http://localhost:8080/easyhome/rest/";
 	
-	private static final int DISCOVERY_PERIOD_MS = 15000; 
+	private static final int DISCOVERY_PERIOD_MS = 15000;
+	private static final int SENSORS_SEND_PERIOD_MS = 6000;
 	
 	private static final boolean MOCKED_GATEWAY = false;
 	
@@ -73,6 +74,8 @@ public class SIPROGateway extends Gateway {
 	private List<Long> sensors = new ArrayList<Long>();
 	
 	private long lastDiscoveryTimeMillis = 0;
+	
+	private long lastSensorsSendingTimeMillis = 0;
 	
     public SIPROGateway(byte id, int port, LogLevel logLevel) {
     	super(id,ProtocolType.NATIVE,port,logLevel);
@@ -172,11 +175,18 @@ public class SIPROGateway extends Gateway {
 				client.resource(SIPRO_TARGET).queryParams(queryParams).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 			}
 			
+			if (System.currentTimeMillis() - SENSORS_SEND_PERIOD_MS > lastSensorsSendingTimeMillis) {
+				
+				sendAllSensorData(jmsSession,producer);
+				lastSensorsSendingTimeMillis = System.currentTimeMillis(); 
+			} else
+				log(LogLevel.DEBUG,"No sensors data sent because of wait time");
+			
 		} else if (OccupancyAttributeReqPacket.validates(pkt) || AlarmStateReqPacket.validates(pkt)) {
 			
 			long destinationNuid = pkt.getDstCoords().getNuid();
 			
-			sendCorrespondingSensorData(destinationNuid,jmsSession,producer);
+			sendMatchingSensorData(destinationNuid,jmsSession,producer);
 		}
     }
     
@@ -232,40 +242,53 @@ public class SIPROGateway extends Gateway {
     	return strb.toString();
     }
     
-    private void sendCorrespondingSensorData(long destinationNuid, Session jmsSession, MessageProducer producer) {
+    private void sendMatchingSensorData(long destinationNuid, Session jmsSession, MessageProducer producer) {
+	    handleSensorReply(getSensorsXMLNodes(),destinationNuid,jmsSession,producer);
+    }
+    
+    private void sendAllSensorData(Session jmsSession, MessageProducer producer) {
+	    handleAllSensorsReply(getSensorsXMLNodes(),jmsSession,producer);  
+    }
+    
+    private NodeList getSensorsXMLNodes() {
+    	
+    	NodeList result = null;
     	
 	    try {
-	    	
-	    	String xmlContent = null;
-	    	
-	    	if (!MOCKED_GATEWAY) {
-		        MultivaluedMap<String,String> queryParams = new MultivaluedMapImpl();
-		        queryParams.add("method","getData");
-		        queryParams.add("params","actuators");
-	    		ClientResponse dataModelResponse = client.resource(SIPRO_TARGET).queryParams(queryParams).accept(MediaType.TEXT_XML).get(ClientResponse.class);
-		    	xmlContent = dataModelResponse.getEntity(String.class);
-	    	} else {
-		    	File xmlFile = new File("/home/geretti/Public/sources/uniud/easyhome/rest/src/test/resources/sensors.xml");
-		    	
-		        try{
-		            xmlContent = FileUtils.readFileToString(xmlFile);
-		        }catch(IOException e){
-		            e.printStackTrace();
-		        } 
-	    	}
-	        
-	    	InputSource is = new InputSource(new StringReader(xmlContent));
+
+	    	InputSource is = new InputSource(new StringReader(getSensorsData()));
 	    	DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 	    	DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 	    	Document doc = dBuilder.parse(is);
 	    
-	    	NodeList inputs = doc.getElementsByTagName("data").item(0).getChildNodes();
-	     
-	    	handleSensorReply(inputs,destinationNuid,jmsSession,producer);
+	    	result = doc.getElementsByTagName("data").item(0).getChildNodes();
 	    	
 	    } catch (Exception e) {
 	    	e.printStackTrace();
-	    }	   
+	    }	
+	    
+	    return result;
+    }
+    
+    private String getSensorsData() {
+    	String result = null;
+    	
+    	if (!MOCKED_GATEWAY) {
+	        MultivaluedMap<String,String> queryParams = new MultivaluedMapImpl();
+	        queryParams.add("method","getData");
+	        queryParams.add("params","sensors");
+    		ClientResponse dataModelResponse = client.resource(SIPRO_TARGET).queryParams(queryParams).accept(MediaType.TEXT_XML).get(ClientResponse.class);
+	    	result = dataModelResponse.getEntity(String.class);
+    	} else {
+	    	File xmlFile = new File("/home/geretti/Public/sources/uniud/easyhome/rest/src/test/resources/sensors.xml");
+	    	
+	        try{
+	            result = FileUtils.readFileToString(xmlFile);
+	        }catch(IOException e){
+	            e.printStackTrace();
+	        } 
+    	}
+    	return result;
     }
     
     private void registerNewDevices() {
@@ -359,11 +382,25 @@ public class SIPROGateway extends Gateway {
     		if (input.getNodeType() == Node.ELEMENT_NODE) {
     			String descrName = getDescriptorName((Element)input);
     			if (descrName.equals("Fridge Alarm Light")) {
-    				if (handleSensorReplyForFridge((Element)input,nuid,jmsSession,producer))
+    				if (handleSensorReplyForFridgeIfMatching((Element)input,nuid,jmsSession,producer))
     					break;
     			} else if (descrName.equals("PIR")) {
-    				if (handleSensorReplyForPIR((Element)input,nuid,jmsSession,producer))
+    				if (handleSensorReplyForPIRIfMatching((Element)input,nuid,jmsSession,producer))
     					break;
+    			}
+    		}
+    	}
+    }    
+    
+    private void handleAllSensorsReply(NodeList inputs, Session jmsSession, MessageProducer producer) {
+    	for (int i=0;i<inputs.getLength();i++) {
+    		Node input = inputs.item(i);
+    		if (input.getNodeType() == Node.ELEMENT_NODE) {
+    			String descrName = getDescriptorName((Element)input);
+    			if (descrName.equals("Fridge Alarm Light")) {
+    				handleSensorReplyForFridge((Element)input,jmsSession,producer);
+    			} else if (descrName.equals("PIR")) {
+    				handleSensorReplyForPIR((Element)input,jmsSession,producer);
     			}
     		}
     	}
@@ -427,66 +464,85 @@ public class SIPROGateway extends Gateway {
         client.resource(INTERNAL_TARGET).path(RestPaths.STATES).path("fridges").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     }
     
-    private boolean handleSensorReplyForFridge(Element elem, long nuidToMatch, Session jmsSession, MessageProducer producer) {
+    private boolean handleSensorReplyForFridgeIfMatching(Element elem, long nuidToMatch, Session jmsSession, MessageProducer producer) {
     	long nuid = Long.parseLong(getTxtFor(elem,"value-3") + getTxtFor(elem,"value-2") + getTxtFor(elem,"value-1"),16);
 		if (nuid == nuidToMatch) {
-			String codeString = getTxtFor(elem,"value0") + getTxtFor(elem,"value1") + getTxtFor(elem,"value2");
-			FridgeCode lastCode = FridgeCode.fromCode(Short.parseShort(codeString));
-			
-			log(LogLevel.FINE,"Code to transmit back from 0x" + Long.toHexString(nuid) + ": " + lastCode);
-			short addr = (short)(nuid & 0xFFFF);
-			byte[] addrBytesLittleEndian = ByteUtils.getBytes(addr, Endianness.LITTLE_ENDIAN);
-			byte[] codeBytesLittleEndian = ByteUtils.getBytes(lastCode.getCode(), Endianness.LITTLE_ENDIAN);
-			
-			byte[] payload = new byte[5];
-			payload[1] = addrBytesLittleEndian[0];
-			payload[2] = addrBytesLittleEndian[1];
-			payload[3] = codeBytesLittleEndian[0];
-			payload[4] = codeBytesLittleEndian[1];
-			ModuleCoordinates sourceCoordinates = new ModuleCoordinates(this.id,nuid,addr,(byte)1);
-			ModuleCoordinates destinationCoordinates = new ModuleCoordinates((byte)1,0L,(short)0,(byte)1);
-			Operation operation = new Operation((byte)0, Domain.EASYHOME.getCode(), EasyHomeContext.ALARM.getCode(), (byte)0, (byte)1, payload);
-			AlarmStateRspPacket packet = new AlarmStateRspPacket(sourceCoordinates,destinationCoordinates,operation);
-	        ObjectMessage inboundMessage;
-			try {
-				inboundMessage = jmsSession.createObjectMessage(packet);
-				producer.send(inboundMessage); 
-			} catch (JMSException e) {
-				e.printStackTrace();
-			}
+			handleSensorReplyForFridge(elem, nuid, jmsSession, producer);
         	return true;
 		} else
         	return false;
     }
     
-    private boolean handleSensorReplyForPIR(Element	elem, long nuidToMatch, Session jmsSession, MessageProducer producer) {
+    private void handleSensorReplyForFridge(Element elem, Session jmsSession, MessageProducer producer) {
+    	long nuid = Long.parseLong(getTxtFor(elem,"value-3") + getTxtFor(elem,"value-2") + getTxtFor(elem,"value-1"),16);
+		handleSensorReplyForFridge(elem, nuid, jmsSession, producer);
+    }
+    
+    private void handleSensorReplyForFridge(Element elem, long nuid, Session jmsSession, MessageProducer producer) {
+
+		String codeString = getTxtFor(elem,"value0") + getTxtFor(elem,"value1") + getTxtFor(elem,"value2");
+		FridgeCode lastCode = FridgeCode.fromCode(Short.parseShort(codeString));
+		
+		log(LogLevel.FINE,"Code to transmit back from 0x" + Long.toHexString(nuid) + ": " + lastCode);
+		short addr = (short)(nuid & 0xFFFF);
+		byte[] addrBytesLittleEndian = ByteUtils.getBytes(addr, Endianness.LITTLE_ENDIAN);
+		byte[] codeBytesLittleEndian = ByteUtils.getBytes(lastCode.getCode(), Endianness.LITTLE_ENDIAN);
+		
+		byte[] payload = new byte[5];
+		payload[1] = addrBytesLittleEndian[0];
+		payload[2] = addrBytesLittleEndian[1];
+		payload[3] = codeBytesLittleEndian[0];
+		payload[4] = codeBytesLittleEndian[1];
+		ModuleCoordinates sourceCoordinates = new ModuleCoordinates(this.id,nuid,addr,(byte)1);
+		ModuleCoordinates destinationCoordinates = new ModuleCoordinates((byte)1,0L,(short)0,(byte)1);
+		Operation operation = new Operation((byte)0, Domain.EASYHOME.getCode(), EasyHomeContext.ALARM.getCode(), (byte)0, (byte)1, payload);
+		AlarmStateRspPacket packet = new AlarmStateRspPacket(sourceCoordinates,destinationCoordinates,operation);
+        ObjectMessage inboundMessage;
+		try {
+			inboundMessage = jmsSession.createObjectMessage(packet);
+			producer.send(inboundMessage); 
+		} catch (JMSException e) {
+			e.printStackTrace();
+		}
+    }    
+    
+    private boolean handleSensorReplyForPIRIfMatching(Element elem, long nuidToMatch, Session jmsSession, MessageProducer producer) {
     	long nuid = Long.parseLong(getTxtFor(elem,"value-3") + getTxtFor(elem,"value-2") + getTxtFor(elem,"value-1"),16);
 		if (nuid == nuidToMatch) {
-			String occupation = getTxtFor(elem,"value0") + getTxtFor(elem,"value1");
-			boolean occupied = occupation.equals("5031");
-			log(LogLevel.FINE,"Occupation result to transmit back from 0x" + Long.toHexString(nuid) + ": " + occupied);
-			
-			short addr = (short)(nuid & 0xFFFF);
-			byte[] addrBytesLittleEndian = ByteUtils.getBytes(addr, Endianness.LITTLE_ENDIAN);
-			
-			byte[] payload = new byte[8];
-			payload[1] = addrBytesLittleEndian[0];
-			payload[2] = addrBytesLittleEndian[1];
-			payload[7] = (occupied ? (byte)0x1 : (byte)0x0);
-			ModuleCoordinates sourceCoordinates = new ModuleCoordinates(this.id,nuid,addr,(byte)1);
-			ModuleCoordinates destinationCoordinates = new ModuleCoordinates((byte)1,0L,(short)0,(byte)1);
-			Operation operation = new Operation((byte)0, Domain.HOME_AUTOMATION.getCode(), HomeAutomationContext.OCCUPANCY_SENSING.getCode(), (byte)0, (byte)1, payload);
-			OccupancyAttributeRspPacket packet = new OccupancyAttributeRspPacket(sourceCoordinates,destinationCoordinates,operation);
-	        ObjectMessage inboundMessage;
-			try {
-				inboundMessage = jmsSession.createObjectMessage(packet);
-				producer.send(inboundMessage); 
-			} catch (JMSException e) {
-				e.printStackTrace();
-			}
+			handleSensorReplyForPIR(elem, nuid, jmsSession, producer);
         	return true;
 		} else
         	return false;
+    }
+    
+    private void handleSensorReplyForPIR(Element elem, Session jmsSession, MessageProducer producer) {
+    	long nuid = Long.parseLong(getTxtFor(elem,"value-3") + getTxtFor(elem,"value-2") + getTxtFor(elem,"value-1"),16);
+		handleSensorReplyForPIR(elem, nuid, jmsSession, producer);
+    }
+    
+    private void handleSensorReplyForPIR(Element elem, long nuid, Session jmsSession, MessageProducer producer) {
+		String occupation = getTxtFor(elem,"value0") + getTxtFor(elem,"value1");
+		boolean occupied = occupation.equals("5031");
+		log(LogLevel.FINE,"Occupation result to transmit back from 0x" + Long.toHexString(nuid) + ": " + occupied);
+		
+		short addr = (short)(nuid & 0xFFFF);
+		byte[] addrBytesLittleEndian = ByteUtils.getBytes(addr, Endianness.LITTLE_ENDIAN);
+		
+		byte[] payload = new byte[8];
+		payload[1] = addrBytesLittleEndian[0];
+		payload[2] = addrBytesLittleEndian[1];
+		payload[7] = (occupied ? (byte)0x1 : (byte)0x0);
+		ModuleCoordinates sourceCoordinates = new ModuleCoordinates(this.id,nuid,addr,(byte)1);
+		ModuleCoordinates destinationCoordinates = new ModuleCoordinates((byte)1,0L,(short)0,(byte)1);
+		Operation operation = new Operation((byte)0, Domain.HOME_AUTOMATION.getCode(), HomeAutomationContext.OCCUPANCY_SENSING.getCode(), (byte)0, (byte)1, payload);
+		OccupancyAttributeRspPacket packet = new OccupancyAttributeRspPacket(sourceCoordinates,destinationCoordinates,operation);
+        ObjectMessage inboundMessage;
+		try {
+			inboundMessage = jmsSession.createObjectMessage(packet);
+			producer.send(inboundMessage); 
+		} catch (JMSException e) {
+			e.printStackTrace();
+		}
     }
     
     private void addNode(long nuid) {

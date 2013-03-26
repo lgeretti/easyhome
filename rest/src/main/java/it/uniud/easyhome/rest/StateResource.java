@@ -300,6 +300,22 @@ public final class StateResource {
     }    
     
     @POST
+    @Path("lamps/{id}/touch")
+    public Response setUpdateForLampState(@PathParam("id") long id) {
+    		
+    	LampState thisLamp = resEjb.findStateByInfoId(id,LampState.class);
+    	
+    	if (thisLamp == null)
+    		throw new WebApplicationException(Response.Status.NOT_FOUND);
+    	
+    	thisLamp.touch();
+    	
+    	resEjb.updateManagedState(thisLamp);
+    	
+    	return Response.ok().build();
+    }   
+    
+    @POST
     @Path("lamps")
     public Response updateLampStateFromGateway(@FormParam("gatewayId") byte gatewayId,
 			   								  @FormParam("nuid") long nuid,
