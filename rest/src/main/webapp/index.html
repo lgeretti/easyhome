@@ -34,6 +34,7 @@
    #eh_description_float {position: absolute; left: 80px; top: 270px; }
    #eh_description_div { border-width: 1px; width: 1070px; border-style: solid; border-color: #666666; }
    
+   #activity {position:absolute; right: 250px; top: 15px; }
 }
 </style>
 
@@ -76,9 +77,10 @@ var optionsCoverDescriptionText = false;
 function restartInactivityCounter() {
 	
 	isInterfaceInactive = false;
+	$("#activity").html("A");
 	
 	clearTimeout(activityTimeout);
-	activityTimeout = setTimeout(function() {isInterfaceInactive = true; }, timeBeforeInactive);
+	activityTimeout = setTimeout(function() {isInterfaceInactive = true; $("#activity").html("I"); }, timeBeforeInactive);
 }
 
 function arrowHoverEffectIn(button) {
@@ -699,7 +701,7 @@ function updateLuminosityValue() {
 			putLuminosityControls();
 		}	
 			
-		setTimeout(updateLuminosityValue, 500);
+		setTimeout(updateLuminosityValue, 1000);
 	}
 }
 
@@ -1006,6 +1008,8 @@ $(".arrow_button").hover(
   <div id="eh_description_float">
       <div id="eh_description_div" class="ui-corner-all text"></div>
   </div>
+  
+  <div id="activity" class="ui-corner-all text"></div>
 
 </body>
 </html>
