@@ -18,8 +18,6 @@ public class LampState implements DeviceState {
 	@Column
 	private boolean online;
     @Column
-    private String identifier;
-    @Column
     private byte red;
     @Column
     private byte green;
@@ -50,10 +48,6 @@ public class LampState implements DeviceState {
 		return this.online;
 	}
 	
-	public String getIdentifier() {
-		return this.identifier;
-	}
-	
 	public byte getRed() {
 		return this.red;
 	}
@@ -80,11 +74,6 @@ public class LampState implements DeviceState {
 	
     public LampState setOnline(boolean val) {
     	this.online = val;
-    	return this;
-    }
-    
-    public LampState setIdentifier(String outputName) {
-    	this.identifier = outputName;
     	return this;
     }
 	

@@ -17,8 +17,6 @@ public class PresenceSensorState implements DeviceState {
     private PersistentInfo device;
     @Column
     private boolean occupied;
-    @Column
-    private String identifier;
 
     @SuppressWarnings("unused")
 	private PresenceSensorState() {}
@@ -35,19 +33,10 @@ public class PresenceSensorState implements DeviceState {
 		return this.occupied;
 	}
 	
-	public String getIdentifier() {
-		return this.identifier;
-	}
-	
 	public PresenceSensorState setOccupied(boolean val) {
 		this.occupied = val;
 		return this;
 	}
-    
-    public PresenceSensorState setIdentifier(String identifier) {
-    	this.identifier = identifier;
-    	return this;
-    }
 	
     @Override
     public boolean equals(Object other) {

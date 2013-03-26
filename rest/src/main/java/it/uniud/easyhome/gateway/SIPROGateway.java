@@ -22,7 +22,9 @@ import it.uniud.easyhome.rest.RestPaths;
 
 import java.io.*;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.jms.Connection;
@@ -64,8 +66,8 @@ public class SIPROGateway extends Gateway {
 	
 	private volatile Set<Long> sensorsRegistered = new HashSet<Long>();
 	private volatile Set<Long> actuatorsRegistered = new HashSet<Long>();
-	private Set<Long> actuators = new HashSet<Long>();
-	private Set<Long> sensors = new HashSet<Long>();
+	private List<Long> actuators = new ArrayList<Long>();
+	private List<Long> sensors = new ArrayList<Long>();
 	
 	private long lastDiscoveryTimeMillis = 0;
 	
@@ -153,7 +155,7 @@ public class SIPROGateway extends Gateway {
 			
 			LampStateSetPacket statePacket = (LampStateSetPacket) pkt;
 			
-			String paramsString = statePacket.getIdentifier()+";changeColor"+statePacket.getSeparatedParameters();
+			String paramsString = "output;changeColor"+statePacket.getSeparatedParameters();
 			
 			log(LogLevel.FINE,"Request to set lamp state values");
 			log(LogLevel.ULTRAFINE,"Request: ?method=setValueParam&params="+paramsString);
@@ -186,7 +188,41 @@ public class SIPROGateway extends Gateway {
     }
     
     private void tryToAwakeActuator() {
+    	int lampToChoose = -1;
+    	switch (actuatorsRegistered.size()) {
+    	case 0:
+    		lampToChoose = (int)(System.currentTimeMillis() & 0x1);    		
+    		break;
+    	case 1:
+    		lampToChoose = (actuatorsRegistered.contains(actuators.get(0)) ? 1 : 0);
+    		break;
+    	default:
+    	}
+    	if (lampToChoose > 0) {
+    		long nuid = actuators.get(lampToChoose);
+    		log(LogLevel.DEBUG, "Trying to awake lamp with id 0x"+Long.toHexString(nuid));
+			if (!MOCKED_GATEWAY) {		
+		        MultivaluedMap<String,String> queryParams = new MultivaluedMapImpl();
+		        queryParams.add("method","setValueParam");
+		        queryParams.add("params",getAwakeString(nuid));
+				client.resource(SIPRO_TARGET).queryParams(queryParams).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+			}
+    	}
+    }
+    
+    private static String getAwakeString(long nuid) {
     	
+    	StringBuilder strb = new StringBuilder();
+    	
+    	String hexNuid = Long.toHexString(nuid);
+    	
+    	strb.append("output;changeColor;")
+    		.append(hexNuid.substring(0, 1)).append(";")
+    		.append(hexNuid.substring(2, 3)).append(";")
+    		.append(hexNuid.substring(4, 5)).append(";")
+    		.append("00;00;00;00;00");
+    	
+    	return strb.toString();
     }
     
     private void sendCorrespondingSensorData(long destinationNuid, Session jmsSession, MessageProducer producer) {
@@ -280,11 +316,10 @@ public class SIPROGateway extends Gateway {
     		Node child = children.item(i);
     		if (child.getNodeType() == Node.ELEMENT_NODE) {
     			Element sensor = (Element)child;
-    			String identifier = sensor.getNodeName();
     			long nuid = Long.parseLong(getTxtFor(sensor,"value-3") + getTxtFor(sensor,"value-2") + getTxtFor(sensor,"value-1"),16);
     			if (!actuatorsRegistered.contains(nuid)) {
     				actuatorsRegistered.add(nuid);
-    				registerLamp(identifier,(Element)child);
+    				registerLamp((Element)child);
     			}
     				
     		}
@@ -298,15 +333,14 @@ public class SIPROGateway extends Gateway {
     		Node child = children.item(i);
     		if (child.getNodeType() == Node.ELEMENT_NODE) {
     			Element sensor = (Element)child;
-    			String identifier = sensor.getNodeName();
     			long nuid = Long.parseLong(getTxtFor(sensor,"value-3") + getTxtFor(sensor,"value-2") + getTxtFor(sensor,"value-1"),16);
     			if (!sensorsRegistered.contains(nuid)) { 
     				sensorsRegistered.add(nuid);
 	    			String descrName = getDescriptorName(sensor);
 	    			if (descrName.equals("Fridge Alarm Light"))
-	    				registerFridge(identifier,sensor);
+	    				registerFridge(sensor);
 	    			else if (descrName.equals("PIR"))
-	    				registerPIR(identifier,sensor);
+	    				registerPIR(sensor);
     			}
     		}
     	}
@@ -332,7 +366,7 @@ public class SIPROGateway extends Gateway {
     	return (byte)(Integer.parseInt(value,16) & 0xFF);
     }
 
-    private void registerLamp(String identifier, Element elem) {
+    private void registerLamp(Element elem) {
     	boolean online = (getTxtFor(elem,"state").equals("ON"));
 		long nuid = Long.parseLong(getTxtFor(elem,"value-3") + getTxtFor(elem,"value-2") + getTxtFor(elem,"value-1"),16);
 		byte red = fromHexStringToByte(getTxtFor(elem,"value0"));
@@ -340,7 +374,7 @@ public class SIPROGateway extends Gateway {
 		byte blue = fromHexStringToByte(getTxtFor(elem,"value2"));
 		byte white = fromHexStringToByte(getTxtFor(elem,"value3"));
 		ColoredAlarm alarm = ColoredAlarm.fromCode((byte)(Integer.parseInt(getTxtFor(elem,"value4"),16) & 0xFF));
-		log(LogLevel.FINE,"Registering Lamp: identifier=" + identifier + ", online=" + online + ", nuid=0x" + Long.toHexString(nuid) + 
+		log(LogLevel.FINE,"Registering Lamp: online=" + online + ", nuid=0x" + Long.toHexString(nuid) + 
 						   ", red=" + red + ", green=" + green + ", blue=" + blue + ", white=" + white + ", alarm=" + alarm);
 		
 		addNode(nuid);
@@ -350,7 +384,6 @@ public class SIPROGateway extends Gateway {
         formData.add("gatewayId",Byte.toString(this.id));
         formData.add("nuid",Long.toString(nuid));  
         formData.add("online",Boolean.toString(online));
-        formData.add("identifier",identifier);
         formData.add("red",Byte.toString(red));
         formData.add("green",Byte.toString(green));
         formData.add("blue",Byte.toString(blue));
@@ -359,32 +392,30 @@ public class SIPROGateway extends Gateway {
         client.resource(INTERNAL_TARGET).path(RestPaths.STATES).path("lamps").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     }
     
-    private void registerPIR(String identifier, Element elem) {
+    private void registerPIR(Element elem) {
 		long nuid = Long.parseLong(getTxtFor(elem,"value-3") + getTxtFor(elem,"value-2") + getTxtFor(elem,"value-1"),16);
 		String occupation = getTxtFor(elem,"value0") + getTxtFor(elem,"value1");
 		boolean occupied = (occupation.equals("5031"));
-		log(LogLevel.FINE,"Registering PIR: identifier=" + identifier + ", nuid=0x" + Long.toHexString(nuid) + ", occupied=" + occupied);
+		log(LogLevel.FINE,"Registering PIR: nuid=0x" + Long.toHexString(nuid) + ", occupied=" + occupied);
 		
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         formData.add("gatewayId",Byte.toString(this.id));
         formData.add("nuid",Long.toString(nuid));  
-        formData.add("identifier",identifier);
         formData.add("occupied",Boolean.toString(occupied));
         client.resource(INTERNAL_TARGET).path(RestPaths.STATES).path("sensors/presence").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     }
     
-    private void registerFridge(String identifier, Element elem) {
+    private void registerFridge(Element elem) {
 		long nuid = Long.parseLong(getTxtFor(elem,"value-3") + getTxtFor(elem,"value-2") + getTxtFor(elem,"value-1"),16);
 		String codeString = getTxtFor(elem,"value0") + getTxtFor(elem,"value1") + getTxtFor(elem,"value2");
 		FridgeCode lastCode = FridgeCode.fromCode(Short.parseShort(codeString));	
-		log(LogLevel.FINE,"Registering Fridge: identifier=" + identifier + ", nuid=0x" + Long.toHexString(nuid) + ", code=" + lastCode);
+		log(LogLevel.FINE,"Registering Fridge: nuid=0x" + Long.toHexString(nuid) + ", code=" + lastCode);
 		
 		addNode(nuid);
 		
         MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
         formData.add("gatewayId",Byte.toString(this.id));
-        formData.add("nuid",Long.toString(nuid));  
-        formData.add("identifier",identifier);
+        formData.add("nuid",Long.toString(nuid));
         formData.add("lastCode",lastCode.toString());
         client.resource(INTERNAL_TARGET).path(RestPaths.STATES).path("fridges").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
     }

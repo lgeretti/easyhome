@@ -46,43 +46,29 @@ public class LampStateSetPacket extends NativePacket {
 	}
 
 	private static byte[] getBytes(LampState lampState, GlobalCoordinates destination) {
-		
-		byte[] identifierBytes = lampState.getIdentifier().getBytes();
-		int numIdentifierBytes = identifierBytes.length;
-		
-		int numBytes = 8+numIdentifierBytes;
-		
-		byte[] result = new byte[numBytes];
+
+		byte[] result = new byte[8];
 		
 		byte[] nuidBytes = ByteUtils.getBytes(destination.getNuid(),Endianness.BIG_ENDIAN);
-		
-		int i=0;
-		
-		for (byte b : identifierBytes) 
-			result[i++] = b;
-		result[i++] = nuidBytes[5];
-		result[i++] = nuidBytes[6];
-		result[i++] = nuidBytes[7];
-		result[i++] = lampState.getRed();
-		result[i++] = lampState.getGreen();
-		result[i++] = lampState.getBlue();
-		result[i++] = lampState.getWhite();
-		result[i++] = lampState.getAlarm().getCode();
+
+		result[0] = nuidBytes[5];
+		result[1] = nuidBytes[6];
+		result[2] = nuidBytes[7];
+		result[3] = lampState.getRed();
+		result[4] = lampState.getGreen();
+		result[5] = lampState.getBlue();
+		result[6] = lampState.getWhite();
+		result[7] = lampState.getAlarm().getCode();
 		
 		return result;
-	}
-	
-	public String getIdentifier() {
-		byte[] data = this.getOperation().getData();
-		return new String(Arrays.copyOfRange(data, 0, data.length-8));
 	}
 	
 	public String getSeparatedParameters() {
 		byte[] data = this.getOperation().getData();
 		
 		StringBuilder resultBuilder = new StringBuilder();
-		for (int i=data.length-8;i<data.length;i++)
-			resultBuilder.append(";").append(Integer.toHexString(data[i]));
+		for (byte b: data)
+			resultBuilder.append(";").append(Integer.toHexString(b));
 			
 		return resultBuilder.toString();
 	}	

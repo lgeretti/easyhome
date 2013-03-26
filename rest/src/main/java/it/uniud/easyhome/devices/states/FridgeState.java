@@ -17,8 +17,6 @@ public class FridgeState implements DeviceState {
     private PersistentInfo device;
     @Column
     private FridgeCode lastCode;
-    @Column
-    private String identifier;
 
     @SuppressWarnings("unused")
 	private FridgeState() {}
@@ -36,10 +34,6 @@ public class FridgeState implements DeviceState {
 		return this.lastCode;
 	}
 	
-	public String getIdentifier() {
-		return this.identifier;
-	}
-	
     @Override
     public boolean equals(Object other) {
         
@@ -54,11 +48,6 @@ public class FridgeState implements DeviceState {
     
     public FridgeState setLastCode(FridgeCode val) {
     	this.lastCode = val;
-    	return this;
-    }
-    
-    public FridgeState setIdentifier(String identifier) {
-    	this.identifier = identifier;
     	return this;
     }
     

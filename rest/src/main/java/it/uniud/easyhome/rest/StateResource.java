@@ -132,7 +132,6 @@ public final class StateResource {
     @POST
     @Path("sensors/presence/{id}")
     public Response updatePresenceSensor(@PathParam("id") long id,
-    									@FormParam("identifier") String identifier,
     									@FormParam("occupied") boolean occupied) {
     		
     	PresenceSensorState thisPresenceSensor = resEjb.findStateByInfoId(id,PresenceSensorState.class);
@@ -140,7 +139,7 @@ public final class StateResource {
     	if (thisPresenceSensor == null)
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
     	
-    	thisPresenceSensor.setIdentifier(identifier).setOccupied(occupied);
+    	thisPresenceSensor.setOccupied(occupied);
     	
     	resEjb.updateManagedState(thisPresenceSensor);
     	
@@ -150,8 +149,7 @@ public final class StateResource {
     @POST
     @Path("sensors/presence")
     public Response updatePresenceSensorFromGateway(@FormParam("gatewayId") byte gatewayId,
-    											   @FormParam("nuid") long nuid,
-				    								@FormParam("identifier") String identifier,
+    											    @FormParam("nuid") long nuid,
 				    								@FormParam("occupied") boolean occupied) {
     		
     	PersistentInfo info = resEjb.findPersistentInfoByGatewayIdAndNuid(gatewayId, nuid);
@@ -163,8 +161,7 @@ public final class StateResource {
     	if (thisPresenceSensor == null)
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
     	
-    	thisPresenceSensor.setIdentifier(identifier)
-    					  .setOccupied(occupied);
+    	thisPresenceSensor.setOccupied(occupied);
     	
     	resEjb.updateManagedState(thisPresenceSensor);
     	
@@ -174,7 +171,6 @@ public final class StateResource {
     @POST
     @Path("fridges/{id}")
     public Response updateFridge(@PathParam("id") long id,
-    							 @FormParam("identifier") String identifier,
     							 @FormParam("lastCode") FridgeCode lastCode) {
     		
     	FridgeState thisFridgeState = resEjb.findStateByInfoId(id,FridgeState.class);
@@ -182,7 +178,7 @@ public final class StateResource {
     	if (thisFridgeState == null)
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
     	
-    	thisFridgeState.setIdentifier(identifier).setLastCode(lastCode);
+    	thisFridgeState.setLastCode(lastCode);
     	
     	resEjb.updateManagedState(thisFridgeState);
     	
@@ -192,9 +188,8 @@ public final class StateResource {
     @POST
     @Path("fridges")
     public Response updateFridgeFromGateway(@FormParam("gatewayId") byte gatewayId,
-			   							   @FormParam("nuid") long nuid,
-			   							   @FormParam("identifier") String identifier,
-			   							   @FormParam("lastCode") FridgeCode lastCode) {
+			   							    @FormParam("nuid") long nuid,
+			   							    @FormParam("lastCode") FridgeCode lastCode) {
     		
     	PersistentInfo info = resEjb.findPersistentInfoByGatewayIdAndNuid(gatewayId, nuid);
     	if (info == null)
@@ -205,7 +200,7 @@ public final class StateResource {
     	if (thisFridgeState == null)
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
     	
-    	thisFridgeState.setIdentifier(identifier).setLastCode(lastCode);
+    	thisFridgeState.setLastCode(lastCode);
     	
     	resEjb.updateManagedState(thisFridgeState);
     	
@@ -217,7 +212,6 @@ public final class StateResource {
     @Path("lamps/{id}")
     public Response updateLampState(@PathParam("id") long id,
     								@FormParam("online") boolean online,
-    								@FormParam("identifier") String identifier,
     								@FormParam("red") byte red,
     								@FormParam("green") byte green,
     								@FormParam("blue") byte blue,
@@ -230,7 +224,6 @@ public final class StateResource {
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
     	
     	thisLamp.setOnline(online)
-    			.setIdentifier(identifier)
     			.setRed(red)
     			.setGreen(green)
     			.setBlue(blue)
@@ -249,7 +242,6 @@ public final class StateResource {
     public Response updateLampStateFromGateway(@FormParam("gatewayId") byte gatewayId,
 			   								  @FormParam("nuid") long nuid,
     										  @FormParam("online") boolean online,
-    										  @FormParam("identifier") String identifier,
     										  @FormParam("red") byte red,
     										  @FormParam("green") byte green,
     										  @FormParam("blue") byte blue,
@@ -266,7 +258,6 @@ public final class StateResource {
     		throw new WebApplicationException(Response.Status.NOT_FOUND);
     	
     	thisLamp.setOnline(online)
-    			.setIdentifier(identifier)
     			.setRed(red)
     			.setGreen(green)
     			.setBlue(blue)
