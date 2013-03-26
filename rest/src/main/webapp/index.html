@@ -76,11 +76,18 @@ var optionsCoverDescriptionText = false;
 
 function restartInactivityCounter() {
 	
+	var showInactivity = false;
+	
 	isInterfaceInactive = false;
-	$("#activity").html("A");
+	if (showInactivity)
+		$("#activity").html("A");
 	
 	clearTimeout(activityTimeout);
-	activityTimeout = setTimeout(function() {isInterfaceInactive = true; $("#activity").html("I"); }, timeBeforeInactive);
+	activityTimeout = setTimeout(function() {
+		isInterfaceInactive = true;
+		if (showInactivity)
+			$("#activity").html("I"); 
+		}, timeBeforeInactive);
 }
 
 function arrowHoverEffectIn(button) {
@@ -705,6 +712,20 @@ function updateLuminosityValue() {
 	}
 }
 
+function setNotchHoverBehavior() {
+    $(".eh_notch").hover(
+            function() {
+                restartInactivityCounter();
+                notchButtonHoverEffectIn($(this));
+            }
+            ,
+            function() {
+                restartInactivityCounter();
+                notchButtonHoverEffectOut($(this));
+            }
+    );
+}
+
 function putLuminosityControls() {
 	
     var htmlText = "<div id='0' class='eh_notch grey_notch_button white_notch ui-widget-content ui-corner-all'><img height='150px' width='100px' src='img/0.svg' /></div>";
@@ -731,7 +752,8 @@ function putLuminosityControls() {
       .css('left','65px').css('top','450px')
       .html(htmlText)
       .show();
-	
+    
+    setNotchHoverBehavior();
 }
 
 function putColorControls() {
@@ -771,6 +793,7 @@ function putColorControls() {
       .html(htmlText)
       .show();	
 	
+    setNotchHoverBehavior();
 }
 
 function showFunctionality(functionality) {
@@ -796,7 +819,7 @@ function showFunctionality(functionality) {
     	
     	putLuminosityControls();
     	
-    	//updateLuminosityValue();
+    	updateLuminosityValue();
     	
     	break;
     	
@@ -857,19 +880,6 @@ function showFunctionality(functionality) {
         showSelections(functionalityOptions);    	
     	break;
     }
-    
-    $(".eh_notch").hover(
-    	    function() {
-    	    	restartInactivityCounter();
-    	        notchButtonHoverEffectIn($(this));
-    	    }
-    	    ,
-    	    function() {
-    	    	restartInactivityCounter();
-    	        notchButtonHoverEffectOut($(this));
-    	    }
-    );
-    
 }
 
 $(document).ready(function(){
