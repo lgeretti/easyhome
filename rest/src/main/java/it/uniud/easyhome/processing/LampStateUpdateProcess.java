@@ -53,12 +53,13 @@ public class LampStateUpdateProcess extends Process {
 	            ObjectMessage changeMessage = jmsSession.createObjectMessage(packet);
 	            getOutboundPacketsProducer().send(changeMessage); 
 	            
-	            log(LogLevel.FINE,"Update sent to lamp with address 0x"+Long.toHexString(node.getCoordinates().getNuid()));
+	            log(LogLevel.FINE,"State update sent to lamp with address 0x"+Long.toHexString(node.getCoordinates().getNuid()));
 	    	}
 	    	Thread.sleep(REQUEST_PERIOD_MS/nodes.size());
 	    	
         } catch (ArithmeticException e) {
         	try {
+        		log(LogLevel.DEBUG,"No lamps to send state updates to");
         		Thread.sleep(REQUEST_PERIOD_MS);
         	} catch (InterruptedException ex) { }
         } catch (Exception e) {

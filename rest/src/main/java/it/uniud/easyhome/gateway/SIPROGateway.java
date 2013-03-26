@@ -25,6 +25,7 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import javax.jms.Connection;
@@ -60,9 +61,11 @@ public class SIPROGateway extends Gateway {
 	
 	private static final int DISCOVERY_PERIOD_MS = 5000; 
 	
-	private static final boolean MOCKED_GATEWAY = false;
+	private static final boolean MOCKED_GATEWAY = true;
 	
 	private static Client client = Client.create();
+	
+	private Random rnd;
 	
 	private volatile Set<Long> sensorsRegistered = new HashSet<Long>();
 	private volatile Set<Long> actuatorsRegistered = new HashSet<Long>();
@@ -79,6 +82,8 @@ public class SIPROGateway extends Gateway {
     	sensors.add(Long.parseLong("424752",16));
     	sensors.add(Long.parseLong("524742",16));
     	sensors.add(Long.parseLong("101010",16));
+    	
+    	rnd = new Random();
     }
     
     @Override
@@ -191,20 +196,22 @@ public class SIPROGateway extends Gateway {
     	int lampToChoose = -1;
     	switch (actuatorsRegistered.size()) {
     	case 0:
-    		lampToChoose = (int)(System.currentTimeMillis() & 0x1);    		
+    		lampToChoose = rnd.nextInt(2);    		
     		break;
     	case 1:
     		lampToChoose = (actuatorsRegistered.contains(actuators.get(0)) ? 1 : 0);
     		break;
     	default:
     	}
-    	if (lampToChoose > 0) {
+    	if (lampToChoose >= 0) {
     		long nuid = actuators.get(lampToChoose);
-    		log(LogLevel.DEBUG, "Trying to awake lamp with id 0x"+Long.toHexString(nuid));
+    		log(LogLevel.ULTRAFINE, "Still " + (actuators.size()-actuatorsRegistered.size()) + " actuators missing : trying to awake lamp with id 0x"+Long.toHexString(nuid));
+    		String awakeString = getAwakeString(nuid);
+    		log(LogLevel.DEBUG,"Request: ?method=setValueParam&params="+awakeString);
 			if (!MOCKED_GATEWAY) {		
 		        MultivaluedMap<String,String> queryParams = new MultivaluedMapImpl();
 		        queryParams.add("method","setValueParam");
-		        queryParams.add("params",getAwakeString(nuid));
+		        queryParams.add("params",awakeString);
 				client.resource(SIPRO_TARGET).queryParams(queryParams).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 			}
     	}
@@ -217,9 +224,9 @@ public class SIPROGateway extends Gateway {
     	String hexNuid = Long.toHexString(nuid);
     	
     	strb.append("output;changeColor;")
-    		.append(hexNuid.substring(0, 1)).append(";")
-    		.append(hexNuid.substring(2, 3)).append(";")
-    		.append(hexNuid.substring(4, 5)).append(";")
+    		.append(hexNuid.substring(0, 2)).append(";")
+    		.append(hexNuid.substring(2, 4)).append(";")
+    		.append(hexNuid.substring(4, 6)).append(";")
     		.append("00;00;00;00;00");
     	
     	return strb.toString();

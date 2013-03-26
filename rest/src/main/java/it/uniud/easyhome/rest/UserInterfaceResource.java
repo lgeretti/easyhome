@@ -184,7 +184,7 @@ public class UserInterfaceResource {
 		insertProcess(ProcessKind.NETWORK_GRAPH_MINIMIZATION);
 		insertProcess(ProcessKind.NETWORK_UPDATE);
 		
-		insertProcess(ProcessKind.LAMP_STATE_UPDATE,LogLevel.DEBUG);
+		insertProcess(ProcessKind.LAMP_STATE_UPDATE, LogLevel.INFO);
 		
 		insertProcess(ProcessKind.OCCUPANCY_REQUEST);//, LogLevel.DEBUG);
 		insertProcess(ProcessKind.OCCUPANCY_REGISTRATION);

@@ -111,8 +111,6 @@ public class SIPROGatewayTest {
 	    } catch (Exception e) {
 	    	e.printStackTrace();
 	    }	
-    	
-    	
     }
     
     private void handleActuators(Node node) {
