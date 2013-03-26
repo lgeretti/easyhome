@@ -23,7 +23,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class OccupancySensingRequestProcess extends Process {
 	
-	public static long REQUEST_PERIOD_MS = 10000;
+	public static long REQUEST_PERIOD_MS = 5000;
 	
 	private byte sequenceNumber = 0;
 	

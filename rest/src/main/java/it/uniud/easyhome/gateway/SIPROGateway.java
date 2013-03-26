@@ -56,7 +56,7 @@ public class SIPROGateway extends Gateway {
 	private static final String SIPRO_TARGET = "http://localhost:5000/";
 	private static final String INTERNAL_TARGET = "http://localhost:8080/easyhome/rest/";
 	
-	private static final int DISCOVERY_PERIOD_MS = 8000; 
+	private static final int DISCOVERY_PERIOD_MS = 10000; 
 	
 	private static final boolean MOCKED_GATEWAY = true;
 	
@@ -122,8 +122,10 @@ public class SIPROGateway extends Gateway {
                 
                 while (state != RunnableState.STOPPING) {
                 	
-                	if (canTryToDiscoverNewDevices())
-                		lookForNewDevices();
+                	if (canTryToDiscoverNewDevices()) {
+                		tryToAwakeActuator();
+                		registerNewDevices();
+                	}
                     handleOutboundPacketsTo(null,outboundConsumer,jmsSession,inboundProducer);
                 }
                 
@@ -174,12 +176,17 @@ public class SIPROGateway extends Gateway {
     private boolean canTryToDiscoverNewDevices() {
     	
     	if (actuatorsRegistered.size() < actuators.size() || sensorsRegistered.size() < sensors.size()) {
-    		if (System.currentTimeMillis() > lastDiscoveryTimeMillis + DISCOVERY_PERIOD_MS)
+    		if (System.currentTimeMillis() > lastDiscoveryTimeMillis + DISCOVERY_PERIOD_MS) {
+    			lastDiscoveryTimeMillis = System.currentTimeMillis();
     			return true;
-    		else
+    		} else
     			return false;
     	} else
     		return false;
+    }
+    
+    private void tryToAwakeActuator() {
+    	
     }
     
     private void sendCorrespondingSensorData(long destinationNuid, Session jmsSession, MessageProducer producer) {
@@ -218,7 +225,7 @@ public class SIPROGateway extends Gateway {
 	    }	   
     }
     
-    private void lookForNewDevices() {
+    private void registerNewDevices() {
     	
 	    try {
 	    	
