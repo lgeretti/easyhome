@@ -62,7 +62,7 @@ public class LampStateUpdateProcess extends Process {
 	    		} else
 	    			log(LogLevel.DEBUG,"Latest update too close: will wait more time");
 	    	}
-	    	Thread.sleep(updateTimeout/4/nodes.size());
+	    	Thread.sleep(updateTimeout/nodes.size());
 	    	
         } catch (ArithmeticException e) {
         	try {

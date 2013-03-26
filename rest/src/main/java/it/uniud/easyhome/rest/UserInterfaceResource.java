@@ -186,12 +186,12 @@ public class UserInterfaceResource {
 		
 		insertProcess(ProcessKind.LAMP_STATE_UPDATE, LogLevel.DEBUG);
 		
-		insertProcess(ProcessKind.OCCUPANCY_REQUEST, LogLevel.DEBUG);
+		//insertProcess(ProcessKind.OCCUPANCY_REQUEST, LogLevel.DEBUG);
 		insertProcess(ProcessKind.OCCUPANCY_REGISTRATION, LogLevel.DEBUG);
 		
 		insertProcess(ProcessKind.LIGHT_LEVEL_CONTROL);//,LogLevel.DEBUG);
 		
-		insertProcess(ProcessKind.ALARM_STATE_REQUEST);//,LogLevel.DEBUG);
+		//insertProcess(ProcessKind.ALARM_STATE_REQUEST);//,LogLevel.DEBUG);
 		insertProcess(ProcessKind.ALARM_STATE_ACKNOWLEDGMENT);//,LogLevel.DEBUG);
 		
 		
