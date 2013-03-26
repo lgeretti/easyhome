@@ -475,6 +475,10 @@ public class SIPROGateway extends Gateway {
     
     private void handleSensorReplyForFridge(Element elem, Session jmsSession, MessageProducer producer) {
     	long nuid = Long.parseLong(getTxtFor(elem,"value-3") + getTxtFor(elem,"value-2") + getTxtFor(elem,"value-1"),16);
+		if (!sensorsRegistered.contains(nuid)) { 
+			sensorsRegistered.add(nuid);
+			registerFridge(elem);
+		}
 		handleSensorReplyForFridge(elem, nuid, jmsSession, producer);
     }
     
@@ -517,6 +521,10 @@ public class SIPROGateway extends Gateway {
     
     private void handleSensorReplyForPIR(Element elem, Session jmsSession, MessageProducer producer) {
     	long nuid = Long.parseLong(getTxtFor(elem,"value-3") + getTxtFor(elem,"value-2") + getTxtFor(elem,"value-1"),16);
+		if (!sensorsRegistered.contains(nuid)) { 
+			sensorsRegistered.add(nuid);
+			registerPIR(elem);
+		}
 		handleSensorReplyForPIR(elem, nuid, jmsSession, producer);
     }
     
