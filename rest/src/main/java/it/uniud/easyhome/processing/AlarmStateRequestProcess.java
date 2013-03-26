@@ -23,8 +23,6 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class AlarmStateRequestProcess extends Process {
 	
-	public static long REQUEST_PERIOD_MS = 5000;
-	
 	private byte sequenceNumber = 0;
 	
     public AlarmStateRequestProcess(int pid, UriInfo uriInfo,ProcessKind kind, LogLevel logLevel) throws NamingException, JMSException {
@@ -38,6 +36,8 @@ public class AlarmStateRequestProcess extends Process {
 	    	ClientResponse getResponse = restResource.path(RestPaths.NODES).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        	        
 	    	List<Node> nodes = JsonUtils.getListFrom(getResponse, Node.class);
+	    	
+	    	long updateTimeout = Long.parseLong(restResource.path(RestPaths.STATES).path("timeouts").path("read").path("fridgecode").accept(MediaType.TEXT_PLAIN).get(String.class));
 	    	
     		MultivaluedMap<String,String> params = new MultivaluedMapImpl();
             params.add("funcType",FunctionalityType.ALARM_ISSUING.toString());
@@ -53,7 +53,7 @@ public class AlarmStateRequestProcess extends Process {
 			    	log(LogLevel.FINE, "Alarm state request for " + node + " dispatched");
 	    		}
 	    	}
-			Thread.sleep(REQUEST_PERIOD_MS/functionalities.size());
+			Thread.sleep(updateTimeout/functionalities.size());
 	    	
         } catch (Exception e) {
         	e.printStackTrace();

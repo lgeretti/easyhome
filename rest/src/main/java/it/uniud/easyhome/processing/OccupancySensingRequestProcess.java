@@ -23,7 +23,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class OccupancySensingRequestProcess extends Process {
 	
-	public static long REQUEST_PERIOD_MS = 5000;
+	public static long REQUEST_PERIOD_MS = 10000;
 	
 	private byte sequenceNumber = 0;
 	
@@ -33,11 +33,13 @@ public class OccupancySensingRequestProcess extends Process {
     
     @Override
 	protected void process() throws JMSException, NamingException {
-
+    	
     	try {
 	    	ClientResponse getResponse = restResource.path(RestPaths.NODES).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        	        
 	    	List<Node> nodes = JsonUtils.getListFrom(getResponse, Node.class);
+	    	
+	    	long updateTimeout = Long.parseLong(restResource.path(RestPaths.STATES).path("timeouts").path("read").path("occupation").accept(MediaType.TEXT_PLAIN).get(String.class));
 	    	
     		MultivaluedMap<String,String> params = new MultivaluedMapImpl();
             params.add("funcType",FunctionalityType.OCCUPATION_SENSING.toString());
@@ -53,7 +55,7 @@ public class OccupancySensingRequestProcess extends Process {
 			    	log(LogLevel.FINE, "Occupancy attribute request for " + node + " dispatched");
 	    		}
 	    	}
-			Thread.sleep(REQUEST_PERIOD_MS/functionalities.size());
+			Thread.sleep(updateTimeout/functionalities.size());
 	    	
         } catch (Exception e) {
         	e.printStackTrace();

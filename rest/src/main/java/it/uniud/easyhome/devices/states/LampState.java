@@ -29,6 +29,8 @@ public class LampState implements DeviceState {
     private ColoredAlarm alarm;
     @Column
     private long lastWhiteUpdate;
+    @Column
+    private long lastUpdate;
 
     
     @SuppressWarnings("unused")
@@ -72,39 +74,44 @@ public class LampState implements DeviceState {
 		return this.lastWhiteUpdate;
 	}
 	
+	public long getLastUpdate() {
+		return this.lastUpdate;
+	}
+	
     public LampState setOnline(boolean val) {
     	this.online = val;
+    	this.lastUpdate = System.currentTimeMillis();
     	return this;
     }
 	
 	public LampState setRed(byte val) {
 		red = val;
+		this.lastUpdate = System.currentTimeMillis();
 		return this;
 	}
 	
 	public LampState setGreen(byte val) {
 		green = val;
+		this.lastUpdate = System.currentTimeMillis();
 		return this;
 	}
 	
 	public LampState setBlue(byte val) {
 		blue = val;
+		this.lastUpdate = System.currentTimeMillis();
 		return this;
 	}
 	
 	public LampState setWhite(byte val) {
 		white = val;
-		update();
+		this.lastWhiteUpdate = System.currentTimeMillis();
+		this.lastUpdate = this.lastWhiteUpdate;
 		return this;
 	}	
 	
 	public LampState setAlarm(ColoredAlarm val) {
 		alarm = val;
 		return this;
-	}
-	
-	private void update() {
-		this.lastWhiteUpdate = System.currentTimeMillis();
 	}
 	
     @Override

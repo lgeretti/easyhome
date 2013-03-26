@@ -26,8 +26,6 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class LampStateUpdateProcess extends Process {
 	
-	public static long REQUEST_PERIOD_MS = 1000;
-	
     public LampStateUpdateProcess(int pid, UriInfo uriInfo,ProcessKind kind, LogLevel logLevel) throws NamingException, JMSException {
         super(pid, UriBuilder.fromUri(uriInfo.getBaseUri()).build(new Object[0]),kind,logLevel);
     }
@@ -35,12 +33,16 @@ public class LampStateUpdateProcess extends Process {
     @Override
 	protected void process() throws JMSException, NamingException {
 
+    	long updateTimeout = 0;
+    	
     	try {
     		MultivaluedMap<String,String> params = new MultivaluedMapImpl();
             params.add("deviceType",DeviceType.COLORED_LAMP.toString());
 	    	ClientResponse getResponse = restResource.path(RestPaths.NODES).queryParams(params).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        	        
 	    	List<Node> nodes = JsonUtils.getListFrom(getResponse, Node.class);
+	    	
+	    	updateTimeout = Long.parseLong(restResource.path(RestPaths.STATES).path("timeouts").path("write").path("lamp").accept(MediaType.TEXT_PLAIN).get(String.class));
     		
 	    	for (Node node : nodes) {
 
@@ -48,19 +50,23 @@ public class LampStateUpdateProcess extends Process {
 	    		ClientResponse lampStateResponse = restResource.path(RestPaths.STATES).path("lamps").path(Long.toString(node.getInfo().getId())).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	    		LampState lampState = JsonUtils.getFrom(lampStateResponse, LampState.class);
 	    		
-				LampStateSetPacket packet = new LampStateSetPacket(lampState,node.getCoordinates());
-		        
-	            ObjectMessage changeMessage = jmsSession.createObjectMessage(packet);
-	            getOutboundPacketsProducer().send(changeMessage); 
-	            
-	            log(LogLevel.FINE,"State update sent to lamp with address 0x"+Long.toHexString(node.getCoordinates().getNuid()));
+	    		if (lampState.getLastUpdate() + updateTimeout < System.currentTimeMillis()) {
+	    		
+					LampStateSetPacket packet = new LampStateSetPacket(lampState,node.getCoordinates());
+			        
+		            ObjectMessage changeMessage = jmsSession.createObjectMessage(packet);
+		            getOutboundPacketsProducer().send(changeMessage); 
+		            
+		            log(LogLevel.FINE,"State update sent to lamp with address 0x"+Long.toHexString(node.getCoordinates().getNuid()));
+	    		} else
+	    			log(LogLevel.DEBUG,"Latest update too close: will wait more time");
 	    	}
-	    	Thread.sleep(REQUEST_PERIOD_MS/nodes.size());
+	    	Thread.sleep(updateTimeout/4/nodes.size());
 	    	
         } catch (ArithmeticException e) {
         	try {
         		log(LogLevel.DEBUG,"No lamps to send state updates to");
-        		Thread.sleep(REQUEST_PERIOD_MS);
+        		Thread.sleep(1000);
         	} catch (InterruptedException ex) { }
         } catch (Exception e) {
         	e.printStackTrace();
