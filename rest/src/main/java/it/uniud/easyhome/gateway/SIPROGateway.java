@@ -156,11 +156,12 @@ public class SIPROGateway extends Gateway {
 			log(LogLevel.FINE,"Request to set lamp state values");
 			log(LogLevel.ULTRAFINE,"Request: ?method=setValueParam&params="+paramsString);
 			
-	        MultivaluedMap<String,String> queryParams = new MultivaluedMapImpl();
-	        queryParams.add("method","setValueParam");
-	        queryParams.add("params",paramsString);
-			
-			client.resource(SIPRO_TARGET).queryParams(queryParams).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+			if (!MOCKED_GATEWAY) {		
+		        MultivaluedMap<String,String> queryParams = new MultivaluedMapImpl();
+		        queryParams.add("method","setValueParam");
+		        queryParams.add("params",paramsString);
+				client.resource(SIPRO_TARGET).queryParams(queryParams).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+			}
 			
 		} else if (OccupancyAttributeReqPacket.validates(pkt) || AlarmStateReqPacket.validates(pkt)) {
 			
