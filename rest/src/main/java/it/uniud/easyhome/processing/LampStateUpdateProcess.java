@@ -55,8 +55,12 @@ public class LampStateUpdateProcess extends Process {
 	            
 	            log(LogLevel.FINE,"Update sent to lamp with address 0x"+Long.toHexString(node.getCoordinates().getNuid()));
 	    	}
-			Thread.sleep(Math.min(REQUEST_PERIOD_MS, REQUEST_PERIOD_MS/nodes.size()));
+	    	Thread.sleep(REQUEST_PERIOD_MS/nodes.size());
 	    	
+        } catch (ArithmeticException e) {
+        	try {
+        		Thread.sleep(REQUEST_PERIOD_MS);
+        	} catch (InterruptedException ex) { }
         } catch (Exception e) {
         	e.printStackTrace();
         }
