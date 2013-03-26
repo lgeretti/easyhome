@@ -5,19 +5,19 @@
 <title>Interfaccia utente EasyHome</title>
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.1/themes/vader/jquery-ui.css" />
 <style>
-   .eh_button { padding: 0.8em; margin: 1em; background: #444444; }
-   .eh_notch { padding: 0.4em; margin: 0.4em; background: #444444; }
-   .selection_button { height: 250px; width: 250px; color: #36609f; }
-   #eh_help_button { height: 125px; width: 125px; color: #eb7914; }
-   .arrow_button { height: 100px; width: 100px; color: #61c165; }
-   .grey_notch_button { height: 150px; width: 100px; color: #444444; float: left}
-   .colored_notch_button { height: 150px; width: 100px; color: #36609f; float: left}
-   .navigation_button { height: 125px; width: 125px; color: #61c165; }
+   .eh_button { padding: 0.8em; margin: 1em; background: #333333; }
+   .eh_notch { padding: 0.4em; margin: 0.4em; background: #333333; }
+   .selection_button { height: 250px; width: 250px; color: #2a4a7a; }
+   #eh_help_button { height: 125px; width: 125px; color: #995111; }
+   .arrow_button { height: 100px; width: 100px; color: #448447; }
+   .grey_notch_button { height: 150px; width: 100px; color: #333333; float: left}
+   .colored_notch_button { height: 150px; width: 100px; color: #2a4a7a; float: left}
+   .navigation_button { height: 125px; width: 125px; color: #448447; }
    .yellow { color: #e0c73d; }
-   .green { color: #61c165; }
-   .blue { color: #36609f; }
+   .green { color: #448447; }
+   .blue { color: #2a4a7a; }
    .red { color: #e75c5c; }
-   .orange { color: #eb7914; }
+   .orange { color: #995111; }
    #eh_selection_buttons_container { position: absolute; left: 15px; bottom: 15px; }
    #eh_selection_buttons_container div { float: left; }
 
@@ -30,7 +30,7 @@
 
    .eh_arrow_button_positioner { position: relative; top: 75px; }
    
-   div.text { font-family:"Verdana"; font-size: 40pt; text-transform: uppercase; text-align: center; font-weight: bold; padding: 0.3em; color: #cccccc; } 
+   div.text { font-family:"Verdana"; font-size: 40pt; text-transform: uppercase; text-align: center; font-weight: bold; padding: 0.3em; color: #777777; } 
    #eh_description_float {position: absolute; left: 80px; top: 270px; }
    #eh_description_div { border-width: 1px; width: 1070px; border-style: solid; border-color: #666666; }
    
@@ -44,10 +44,10 @@
 
 var roomsLoaded = false;
 
-var grey = "#444444";
-var blue = "#36609f";
+var grey = "#333333";
+var blue = "#2a4a7a";
 
-var host = "http://localhost:8080/easyhome/";
+var host = "";//"http://localhost:8080/easyhome/";
 
 var hoverTimeout;
 var hoverEffectTime = 1000;
