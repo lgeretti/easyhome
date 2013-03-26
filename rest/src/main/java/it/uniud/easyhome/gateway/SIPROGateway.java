@@ -61,7 +61,7 @@ public class SIPROGateway extends Gateway {
 	
 	private static final int DISCOVERY_PERIOD_MS = 15000; 
 	
-	private static final boolean MOCKED_GATEWAY = true;
+	private static final boolean MOCKED_GATEWAY = false;
 	
 	private static Client client = Client.create();
 	
