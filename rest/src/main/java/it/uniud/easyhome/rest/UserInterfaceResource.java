@@ -189,7 +189,7 @@ public class UserInterfaceResource {
 		insertProcess(ProcessKind.OCCUPANCY_REQUEST, LogLevel.DEBUG);
 		insertProcess(ProcessKind.OCCUPANCY_REGISTRATION, LogLevel.DEBUG);
 		
-		insertProcess(ProcessKind.LIGHT_LEVEL_CONTROL);//,LogLevel.DEBUG);
+		insertProcess(ProcessKind.LIGHT_LEVEL_CONTROL,LogLevel.DEBUG);
 		
 		insertProcess(ProcessKind.ALARM_STATE_REQUEST);//,LogLevel.DEBUG);
 		insertProcess(ProcessKind.ALARM_STATE_ACKNOWLEDGMENT);//,LogLevel.DEBUG);
@@ -264,8 +264,8 @@ public class UserInterfaceResource {
 	        formData.add("deviceType", DeviceType.COLORED_LAMP.toString());
 	        formData.add("imgPath","img/colorlight.svg");
 	        formData.add("help", "E' possibile cambiare luce o colore della lampada");
-	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(0x424752L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(0x424752L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(0x524742L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(0x524742L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        long lampadaSalottoInfoId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
 	        
 	        // Lampada camera doppia
@@ -276,8 +276,8 @@ public class UserInterfaceResource {
 	        formData.add("deviceType", DeviceType.COLORED_LAMP.toString());
 	        formData.add("imgPath","img/colorlight.svg");
 	        formData.add("help", "E' possibile cambiare luce o colore della lampada");
-	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(0x524742L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(0x524742L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(0x424752L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(0x424752L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        long lampadaCameraDoppiaInfoId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
 	        
 	        // Frigo
@@ -304,7 +304,7 @@ public class UserInterfaceResource {
 	    	
 	        formData = new MultivaluedMapImpl();
 	        formData.add("name","Interfaccia gestuale");
-	        formData.add("locationName",locs.get(2));
+	        formData.add("locationName",locs.get(0));
 	        formData.add("deviceType", DeviceType.HAND_CONTROLLER.toString());
 	        formData.add("imgPath","img/hand.svg");
 	        formData.add("help", "E' possibile cambiare la lampada associata all'interfaccia e spostare il dispositivo in un'altra stanza");

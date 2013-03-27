@@ -26,7 +26,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class LightLevelControlProcess extends Process {
 
-	private static int LOCK_TIME_BETWEEN_UPDATES_IN_SECONDS = 3;
+	private static int LOCK_TIME_BETWEEN_UPDATES_IN_SECONDS = 10;
 	
     public LightLevelControlProcess(int pid, UriInfo uriInfo,ProcessKind kind, LogLevel logLevel) throws NamingException, JMSException {
         super(pid, UriBuilder.fromUri(uriInfo.getBaseUri()).build(new Object[0]),kind,logLevel);
@@ -73,7 +73,7 @@ public class LightLevelControlProcess extends Process {
 																.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 				        		LampState state = JsonUtils.getFrom(getLampStateResponse, LampState.class);
 				        		
-				        		if (state.isOnline()) {
+				        		//if (state.isOnline()) {
 				        			
 					        		Date lastStateUpdatePlusLockTime = new Date(state.getLastWhiteUpdate()+1000*LOCK_TIME_BETWEEN_UPDATES_IN_SECONDS);
 					        		Date currentDate = new Date(System.currentTimeMillis());
@@ -84,6 +84,10 @@ public class LightLevelControlProcess extends Process {
 						        		int newVal = Math.max(0, Math.min(100, previousVal +levelPercentage));
 									
 						        		if (previousVal != newVal) {
+										if (previousVal != 0)
+											newVal = 0;
+										else
+											newVal = 50;
 							        		log(LogLevel.INFO, "Level modified from " + previousVal + " to " + newVal);
 							        		
 							        		
@@ -98,8 +102,8 @@ public class LightLevelControlProcess extends Process {
 					        		} else
 					        			log(LogLevel.FINE, "Lamp state updated too recently: discarding the event");				        			
 				        			
-				        		} else 
-				        			log(LogLevel.FINE, "Lamp is offline: discarding the event");
+				        		//} else 
+				        		//	log(LogLevel.FINE, "Lamp is offline: discarding the event");
 			                
 			        		} else if (getPairingResponse.getClientResponseStatus() == ClientResponse.Status.NOT_FOUND) 
 			                	log(LogLevel.FINE, "Pairing not present for this controller");
