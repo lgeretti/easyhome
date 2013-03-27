@@ -57,12 +57,14 @@ public class LampStateUpdateProcess extends Process {
 		            ObjectMessage changeMessage = jmsSession.createObjectMessage(packet);
 		            getOutboundPacketsProducer().send(changeMessage); 
 		            
+		            restResource.path(RestPaths.STATES).path("lamps").path(Long.toString(node.getInfo().getId())).path("touch").post();
+		            
 		            log(LogLevel.FINE,"State update sent to lamp with address 0x"+Long.toHexString(node.getCoordinates().getNuid()));
 		            break; // This way we distribute the updates
 	    		} else
 	    			log(LogLevel.DEBUG,"Latest update too close: will wait more time");
 	    	}
-	    	Thread.sleep(updateTimeout/4/nodes.size());
+	    	Thread.sleep(updateTimeout/nodes.size());
 	    	
         } catch (ArithmeticException e) {
         	try {

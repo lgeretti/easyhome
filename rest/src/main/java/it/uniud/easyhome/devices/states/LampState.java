@@ -80,38 +80,42 @@ public class LampState implements DeviceState {
 	
     public LampState setOnline(boolean val) {
     	this.online = val;
-    	this.lastUpdate = System.currentTimeMillis();
+    	touch();
     	return this;
     }
 	
 	public LampState setRed(byte val) {
 		red = val;
-		this.lastUpdate = System.currentTimeMillis();
+		touch();
 		return this;
 	}
 	
 	public LampState setGreen(byte val) {
 		green = val;
-		this.lastUpdate = System.currentTimeMillis();
+		touch();
 		return this;
 	}
 	
 	public LampState setBlue(byte val) {
 		blue = val;
-		this.lastUpdate = System.currentTimeMillis();
+		touch();
 		return this;
 	}
 	
 	public LampState setWhite(byte val) {
 		white = val;
 		this.lastWhiteUpdate = System.currentTimeMillis();
-		this.lastUpdate = this.lastWhiteUpdate;
+		touch();
 		return this;
 	}	
 	
 	public LampState setAlarm(ColoredAlarm val) {
 		alarm = val;
 		return this;
+	}
+	
+	public void touch() {
+		this.lastUpdate = System.currentTimeMillis();
 	}
 	
     @Override
