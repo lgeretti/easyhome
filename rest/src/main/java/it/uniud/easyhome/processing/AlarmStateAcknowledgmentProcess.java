@@ -94,16 +94,40 @@ public class AlarmStateAcknowledgmentProcess extends Process {
 				            		switch (alarmCode) {
 					            		case ALARM1:
 					            			if (presenceState.isOccupied())
-					            				alarmToIssue = ColoredAlarm.RED_BLINK;
+					            				alarmToIssue = ColoredAlarm.RED_FIXED;
 					            			else
 					            				alarmToIssue = ColoredAlarm.NONE;
 					            			break;
 					            		case ALARM2:
 					            			if (presenceState.isOccupied())
+					            				alarmToIssue = ColoredAlarm.RED_BLINK;
+					            			else
+					            				alarmToIssue = ColoredAlarm.NONE;
+					            			break;
+					            		case ALARM3:
+					            			if (presenceState.isOccupied())
+					            				alarmToIssue = ColoredAlarm.BLUE_FIXED;
+					            			else
+					            				alarmToIssue = ColoredAlarm.NONE;
+					            			break;
+					            		case ALARM4:
+					            			if (presenceState.isOccupied())
 					            				alarmToIssue = ColoredAlarm.BLUE_BLINK;
 					            			else
 					            				alarmToIssue = ColoredAlarm.NONE;
 					            			break;
+					            		case ALARM5:
+					            			if (presenceState.isOccupied())
+					            				alarmToIssue = ColoredAlarm.GREEN_FIXED;
+					            			else
+					            				alarmToIssue = ColoredAlarm.NONE;
+					            			break;
+					            		case ALARM6:
+					            			if (presenceState.isOccupied())
+					            				alarmToIssue = ColoredAlarm.GREEN_BLINK;
+					            			else
+					            				alarmToIssue = ColoredAlarm.NONE;
+					            			break;					            			
 					            		default:
 					            			alarmToIssue = ColoredAlarm.NONE;
 				            		}

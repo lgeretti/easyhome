@@ -31,7 +31,7 @@ public class AlarmStateRspPacket extends NativePacket {
 	}
 	
 	public short getAddrOfInterest() {
-		return ByteUtils.getShort(getOperation().getData(), 1, Endianness.LITTLE_ENDIAN); 
+		return ByteUtils.getShort(getOperation().getData(), 1, Endianness.LITTLE_ENDIAN);
 	}
 	
 	public short getAlarmCode() {

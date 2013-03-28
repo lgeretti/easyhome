@@ -58,18 +58,5 @@
 <name>PIR</name>
 </descriptor>
 </input2>
-<input3>
-<value-3>10</value-3>
-<value-2>10</value-2>
-<value-1>10</value-1>
-<value0>2</value0>
-<value1>5</value1>
-<value2>1</value2>
-<descriptor>
-<type>Intelligent Fridge</type>
-<app_area>Communication with Light</app_area>
-<name>Fridge Alarm Light</name>
-</descriptor>
-</input3>
 </data>
 </datamodel>

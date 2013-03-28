@@ -192,7 +192,7 @@ public class UserInterfaceResource {
 		insertProcess(ProcessKind.LIGHT_LEVEL_CONTROL,LogLevel.DEBUG);
 		
 		//insertProcess(ProcessKind.ALARM_STATE_REQUEST);//,LogLevel.DEBUG);
-		insertProcess(ProcessKind.ALARM_STATE_ACKNOWLEDGMENT);//,LogLevel.DEBUG);
+		insertProcess(ProcessKind.ALARM_STATE_ACKNOWLEDGMENT, LogLevel.DEBUG);
 		
 		
 		
@@ -294,7 +294,7 @@ public class UserInterfaceResource {
 	        // ZigBee devices
 	        
 	        formData = new MultivaluedMapImpl();
-	        formData.add("name","Frigo (ZigBee)");
+	        formData.add("name","Frigo");
 	        formData.add("locationName",locs.get(1));
 	        formData.add("imgPath","img/fridge.svg");
 	        formData.add("help", "Nessuna funzione correntemente disponibile");
