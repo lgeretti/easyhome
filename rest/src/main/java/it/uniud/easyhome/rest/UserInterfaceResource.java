@@ -307,8 +307,8 @@ public class UserInterfaceResource {
 	        formData.add("locationName",locs.get(0));
 	        formData.add("imgPath","img/accesspoint.svg");
 	        formData.add("help", "E' possibile spostare il dispositivo in un'altra stanza");
-	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146521827785L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	        response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146521827785L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146521326185L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	        response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146521326185L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        long zigbeeGatewayInfoId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
 	    	
 	        formData = new MultivaluedMapImpl();
@@ -317,8 +317,8 @@ public class UserInterfaceResource {
 	        formData.add("deviceType", DeviceType.HAND_CONTROLLER.toString());
 	        formData.add("imgPath","img/hand.svg");
 	        formData.add("help", "E' possibile cambiare la lampada associata all'interfaccia e spostare il dispositivo in un'altra stanza");
-	        client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928337L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	        response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928337L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	        client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928176L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	        response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928176L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        long gestualInfoId = JsonUtils.getFrom(response, PersistentInfo.class).getId();     
 	    	
 	        formData = new MultivaluedMapImpl();
