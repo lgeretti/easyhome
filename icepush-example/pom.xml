@@ -43,6 +43,11 @@
             <version>${ice.version}</version>
         </dependency>
         <dependency>
+	        <groupId>com.sun.jersey</groupId>
+	        <artifactId>jersey-core</artifactId>
+	        <version>1.14</version>
+        </dependency>
+        <dependency>
             <groupId>org.icepush</groupId>
             <artifactId>icepush</artifactId>
             <version>${icepush.version}</version>

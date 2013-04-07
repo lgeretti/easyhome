@@ -11,11 +11,11 @@
 </h:head>
 <h:body>
     <h:form>
-        <i>Count: </i><h:outputText value="#{pushController.count}"/>
+        <i>Count (via JSF): </i><h:outputText value="#{counterController.count}"/>
         <br/>
-        <h:commandButton value="Increase" action="#{pushController.doIncreaseCounter}"/>
+        <i>Count (via jQuery): </i><h:outputText class="pushedText"/>
+        <p/>
+        <h:commandButton value="Increase" action="#{counterController.doIncreaseCounter}"/>
     </h:form>
-    <hr/>
-    <p class="pushedText">Number of pushes: </p>
 </h:body>
 </html>

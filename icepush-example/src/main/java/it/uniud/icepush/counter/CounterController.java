@@ -9,7 +9,7 @@ import org.icefaces.application.PushRenderer;
 
 @ManagedBean
 @ViewScoped 
-public class PushController {
+public class CounterController {
     
     private static final String PUSH_GROUP = "counter";
 
