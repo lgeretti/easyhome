@@ -1,0 +1,21 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core">
+<h:head>
+    <title>Counter</title>
+    <script type="text/javascript" src="script/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="script/jquery.icepush.js"></script>
+    <script type="text/javascript" src="script/counter-addition.js"></script>
+</h:head>
+<h:body>
+    <h:form>
+        <i>Count: </i><h:outputText value="#{pushController.count}"/>
+        <br/>
+        <h:commandButton value="Increase" action="#{pushController.doIncreaseCounter}"/>
+    </h:form>
+    <hr/>
+    <p class="pushedText">Number of pushes: </p>
+</h:body>
+</html>
