@@ -5,9 +5,9 @@ import javax.ws.rs.*;
 
 public interface CounterResource {
     
-	public static String PATH = "count";
+	public static String PATH = "counter";
 	
 	@GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getCount();
+    @Produces(MediaType.APPLICATION_JSON)
+    public Counter getCounter();
 }

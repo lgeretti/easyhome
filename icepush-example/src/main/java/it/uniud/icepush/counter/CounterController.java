@@ -26,8 +26,8 @@ public class CounterController {
         PushRenderer.render(PUSH_GROUP);
     }
     
-    public int getCount() {
-        return counter.getCount();
+    public Counter getCounter() {
+        return counter;
     }
     
     public void setCounter(Counter counter) {

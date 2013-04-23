@@ -5,9 +5,9 @@ import javax.ws.rs.Path;
 @Path(CounterResource.PATH)
 public final class CounterResourceService implements CounterResource {
     
-    public String getCount() {
+    public Counter getCounter() {
         
-		// Pretty stupid, only used to get the global value
-        return Integer.toString(new Counter().getCount());
+		// Pretty stupid, only used to get the singleton value
+        return new Counter();
     }
 }

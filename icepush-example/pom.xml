@@ -13,6 +13,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <ice.version>3.1.0</ice.version>
+        <jersey.version>1.14</jersey.version>
         <icepush.version>3.0.1</icepush.version>
         <jsf-version>2.0</jsf-version>
         <glassfish-version>3.1.1</glassfish-version>
@@ -45,8 +46,13 @@
         <dependency>
 	        <groupId>com.sun.jersey</groupId>
 	        <artifactId>jersey-core</artifactId>
-	        <version>1.14</version>
+	        <version>${jersey.version}</version>
         </dependency>
+	    <dependency>
+	        <groupId>com.sun.jersey</groupId>
+	        <artifactId>jersey-json</artifactId>
+	        <version>${jersey.version}</version>
+	    </dependency>        
         <dependency>
             <groupId>org.icepush</groupId>
             <artifactId>icepush</artifactId>

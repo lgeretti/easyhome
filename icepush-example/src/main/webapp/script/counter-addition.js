@@ -3,10 +3,10 @@
 	function getCount() {
 	   $.ajax({ 
 	       type: "GET",
-	       dataType: "text",
-	       url: "rest/count",
+	       dataType: "json",
+	       url: "rest/counter",
 	       success: function(data){        
-	          $(".pushedText").html(data);
+	          $(".pushedText").html(data.count);
 	       }
 	   });
 	}
