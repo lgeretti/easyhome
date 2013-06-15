@@ -175,8 +175,8 @@ public class UserInterfaceResource {
 		insertProcess(ProcessKind.ACTIVE_ENDPOINTS_REGISTRATION);
 		insertProcess(ProcessKind.SIMPLE_DESCR_REQUEST);
 		insertProcess(ProcessKind.SIMPLE_DESCR_REGISTRATION);
-		insertProcess(ProcessKind.NODE_DISCOVERY_REQUEST, LogLevel.DEBUG);
-		insertProcess(ProcessKind.NODE_DISCOVERY_REGISTRATION, LogLevel.DEBUG);
+		insertProcess(ProcessKind.NODE_DISCOVERY_REQUEST);
+		insertProcess(ProcessKind.NODE_DISCOVERY_REGISTRATION);
 		insertProcess(ProcessKind.NODE_POWER_LEVEL_REQUEST);
 		insertProcess(ProcessKind.NODE_POWER_LEVEL_REGISTRATION);
 		insertProcess(ProcessKind.NODE_POWER_LEVEL_SET_ISSUE);
@@ -184,7 +184,7 @@ public class UserInterfaceResource {
 		insertProcess(ProcessKind.NETWORK_GRAPH_MINIMIZATION);
 		insertProcess(ProcessKind.NETWORK_UPDATE);
 		
-		insertProcess(ProcessKind.LAMP_STATE_UPDATE, LogLevel.DEBUG);
+		insertProcess(ProcessKind.LAMP_STATE_UPDATE);
 		
 		//insertProcess(ProcessKind.OCCUPANCY_REQUEST, LogLevel.DEBUG);
 		insertProcess(ProcessKind.OCCUPANCY_REGISTRATION, LogLevel.DEBUG);
@@ -279,17 +279,6 @@ public class UserInterfaceResource {
 	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(0x424752L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(0x424752L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        long lampadaCameraDoppiaInfoId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
-	        
-	        // Frigo        
-	        
-	        formData = new MultivaluedMapImpl();
-	        formData.add("name","Frigo (PLC)");
-	        formData.add("locationName",locs.get(1));
-	        formData.add("imgPath","img/fridge.svg");
-	        formData.add("help", "Nessuna funzione correntemente disponibile");
-	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(0x101010L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(0x101010L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-	    	long frigoPLCInfoId = JsonUtils.getFrom(response, PersistentInfo.class).getId();   	
 	        
 	        // ZigBee devices
 	        
@@ -402,14 +391,6 @@ public class UserInterfaceResource {
 	    	client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        formData.putSingle("infoId",Long.toString(lampadaSalottoInfoId));
 	    	client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
-
-	    	formData = new MultivaluedMapImpl();
-	        formData.add("name","Allarme");
-	        formData.add("type",FunctionalityType.ALARM_ISSUING.toString());
-	        formData.add("imgPath","img/bell.svg");
-	        formData.add("help", "Nessuna funzione prevista: è semplicemente possibile rilevare la presenza di allarme");
-	        formData.putSingle("infoId",Long.toString(frigoPLCInfoId));
-	    	client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	    	
 	    	formData = new MultivaluedMapImpl();
 	        formData.add("name","Allarme");
@@ -435,7 +416,7 @@ public class UserInterfaceResource {
 	        formData.putSingle("infoId",Long.toString(timerInfoId));
 	        client.resource(TARGET).path(RestPaths.FUNCTIONALITIES).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	        
-	        addStates(lampadaSalottoInfoId,lampadaCameraDoppiaInfoId,frigoPLCInfoId,frigoZigBeeInfoId);
+	        addStates(lampadaSalottoInfoId,lampadaCameraDoppiaInfoId,frigoZigBeeInfoId);
 
             
     	} catch (JSONException ex) {
@@ -582,11 +563,10 @@ public class UserInterfaceResource {
     	return timerInfoId;
     }
     
-    private void addStates(long lampadaSalottoInfoId, long lampadaCameraInfoId, long frigoPLCInfoId, long frigoZigBeeInfoId) {
+    private void addStates(long lampadaSalottoInfoId, long lampadaCameraInfoId, long frigoZigBeeInfoId) {
 
         client.resource(TARGET).path(RestPaths.STATES).path("lamps").path(Long.toString(lampadaSalottoInfoId)).put(ClientResponse.class);
         client.resource(TARGET).path(RestPaths.STATES).path("lamps").path(Long.toString(lampadaCameraInfoId)).put(ClientResponse.class);
-        client.resource(TARGET).path(RestPaths.STATES).path("fridges").path(Long.toString(frigoPLCInfoId)).put(ClientResponse.class);
         client.resource(TARGET).path(RestPaths.STATES).path("fridges").path(Long.toString(frigoZigBeeInfoId)).put(ClientResponse.class);
         client.resource(TARGET).path(RestPaths.STATES).path("sensors").path("presence").path(Long.toString(lampadaSalottoInfoId)).put(ClientResponse.class);
         client.resource(TARGET).path(RestPaths.STATES).path("sensors").path("presence").path(Long.toString(lampadaCameraInfoId)).put(ClientResponse.class);

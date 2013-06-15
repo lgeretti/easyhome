@@ -10,6 +10,7 @@ import it.uniud.easyhome.devices.DeviceType;
 import it.uniud.easyhome.devices.FunctionalityType;
 import it.uniud.easyhome.devices.states.ColoredAlarm;
 import it.uniud.easyhome.devices.states.FridgeCode;
+import it.uniud.easyhome.devices.states.FridgeState;
 import it.uniud.easyhome.devices.states.LampState;
 import it.uniud.easyhome.devices.states.PresenceSensorState;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
@@ -67,7 +68,21 @@ public class AlarmStateAcknowledgmentProcess extends Process {
 	        			
 	        			FridgeCode alarmCode = FridgeCode.fromCode(alarmPkt.getAlarmCode());
 	        			
-	        			// (NOTE: for simplicity, we assume that only one source of alarms exists)
+	        			// (NOTE: for simplicity, we assume that only one source of alarms (a fridge) exists)
+	        			
+	            		ClientResponse fridgesResponse = restResource.path(RestPaths.STATES).path("fridges").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	            		
+		        		if (fridgesResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
+
+		        			FridgeState fridgeState = JsonUtils.getListFrom(fridgesResponse, FridgeState.class).get(0);
+		        			long fridgeStateId = fridgeState.getDevice().getId();
+		        			MultivaluedMap<String,String> params = new MultivaluedMapImpl();
+		        			params.add("lastCode",alarmCode.toString());
+			                ClientResponse updateCodeResponse = restResource.path(RestPaths.STATES).path("fridges").path(Long.toString(fridgeStateId))
+                						.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,params);
+			                if (updateCodeResponse.getClientResponseStatus() != ClientResponse.Status.OK)
+			                	log(LogLevel.DEBUG, "Error when changing fridge state id " + fridgeStateId + ": " + updateCodeResponse.getClientResponseStatus());
+		        		}
 	        			
 		        		synchronized(nodesLock) {
 		        			
