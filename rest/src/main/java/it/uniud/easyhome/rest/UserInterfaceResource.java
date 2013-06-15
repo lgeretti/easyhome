@@ -282,7 +282,6 @@ public class UserInterfaceResource {
 	        
 	        // ZigBee devices
 	        
-	    	/*
 	        formData = new MultivaluedMapImpl();
 	        formData.add("name","Frigo");
 	        formData.add("locationName",locs.get(1));
@@ -291,7 +290,8 @@ public class UserInterfaceResource {
 	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928327L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928327L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	    	long frigoZigBeeInfoId = JsonUtils.getFrom(response, PersistentInfo.class).getId();	 
-	    	*/
+	    	
+	        /*
 	        formData = new MultivaluedMapImpl();
 	        formData.add("name","Frigo (fake)");
 	        formData.add("locationName",locs.get(1));
@@ -300,7 +300,7 @@ public class UserInterfaceResource {
 	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928337L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928337L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	    	long frigoZigBeeInfoId = JsonUtils.getFrom(response, PersistentInfo.class).getId();	
-	    	
+	    	*/
 	        formData = new MultivaluedMapImpl();
 	        formData.add("name","Gateway ZigBee");
 	        formData.add("locationName",locs.get(0));
