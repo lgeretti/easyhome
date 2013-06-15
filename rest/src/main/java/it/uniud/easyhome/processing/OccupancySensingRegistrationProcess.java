@@ -7,9 +7,15 @@ import it.uniud.easyhome.common.JMSConstants;
 import it.uniud.easyhome.common.JsonUtils;
 import it.uniud.easyhome.common.LogLevel;
 import it.uniud.easyhome.contexts.ManagementContext;
+import it.uniud.easyhome.devices.DeviceType;
 import it.uniud.easyhome.devices.Location;
 import it.uniud.easyhome.devices.Manufacturer;
 import it.uniud.easyhome.devices.PersistentInfo;
+import it.uniud.easyhome.devices.states.ColoredAlarm;
+import it.uniud.easyhome.devices.states.FridgeCode;
+import it.uniud.easyhome.devices.states.FridgeState;
+import it.uniud.easyhome.devices.states.LampState;
+import it.uniud.easyhome.devices.states.PresenceSensorState;
 import it.uniud.easyhome.exceptions.InvalidNodeLogicalTypeException;
 import it.uniud.easyhome.exceptions.InvalidPacketTypeException;
 import it.uniud.easyhome.network.LocalCoordinates;
@@ -88,6 +94,9 @@ public class OccupancySensingRegistrationProcess extends Process {
 					                restResource.path(RestPaths.LOCATIONS).path(Integer.toString(location.getId())).path(occupied ? "occupied" : "unoccupied").put(ClientResponse.class);
 					                restResource.path(RestPaths.STATES).path("sensors").path("presence").path(Long.toString(sender.getInfo().getId())).path(occupied ? "occupied" : "unoccupied").put(ClientResponse.class);
 				                	log(LogLevel.INFO, location + " is now " + (occupied ? "occupied" : "unoccupied"));
+
+				                	updateAlarms(occupied, location);
+				                	
 				                } else
 				                	log(LogLevel.FINE, "No change in occupancy state");
 		        			}
@@ -102,6 +111,89 @@ public class OccupancySensingRegistrationProcess extends Process {
 				}
         	}
     	}
+    }
+    
+    private void updateAlarms(boolean occupied, Location location) throws JSONException {
+    	
+		ClientResponse fridgesResponse = restResource.path(RestPaths.STATES).path("fridges").accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+		FridgeCode alarmCode = JsonUtils.getListFrom(fridgesResponse, FridgeState.class).get(0).getLastCode();
+    	
+		synchronized(nodesLock) {
+			
+    		MultivaluedMap<String,String> params = new MultivaluedMapImpl();
+            params.add("deviceType",DeviceType.COLORED_LAMP.toString());
+            params.add("locationId",Integer.toString(location.getId()));
+    		ClientResponse nodesResponse = restResource.path(RestPaths.NODES).queryParams(params).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+    		
+    		if (nodesResponse.getClientResponseStatus() == ClientResponse.Status.OK) {
+
+    			List<Node> nodes = JsonUtils.getListFrom(nodesResponse, Node.class);
+
+    			for (Node node : nodes) {
+            		
+            		ClientResponse lampResponse = restResource.path(RestPaths.STATES).path("lamps").path(Long.toString(node.getInfo().getId()))
+            												  .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+            		LampState lampState = JsonUtils.getFrom(lampResponse, LampState.class);
+            		
+            		MultivaluedMap<String,String> formData = new MultivaluedMapImpl();
+            		ColoredAlarm alarmToIssue = null;
+            		switch (alarmCode) {
+	            		case ALARM1:
+	            			if (occupied)
+	            				alarmToIssue = ColoredAlarm.RED_FIXED;
+	            			else
+	            				alarmToIssue = ColoredAlarm.NONE;
+	            			break;
+	            		case ALARM2:
+	            			if (occupied)
+	            				alarmToIssue = ColoredAlarm.RED_BLINK;
+	            			else
+	            				alarmToIssue = ColoredAlarm.NONE;
+	            			break;
+	            		case ALARM3:
+	            			if (occupied)
+	            				alarmToIssue = ColoredAlarm.BLUE_FIXED;
+	            			else
+	            				alarmToIssue = ColoredAlarm.NONE;
+	            			break;
+	            		case ALARM4:
+	            			if (occupied)
+	            				alarmToIssue = ColoredAlarm.BLUE_BLINK;
+	            			else
+	            				alarmToIssue = ColoredAlarm.NONE;
+	            			break;
+	            		case ALARM5:
+	            			if (occupied)
+	            				alarmToIssue = ColoredAlarm.GREEN_FIXED;
+	            			else
+	            				alarmToIssue = ColoredAlarm.NONE;
+	            			break;
+	            		case ALARM6:
+	            			if (occupied)
+	            				alarmToIssue = ColoredAlarm.GREEN_BLINK;
+	            			else
+	            				alarmToIssue = ColoredAlarm.NONE;
+	            			break;					            			
+	            		default:
+	            			alarmToIssue = ColoredAlarm.NONE;
+            		}
+            		
+            		if (alarmToIssue != lampState.getAlarm()) {
+	            		formData.add("value",alarmToIssue.toString());
+		                restResource.path(RestPaths.STATES).path("lamps").path(Long.toString(node.getInfo().getId())).path("alarm")
+            						.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+		                log(LogLevel.INFO, "Alarm set for lamp id " + node.getId() + " (" + (occupied ? "occupied":"unoccupied") 
+            					+ "): " + alarmToIssue);
+            		} else
+            			log(LogLevel.FINE, "Alarm for lamp id " + node.getId() + " (" + (occupied ? "occupied":"unoccupied") 
+            					+ ") not changed");
+    			}
+    			
+        	} else
+        		log(LogLevel.FINE, "No lamp actuators are available for alarms, ignoring");
+		
+		}
+    	
     }
 
 }
