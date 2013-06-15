@@ -280,7 +280,7 @@ public class UserInterfaceResource {
 	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)3)).path(Long.toString(0x424752L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	        long lampadaCameraDoppiaInfoId = JsonUtils.getFrom(response, PersistentInfo.class).getId();
 	        
-	        // Frigo
+	        // Frigo        
 	        
 	        formData = new MultivaluedMapImpl();
 	        formData.add("name","Frigo (PLC)");
@@ -293,6 +293,7 @@ public class UserInterfaceResource {
 	        
 	        // ZigBee devices
 	        
+	    	/*
 	        formData = new MultivaluedMapImpl();
 	        formData.add("name","Frigo");
 	        formData.add("locationName",locs.get(1));
@@ -301,6 +302,15 @@ public class UserInterfaceResource {
 	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928327L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
 	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928327L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 	    	long frigoZigBeeInfoId = JsonUtils.getFrom(response, PersistentInfo.class).getId();	 
+	    	*/
+	        formData = new MultivaluedMapImpl();
+	        formData.add("name","Frigo (fake)");
+	        formData.add("locationName",locs.get(1));
+	        formData.add("imgPath","img/fridge.svg");
+	        formData.add("help", "Nessuna funzione correntemente disponibile");
+	    	client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928337L)).type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).post(ClientResponse.class,formData);
+	    	response = client.resource(TARGET).path(RestPaths.PERSISTENTINFO).path(Byte.toString((byte)2)).path(Long.toString(5526146523928337L)).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+	    	long frigoZigBeeInfoId = JsonUtils.getFrom(response, PersistentInfo.class).getId();	
 	    	
 	        formData = new MultivaluedMapImpl();
 	        formData.add("name","Gateway ZigBee");
