@@ -1,0 +1,1 @@
+EasyHome is a Java EE application that enables the interaction of nodes from heterogeneous networks, with particular emphasis on the ZigBee standard. 
